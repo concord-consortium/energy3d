@@ -844,7 +844,7 @@ public class Scene implements Serializable {
 		}
 		if (walls != null && !walls.isEmpty()) {
 			for (final Wall w : walls) {
-				w.connectedWalls();
+				w.connectWithOtherWalls(w.getTopContainer(), true);
 			}
 			for (final Wall w : walls) {
 				w.computeInsideDirectionOfAttachedWalls(false);

@@ -346,7 +346,7 @@ public class Wall extends HousePart implements Thermal {
 		super.complete();
 	}
 
-	protected boolean snapToWall(final Vector3 p, final int index) {
+	private boolean snapToWall(final Vector3 p, final int index) {
 		ReadOnlyVector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
 		for (final HousePart housePart : container.getChildren()) {
@@ -1601,20 +1601,38 @@ public class Wall extends HousePart implements Thermal {
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getWallColor() : getColor());
 	}
 
-	public void connectedWalls() {
+	public void connectWithOtherWalls(final Foundation foundation, final boolean requireDrawCompletion) {
 		if (!isDrawable() || (neighbors[0] != null && neighbors[1] != null)) {
 			return;
 		}
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall && part != this && part.isDrawCompleted()) {
-				final Wall otherWall = (Wall) part;
-				for (int index = 0; index < 2; index++) {
-					if (neighbors[index] == null) {
-						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
-							// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
-							if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
-								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
-								break;
+		if (requireDrawCompletion) {
+			for (final HousePart part : foundation.children) {
+				if (part instanceof Wall && part != this && part.isDrawCompleted()) {
+					final Wall otherWall = (Wall) part;
+					for (int index = 0; index < 2; index++) {
+						if (neighbors[index] == null) {
+							for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
+								// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+								if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+									setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			for (final HousePart part : foundation.children) {
+				if (part instanceof Wall && part != this) {
+					final Wall otherWall = (Wall) part;
+					for (int index = 0; index < 2; index++) {
+						if (neighbors[index] == null) {
+							for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
+								if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+									setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
+									break;
+								}
 							}
 						}
 					}

@@ -151,10 +151,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public Foundation(final double xLength, final double yLength) {
 		super(2, 12, 1, true);
-		points.get(0).set(-xLength / 2.0, -yLength / 2.0, 0);
-		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
-		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
-		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
+		final double halfXLength = 0.5 * xLength;
+		final double halfYLength = 0.5 * yLength;
+		points.get(0).set(-halfXLength, -halfYLength, 0);
+		points.get(2).set(halfXLength, -halfYLength, 0);
+		points.get(1).set(-halfXLength, halfYLength, 0);
+		points.get(3).set(halfXLength, halfYLength, 0);
 	}
 
 	@Override
@@ -4273,7 +4275,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 		if (walls != null && !walls.isEmpty()) {
 			for (final Wall w : walls) {
-				w.connectedWalls();
+				w.connectWithOtherWalls(this, true);
 			}
 			for (final Wall w : walls) {
 				w.computeInsideDirectionOfAttachedWalls(false);

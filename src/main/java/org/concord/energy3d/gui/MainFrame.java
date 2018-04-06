@@ -1374,6 +1374,13 @@ public class MainFrame extends JFrame {
 			});
 
 			analysisMenu.add(getSimulationSettingsMenuItem());
+
+			final JMenu weatherMenu = new JMenu("Weather");
+			weatherMenu.add(getMonthlySunshineHoursMenuItem());
+			weatherMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
+			weatherMenu.add(getDailyEnvironmentalTemperatureMenuItem());
+			analysisMenu.add(weatherMenu);
+
 			analysisMenu.addSeparator();
 
 			final JMenu buildingsMenu = new JMenu("Buildings");
@@ -1425,6 +1432,7 @@ public class MainFrame extends JFrame {
 
 			analysisMenu.add(getCostAnalysisMenuItem());
 			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
+
 		}
 		return analysisMenu;
 	}
@@ -1687,15 +1695,10 @@ public class MainFrame extends JFrame {
 			solarHeatMapMenu.add(getOnlyReflectionHeatMapMenuItem());
 			solarHeatMapMenu.add(getShowSolarLandMenuItem());
 
-			final JMenu weatherMenu = new JMenu("Weather");
-			weatherMenu.add(getMonthlySunshineHoursMenuItem());
-			weatherMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
-			weatherMenu.add(getDailyEnvironmentalTemperatureMenuItem());
-
-			// viewMenu.add(getUnitsMenu()); // disable temporarily because it doesn't work to expectation
+			viewMenu.add(getVisualizationSettingsMenuItem());
+			viewMenu.addSeparator();
 			viewMenu.add(getOrbitMenuItem());
 			viewMenu.add(getFirstPersonMenuItem());
-			viewMenu.addSeparator();
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(orbitMenuItem);
 			bg.add(firstPersonMenuItem);
@@ -1704,12 +1707,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomInMenuItem());
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getGroundImageMenu());
 			viewMenu.add(getThemeMenu());
 			viewMenu.add(getTextureMenu());
-			viewMenu.addSeparator();
-			viewMenu.add(getVisualizationSettingsMenuItem());
-			viewMenu.add(getGroundImageMenu());
-			viewMenu.add(weatherMenu);
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -2547,7 +2547,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSimulationSettingsMenuItem() {
 		if (simulationSettingsMenuItem == null) {
-			simulationSettingsMenuItem = new JMenuItem("Change Simulation Settings...");
+			simulationSettingsMenuItem = new JMenuItem("Simulation Settings...");
 			simulationSettingsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2560,7 +2560,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getVisualizationSettingsMenuItem() {
 		if (visualizationSettingsMenuItem == null) {
-			visualizationSettingsMenuItem = new JMenuItem("Change Visualization Settings...");
+			visualizationSettingsMenuItem = new JMenuItem("Visualization Settings...");
 			visualizationSettingsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

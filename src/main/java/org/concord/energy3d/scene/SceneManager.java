@@ -259,7 +259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_EXTERIOR_WALL, DRAW_INTERIOR_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_RACK, DRAW_MIRROR, DRAW_PARABOLIC_TROUGH, DRAW_PARABOLIC_DISH, DRAW_FRESNEL_REFLECTOR, DRAW_SOLAR_WATER_HEATER, DRAW_TAPE_MEASURE, DRAW_SENSOR, DRAW_PLANT, DRAW_HUMAN
+		SELECT, RESIZE, ROTATE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_EXTERIOR_WALL, DRAW_INTERIOR_WALL, DRAW_DOOR, ADD_ROOF_PYRAMID, ADD_ROOF_HIP, ADD_ROOF_SHED, ADD_ROOF_GAMBREL, ADD_ROOF_CUSTOM, GABLE_ROOF, ADD_FLOOR, ADD_SOLAR_PANEL, ADD_RACK, ADD_HELIOSTAT, ADD_PARABOLIC_TROUGH, ADD_PARABOLIC_DISH, ADD_FRESNEL_REFLECTOR, ADD_SOLAR_WATER_HEATER, ADD_TAPE_MEASURE, ADD_SENSOR, ADD_BOX, ADD_PLANT, ADD_HUMAN
 	}
 
 	public enum CameraMode {
@@ -1536,46 +1536,46 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn.setColor(Scene.getInstance().getDoorColor());
 		} else if (operation == Operation.DRAW_WINDOW) {
 			drawn = new Window();
-		} else if (operation == Operation.DRAW_ROOF_PYRAMID) {
+		} else if (operation == Operation.ADD_ROOF_PYRAMID) {
 			drawn = new PyramidRoof();
 			drawn.setColor(Scene.getInstance().getRoofColor());
-		} else if (operation == Operation.DRAW_ROOF_HIP) {
+		} else if (operation == Operation.ADD_ROOF_HIP) {
 			drawn = new HipRoof();
 			drawn.setColor(Scene.getInstance().getRoofColor());
-		} else if (operation == Operation.DRAW_ROOF_SHED) {
+		} else if (operation == Operation.ADD_ROOF_SHED) {
 			drawn = new ShedRoof();
 			drawn.setColor(Scene.getInstance().getRoofColor());
-		} else if (operation == Operation.DRAW_ROOF_GAMBREL) {
+		} else if (operation == Operation.ADD_ROOF_GAMBREL) {
 			drawn = new GambrelRoof();
 			drawn.setColor(Scene.getInstance().getRoofColor());
-		} else if (operation == Operation.DRAW_ROOF_CUSTOM) {
+		} else if (operation == Operation.ADD_ROOF_CUSTOM) {
 			drawn = new CustomRoof();
 			drawn.setColor(Scene.getInstance().getRoofColor());
-		} else if (operation == Operation.DRAW_FLOOR) {
+		} else if (operation == Operation.ADD_FLOOR) {
 			drawn = new Floor();
 			drawn.setColor(Scene.getInstance().getFloorColor());
-		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
+		} else if (operation == Operation.ADD_SOLAR_PANEL) {
 			drawn = new SolarPanel();
-		} else if (operation == Operation.DRAW_RACK) {
+		} else if (operation == Operation.ADD_RACK) {
 			drawn = new Rack();
-		} else if (operation == Operation.DRAW_MIRROR) {
+		} else if (operation == Operation.ADD_HELIOSTAT) {
 			drawn = new Mirror();
-		} else if (operation == Operation.DRAW_PARABOLIC_TROUGH) {
+		} else if (operation == Operation.ADD_PARABOLIC_TROUGH) {
 			drawn = new ParabolicTrough();
-		} else if (operation == Operation.DRAW_PARABOLIC_DISH) {
+		} else if (operation == Operation.ADD_PARABOLIC_DISH) {
 			drawn = new ParabolicDish();
-		} else if (operation == Operation.DRAW_FRESNEL_REFLECTOR) {
+		} else if (operation == Operation.ADD_FRESNEL_REFLECTOR) {
 			drawn = new FresnelReflector();
-		} else if (operation == Operation.DRAW_SENSOR) {
+		} else if (operation == Operation.ADD_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
 			setGridsVisible(Scene.getInstance().isSnapToGrids());
 			drawn.setColor(Scene.getInstance().getFoundationColor());
-		} else if (operation == Operation.DRAW_PLANT) {
+		} else if (operation == Operation.ADD_PLANT) {
 			drawn = new Tree();
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_HUMAN) {
+		} else if (operation == Operation.ADD_HUMAN) {
 			drawn = new Human();
 			setGridsVisible(true);
 		} else {
@@ -1876,18 +1876,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void run() {
 				final Component canvasComponent = (Component) canvas;
-				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
-					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
-						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-					} else if (hoveredPart instanceof SolarCollector) {
-						if (pick.getEditPointIndex() >= 0) {
-							canvasComponent.setCursor(Cursor.getPredefinedCursor(pick.getEditPointIndex() == 0 ? Cursor.MOVE_CURSOR : Cursor.HAND_CURSOR));
-						}
-					} else {
-						if (pick.getEditPointIndex() == -1) {
-							if (hoveredPart instanceof Window) { // for windows, there is no apparent move point
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				if (operation == Operation.ADD_BOX) {
+					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				} else {
+					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
+						if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
+							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+						} else if (hoveredPart instanceof SolarCollector) {
+							if (pick.getEditPointIndex() >= 0) {
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(pick.getEditPointIndex() == 0 ? Cursor.MOVE_CURSOR : Cursor.HAND_CURSOR));
+							}
+						} else {
+							if (pick.getEditPointIndex() == -1) {
+								if (hoveredPart instanceof Window) { // for windows, there is no apparent move point
+									canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+								}
 							}
 						}
 					}
@@ -2087,7 +2091,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				System.out.println("OPERATION: " + operation);
 				try {
-					if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
+					if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.GABLE_ROOF) {
 						if (selectedPart == null || selectedPart.isDrawCompleted()) {
 							final HousePart previousSelectedPart = selectedPart;
 							final PickedHousePart pickedPart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
@@ -2227,7 +2231,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 							}
 							SelectUtil.nextPickLayer();
-							if (operation == Operation.DRAW_ROOF_GABLE && selectedPart instanceof Roof) {
+							if (operation == Operation.GABLE_ROOF && selectedPart instanceof Roof) {
 								System.out.println("deleting roof #" + pick.getEditPointIndex());
 								final int roofPartIndex = pick.getEditPointIndex();
 								final Roof roof = (Roof) selectedPart;
@@ -2256,124 +2260,132 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public Object call() {
 				try {
-					if (selectedPart != null) {
-						selectedPart.setGridsVisible(false);
-						selectedPart.setLinePatternVisible(false);
-					}
-					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-						if (selectedPart != null && (!selectedPart.isDrawCompleted() || objectMoveStartPoint != null)) {
-							if (selectedPart.isDrawable()) {
-								selectedPart.complete();
-								if (editPartCommand != null && editPartCommand.isReallyEdited()) {
-									if (SceneManager.getInstance().getSolarHeatMap()) {
-										EnergyPanel.getInstance().updateRadiationHeatMap();
-									}
-								}
-							} else {
-								if (editPartCommand != null) {
-									editPartCommand.undo();
-									selectedPart.setHighlight(false);
-									selectedPart.complete();
-								}
-							}
-							if (editPartCommand != null) {
-								if (isTooFar(selectedPart)) {
-									editPartCommand.undo();
-									final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
-									EventQueue.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Moving " + name + " was not allowed because it was moved too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
-										}
-									});
-								} else {
-									if (editPartCommand.isReallyEdited()) {
-										undoManager.addEdit(editPartCommand);
-									}
-								}
-								editPartCommand = null;
-							}
-						}
-						if (!zoomLock) {
+					if (operation == Operation.ADD_BOX) {
+						Scene.getInstance().importFile(MainApplication.class.getResource("prefabs/box.ng3"));
+						if (!operationStick) {
+							MainPanel.getInstance().defaultTool();
 							cameraControl.setLeftMouseButtonEnabled(true);
 						}
-						objectMoveStartPoint = null;
-						if (objectMovePoints != null) {
-							objectMovePoints.clear();
-						}
-						if (objectGroupMovePoints != null) {
-							objectGroupMovePoints.clear();
-						}
-						if (cameraChanged) {
-							TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
-							cameraChanged = false;
-						}
 					} else {
-						if (selectedPart != null && !selectedPart.isDrawCompleted()) {
-							selectedPart.addPoint(mouseState.getX(), mouseState.getY());
-							if (selectedPart.isDrawCompleted() && !selectedPart.isDrawable()) {
-								addPartCommand = null;
-								Scene.getInstance().remove(selectedPart, true);
-								selectedPart = null;
-								if (operationStick) {
-									operationFlag = true;
-								}
-							}
+						if (selectedPart != null) {
+							selectedPart.setGridsVisible(false);
+							selectedPart.setLinePatternVisible(false);
 						}
-						if (selectedPart != null && selectedPart.isDrawCompleted()) {
-							final boolean drawCompletedOrg = selectedPart.isDrawCompleted();
-							selectedPart.setDrawCompleted(false); // because solar panels.isDrawble() only works if incomplete
-							if (selectedPart.isDrawable()) {
-								selectedPart.setDrawCompleted(drawCompletedOrg);
-								if (addPartCommand != null) {
-									if (isTooFar(selectedPart)) { // prevent an object to be placed at a very far position
-										Scene.getInstance().remove(selectedPart, true);
+						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+							if (selectedPart != null && (!selectedPart.isDrawCompleted() || objectMoveStartPoint != null)) {
+								if (selectedPart.isDrawable()) {
+									selectedPart.complete();
+									if (editPartCommand != null && editPartCommand.isReallyEdited()) {
+										if (SceneManager.getInstance().getSolarHeatMap()) {
+											EnergyPanel.getInstance().updateRadiationHeatMap();
+										}
+									}
+								} else {
+									if (editPartCommand != null) {
+										editPartCommand.undo();
+										selectedPart.setHighlight(false);
+										selectedPart.complete();
+									}
+								}
+								if (editPartCommand != null) {
+									if (isTooFar(selectedPart)) {
+										editPartCommand.undo();
 										final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
 										EventQueue.invokeLater(new Runnable() {
 											@Override
 											public void run() {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Adding " + name + " was not allowed because it was placed too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Moving " + name + " was not allowed because it was moved too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
 											}
 										});
-									} else
-
-									{
-										undoManager.addEdit(addPartCommand);
-										if (selectedPart instanceof Foundation) { // only when we add a new foundation do we ensure the order of its points (later a foundation can be rotated, altering the order)
-											((Foundation) selectedPart).ensureFoundationPointOrder();
+									} else {
+										if (editPartCommand.isReallyEdited()) {
+											undoManager.addEdit(editPartCommand);
 										}
 									}
+									editPartCommand = null;
 								}
-								addPartCommand = null;
-							} else {
-								Scene.getInstance().remove(selectedPart, true);
 							}
-							selectedPart.setEditPointsVisible(false);
-							selectedPart = null;
-							if (operationStick) {
-								operationFlag = true;
+							if (!zoomLock) {
+								cameraControl.setLeftMouseButtonEnabled(true);
 							}
-							if (SceneManager.getInstance().getSolarHeatMap()) {
-								EnergyPanel.getInstance().updateRadiationHeatMap();
+							objectMoveStartPoint = null;
+							if (objectMovePoints != null) {
+								objectMovePoints.clear();
+							}
+							if (objectGroupMovePoints != null) {
+								objectGroupMovePoints.clear();
+							}
+							if (cameraChanged) {
+								TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
+								cameraChanged = false;
+							}
+						} else {
+							if (selectedPart != null && !selectedPart.isDrawCompleted()) {
+								selectedPart.addPoint(mouseState.getX(), mouseState.getY());
+								if (selectedPart.isDrawCompleted() && !selectedPart.isDrawable()) {
+									addPartCommand = null;
+									Scene.getInstance().remove(selectedPart, true);
+									selectedPart = null;
+									if (operationStick) {
+										operationFlag = true;
+									}
+								}
+							}
+							if (selectedPart != null && selectedPart.isDrawCompleted()) {
+								final boolean drawCompletedOrg = selectedPart.isDrawCompleted();
+								selectedPart.setDrawCompleted(false); // because solar panels.isDrawble() only works if incomplete
+								if (selectedPart.isDrawable()) {
+									selectedPart.setDrawCompleted(drawCompletedOrg);
+									if (addPartCommand != null) {
+										if (isTooFar(selectedPart)) { // prevent an object to be placed at a very far position
+											Scene.getInstance().remove(selectedPart, true);
+											final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
+											EventQueue.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													JOptionPane.showMessageDialog(MainFrame.getInstance(), "Adding " + name + " was not allowed because it was placed too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+												}
+											});
+										} else
+
+										{
+											undoManager.addEdit(addPartCommand);
+											if (selectedPart instanceof Foundation) { // only when we add a new foundation do we ensure the order of its points (later a foundation can be rotated, altering the order)
+												((Foundation) selectedPart).ensureFoundationPointOrder();
+											}
+										}
+									}
+									addPartCommand = null;
+								} else {
+									Scene.getInstance().remove(selectedPart, true);
+								}
+								selectedPart.setEditPointsVisible(false);
+								selectedPart = null;
+								if (operationStick) {
+									operationFlag = true;
+								}
+								if (SceneManager.getInstance().getSolarHeatMap()) {
+									EnergyPanel.getInstance().updateRadiationHeatMap();
+								}
+							}
+							if (!operationFlag) {
+								MainPanel.getInstance().defaultTool();
+								cameraControl.setLeftMouseButtonEnabled(true);
 							}
 						}
-						if (!operationFlag) {
-							MainPanel.getInstance().defaultTool();
-							cameraControl.setLeftMouseButtonEnabled(true);
+						updateHeliodonAndAnnotationSize();
+						if (selectedPart instanceof Foundation) {
+							final Foundation foundation = (Foundation) selectedPart;
+							if (!foundation.getLockEdit()) {
+								Scene.getInstance().updateTrackables(foundation);
+							}
+						} else if (selectedPart instanceof Rack) {
+							((Rack) selectedPart).ensureFullSolarPanels(true);
+						} else if (selectedPart instanceof ParabolicTrough) {
+							((ParabolicTrough) selectedPart).ensureFullModules(true);
+						} else if (selectedPart instanceof FresnelReflector) {
+							((FresnelReflector) selectedPart).ensureFullModules(true);
 						}
-					}
-					updateHeliodonAndAnnotationSize();
-					if (selectedPart instanceof Foundation) {
-						final Foundation foundation = (Foundation) selectedPart;
-						if (!foundation.getLockEdit()) {
-							Scene.getInstance().updateTrackables(foundation);
-						}
-					} else if (selectedPart instanceof Rack) {
-						((Rack) selectedPart).ensureFullSolarPanels(true);
-					} else if (selectedPart instanceof ParabolicTrough) {
-						((ParabolicTrough) selectedPart).ensureFullModules(true);
-					} else if (selectedPart instanceof FresnelReflector) {
-						((FresnelReflector) selectedPart).ensureFullModules(true);
 					}
 					EnergyPanel.getInstance().update();
 				} catch (final Throwable t) {

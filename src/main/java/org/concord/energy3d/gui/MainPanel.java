@@ -67,7 +67,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton selectButton;
 	private JToggleButton wallButton;
 	private JToggleButton roofButton;
-	private JToggleButton foundationButton;
+	private JToggleButton baseButton;
 	private JToggleButton shadowButton;
 	private JToggleButton spinViewButton;
 	private JToggleButton resizeButton;
@@ -87,19 +87,22 @@ public class MainPanel extends JPanel {
 	private JToggleButton solarButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
+	private JButton baseArrowButton;
 	private JButton wallArrowButton;
 	private JButton roofArrowButton;
 	private JButton miscArrowButton;
 	private JButton solaArrowButton;
 	private int defaultDividerSize = -1;
+	private final JPopupMenu baseMenu;
 	private final JPopupMenu wallMenu;
 	private final JPopupMenu roofMenu;
 	private final JPopupMenu miscMenu;
 	private final JPopupMenu solaMenu;
+	private Operation baseCommand = SceneManager.Operation.DRAW_FOUNDATION;
 	private Operation wallCommand = SceneManager.Operation.DRAW_EXTERIOR_WALL;
-	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
+	private Operation roofCommand = SceneManager.Operation.ADD_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_WINDOW;
-	private Operation solaCommand = SceneManager.Operation.DRAW_RACK;
+	private Operation solaCommand = SceneManager.Operation.ADD_RACK;
 	private final double rotationAngleAbsolute = 5 * Math.PI / 180;
 	private double rotationAngle = -rotationAngleAbsolute;
 	private String noteString = "";
@@ -137,6 +140,35 @@ public class MainPanel extends JPanel {
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
 
+		// create base menu
+		final JCheckBoxMenuItem miFoundation = new JCheckBoxMenuItem("Foundation", new ImageIcon(getClass().getResource("icons/foundation.png")), true);
+		final JCheckBoxMenuItem miBox = new JCheckBoxMenuItem("Box", new ImageIcon(getClass().getResource("icons/box.png")), true);
+		final ActionListener baseAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
+				baseButton.setIcon(selected.getIcon());
+				if (selected == miFoundation) {
+					baseCommand = SceneManager.Operation.DRAW_FOUNDATION;
+					baseButton.setToolTipText("Draw a foundation");
+				} else if (selected == miBox) {
+					baseCommand = SceneManager.Operation.ADD_BOX;
+					baseButton.setToolTipText("Add a box");
+				}
+				SceneManager.getInstance().setOperation(baseCommand);
+				baseButton.setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+			}
+		};
+		miFoundation.addActionListener(baseAction);
+		miBox.addActionListener(baseAction);
+		baseMenu = new JPopupMenu();
+		baseMenu.add(miFoundation);
+		baseMenu.add(miBox);
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(miFoundation);
+		bg.add(miBox);
+
 		// create wall menu
 		final JCheckBoxMenuItem miExteriorWall = new JCheckBoxMenuItem("Exterior Wall", new ImageIcon(getClass().getResource("icons/exterior_wall.png")), true);
 		final JCheckBoxMenuItem miInteriorWall = new JCheckBoxMenuItem("Interior Wall", new ImageIcon(getClass().getResource("icons/interior_wall.png")), true);
@@ -148,10 +180,10 @@ public class MainPanel extends JPanel {
 				wallButton.setIcon(selected.getIcon());
 				if (selected == miExteriorWall) {
 					wallCommand = SceneManager.Operation.DRAW_EXTERIOR_WALL;
-					wallButton.setToolTipText("Draw exterior wall");
+					wallButton.setToolTipText("Draw an exterior wall");
 				} else if (selected == miInteriorWall) {
 					wallCommand = SceneManager.Operation.DRAW_INTERIOR_WALL;
-					wallButton.setToolTipText("Draw interior wall");
+					wallButton.setToolTipText("Draw an interior wall");
 				}
 				SceneManager.getInstance().setOperation(wallCommand);
 				wallButton.setSelected(true);
@@ -163,7 +195,7 @@ public class MainPanel extends JPanel {
 		wallMenu = new JPopupMenu();
 		wallMenu.add(miExteriorWall);
 		wallMenu.add(miInteriorWall);
-		ButtonGroup bg = new ButtonGroup();
+		bg = new ButtonGroup();
 		bg.add(miExteriorWall);
 		bg.add(miInteriorWall);
 
@@ -180,23 +212,23 @@ public class MainPanel extends JPanel {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				roofButton.setIcon(selected.getIcon());
 				if (selected == miPyramidRoof) {
-					roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
-					roofButton.setToolTipText("Draw pyramid roof");
+					roofCommand = SceneManager.Operation.ADD_ROOF_PYRAMID;
+					roofButton.setToolTipText("Add a pyramid roof");
 				} else if (selected == miHipRoof) {
-					roofCommand = SceneManager.Operation.DRAW_ROOF_HIP;
-					roofButton.setToolTipText("Draw hip roof");
+					roofCommand = SceneManager.Operation.ADD_ROOF_HIP;
+					roofButton.setToolTipText("Add a hip roof");
 				} else if (selected == miShedRoof) {
-					roofCommand = SceneManager.Operation.DRAW_ROOF_SHED;
-					roofButton.setToolTipText("Draw shed roof");
+					roofCommand = SceneManager.Operation.ADD_ROOF_SHED;
+					roofButton.setToolTipText("Add a shed roof");
 				} else if (selected == miGambrelRoof) {
-					roofCommand = SceneManager.Operation.DRAW_ROOF_GAMBREL;
-					roofButton.setToolTipText("Draw gambrel roof");
+					roofCommand = SceneManager.Operation.ADD_ROOF_GAMBREL;
+					roofButton.setToolTipText("Add a gambrel roof");
 				} else if (selected == miCustomRoof) {
-					roofCommand = SceneManager.Operation.DRAW_ROOF_CUSTOM;
-					roofButton.setToolTipText("Draw custom roof");
+					roofCommand = SceneManager.Operation.ADD_ROOF_CUSTOM;
+					roofButton.setToolTipText("Add a custom roof");
 				} else {
-					roofCommand = Operation.DRAW_ROOF_GABLE;
-					roofButton.setToolTipText("Convert to gable roof");
+					roofCommand = Operation.GABLE_ROOF;
+					roofButton.setToolTipText("Convert to a gable roof");
 				}
 				SceneManager.getInstance().setOperation(roofCommand);
 				roofButton.setSelected(true);
@@ -241,25 +273,25 @@ public class MainPanel extends JPanel {
 				miscButton.setIcon(selected.getIcon());
 				if (selected == miWindow) {
 					miscCommand = SceneManager.Operation.DRAW_WINDOW;
-					miscButton.setToolTipText("Draw window");
+					miscButton.setToolTipText("Draw a window");
 				} else if (selected == miDoor) {
 					miscCommand = SceneManager.Operation.DRAW_DOOR;
-					miscButton.setToolTipText("Draw door");
+					miscButton.setToolTipText("Draw a door");
 				} else if (selected == miFloor) {
-					miscCommand = SceneManager.Operation.DRAW_FLOOR;
-					miscButton.setToolTipText("Draw floor");
+					miscCommand = SceneManager.Operation.ADD_FLOOR;
+					miscButton.setToolTipText("Add a floor");
 				} else if (selected == miPlant) {
-					miscCommand = SceneManager.Operation.DRAW_PLANT;
-					miscButton.setToolTipText("Insert a plant");
+					miscCommand = SceneManager.Operation.ADD_PLANT;
+					miscButton.setToolTipText("Add a plant");
 				} else if (selected == miHuman) {
-					miscCommand = SceneManager.Operation.DRAW_HUMAN;
-					miscButton.setToolTipText("Insert a human");
+					miscCommand = SceneManager.Operation.ADD_HUMAN;
+					miscButton.setToolTipText("Add a human");
 				} else if (selected == miSensor) {
-					miscCommand = SceneManager.Operation.DRAW_SENSOR;
-					miscButton.setToolTipText("Insert a sensor module");
+					miscCommand = SceneManager.Operation.ADD_SENSOR;
+					miscButton.setToolTipText("Add a sensor module");
 				} else if (selected == miTapeMeasure) {
-					miscCommand = SceneManager.Operation.DRAW_TAPE_MEASURE;
-					miscButton.setToolTipText("Insert a tape measure");
+					miscCommand = SceneManager.Operation.ADD_TAPE_MEASURE;
+					miscButton.setToolTipText("Add a tape measure");
 				}
 				SceneManager.getInstance().setOperation(miscCommand);
 				miscButton.setSelected(true);
@@ -307,26 +339,26 @@ public class MainPanel extends JPanel {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				solarButton.setIcon(selected.getIcon());
 				if (selected == miSolarPanel) {
-					solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
-					solarButton.setToolTipText("Insert a single solar panel");
+					solaCommand = SceneManager.Operation.ADD_SOLAR_PANEL;
+					solarButton.setToolTipText("Add a single solar panel");
 				} else if (selected == miRack) {
-					solaCommand = SceneManager.Operation.DRAW_RACK;
-					solarButton.setToolTipText("Insert a rack of solar panels");
+					solaCommand = SceneManager.Operation.ADD_RACK;
+					solarButton.setToolTipText("Add a rack of solar panels");
 				} else if (selected == miHeliostat) {
-					solaCommand = SceneManager.Operation.DRAW_MIRROR;
-					solarButton.setToolTipText("Insert a heliostat");
+					solaCommand = SceneManager.Operation.ADD_HELIOSTAT;
+					solarButton.setToolTipText("Add a heliostat");
 				} else if (selected == miParabolicTrough) {
-					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_TROUGH;
-					solarButton.setToolTipText("Insert a parabolic trough");
+					solaCommand = SceneManager.Operation.ADD_PARABOLIC_TROUGH;
+					solarButton.setToolTipText("Add a parabolic trough");
 				} else if (selected == miParabolicDish) {
-					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_DISH;
-					solarButton.setToolTipText("Insert a parabolic dish");
+					solaCommand = SceneManager.Operation.ADD_PARABOLIC_DISH;
+					solarButton.setToolTipText("Add a parabolic dish");
 				} else if (selected == miFresnelReflector) {
-					solaCommand = SceneManager.Operation.DRAW_FRESNEL_REFLECTOR;
-					solarButton.setToolTipText("Insert a linear Fresnel reflector");
+					solaCommand = SceneManager.Operation.ADD_FRESNEL_REFLECTOR;
+					solarButton.setToolTipText("Add a linear Fresnel reflector");
 				} else if (selected == miSolarWaterHeater) {
-					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
-					solarButton.setToolTipText("Insert a solar water heater");
+					solaCommand = SceneManager.Operation.ADD_SOLAR_WATER_HEATER;
+					solarButton.setToolTipText("Add a solar water heater");
 				}
 				SceneManager.getInstance().setOperation(solaCommand);
 				solarButton.setSelected(true);
@@ -383,7 +415,8 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getRotateButton());
 			appToolbar.addSeparator();
-			appToolbar.add(getFoundationButton());
+			appToolbar.add(getBaseButton());
+			appToolbar.add(getBaseArrowButton());
 			appToolbar.add(getWallButton());
 			appToolbar.add(getWallArrowButton());
 			appToolbar.add(getRoofButton());
@@ -401,7 +434,7 @@ public class MainPanel extends JPanel {
 			bg.add(selectButton);
 			bg.add(zoomButton);
 			bg.add(resizeButton);
-			bg.add(foundationButton);
+			bg.add(baseButton);
 			bg.add(wallButton);
 			bg.add(roofButton);
 			bg.add(solarButton);
@@ -451,7 +484,7 @@ public class MainPanel extends JPanel {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
 			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/exterior_wall.png")));
-			wallButton.setToolTipText("Draw exterior wall");
+			wallButton.setToolTipText("Draw an exterior wall");
 			wallButton.setFocusable(false);
 			wallButton.addActionListener(new ActionListener() {
 				@Override
@@ -489,7 +522,7 @@ public class MainPanel extends JPanel {
 		if (miscButton == null) {
 			miscButton = new JToggleButton();
 			miscButton.setText("");
-			miscButton.setToolTipText("Draw window");
+			miscButton.setToolTipText("Draw a window");
 			miscButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
 			miscButton.setFocusable(false);
 			miscButton.addActionListener(new ActionListener() {
@@ -524,23 +557,42 @@ public class MainPanel extends JPanel {
 		return miscArrowButton;
 	}
 
-	private JToggleButton getFoundationButton() {
-		if (foundationButton == null) {
-			foundationButton = new JToggleButton();
-			foundationButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
-			foundationButton.setToolTipText("Draw foundation");
-			foundationButton.setFocusable(false);
-			foundationButton.addActionListener(new ActionListener() {
+	private JToggleButton getBaseButton() {
+		if (baseButton == null) {
+			baseButton = new JToggleButton();
+			baseButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
+			baseButton.setToolTipText("Draw a foundation");
+			baseButton.setFocusable(false);
+			baseButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
+					SceneManager.getInstance().setOperation(baseCommand);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			foundationButton.addMouseListener(operationStickAndRefreshUponExit);
-			addMouseOverEffect(foundationButton);
+			baseButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(baseButton);
 		}
-		return foundationButton;
+		return baseButton;
+	}
+
+	private JButton getBaseArrowButton() {
+		if (baseArrowButton == null) {
+			baseArrowButton = new JButton();
+			baseArrowButton.setFocusable(false);
+			final Dimension d = new Dimension(12, baseButton.getMaximumSize().height);
+			baseArrowButton.setMaximumSize(d);
+			baseArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
+			baseArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					baseMenu.show(baseButton, 0, baseButton.getHeight());
+				}
+			});
+			baseArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			baseArrowButton.setFocusPainted(false);
+		}
+		return baseArrowButton;
 	}
 
 	public JToggleButton getShadowButton() {
@@ -921,7 +973,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Add solar panel rack");
+			solarButton.setToolTipText("Add a solar panel rack");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/rack.png")));
 			solarButton.setFocusable(false);
 			solarButton.addActionListener(new ActionListener() {
@@ -960,7 +1012,7 @@ public class MainPanel extends JPanel {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
 			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/pyramid_roof.png")));
-			roofButton.setToolTipText("Draw pyramid roof");
+			roofButton.setToolTipText("Add a pyramid roof");
 			roofButton.setFocusable(false);
 			roofButton.addActionListener(new ActionListener() {
 				@Override
