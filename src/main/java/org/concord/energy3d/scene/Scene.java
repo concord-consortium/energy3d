@@ -708,7 +708,7 @@ public class Scene implements Serializable {
 		// remove all undrawables
 		final ArrayList<HousePart> a = new ArrayList<HousePart>();
 		for (final HousePart p : parts) {
-			if (!p.isDrawable()) {
+			if (!p.isDrawable() || p.getNormal() == null) {
 				a.add(p);
 			}
 		}

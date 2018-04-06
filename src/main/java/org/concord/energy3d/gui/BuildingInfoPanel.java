@@ -135,7 +135,7 @@ public class BuildingInfoPanel extends JPanel {
 
 	void update(final Foundation foundation) {
 		final Building b = new Building(foundation);
-		if (b.isWallComplete()) {
+		if (b.areWallsAcceptable()) {
 			b.calculate();
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:

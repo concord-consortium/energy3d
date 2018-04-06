@@ -94,7 +94,7 @@ public class BuildingCost extends ProjectCost {
 		if (part instanceof Foundation) {
 			final Foundation foundation = (Foundation) part;
 			final Building b = new Building(foundation);
-			if (b.isWallComplete()) {
+			if (b.areWallsAcceptable()) {
 				b.calculate();
 				final double uFactor = foundation.getUValue();
 				final double unitPrice = 300.0 + 8.0 / uFactor;

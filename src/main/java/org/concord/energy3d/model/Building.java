@@ -30,7 +30,7 @@ public class Building {
 	private Roof roof;
 	private final ArrayList<Vector2> wallVertices;
 	private double area, height, cx, cy, wallArea, windowArea, windowToFloorRatio;
-	private boolean wallComplete;
+	private boolean wallAcceptable;
 	private Path2D.Double wallPath;
 
 	public Building(final Foundation foundation) {
@@ -88,11 +88,11 @@ public class Building {
 					wallVertices.add(v2);
 			}
 		});
-		wallComplete = walls.size() == wallVertices.size();
+		wallAcceptable = walls.size() == wallVertices.size();
 	}
 
-	public boolean isWallComplete() {
-		return wallComplete;
+	public boolean areWallsAcceptable() {
+		return wallAcceptable;
 	}
 
 	public Foundation getFoundation() {
@@ -109,7 +109,7 @@ public class Building {
 		final double scale = Scene.getInstance().getAnnotationScale();
 		height = foundation.getBoundingHeight() * scale;
 
-		if (!wallComplete)
+		if (!wallAcceptable)
 			return false;
 
 		final int n = wallVertices.size();
@@ -208,7 +208,7 @@ public class Building {
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {
-		if (!wallComplete)
+		if (!wallAcceptable)
 			return false;
 		final int n = wallVertices.size();
 		if (n == 0)
@@ -295,7 +295,7 @@ public class Building {
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
 				Building b = new Building((Foundation) p);
-				if (b.isWallComplete() && !buildings.contains(b)) {
+				if (b.areWallsAcceptable() && !buildings.contains(b)) {
 					buildings.add(b);
 				}
 			}

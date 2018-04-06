@@ -102,7 +102,7 @@ class LoggerUtil {
 		if (bid != -1 && bid == p.getId()) {
 			if (p instanceof Foundation) {
 				Building b = new Building((Foundation) p);
-				if (b.isWallComplete()) {
+				if (b.areWallsAcceptable()) {
 					s += ", " + b.geometryToJson();
 				}
 			}

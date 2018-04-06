@@ -1070,7 +1070,7 @@ public abstract class HousePart implements Serializable {
 		double a = area;
 		if (this instanceof Foundation) {
 			final Building building = new Building((Foundation) this);
-			if (building.isWallComplete()) {
+			if (building.areWallsAcceptable()) {
 				building.calculate();
 				a = building.getArea(); // reduce the area of the foundation to the floor area within the building envelope
 			}

@@ -274,7 +274,7 @@ public class Floor extends HousePart {
 	@Override
 	protected void computeArea() {
 		final Building b = new Building(getTopContainer());
-		if (b.isWallComplete()) {
+		if (b.areWallsAcceptable()) {
 			b.calculate();
 			area = b.getArea();
 		} else {

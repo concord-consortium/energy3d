@@ -147,8 +147,8 @@ public abstract class Analysis {
 		Scene.getInstance().redrawAllNow();
 	}
 
-	static boolean isBuildingComplete(final Foundation foundation) {
-		return new Building(foundation).isWallComplete();
+	static boolean isBuildingAcceptable(final Foundation foundation) {
+		return new Building(foundation).areWallsAcceptable();
 	}
 
 	public abstract String toJson();

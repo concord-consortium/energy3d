@@ -155,7 +155,7 @@ public class EnergyAngularAnalysis extends Analysis {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
-			if (!isBuildingComplete((Foundation) selectedPart)) {
+			if (!isBuildingAcceptable((Foundation) selectedPart)) {
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 					return;
 				}

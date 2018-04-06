@@ -207,8 +207,8 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.WARNING_MESSAGE);
 						return;
 					}
-					if (!isBuildingComplete((Foundation) selectedPart)) {
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+					if (!isBuildingAcceptable((Foundation) selectedPart)) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>The selected building cannot be accepted for this analysis.<br>Are you sure to continue?</html>", "Unacceptable Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 							return;
 						}
 					}

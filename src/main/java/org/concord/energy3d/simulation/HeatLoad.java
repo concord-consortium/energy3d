@@ -123,7 +123,7 @@ public class HeatLoad {
 						}
 						final Building building = new Building(foundation);
 						double area;
-						if (building.isWallComplete()) {
+						if (building.areWallsAcceptable()) {
 							building.calculate();
 							area = building.getArea();
 						} else {

@@ -102,7 +102,7 @@ class GlobalMap extends JDialog {
 		final JLabel regionsLabel = new JLabel("Regions:");
 		if (Config.isMac()) {
 			regionsLabel.setFont(new Font(regionsLabel.getFont().getName(), Font.PLAIN, regionsLabel.getFont().getSize() - 2));
-			regionsComboBox.setFont(new Font(regionsComboBox.getFont().getName(), Font.PLAIN, regionsComboBox.getFont().getSize() - 2));
+			regionsComboBox.setFont(new Font(regionsComboBox.getFont().getName(), Font.PLAIN, regionsComboBox.getFont().getSize() - 3));
 			countriesComboBox.setFont(regionsComboBox.getFont());
 		}
 		final ItemListener listener = new ItemListener() {
