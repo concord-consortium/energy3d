@@ -450,7 +450,7 @@ public class MainPanel extends JPanel {
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					button.setBackground(defaultColor);
+					button.setBackground(button.isSelected() ? SystemColor.controlShadow : defaultColor);
 				}
 
 				@Override
