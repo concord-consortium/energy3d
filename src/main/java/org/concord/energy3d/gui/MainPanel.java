@@ -450,7 +450,7 @@ public class MainPanel extends JPanel {
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					button.setBackground(button.isSelected() ? SystemColor.controlShadow : defaultColor);
+					button.setBackground(button.isSelected() ? Color.LIGHT_GRAY : defaultColor);
 				}
 
 				@Override
@@ -461,7 +461,7 @@ public class MainPanel extends JPanel {
 			button.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					button.setBackground(button.isSelected() ? SystemColor.controlShadow : defaultColor);
+					button.setBackground(button.isSelected() ? Color.LIGHT_GRAY : defaultColor);
 				}
 			});
 		}
