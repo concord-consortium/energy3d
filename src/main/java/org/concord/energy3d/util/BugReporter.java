@@ -48,6 +48,7 @@ public class BugReporter {
 				@Override
 				public void run() {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Energy3D has temporarily run out of memory. If this message<br>persists, please restart the software.</html>", "Out of Memory", JOptionPane.ERROR_MESSAGE);
+					System.gc();
 				}
 			});
 		} else {

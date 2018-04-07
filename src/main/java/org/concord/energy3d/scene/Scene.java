@@ -319,6 +319,7 @@ public class Scene implements Serializable {
 		if (foundationGroups != null) {
 			foundationGroups.clear();
 		}
+		System.gc();
 	}
 
 	public static void openNow(final URL file) throws Exception {
