@@ -724,27 +724,31 @@ public class MainFrame extends JFrame {
 			recoveryMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File f = SnapshotLogger.getInstance().getLatestSnapshot();
-					if (f != null) {
-						SceneManager.getTaskManager().update(new Callable<Object>() {
-							@Override
-							public Object call() {
-								try {
-									Scene.open(f.toURI().toURL());
-									EventQueue.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											updateTitleBar();
-											JOptionPane.showMessageDialog(MainFrame.instance, "<html>Please overwrite the file you wish to restore with the recovered file.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
-											saveasMenuItem.doClick();
-										}
-									});
-								} catch (final Throwable err) {
-									BugReporter.report(err, "Recovery error");
+					if (Scene.getInstance().getNoSnaphshotLogging()) {
+						JOptionPane.showMessageDialog(instance, "<html>Sorry, your file cannot be recovered as snapshot logging<br>is disabled for it.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						final File f = SnapshotLogger.getInstance().getLatestSnapshot();
+						if (f != null) {
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() {
+									try {
+										Scene.open(f.toURI().toURL());
+										EventQueue.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												updateTitleBar();
+												JOptionPane.showMessageDialog(instance, "<html>Please overwrite the file you wish to restore with the recovered file.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
+												saveasMenuItem.doClick();
+											}
+										});
+									} catch (final Throwable err) {
+										BugReporter.report(err, "Recovery error");
+									}
+									return null;
 								}
-								return null;
-							}
-						});
+							});
+						}
 					}
 				}
 			});
@@ -1254,16 +1258,16 @@ public class MainFrame extends JFrame {
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 			final String title = "<h3>Energy3D</h3><h4><i>Learning to build a sustainable world</i></h4>Version: " + MainApplication.VERSION + ", &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR);
-			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.";
-			final String license = "<br>The program is provided as it is to you under the MIT License.";
+			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Java, Ardor3D, Getdown, JOGL, and Poly2tri.";
+			final String license = "<br>The program is provided to you under the MIT License.";
 			final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079, awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
 			final String source = "<h4>Source Code</h4>https://github.com/concord-consortium/energy3d";
 			String acknowledge = "<h4>Acknowledgement</h4>";
-			acknowledge += "<font size=2>The help from the following people to improve this program is appreciated:<br>";
-			acknowledge += "Katie Armstrong, Siobhan Bailey, Jie Chao, Guanhua Chen, Maya Haigis,<br>";
-			acknowledge += "Xudong Huang, Shiyan Jiang, Alex Lee, Shasha Liu, Jeff Lockwood,<br>";
-			acknowledge += "Joy Massicotte, Ethan McElroy, Scott Ogle, Cormac Paterson, Corey Schimpf<br>";
-			acknowledge += "Zhenghui Sha";
+			acknowledge += "<font size=2>This program is dedicated to Dr. Robert Tinker (1941-2017), the founder of<br>the Concord Consortium. ";
+			acknowledge += "The help from the following people to improve<br>this program is much appreciated: Katie Armstrong, Siobhan Bailey, Jie Chao,<br>";
+			acknowledge += "Guanhua Chen, Maya Haigis, Xudong Huang, Shiyan Jiang, Shasha Liu,<br>";
+			acknowledge += "Jeff Lockwood, Joy Massicotte, Ethan McElroy, Scott Ogle, Cormac Paterson,<br>";
+			acknowledge += "Corey Schimpf, Zhenghui Sha";
 			p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {

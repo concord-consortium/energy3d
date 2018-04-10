@@ -590,11 +590,9 @@ public abstract class HousePart implements Serializable {
 
 	public void setLinePatternVisible(final boolean visible) {
 		if (container instanceof Foundation) {
-			if (Scene.getInstance().countParts(Foundation.class) > 1) { // if there are multiple foundations, we need to highlight which one we are acting upon
-				final Foundation foundation = (Foundation) container;
-				foundation.drawLinePattern();
-				foundation.linePatternMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
-			}
+			final Foundation foundation = (Foundation) container;
+			foundation.drawLinePattern();
+			foundation.linePatternMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		}
 	}
 
