@@ -60,10 +60,12 @@ public class RescaleBuildingCommand extends MyAbstractUndoableEdit {
 		super.undo();
 		if (foundation.isGroupMaster()) {
 			final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
-			for (final Foundation f : g) {
-				f.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
-				f.draw();
-				f.drawChildren();
+			if (g != null) {
+				for (final Foundation f : g) {
+					f.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
+					f.draw();
+					f.drawChildren();
+				}
 			}
 		} else {
 			foundation.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
@@ -78,10 +80,12 @@ public class RescaleBuildingCommand extends MyAbstractUndoableEdit {
 		super.redo();
 		if (foundation.isGroupMaster()) {
 			final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
-			for (final Foundation f : g) {
-				f.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
-				f.draw();
-				f.drawChildren();
+			if (g != null) {
+				for (final Foundation f : g) {
+					f.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
+					f.draw();
+					f.drawChildren();
+				}
 			}
 		} else {
 			foundation.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);

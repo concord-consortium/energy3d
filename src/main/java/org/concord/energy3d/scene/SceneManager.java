@@ -1298,8 +1298,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Foundation f = (Foundation) selectedPart;
 			if (f.isGroupMaster()) {
 				final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-				for (final Foundation x : g) {
-					x.move(v, selectedPart.getGridSize());
+				if (g != null) {
+					for (final Foundation x : g) {
+						x.move(v, selectedPart.getGridSize());
+					}
 				}
 			} else {
 				f.move(v, selectedPart.getGridSize());
@@ -1312,8 +1314,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Foundation f = selectedPart.getTopContainer();
 				if (f.isGroupMaster()) {
 					final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-					for (final Foundation x : g) {
-						x.move(v, selectedPart.getGridSize());
+					if (g != null) {
+						for (final Foundation x : g) {
+							x.move(v, selectedPart.getGridSize());
+						}
 					}
 				} else {
 					f.move(v, selectedPart.getGridSize());
@@ -1829,10 +1833,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(objectMoveStartPoint.multiply(1, 1, 0, null));
 								if (foundation.isGroupMaster()) {
 									final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
-									for (final Foundation f : g) {
-										final ArrayList<Vector3> movePoints = objectGroupMovePoints.get(f);
-										if (movePoints != null) { // just in case this foundation's move point hasn't been included yet
-											f.move(d, movePoints);
+									if (g != null) {
+										for (final Foundation f : g) {
+											final ArrayList<Vector3> movePoints = objectGroupMovePoints.get(f);
+											if (movePoints != null) { // just in case this foundation's move point hasn't been included yet
+												f.move(d, movePoints);
+											}
 										}
 									}
 								} else {
@@ -2178,7 +2184,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									final Foundation f = (Foundation) selectedPart;
 									if (f.isGroupMaster()) {
 										final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-										if (!g.isEmpty()) {
+										if (g != null && !g.isEmpty()) {
 											if (objectGroupMovePoints == null) {
 												objectGroupMovePoints = new HashMap<Foundation, ArrayList<Vector3>>();
 											} else {
@@ -2568,9 +2574,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (!f.getLockEdit()) {
 				if (f.isGroupMaster()) {
 					final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-					final Vector3 center = f.toRelative(f.getCenter().clone());
-					for (final Foundation x : g) {
-						x.rotate(angle, center, true);
+					if (g != null) {
+						final Vector3 center = f.toRelative(f.getCenter().clone());
+						for (final Foundation x : g) {
+							x.rotate(angle, center, true);
+						}
 					}
 				} else {
 					f.rotate(angle, null, true);

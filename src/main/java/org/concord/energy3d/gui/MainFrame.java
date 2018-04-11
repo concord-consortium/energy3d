@@ -169,6 +169,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem newMenuItem;
 	private JMenuItem openMenuItem;
 	private JMenuItem recoveryMenuItem;
+	private JMenuItem listLoggedSnapshotsMenuItem;
 	private JMenuItem replayFolderMenuItem;
 	private JMenuItem replayLastFolderMenuItem;
 	private JMenu replayControlsMenu;
@@ -720,7 +721,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getRecoveryMenuItem() {
 		if (recoveryMenuItem == null) {
-			recoveryMenuItem = new JMenuItem("Recover from Log...");
+			recoveryMenuItem = new JMenuItem("Recover from Latest Snapshot...");
 			recoveryMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -754,6 +755,41 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return recoveryMenuItem;
+	}
+
+	private JMenuItem getListLoggedSnapshotsMenuItem() {
+		if (listLoggedSnapshotsMenuItem == null) {
+			listLoggedSnapshotsMenuItem = new JMenuItem("List All Logged Snapshots...");
+			listLoggedSnapshotsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (Scene.getInstance().getNoSnaphshotLogging()) {
+						JOptionPane.showMessageDialog(instance, "<html>Sorry, the snapshot logging of this file is disabled.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						final FileChooser fileChooser = new FileChooser();
+						fileChooser.setCurrentDirectory(SnapshotLogger.getLogFolder());
+						final File file = fileChooser.showDialog(".ng3", FileChooser.ng3Filter, true);
+						if (file == null) {
+							return;
+						}
+						SceneManager.getInstance().refresh(1);
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								try {
+									Scene.open(file.toURI().toURL());
+								} catch (final Throwable err) {
+									BugReporter.report(err, file.getAbsolutePath());
+								}
+								return null;
+							}
+						});
+						topViewCheckBoxMenuItem.setSelected(false);
+					}
+				}
+			});
+		}
+		return listLoggedSnapshotsMenuItem;
 	}
 
 	private JMenuItem getPreferencesMenuItem() {
@@ -1127,6 +1163,7 @@ public class MainFrame extends JFrame {
 			helpMenu.add(getFixProblemsMenuItem());
 			helpMenu.add(getSortIdMenuItem());
 			helpMenu.add(getRecoveryMenuItem());
+			helpMenu.add(getListLoggedSnapshotsMenuItem());
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
 			helpMenu.add(miUpdate);

@@ -76,8 +76,10 @@ public class MovePartCommand extends MyAbstractUndoableEdit {
 					final Foundation f = (Foundation) part;
 					if (f.isGroupMaster()) {
 						final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-						for (final Foundation x : g) {
-							x.move(v, part.getGridSize());
+						if (g != null) {
+							for (final Foundation x : g) {
+								x.move(v, part.getGridSize());
+							}
 						}
 					} else {
 						f.move(v, part.getGridSize());

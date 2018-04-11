@@ -63,6 +63,10 @@ public class FileChooser {
 		}
 	}
 
+	public void setCurrentDirectory(final File dir) {
+		fileChooser.setCurrentDirectory(dir);
+	}
+
 	public void rememberFile(final String fileName) {
 		if (fileName == null) {
 			return;

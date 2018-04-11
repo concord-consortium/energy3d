@@ -156,10 +156,12 @@ class RescaleBuildingDialog extends JDialog {
 					public Object call() {
 						if (foundation.isGroupMaster()) {
 							final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
-							for (final Foundation f : g) {
-								f.rescale(scaleX, scaleY, scaleZ);
-								f.draw();
-								f.drawChildren();
+							if (g != null) {
+								for (final Foundation f : g) {
+									f.rescale(scaleX, scaleY, scaleZ);
+									f.draw();
+									f.drawChildren();
+								}
 							}
 						} else {
 							foundation.rescale(scaleX, scaleY, scaleZ);
