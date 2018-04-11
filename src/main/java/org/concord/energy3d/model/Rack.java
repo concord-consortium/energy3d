@@ -839,11 +839,11 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		final double lx = s * v.getX() * tx;
 		final double ly = s * v.getY() * ty;
 		final double newX = points.get(0).getX() + lx;
-		if (newX > 1 - tx || newX < tx) {
+		if (newX > 1 - 0.5 * tx || newX < 0.5 * tx) {
 			return false;
 		}
 		final double newY = points.get(0).getY() + ly;
-		if (newY > 1 - ty || newY < ty) {
+		if (newY > 1 - 0.5 * ty || newY < 0.5 * ty) {
 			return false;
 		}
 		rack.points.get(0).setX(newX);

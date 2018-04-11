@@ -652,14 +652,14 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		return true;
 	}
 
-	private double checkCopyOverlap() { // copy only in the direction of trough width (parabola width)
-		final double w1 = apertureWidth / Scene.getInstance().getAnnotationScale();
+	private double checkCopyOverlap(final boolean inWidth) {
+		final double w1 = (inWidth ? apertureWidth : troughLength) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicTrough) {
 					final ParabolicTrough s2 = (ParabolicTrough) p;
-					final double w2 = s2.apertureWidth / Scene.getInstance().getAnnotationScale();
+					final double w2 = (inWidth ? s2.apertureWidth : s2.troughLength) / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -684,33 +684,60 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		return c;
 	}
 
-	// troughs align with the north-south axis, so copy and paste only in the x-direction (east-west axis)
 	private boolean isPositionLegal(final ParabolicTrough copy, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
+		final Vector3 p1 = foundation.getAbsPoint(1);
 		final Vector3 p2 = foundation.getAbsPoint(2);
-		double dx;
+		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
+		double len;
 		double s;
+		boolean inWidth = true;
 		final ParabolicTrough nearest = foundation.getNearestParabolicTrough(this);
-		if (nearest != null) { // use the nearest trough as the reference to infer next position
+		if (nearest != null) { // use the nearest reflector as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
-			dx = Math.abs(d.getX());
-			if (dx > apertureWidth * 5 / Scene.getInstance().getAnnotationScale()) {
-				dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
-				s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			len = d.length();
+			if (apertureWidth > len * Scene.getInstance().getAnnotationScale()) {
+				inWidth = false;
+			}
+			if (len > Math.min(apertureWidth, troughLength) * 5 / Scene.getInstance().getAnnotationScale()) {
+				len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
-				s = Math.signum(d.getX());
+				final double vx = v.getX();
+				final double vy = v.getY();
+				if (Math.abs(d.getX()) > Math.abs(d.getY())) {
+					if (Math.abs(vx) < Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				} else {
+					if (Math.abs(vx) > Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				}
+				s = Math.signum(d.dot(v));
 			}
 		} else {
-			dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
-			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		}
-		final double tx = dx / p0.distance(p2);
-		final double newX = points.get(0).getX() + s * tx;
-		if (newX > 1 - tx || newX < tx) {
+		final double tx = len / p0.distance(p2);
+		final double ty = len / p0.distance(p1);
+		final double lx = s * v.getX() * tx;
+		final double ly = s * v.getY() * ty;
+		final double newX = points.get(0).getX() + lx;
+		if (newX > 1 - 0.5 * tx || newX < 0.5 * tx) {
+			return false;
+		}
+		final double newY = points.get(0).getY() + ly;
+		if (newY > 1 - 0.5 * ty || newY < 0.5 * ty) {
 			return false;
 		}
 		copy.points.get(0).setX(newX);
-		final double o = copy.checkCopyOverlap();
+		copy.points.get(0).setY(newY);
+		final double o = copy.checkCopyOverlap(inWidth);
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new trough is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
