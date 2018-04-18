@@ -233,8 +233,29 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			textureMenu.addSeparator();
 
 			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			final JRadioButtonMenuItem rbmiTexture02 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_02, "icons/door_02.png");
+			final JRadioButtonMenuItem rbmiTexture03 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_03, "icons/door_03.png");
+			final JRadioButtonMenuItem rbmiTexture04 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_04, "icons/door_04.png");
+			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_05, "icons/door_05.png");
+			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
+			final JRadioButtonMenuItem rbmiTexture07 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
+			final JRadioButtonMenuItem rbmiTexture08 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
 			textureGroup.add(rbmiTexture01);
+			textureGroup.add(rbmiTexture02);
+			textureGroup.add(rbmiTexture03);
+			textureGroup.add(rbmiTexture04);
+			textureGroup.add(rbmiTexture05);
+			textureGroup.add(rbmiTexture06);
+			textureGroup.add(rbmiTexture07);
+			textureGroup.add(rbmiTexture08);
 			textureMenu.add(rbmiTexture01);
+			textureMenu.add(rbmiTexture02);
+			textureMenu.add(rbmiTexture03);
+			textureMenu.add(rbmiTexture04);
+			textureMenu.add(rbmiTexture05);
+			textureMenu.add(rbmiTexture06);
+			textureMenu.add(rbmiTexture07);
+			textureMenu.add(rbmiTexture08);
 
 			textureMenu.addMenuListener(new MenuListener() {
 
@@ -248,9 +269,30 @@ class PopupMenuForDoor extends PopupMenuFactory {
 						Util.selectSilently(rbmiTextureOutline, true);
 						return;
 					}
-					switch (Scene.getInstance().getWallTextureType()) {
+					switch (Scene.getInstance().getDoorTextureType()) {
 					case Door.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
+						break;
+					case Door.TEXTURE_02:
+						Util.selectSilently(rbmiTexture02, true);
+						break;
+					case Door.TEXTURE_03:
+						Util.selectSilently(rbmiTexture03, true);
+						break;
+					case Door.TEXTURE_04:
+						Util.selectSilently(rbmiTexture04, true);
+						break;
+					case Door.TEXTURE_05:
+						Util.selectSilently(rbmiTexture05, true);
+						break;
+					case Door.TEXTURE_06:
+						Util.selectSilently(rbmiTexture06, true);
+						break;
+					case Door.TEXTURE_07:
+						Util.selectSilently(rbmiTexture07, true);
+						break;
+					case Door.TEXTURE_08:
+						Util.selectSilently(rbmiTexture08, true);
 						break;
 					}
 				}

@@ -1945,9 +1945,30 @@ public class MainFrame extends JFrame {
 			textureMenu.add(doorTextureMenu);
 
 			final JRadioButtonMenuItem doorTexture01MenuItem = createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			final JRadioButtonMenuItem doorTexture02MenuItem = createDoorTextureMenuItem(Door.TEXTURE_02, "icons/door_02.png");
+			final JRadioButtonMenuItem doorTexture03MenuItem = createDoorTextureMenuItem(Door.TEXTURE_03, "icons/door_03.png");
+			final JRadioButtonMenuItem doorTexture04MenuItem = createDoorTextureMenuItem(Door.TEXTURE_04, "icons/door_04.png");
+			final JRadioButtonMenuItem doorTexture05MenuItem = createDoorTextureMenuItem(Door.TEXTURE_05, "icons/door_05.png");
+			final JRadioButtonMenuItem doorTexture06MenuItem = createDoorTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
+			final JRadioButtonMenuItem doorTexture07MenuItem = createDoorTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
+			final JRadioButtonMenuItem doorTexture08MenuItem = createDoorTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
 			final ButtonGroup doorTextureButtonGroup = new ButtonGroup();
 			doorTextureButtonGroup.add(doorTexture01MenuItem);
+			doorTextureButtonGroup.add(doorTexture02MenuItem);
+			doorTextureButtonGroup.add(doorTexture03MenuItem);
+			doorTextureButtonGroup.add(doorTexture04MenuItem);
+			doorTextureButtonGroup.add(doorTexture05MenuItem);
+			doorTextureButtonGroup.add(doorTexture06MenuItem);
+			doorTextureButtonGroup.add(doorTexture07MenuItem);
+			doorTextureButtonGroup.add(doorTexture08MenuItem);
 			doorTextureMenu.add(doorTexture01MenuItem);
+			doorTextureMenu.add(doorTexture02MenuItem);
+			doorTextureMenu.add(doorTexture03MenuItem);
+			doorTextureMenu.add(doorTexture04MenuItem);
+			doorTextureMenu.add(doorTexture05MenuItem);
+			doorTextureMenu.add(doorTexture06MenuItem);
+			doorTextureMenu.add(doorTexture07MenuItem);
+			doorTextureMenu.add(doorTexture08MenuItem);
 			doorTextureMenu.addMenuListener(new MenuListener() {
 
 				@Override
@@ -1966,6 +1987,27 @@ public class MainFrame extends JFrame {
 						switch (Scene.getInstance().getDoorTextureType()) {
 						case Door.TEXTURE_01:
 							Util.selectSilently(doorTexture01MenuItem, true);
+							break;
+						case Door.TEXTURE_02:
+							Util.selectSilently(doorTexture02MenuItem, true);
+							break;
+						case Door.TEXTURE_03:
+							Util.selectSilently(doorTexture03MenuItem, true);
+							break;
+						case Door.TEXTURE_04:
+							Util.selectSilently(doorTexture04MenuItem, true);
+							break;
+						case Door.TEXTURE_05:
+							Util.selectSilently(doorTexture05MenuItem, true);
+							break;
+						case Door.TEXTURE_06:
+							Util.selectSilently(doorTexture06MenuItem, true);
+							break;
+						case Door.TEXTURE_07:
+							Util.selectSilently(doorTexture07MenuItem, true);
+							break;
+						case Door.TEXTURE_08:
+							Util.selectSilently(doorTexture08MenuItem, true);
 							break;
 						}
 					}

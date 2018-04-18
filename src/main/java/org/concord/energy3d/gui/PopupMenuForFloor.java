@@ -19,7 +19,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -221,7 +220,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 						return;
 					}
 					switch (Scene.getInstance().getWallTextureType()) {
-					case Door.TEXTURE_01:
+					case Floor.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
 					}

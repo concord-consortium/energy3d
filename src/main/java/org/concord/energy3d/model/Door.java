@@ -24,6 +24,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Door extends HousePart implements Thermal {
 
 	public static final int TEXTURE_01 = 1;
+	public static final int TEXTURE_02 = 2;
+	public static final int TEXTURE_03 = 3;
+	public static final int TEXTURE_04 = 4;
+	public static final int TEXTURE_05 = 5;
+	public static final int TEXTURE_06 = 6;
+	public static final int TEXTURE_07 = 7;
+	public static final int TEXTURE_08 = 8;
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_DOOR_HEIGHT = 10;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
@@ -220,6 +227,20 @@ public class Door extends HousePart implements Thermal {
 		switch (Scene.getInstance().getDoorTextureType()) {
 		case TEXTURE_01:
 			return "door_01.png";
+		case TEXTURE_02:
+			return "door_02.png";
+		case TEXTURE_03:
+			return "door_03.png";
+		case TEXTURE_04:
+			return "door_04.png";
+		case TEXTURE_05:
+			return "door_05.png";
+		case TEXTURE_06:
+			return "door_06.png";
+		case TEXTURE_07:
+			return "door_07.png";
+		case TEXTURE_08:
+			return "door_08.png";
 		}
 		return null;
 	}

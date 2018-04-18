@@ -330,8 +330,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setEditPointsVisible(final boolean visible) {
-		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-			getEditPointShape(i).setVisible(visible);
+		if (pointsRoot != null) {
+			for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
+				getEditPointShape(i).setVisible(visible);
+			}
 		}
 	}
 
