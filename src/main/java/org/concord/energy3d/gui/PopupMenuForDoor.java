@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -34,6 +36,7 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeDoorSizeOnWallCommand;
+import org.concord.energy3d.undo.ChangeDoorTextureCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForDoorsOnFoundationCommand;
 import org.concord.energy3d.util.Util;
@@ -232,14 +235,14 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			textureMenu.add(rbmiTextureOutline);
 			textureMenu.addSeparator();
 
-			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
-			final JRadioButtonMenuItem rbmiTexture02 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_02, "icons/door_02.png");
-			final JRadioButtonMenuItem rbmiTexture03 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_03, "icons/door_03.png");
-			final JRadioButtonMenuItem rbmiTexture04 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_04, "icons/door_04.png");
-			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_05, "icons/door_05.png");
-			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
-			final JRadioButtonMenuItem rbmiTexture07 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
-			final JRadioButtonMenuItem rbmiTexture08 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
+			final JRadioButtonMenuItem rbmiTexture01 = createTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			final JRadioButtonMenuItem rbmiTexture02 = createTextureMenuItem(Door.TEXTURE_02, "icons/door_02.png");
+			final JRadioButtonMenuItem rbmiTexture03 = createTextureMenuItem(Door.TEXTURE_03, "icons/door_03.png");
+			final JRadioButtonMenuItem rbmiTexture04 = createTextureMenuItem(Door.TEXTURE_04, "icons/door_04.png");
+			final JRadioButtonMenuItem rbmiTexture05 = createTextureMenuItem(Door.TEXTURE_05, "icons/door_05.png");
+			final JRadioButtonMenuItem rbmiTexture06 = createTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
+			final JRadioButtonMenuItem rbmiTexture07 = createTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
+			final JRadioButtonMenuItem rbmiTexture08 = createTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
 			textureGroup.add(rbmiTexture01);
 			textureGroup.add(rbmiTexture02);
 			textureGroup.add(rbmiTexture03);
@@ -269,7 +272,12 @@ class PopupMenuForDoor extends PopupMenuFactory {
 						Util.selectSilently(rbmiTextureOutline, true);
 						return;
 					}
-					switch (Scene.getInstance().getDoorTextureType()) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Door)) {
+						return;
+					}
+					final Door door = (Door) selectedPart;
+					switch (door.getTextureType()) {
 					case Door.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
@@ -294,6 +302,8 @@ class PopupMenuForDoor extends PopupMenuFactory {
 					case Door.TEXTURE_08:
 						Util.selectSilently(rbmiTexture08, true);
 						break;
+					default:
+						textureGroup.clearSelection();
 					}
 				}
 
@@ -350,6 +360,39 @@ class PopupMenuForDoor extends PopupMenuFactory {
 
 		return popupMenuForDoor;
 
+	}
+
+	private static JRadioButtonMenuItem createTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Door)) {
+						return;
+					}
+					final Door door = (Door) selectedPart;
+					final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand(door);
+					door.setTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
+					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			}
+		});
+		return m;
 	}
 
 }

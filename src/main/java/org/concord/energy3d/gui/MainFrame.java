@@ -122,7 +122,6 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeDoorTextureCommand;
 import org.concord.energy3d.undo.ChangeFloorTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationTextureCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
@@ -1941,79 +1940,6 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu doorTextureMenu = new JMenu("Doors");
-			textureMenu.add(doorTextureMenu);
-
-			final JRadioButtonMenuItem doorTexture01MenuItem = createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
-			final JRadioButtonMenuItem doorTexture02MenuItem = createDoorTextureMenuItem(Door.TEXTURE_02, "icons/door_02.png");
-			final JRadioButtonMenuItem doorTexture03MenuItem = createDoorTextureMenuItem(Door.TEXTURE_03, "icons/door_03.png");
-			final JRadioButtonMenuItem doorTexture04MenuItem = createDoorTextureMenuItem(Door.TEXTURE_04, "icons/door_04.png");
-			final JRadioButtonMenuItem doorTexture05MenuItem = createDoorTextureMenuItem(Door.TEXTURE_05, "icons/door_05.png");
-			final JRadioButtonMenuItem doorTexture06MenuItem = createDoorTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
-			final JRadioButtonMenuItem doorTexture07MenuItem = createDoorTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
-			final JRadioButtonMenuItem doorTexture08MenuItem = createDoorTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
-			final ButtonGroup doorTextureButtonGroup = new ButtonGroup();
-			doorTextureButtonGroup.add(doorTexture01MenuItem);
-			doorTextureButtonGroup.add(doorTexture02MenuItem);
-			doorTextureButtonGroup.add(doorTexture03MenuItem);
-			doorTextureButtonGroup.add(doorTexture04MenuItem);
-			doorTextureButtonGroup.add(doorTexture05MenuItem);
-			doorTextureButtonGroup.add(doorTexture06MenuItem);
-			doorTextureButtonGroup.add(doorTexture07MenuItem);
-			doorTextureButtonGroup.add(doorTexture08MenuItem);
-			doorTextureMenu.add(doorTexture01MenuItem);
-			doorTextureMenu.add(doorTexture02MenuItem);
-			doorTextureMenu.add(doorTexture03MenuItem);
-			doorTextureMenu.add(doorTexture04MenuItem);
-			doorTextureMenu.add(doorTexture05MenuItem);
-			doorTextureMenu.add(doorTexture06MenuItem);
-			doorTextureMenu.add(doorTexture07MenuItem);
-			doorTextureMenu.add(doorTexture08MenuItem);
-			doorTextureMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					doorTextureButtonGroup.clearSelection();
-					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-						switch (Scene.getInstance().getDoorTextureType()) {
-						case Door.TEXTURE_01:
-							Util.selectSilently(doorTexture01MenuItem, true);
-							break;
-						case Door.TEXTURE_02:
-							Util.selectSilently(doorTexture02MenuItem, true);
-							break;
-						case Door.TEXTURE_03:
-							Util.selectSilently(doorTexture03MenuItem, true);
-							break;
-						case Door.TEXTURE_04:
-							Util.selectSilently(doorTexture04MenuItem, true);
-							break;
-						case Door.TEXTURE_05:
-							Util.selectSilently(doorTexture05MenuItem, true);
-							break;
-						case Door.TEXTURE_06:
-							Util.selectSilently(doorTexture06MenuItem, true);
-							break;
-						case Door.TEXTURE_07:
-							Util.selectSilently(doorTexture07MenuItem, true);
-							break;
-						case Door.TEXTURE_08:
-							Util.selectSilently(doorTexture08MenuItem, true);
-							break;
-						}
-					}
-				}
-			});
-
 			final JMenu floorTextureMenu = new JMenu("Floors");
 			textureMenu.add(floorTextureMenu);
 
@@ -2204,34 +2130,6 @@ public class MainFrame extends JFrame {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final ChangeWallTextureCommand c = new ChangeWallTextureCommand();
 					Scene.getInstance().setWallTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			}
-		});
-		return m;
-	}
-
-	JRadioButtonMenuItem createDoorTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
-		m.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand();
-					Scene.getInstance().setDoorTextureType(type);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {

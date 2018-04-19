@@ -186,7 +186,6 @@ public class Scene implements Serializable {
 	private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
 	private int wallTextureType;
 	private int roofTextureType;
-	private int doorTextureType;
 	private int floorTextureType;
 	private int foundationTextureType;
 
@@ -1580,14 +1579,6 @@ public class Scene implements Serializable {
 
 	public int getRoofTextureType() {
 		return roofTextureType;
-	}
-
-	public void setDoorTextureType(final int doorTextureType) {
-		this.doorTextureType = doorTextureType;
-	}
-
-	public int getDoorTextureType() {
-		return doorTextureType;
 	}
 
 	public void setFloorTextureType(final int floorTextureType) {

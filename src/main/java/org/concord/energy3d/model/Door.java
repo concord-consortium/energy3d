@@ -36,6 +36,7 @@ public class Door extends HousePart implements Thermal {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 2; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private transient Line outlineMesh;
+	private int textureType = 0;
 
 	public Door() {
 		super(2, 4, DEFAULT_DOOR_HEIGHT);
@@ -160,7 +161,7 @@ public class Door extends HousePart implements Thermal {
 
 		mesh.updateModelBound();
 
-		if (Scene.getInstance().getTextureMode() == TextureMode.None || Scene.getInstance().getDoorTextureType() == 0) {
+		if (Scene.getInstance().getTextureMode() == TextureMode.None || textureType == 0) {
 
 			outlineMesh.getSceneHints().setCullHint(CullHint.Inherit);
 
@@ -224,7 +225,7 @@ public class Door extends HousePart implements Thermal {
 		if (t == TextureMode.Simple) {
 			return "door.png";
 		}
-		switch (Scene.getInstance().getDoorTextureType()) {
+		switch (textureType) {
 		case TEXTURE_01:
 			return "door_01.png";
 		case TEXTURE_02:
@@ -295,6 +296,14 @@ public class Door extends HousePart implements Thermal {
 			return false;
 		}
 		return super.isDrawable();
+	}
+
+	public void setTextureType(final int textureType) {
+		this.textureType = textureType;
+	}
+
+	public int getTextureType() {
+		return textureType;
 	}
 
 	public void setDoorWidth(final double width) {

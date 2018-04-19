@@ -13,9 +13,11 @@ public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;
 	private int newValue;
+	private final Door door;
 
-	public ChangeDoorTextureCommand() {
-		oldValue = Scene.getInstance().getDoorTextureType();
+	public ChangeDoorTextureCommand(final Door door) {
+		this.door = door;
+		oldValue = door.getTextureType();
 	}
 
 	public int getOldValue() {
@@ -25,8 +27,8 @@ public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = Scene.getInstance().getDoorTextureType();
-		Scene.getInstance().setDoorTextureType(oldValue);
+		newValue = door.getTextureType();
+		door.setTextureType(oldValue);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Door) {
 				p.draw();
@@ -38,7 +40,7 @@ public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setDoorTextureType(newValue);
+		door.setTextureType(newValue);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Door) {
 				p.draw();
