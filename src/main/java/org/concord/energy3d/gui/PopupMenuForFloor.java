@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -28,6 +29,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
+import org.concord.energy3d.undo.ChangeFloorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -203,7 +205,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 			textureMenu.add(rbmiTextureOutline);
 			textureMenu.addSeparator();
 
-			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createFloorTextureMenuItem(Floor.TEXTURE_01, "icons/floor_01.png");
+			final JRadioButtonMenuItem rbmiTexture01 = createTextureMenuItem(Floor.TEXTURE_01, "icons/floor_01.png");
 			textureGroup.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture01);
 
@@ -219,10 +221,17 @@ class PopupMenuForFloor extends PopupMenuFactory {
 						Util.selectSilently(rbmiTextureOutline, true);
 						return;
 					}
-					switch (Scene.getInstance().getWallTextureType()) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Floor)) {
+						return;
+					}
+					final Floor floor = (Floor) selectedPart;
+					switch (floor.getTextureType()) {
 					case Floor.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
+					default:
+						textureGroup.clearSelection();
 					}
 				}
 
@@ -258,4 +267,38 @@ class PopupMenuForFloor extends PopupMenuFactory {
 		return popupMenuForFloor;
 
 	}
+
+	private static JRadioButtonMenuItem createTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Floor)) {
+						return;
+					}
+					final Floor floor = (Floor) selectedPart;
+					final ChangeFloorTextureCommand c = new ChangeFloorTextureCommand(floor);
+					floor.setTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
+					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			}
+		});
+		return m;
+	}
+
 }

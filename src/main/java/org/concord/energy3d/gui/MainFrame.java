@@ -122,7 +122,6 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeFloorTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationTextureCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
@@ -1940,37 +1939,6 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu floorTextureMenu = new JMenu("Floors");
-			textureMenu.add(floorTextureMenu);
-
-			final JRadioButtonMenuItem floorTexture01MenuItem = createFloorTextureMenuItem(Floor.TEXTURE_01, "icons/floor_01.png");
-			final ButtonGroup floorTextureButtonGroup = new ButtonGroup();
-			floorTextureButtonGroup.add(floorTexture01MenuItem);
-			floorTextureMenu.add(floorTexture01MenuItem);
-			floorTextureMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					floorTextureButtonGroup.clearSelection();
-					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-						switch (Scene.getInstance().getFloorTextureType()) {
-						case Floor.TEXTURE_01:
-							Util.selectSilently(floorTexture01MenuItem, true);
-							break;
-						}
-					}
-				}
-			});
-
 			final JMenu foundationTextureMenu = new JMenu("Foundations");
 			textureMenu.add(foundationTextureMenu);
 
@@ -2130,34 +2098,6 @@ public class MainFrame extends JFrame {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final ChangeWallTextureCommand c = new ChangeWallTextureCommand();
 					Scene.getInstance().setWallTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			}
-		});
-		return m;
-	}
-
-	JRadioButtonMenuItem createFloorTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
-		m.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final ChangeFloorTextureCommand c = new ChangeFloorTextureCommand();
-					Scene.getInstance().setFloorTextureType(type);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {

@@ -4,8 +4,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
@@ -29,11 +27,7 @@ public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
 		super.undo();
 		newValue = door.getTextureType();
 		door.setTextureType(oldValue);
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Door) {
-				p.draw();
-			}
-		}
+		door.draw();
 		SceneManager.getInstance().refresh();
 	}
 
@@ -41,11 +35,7 @@ public class ChangeDoorTextureCommand extends MyAbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		door.setTextureType(newValue);
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Door) {
-				p.draw();
-			}
-		}
+		door.draw();
 		SceneManager.getInstance().refresh();
 	}
 

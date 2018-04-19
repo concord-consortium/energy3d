@@ -246,6 +246,14 @@ public class Door extends HousePart implements Thermal {
 		return null;
 	}
 
+	public void setTextureType(final int textureType) {
+		this.textureType = textureType;
+	}
+
+	public int getTextureType() {
+		return textureType;
+	}
+
 	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return container != null ? container.getRoot().getTransform().applyForward(super.getAbsPoint(index)) : super.getAbsPoint(index);
@@ -296,14 +304,6 @@ public class Door extends HousePart implements Thermal {
 			return false;
 		}
 		return super.isDrawable();
-	}
-
-	public void setTextureType(final int textureType) {
-		this.textureType = textureType;
-	}
-
-	public int getTextureType() {
-		return textureType;
 	}
 
 	public void setDoorWidth(final double width) {
