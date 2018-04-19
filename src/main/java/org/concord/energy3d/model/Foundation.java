@@ -3635,6 +3635,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	// change properties of all doors on this foundation
+
 	public void setSizeForDoors(final double width, final double height) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Door && p.getTopContainer() == this) {
@@ -3643,6 +3645,17 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				d.setDoorHeight(height);
 				d.draw();
 				d.getContainer().draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTextureForDoors(final int textureType) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Door && p.getTopContainer() == this) {
+				final Door d = (Door) p;
+				d.setTextureType(textureType);
+				d.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

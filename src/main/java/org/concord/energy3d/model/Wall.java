@@ -1896,6 +1896,17 @@ public class Wall extends HousePart implements Thermal {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setDoorTexture(final int textureType) {
+		for (final HousePart p : children) {
+			if (p instanceof Door) {
+				final Door d = (Door) p;
+				d.setTextureType(textureType);
+				d.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public List<Door> getDoors() {
 		final List<Door> doors = new ArrayList<Door>();
 		for (final HousePart x : children) {

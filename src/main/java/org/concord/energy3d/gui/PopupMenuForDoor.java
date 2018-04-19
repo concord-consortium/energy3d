@@ -37,8 +37,10 @@ import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeDoorSizeOnWallCommand;
 import org.concord.energy3d.undo.ChangeDoorTextureCommand;
+import org.concord.energy3d.undo.ChangeDoorTextureOnWallCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForDoorsOnFoundationCommand;
+import org.concord.energy3d.undo.SetTextureForDoorsOnFoundationCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForDoor extends PopupMenuFactory {
@@ -366,6 +368,9 @@ class PopupMenuForDoor extends PopupMenuFactory {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
 		m.setText("Texture #" + type);
 		m.addItemListener(new ItemListener() {
+
+			private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -374,25 +379,88 @@ class PopupMenuForDoor extends PopupMenuFactory {
 						return;
 					}
 					final Door door = (Door) selectedPart;
-					final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand(door);
-					door.setTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					final HousePart container = door.getContainer();
+					final Foundation foundation = door.getTopContainer();
+					final String partInfo = door.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Door", true);
+					final JRadioButton rb2 = new JRadioButton("All Doors on this Wall");
+					final JRadioButton rb3 = new JRadioButton("All Doors of this Building");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
 					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set Texture for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Door Texture");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand(door);
+								door.setTextureType(type);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								if (container instanceof Wall) {
+									final Wall wall = (Wall) container;
+									final ChangeDoorTextureOnWallCommand c = new ChangeDoorTextureOnWallCommand(wall);
+									wall.setDoorTexture(type);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final SetTextureForDoorsOnFoundationCommand c = new SetTextureForDoorsOnFoundationCommand(foundation);
+								foundation.setTextureForDoors(type);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+								MainPanel.getInstance().getEnergyButton().setSelected(false);
+							}
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									Scene.getInstance().setTextureMode(TextureMode.Full);
+									SceneManager.getInstance().refresh();
+									return null;
+								}
+							});
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
 				}
 			}
 		});
+
 		return m;
+
 	}
 
 }
