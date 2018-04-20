@@ -185,7 +185,6 @@ public class Scene implements Serializable {
 	private boolean noSnapshotLogging;
 	private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
 	private int wallTextureType;
-	private int roofTextureType;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -1571,14 +1570,6 @@ public class Scene implements Serializable {
 		return wallTextureType;
 	}
 
-	public void setRoofTextureType(final int roofTextureType) {
-		this.roofTextureType = roofTextureType;
-	}
-
-	public int getRoofTextureType() {
-		return roofTextureType;
-	}
-
 	public void setHeliostatTextureType(final int heliostatTextureType) {
 		this.heliostatTextureType = heliostatTextureType;
 	}
@@ -2520,10 +2511,19 @@ public class Scene implements Serializable {
 	}
 
 	public void setColorOfAllPartsOfSameType(final HousePart part, final ReadOnlyColorRGBA color) {
-		for (final HousePart p : parts) {
-			if (p.getClass().equals(part.getClass())) {
-				p.setColor(color);
-				p.draw();
+		if (part instanceof Roof) { // make a special case for roofs as they have many subclasses
+			for (final HousePart p : parts) {
+				if (p instanceof Roof) {
+					p.setColor(color);
+					p.draw();
+				}
+			}
+		} else {
+			for (final HousePart p : parts) {
+				if (p.getClass().equals(part.getClass())) {
+					p.setColor(color);
+					p.draw();
+				}
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2533,6 +2533,12 @@ public class Scene implements Serializable {
 		final List<HousePart> list = new ArrayList<HousePart>();
 		if (x instanceof Foundation) {
 			list.add(x);
+		} else if (x instanceof Roof) { // make a special case for roofs as they have many subclasses
+			for (final HousePart p : parts) {
+				if (p instanceof Roof && p.getTopContainer() == x.getTopContainer()) {
+					list.add(p);
+				}
+			}
 		} else {
 			for (final HousePart p : parts) {
 				if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer()) {
@@ -2545,9 +2551,17 @@ public class Scene implements Serializable {
 
 	public List<HousePart> getAllPartsOfSameType(final HousePart x) {
 		final List<HousePart> list = new ArrayList<HousePart>();
-		for (final HousePart p : parts) {
-			if (p.getClass().equals(x.getClass())) {
-				list.add(p);
+		if (x instanceof Roof) { // make a special case for roofs as they are the only class that has many subclasses
+			for (final HousePart p : parts) {
+				if (p instanceof Roof) {
+					list.add(p);
+				}
+			}
+		} else {
+			for (final HousePart p : parts) {
+				if (p.getClass().equals(x.getClass())) {
+					list.add(p);
+				}
 			}
 		}
 		return list;
@@ -2557,6 +2571,12 @@ public class Scene implements Serializable {
 		if (x instanceof Thermal) {
 			if (x instanceof Foundation) {
 				((Foundation) x).setUValue(uValue);
+			} else if (x instanceof Roof) { // make a special case for roofs as they are the only class that has many subclasses
+				for (final HousePart p : parts) {
+					if (p instanceof Roof && p.getTopContainer() == x.getTopContainer()) {
+						((Thermal) p).setUValue(uValue);
+					}
+				}
 			} else {
 				for (final HousePart p : parts) {
 					if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer()) {

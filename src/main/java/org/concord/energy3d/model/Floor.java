@@ -40,7 +40,6 @@ public class Floor extends HousePart {
 	private transient List<ReadOnlyVector3> wallUpperVectors;
 	private transient Line outlineMesh;
 	private int type = SOLID;
-	private int textureType = 0;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -234,14 +233,6 @@ public class Floor extends HousePart {
 			return "floor_01.png";
 		}
 		return null;
-	}
-
-	public void setTextureType(final int textureType) {
-		this.textureType = textureType;
-	}
-
-	public int getTextureType() {
-		return textureType;
 	}
 
 	@Override

@@ -112,6 +112,7 @@ public abstract class HousePart implements Serializable {
 	boolean labelId;
 	String labelCustomText;
 	boolean lockEdit;
+	int textureType = 0;
 	static final ColorRGBA disabledColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f);
 
 	transient Line heatFlux;
@@ -1388,6 +1389,14 @@ public abstract class HousePart implements Serializable {
 
 	public boolean getLockEdit() {
 		return lockEdit;
+	}
+
+	public void setTextureType(final int textureType) {
+		this.textureType = textureType;
+	}
+
+	public int getTextureType() {
+		return textureType;
 	}
 
 }

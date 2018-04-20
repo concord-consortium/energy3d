@@ -720,7 +720,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
 			return "roof.png";
 		}
-		switch (Scene.getInstance().getRoofTextureType()) {
+		switch (textureType) {
 		case TEXTURE_01:
 			return "roof_01.png";
 		case TEXTURE_02:

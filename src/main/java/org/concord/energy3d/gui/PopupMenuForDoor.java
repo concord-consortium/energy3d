@@ -36,8 +36,8 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeDoorSizeOnWallCommand;
-import org.concord.energy3d.undo.ChangeDoorTextureCommand;
 import org.concord.energy3d.undo.ChangeDoorTextureOnWallCommand;
+import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForDoorsOnFoundationCommand;
 import org.concord.energy3d.undo.SetTextureForDoorsOnFoundationCommand;
@@ -388,7 +388,7 @@ class PopupMenuForDoor extends PopupMenuFactory {
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Door", true);
 					final JRadioButton rb2 = new JRadioButton("All Doors on this Wall");
-					final JRadioButton rb3 = new JRadioButton("All Doors of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Doors on this Foundation");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
 					scopePanel.add(rb3);
@@ -420,7 +420,7 @@ class PopupMenuForDoor extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand(door);
+								final ChangeTextureCommand c = new ChangeTextureCommand(door);
 								door.setTextureType(type);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;

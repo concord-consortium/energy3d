@@ -138,7 +138,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private boolean labelSolarPotential;
 	private boolean labelBuildingEnergy;
 	private int structureType = TYPE_AUTO_DETECTED;
-	private int textureType = 0;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -1478,14 +1477,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			return "foundation_01.png";
 		}
 		return null;
-	}
-
-	public void setTextureType(final int textureType) {
-		this.textureType = textureType;
-	}
-
-	public int getTextureType() {
-		return textureType;
 	}
 
 	@Override
@@ -3665,6 +3656,19 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				final Door d = (Door) p;
 				d.setTextureType(textureType);
 				d.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all roofs on this foundation
+
+	public void setTextureForRoofs(final int textureType) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Roof && p.getTopContainer() == this) {
+				final Roof r = (Roof) p;
+				r.setTextureType(textureType);
+				r.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

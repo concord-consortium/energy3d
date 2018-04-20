@@ -36,7 +36,6 @@ public class Door extends HousePart implements Thermal {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 2; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private transient Line outlineMesh;
-	private int textureType = 0;
 
 	public Door() {
 		super(2, 4, DEFAULT_DOOR_HEIGHT);
@@ -244,14 +243,6 @@ public class Door extends HousePart implements Thermal {
 			return "door_08.png";
 		}
 		return null;
-	}
-
-	public void setTextureType(final int textureType) {
-		this.textureType = textureType;
-	}
-
-	public int getTextureType() {
-		return textureType;
 	}
 
 	@Override

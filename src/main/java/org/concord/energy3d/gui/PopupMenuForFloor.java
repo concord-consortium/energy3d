@@ -29,7 +29,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
-import org.concord.energy3d.undo.ChangeFloorTextureCommand;
+import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -280,7 +280,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 						return;
 					}
 					final Floor floor = (Floor) selectedPart;
-					final ChangeFloorTextureCommand c = new ChangeFloorTextureCommand(floor);
+					final ChangeTextureCommand c = new ChangeTextureCommand(floor);
 					floor.setTextureType(type);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override

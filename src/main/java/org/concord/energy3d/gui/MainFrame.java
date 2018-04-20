@@ -125,7 +125,6 @@ import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangeRoofTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeWallTextureCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
@@ -1871,73 +1870,6 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu roofTextureMenu = new JMenu("Roofs");
-			textureMenu.add(roofTextureMenu);
-
-			final JRadioButtonMenuItem roofTexture01MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_01, "icons/roof_01.png");
-			final JRadioButtonMenuItem roofTexture02MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_02, "icons/roof_02.png");
-			final JRadioButtonMenuItem roofTexture03MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_03, "icons/roof_03.png");
-			final JRadioButtonMenuItem roofTexture04MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_04, "icons/roof_04.png");
-			final JRadioButtonMenuItem roofTexture05MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_05, "icons/roof_05.png");
-			final JRadioButtonMenuItem roofTexture06MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_06, "icons/roof_06.png");
-			final JRadioButtonMenuItem roofTexture07MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_07, "icons/roof_07.png");
-			final ButtonGroup roofTextureButtonGroup = new ButtonGroup();
-			roofTextureButtonGroup.add(roofTexture01MenuItem);
-			roofTextureButtonGroup.add(roofTexture02MenuItem);
-			roofTextureButtonGroup.add(roofTexture03MenuItem);
-			roofTextureButtonGroup.add(roofTexture04MenuItem);
-			roofTextureButtonGroup.add(roofTexture05MenuItem);
-			roofTextureButtonGroup.add(roofTexture06MenuItem);
-			roofTextureButtonGroup.add(roofTexture07MenuItem);
-			roofTextureMenu.add(roofTexture01MenuItem);
-			roofTextureMenu.add(roofTexture02MenuItem);
-			roofTextureMenu.add(roofTexture03MenuItem);
-			roofTextureMenu.add(roofTexture04MenuItem);
-			roofTextureMenu.add(roofTexture05MenuItem);
-			roofTextureMenu.add(roofTexture06MenuItem);
-			roofTextureMenu.add(roofTexture07MenuItem);
-			roofTextureMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					roofTextureButtonGroup.clearSelection();
-					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-						switch (Scene.getInstance().getRoofTextureType()) {
-						case Roof.TEXTURE_01:
-							Util.selectSilently(roofTexture01MenuItem, true);
-							break;
-						case Roof.TEXTURE_02:
-							Util.selectSilently(roofTexture02MenuItem, true);
-							break;
-						case Roof.TEXTURE_03:
-							Util.selectSilently(roofTexture03MenuItem, true);
-							break;
-						case Roof.TEXTURE_04:
-							Util.selectSilently(roofTexture04MenuItem, true);
-							break;
-						case Roof.TEXTURE_05:
-							Util.selectSilently(roofTexture05MenuItem, true);
-							break;
-						case Roof.TEXTURE_06:
-							Util.selectSilently(roofTexture06MenuItem, true);
-							break;
-						case Roof.TEXTURE_07:
-							Util.selectSilently(roofTexture07MenuItem, true);
-							break;
-						}
-					}
-				}
-			});
-
 			textureMenu.addSeparator();
 
 			final JMenu heliostatTextureMenu = new JMenu("Heliostats");
@@ -2066,34 +1998,6 @@ public class MainFrame extends JFrame {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final ChangeWallTextureCommand c = new ChangeWallTextureCommand();
 					Scene.getInstance().setWallTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			}
-		});
-		return m;
-	}
-
-	JRadioButtonMenuItem createRoofTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
-		m.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final ChangeRoofTextureCommand c = new ChangeRoofTextureCommand();
-					Scene.getInstance().setRoofTextureType(type);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {

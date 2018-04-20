@@ -10,6 +10,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -71,11 +72,11 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationSizeCommand;
-import org.concord.energy3d.undo.ChangeFoundationTextureCommand;
+import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.SetFoundationLabelCommand;
 import org.concord.energy3d.undo.SetGroupMasterCommand;
-import org.concord.energy3d.undo.SetTextureForFoundationsCommand;
+import org.concord.energy3d.undo.SetTextureForPartsCommand;
 import org.concord.energy3d.undo.ShowFoundationInsetCommand;
 import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
@@ -2442,14 +2443,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final ChangeFoundationTextureCommand c = new ChangeFoundationTextureCommand(foundation);
+								final ChangeTextureCommand c = new ChangeTextureCommand(foundation);
 								foundation.setTextureType(type);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final List<Foundation> group = Scene.getInstance().getFoundationGroup(foundation);
 								if (group != null && !group.isEmpty()) {
-									final SetTextureForFoundationsCommand c = new SetTextureForFoundationsCommand(group);
+									final List<HousePart> parts = new ArrayList<HousePart>();
+									parts.addAll(group);
+									final SetTextureForPartsCommand c = new SetTextureForPartsCommand(parts);
 									for (final Foundation f : group) {
 										f.setTextureType(type);
 									}
@@ -2457,9 +2460,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-								final SetTextureForFoundationsCommand c = new SetTextureForFoundationsCommand(foundations);
-								for (final Foundation f : foundations) {
+								final List<HousePart> foundations = Scene.getInstance().getPartsOfSameTypeInBuilding(foundation);
+								final SetTextureForPartsCommand c = new SetTextureForPartsCommand(foundations);
+								for (final HousePart f : foundations) {
 									f.setTextureType(type);
 								}
 								SceneManager.getInstance().getUndoManager().addEdit(c);
