@@ -10,11 +10,14 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -24,6 +27,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -67,9 +71,11 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationSizeCommand;
+import org.concord.energy3d.undo.ChangeFoundationTextureCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.SetFoundationLabelCommand;
 import org.concord.energy3d.undo.SetGroupMasterCommand;
+import org.concord.energy3d.undo.SetTextureForFoundationsCommand;
 import org.concord.energy3d.undo.ShowFoundationInsetCommand;
 import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
@@ -1978,7 +1984,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			textureMenu.add(rbmiTextureOutline);
 			textureMenu.addSeparator();
 
-			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createFoundationTextureMenuItem(Foundation.TEXTURE_01, "icons/foundation_01.png");
+			final JRadioButtonMenuItem rbmiTexture01 = createTextureMenuItem(Foundation.TEXTURE_01, "icons/foundation_01.png");
 			textureGroup.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture01);
 
@@ -1994,10 +2000,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						Util.selectSilently(rbmiTextureOutline, true);
 						return;
 					}
-					switch (Scene.getInstance().getFoundationTextureType()) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					switch (foundation.getTextureType()) {
 					case Foundation.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
+					default:
+						textureGroup.clearSelection();
 					}
 				}
 
@@ -2372,6 +2385,108 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 		}
 
 		return popupMenuForFoundation;
+
+	}
+
+	private static JRadioButtonMenuItem createTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+
+			private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final String partInfo = foundation.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Foundation", true);
+					final JRadioButton rb2 = new JRadioButton("All Foundations in this Group");
+					final JRadioButton rb3 = new JRadioButton("All Foundations");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set Texture for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Foundation Texture");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final ChangeFoundationTextureCommand c = new ChangeFoundationTextureCommand(foundation);
+								foundation.setTextureType(type);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final List<Foundation> group = Scene.getInstance().getFoundationGroup(foundation);
+								if (group != null && !group.isEmpty()) {
+									final SetTextureForFoundationsCommand c = new SetTextureForFoundationsCommand(group);
+									for (final Foundation f : group) {
+										f.setTextureType(type);
+									}
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+								final SetTextureForFoundationsCommand c = new SetTextureForFoundationsCommand(foundations);
+								for (final Foundation f : foundations) {
+									f.setTextureType(type);
+								}
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+								MainPanel.getInstance().getEnergyButton().setSelected(false);
+							}
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									Scene.getInstance().setTextureMode(TextureMode.Full);
+									SceneManager.getInstance().refresh();
+									return null;
+								}
+							});
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
+		return m;
 
 	}
 

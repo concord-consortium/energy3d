@@ -138,6 +138,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private boolean labelSolarPotential;
 	private boolean labelBuildingEnergy;
 	private int structureType = TYPE_AUTO_DETECTED;
+	private int textureType = 0;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -1472,11 +1473,19 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (Scene.getInstance().getTextureMode() == TextureMode.None || Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
 			return null;
 		}
-		switch (Scene.getInstance().getFoundationTextureType()) {
+		switch (textureType) {
 		case TEXTURE_01:
 			return "foundation_01.png";
 		}
 		return null;
+	}
+
+	public void setTextureType(final int textureType) {
+		this.textureType = textureType;
+	}
+
+	public int getTextureType() {
+		return textureType;
 	}
 
 	@Override

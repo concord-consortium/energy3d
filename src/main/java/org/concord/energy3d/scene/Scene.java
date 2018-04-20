@@ -186,7 +186,6 @@ public class Scene implements Serializable {
 	private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
 	private int wallTextureType;
 	private int roofTextureType;
-	private int foundationTextureType;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -1578,14 +1577,6 @@ public class Scene implements Serializable {
 
 	public int getRoofTextureType() {
 		return roofTextureType;
-	}
-
-	public void setFoundationTextureType(final int foundationTextureType) {
-		this.foundationTextureType = foundationTextureType;
-	}
-
-	public int getFoundationTextureType() {
-		return foundationTextureType;
 	}
 
 	public void setHeliostatTextureType(final int heliostatTextureType) {
