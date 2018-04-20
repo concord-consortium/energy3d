@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
@@ -356,7 +355,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, null, TextureMode.Full);
+		updateTextureAndColor(mesh, null);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.SelectUtil;
 
@@ -136,7 +135,7 @@ public class Human extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, ColorRGBA.WHITE, TextureMode.Full);
+		updateTextureAndColor(mesh, ColorRGBA.WHITE);
 	}
 
 	public void setHumanType(final int humanType) {

@@ -7,7 +7,6 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -211,7 +210,7 @@ public class Door extends HousePart implements Thermal {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), TextureMode.Full);
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor());
 	}
 
 	@Override

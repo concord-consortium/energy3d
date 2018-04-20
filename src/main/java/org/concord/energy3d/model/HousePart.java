@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
@@ -121,12 +120,16 @@ public abstract class HousePart implements Serializable {
 	transient Line heatFlux;
 	transient ReadOnlyVector3 pickedNormal;
 
-	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
+	private static Map<String, Texture> cachedTextures = new HashMap<String, Texture>();
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(1f);
 		offsetState.setUnits(1f);
+	}
+
+	public static void clearCachedTextures() {
+		cachedTextures.clear();
 	}
 
 	public static boolean isSnapToObjects() {
@@ -761,10 +764,6 @@ public abstract class HousePart implements Serializable {
 	public abstract void updateTextureAndColor();
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
-		updateTextureAndColor(mesh, defaultColor, TextureMode.Full);
-	}
-
-	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureType == TEXTURE_EDGE, defaultColor, lockEdit);
@@ -777,7 +776,7 @@ public abstract class HousePart implements Serializable {
 						SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
 					}
 				}
-			} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
+			} else if (getTextureFileName() == null) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(defaultColor);
 			} else {
@@ -790,12 +789,23 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, final boolean grayout) {
+	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA color, final boolean grayout) {
 		Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
 		if (isTransparent) {
-			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
+			final Color c = new Color(color.getRed(), color.getGreen(), color.getBlue());
+			final Texture coloredTexture = cachedTextures.get(filename + ":" + c);
+			if (coloredTexture != null) {
+				return coloredTexture;
+			}
 			final Image image = texture.getImage();
+			final Image coloredImage = new Image(); // make a copy
+			coloredImage.setDataFormat(image.getDataFormat());
+			coloredImage.setDataType(image.getDataType());
+			coloredImage.setWidth(image.getWidth());
+			coloredImage.setHeight(image.getHeight());
+			coloredImage.setMipMapByteSizes(image.getMipMapByteSizes());
 			final ByteBuffer data = image.getData(0);
+			final ByteBuffer coloredData = ByteBuffer.allocate(data.capacity());
 			byte alpha;
 			int i;
 			for (int y = 0; y < image.getHeight(); y++) {
@@ -803,16 +813,18 @@ public abstract class HousePart implements Serializable {
 					i = (y * image.getWidth() + x) * 4;
 					alpha = data.get(i + 3);
 					if (alpha == 0) { // when it is transparent, put the default color of the part
-						data.put(i, (byte) color.getRed());
-						data.put(i + 1, (byte) color.getGreen());
-						data.put(i + 2, (byte) color.getBlue());
+						coloredData.put(i, (byte) c.getRed());
+						coloredData.put(i + 1, (byte) c.getGreen());
+						coloredData.put(i + 2, (byte) c.getBlue());
 					}
 				}
 			}
-			texture.setImage(image);
+			coloredImage.addData(coloredData);
+			texture = TextureManager.loadFromImage(coloredImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
+			cachedTextures.put(filename + ":" + c, texture);
 		}
 		if (grayout) {
-			final Texture grayoutTexture = cachedGrayTextures.get(filename + ":grayout");
+			final Texture grayoutTexture = cachedTextures.get(filename + ":grayout");
 			if (grayoutTexture != null) {
 				return grayoutTexture;
 			}
@@ -844,7 +856,7 @@ public abstract class HousePart implements Serializable {
 			}
 			grayImage.addData(grayData);
 			texture = TextureManager.loadFromImage(grayImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
-			cachedGrayTextures.put(filename + ":grayout", texture);
+			cachedTextures.put(filename + ":grayout", texture);
 		}
 		return texture;
 	}

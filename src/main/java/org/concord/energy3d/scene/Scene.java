@@ -214,7 +214,8 @@ public class Scene implements Serializable {
 		InternationalSystemOfUnits, USCustomaryUnits
 	};
 
-	public static enum TextureMode { // deprecated
+	@Deprecated
+	public static enum TextureMode {
 		None, Simple, Full // BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE
 	};
 
@@ -301,6 +302,7 @@ public class Scene implements Serializable {
 			p.getRoot().detachAllChildren(); // detachment cannot be put into delete(), we detach all children here to help garbage collection
 		}
 		parts.clear();
+		HousePart.clearCachedTextures();
 		if (groundImage != null) {
 			groundImage.flush();
 			groundImage = null;

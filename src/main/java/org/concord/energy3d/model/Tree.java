@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.SelectUtil;
@@ -225,7 +224,7 @@ public class Tree extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, ColorRGBA.WHITE, TextureMode.Full);
+		updateTextureAndColor(mesh, ColorRGBA.WHITE);
 	}
 
 	@Override

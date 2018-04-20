@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -211,7 +210,7 @@ public class Sensor extends HousePart implements SolarCollector {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, null, TextureMode.Full);
+		updateTextureAndColor(mesh, null);
 	}
 
 	@Override

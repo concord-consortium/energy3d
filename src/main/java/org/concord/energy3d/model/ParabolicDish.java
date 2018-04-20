@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
@@ -481,7 +480,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, ColorRGBA.LIGHT_GRAY, TextureMode.Full);
+		updateTextureAndColor(mesh, ColorRGBA.LIGHT_GRAY);
 	}
 
 	@Override
