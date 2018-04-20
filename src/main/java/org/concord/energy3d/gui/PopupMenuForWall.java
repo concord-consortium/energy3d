@@ -39,11 +39,9 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
-import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
@@ -526,44 +524,8 @@ class PopupMenuForWall extends PopupMenuFactory {
 			final JMenu textureMenu = new JMenu("Texture");
 			popupMenuForWall.add(textureMenu);
 			final ButtonGroup textureButtonGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem rbmiTextureNone = new JRadioButtonMenuItem("No Texture");
-			rbmiTextureNone.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-						Scene.getInstance().setTextureMode(TextureMode.None);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			textureButtonGroup.add(rbmiTextureNone);
-			textureMenu.add(rbmiTextureNone);
-
-			final JRadioButtonMenuItem rbmiTextureOutline = new JRadioButtonMenuItem("Outline Texture");
-			rbmiTextureOutline.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-						Scene.getInstance().setTextureMode(TextureMode.Simple);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			textureButtonGroup.add(rbmiTextureOutline);
-			textureMenu.add(rbmiTextureOutline);
-			textureMenu.addSeparator();
-
+			final JRadioButtonMenuItem rbmiTextureNone = createTextureMenuItem(Wall.TEXTURE_NONE, null);
+			final JRadioButtonMenuItem rbmiTextureEdge = createTextureMenuItem(Wall.TEXTURE_EDGE, null);
 			final JRadioButtonMenuItem rbmiTexture01 = createTextureMenuItem(Wall.TEXTURE_01, "icons/wall_01.png");
 			final JRadioButtonMenuItem rbmiTexture02 = createTextureMenuItem(Wall.TEXTURE_02, "icons/wall_02.png");
 			final JRadioButtonMenuItem rbmiTexture03 = createTextureMenuItem(Wall.TEXTURE_03, "icons/wall_03.png");
@@ -571,6 +533,8 @@ class PopupMenuForWall extends PopupMenuFactory {
 			final JRadioButtonMenuItem rbmiTexture05 = createTextureMenuItem(Wall.TEXTURE_05, "icons/wall_05.png");
 			final JRadioButtonMenuItem rbmiTexture06 = createTextureMenuItem(Wall.TEXTURE_06, "icons/wall_06.png");
 			final JRadioButtonMenuItem rbmiTexture07 = createTextureMenuItem(Wall.TEXTURE_07, "icons/wall_07.png");
+			textureButtonGroup.add(rbmiTextureNone);
+			textureButtonGroup.add(rbmiTextureEdge);
 			textureButtonGroup.add(rbmiTexture01);
 			textureButtonGroup.add(rbmiTexture02);
 			textureButtonGroup.add(rbmiTexture03);
@@ -578,6 +542,9 @@ class PopupMenuForWall extends PopupMenuFactory {
 			textureButtonGroup.add(rbmiTexture05);
 			textureButtonGroup.add(rbmiTexture06);
 			textureButtonGroup.add(rbmiTexture07);
+			textureMenu.add(rbmiTextureNone);
+			textureMenu.add(rbmiTextureEdge);
+			textureMenu.addSeparator();
 			textureMenu.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture02);
 			textureMenu.add(rbmiTexture03);
@@ -590,20 +557,18 @@ class PopupMenuForWall extends PopupMenuFactory {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-						Util.selectSilently(rbmiTextureNone, true);
-						return;
-					}
-					if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
-						Util.selectSilently(rbmiTextureOutline, true);
-						return;
-					}
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Wall)) {
 						return;
 					}
 					final Wall wall = (Wall) selectedPart;
 					switch (wall.getTextureType()) {
+					case Wall.TEXTURE_NONE:
+						Util.selectSilently(rbmiTextureNone, true);
+						break;
+					case Wall.TEXTURE_EDGE:
+						Util.selectSilently(rbmiTextureEdge, true);
+						break;
 					case Wall.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
@@ -887,8 +852,17 @@ class PopupMenuForWall extends PopupMenuFactory {
 	}
 
 	private static JRadioButtonMenuItem createTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
+
+		final JRadioButtonMenuItem m;
+		if (type == HousePart.TEXTURE_NONE) {
+			m = new JRadioButtonMenuItem("No Texture");
+		} else if (type == HousePart.TEXTURE_EDGE) {
+			m = new JRadioButtonMenuItem("Edge Texture");
+		} else {
+			m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+			m.setText("Texture #" + type);
+		}
+
 		m.addItemListener(new ItemListener() {
 
 			private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
@@ -943,6 +917,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 							if (rb1.isSelected()) {
 								final ChangeTextureCommand c = new ChangeTextureCommand(wall);
 								wall.setTextureType(type);
+								wall.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
@@ -955,6 +930,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 								final SetTextureForPartsCommand c = new SetTextureForPartsCommand(walls);
 								for (final HousePart p : walls) {
 									p.setTextureType(type);
+									p.draw();
 								}
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
@@ -963,14 +939,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 							if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 								MainPanel.getInstance().getEnergyButton().setSelected(false);
 							}
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() throws Exception {
-									Scene.getInstance().setTextureMode(TextureMode.Full);
-									SceneManager.getInstance().refresh();
-									return null;
-								}
-							});
+							SceneManager.getInstance().refresh();
 							if (choice == options[0]) {
 								break;
 							}

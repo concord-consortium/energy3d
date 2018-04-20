@@ -20,7 +20,6 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -1469,9 +1468,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	@Override
 	protected String getTextureFileName() {
-		if (Scene.getInstance().getTextureMode() == TextureMode.None || Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
-			return null;
-		}
 		switch (textureType) {
 		case TEXTURE_01:
 			return "foundation_01.png";
@@ -1497,8 +1493,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	@Override
 	public void updateTextureAndColor() {
 		for (final Mesh mesh : sideMesh) {
-			mesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : (getColor() == null ? Scene.getInstance().getFoundationColor() : getColor()));
-			updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+			mesh.setDefaultColor(getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+			updateTextureAndColor(mesh, mesh.getDefaultColor());
 		}
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
 		if (!SceneManager.getInstance().getSolarHeatMap() && importedNodes != null) {

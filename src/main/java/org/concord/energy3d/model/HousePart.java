@@ -71,6 +71,9 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class HousePart implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final int TEXTURE_EDGE = -1;
+	public static final int TEXTURE_NONE = 0;
 	public static final OffsetState offsetState = new OffsetState();
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static final double STRETCH_ROOF_STEP = 1;
@@ -112,7 +115,7 @@ public abstract class HousePart implements Serializable {
 	boolean labelId;
 	String labelCustomText;
 	boolean lockEdit;
-	int textureType = 0;
+	int textureType = TEXTURE_NONE;
 	static final ColorRGBA disabledColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f);
 
 	transient Line heatFlux;
@@ -758,13 +761,13 @@ public abstract class HousePart implements Serializable {
 	public abstract void updateTextureAndColor();
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
-		updateTextureAndColor(mesh, defaultColor, Scene.getInstance().getTextureMode());
+		updateTextureAndColor(mesh, defaultColor, TextureMode.Full);
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
-			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, lockEdit);
+			final Texture texture = getTexture(getTextureFileName(), textureType == TEXTURE_EDGE, defaultColor, lockEdit);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
@@ -779,7 +782,7 @@ public abstract class HousePart implements Serializable {
 				mesh.setDefaultColor(defaultColor);
 			} else {
 				final TextureState ts = new TextureState();
-				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
+				final Texture texture = getTexture(getTextureFileName(), textureType == TEXTURE_EDGE, defaultColor, false);
 				ts.setTexture(texture);
 				mesh.setRenderState(ts);
 				mesh.setDefaultColor(ColorRGBA.WHITE);
@@ -1040,7 +1043,7 @@ public abstract class HousePart implements Serializable {
 
 	/** use the lightness of color to approximate albedo */
 	public float getAlbedo() {
-		if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+		if (textureType != TEXTURE_NONE && textureType != TEXTURE_EDGE) { // TODO
 			return 0.2f;
 		}
 		ReadOnlyColorRGBA c = null;

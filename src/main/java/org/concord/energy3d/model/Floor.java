@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.PolygonWithHoles;
@@ -130,7 +129,7 @@ public class Floor extends HousePart {
 		default:
 			mesh.getSceneHints().setCullHint(CullHint.Inherit);
 		}
-		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
+		final double scale = textureType == TEXTURE_EDGE ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0), false);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		drawOutline();
@@ -221,14 +220,9 @@ public class Floor extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		final TextureMode t = Scene.getInstance().getTextureMode();
-		if (t == TextureMode.None) {
-			return null;
-		}
-		if (t == TextureMode.Simple) {
-			return "floor.png";
-		}
 		switch (textureType) {
+		case TEXTURE_EDGE:
+			return "floor_edge.png";
 		case TEXTURE_01:
 			return "floor_01.png";
 		}

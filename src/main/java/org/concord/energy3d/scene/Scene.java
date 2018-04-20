@@ -107,7 +107,6 @@ public class Scene implements Serializable {
 	private static final Node root = new Node("Model Root");
 	private static final Node originalHouseRoot = new Node("Original Model Root");
 	private static final Node notReceivingShadowRoot = new Node("No-Shadow Root");
-	private static final int currentVersion = 1;
 	private static boolean first = true;
 	private static Scene instance;
 	private static URL url;
@@ -120,7 +119,6 @@ public class Scene implements Serializable {
 	private transient boolean avoidSavingGroundImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
-	private TextureMode textureMode = TextureMode.None;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
 	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1.0f, 0.75f, 0.5f);
@@ -149,7 +147,6 @@ public class Scene implements Serializable {
 	private String city;
 	private String note;
 	private long idCounter;
-	private int version = currentVersion;
 	private int latitude; // Legacy: Do NOT use this in the calculation -- use geoLocation.getLatitude() instead
 	private int solarContrast;
 	private int theme;
@@ -217,8 +214,8 @@ public class Scene implements Serializable {
 		InternationalSystemOfUnits, USCustomaryUnits
 	};
 
-	public static enum TextureMode {
-		None, Simple, Full // BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE // all the capitalized names are deprecated
+	public static enum TextureMode { // deprecated
+		None, Simple, Full // BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE
 	};
 
 	public static Scene getInstance() {
@@ -353,7 +350,6 @@ public class Scene implements Serializable {
 			for (final HousePart part : instance.parts) {
 				part.getRoot();
 			}
-			instance.upgradeSceneToNewVersion();
 			instance.cleanup();
 			loadCameraLocation();
 		}
@@ -604,7 +600,6 @@ public class Scene implements Serializable {
 			in.close();
 
 			// instance.cleanup();
-			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
 				final AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
@@ -802,29 +797,6 @@ public class Scene implements Serializable {
 			}
 		}
 
-	}
-
-	private void upgradeSceneToNewVersion() {
-		if (textureMode == null) {
-			textureMode = TextureMode.Full;
-			for (final HousePart p : parts) {
-				if (p instanceof Roof) {
-					((Roof) p).setOverhangLength(0.2);
-				}
-			}
-		}
-
-		if (version < 1) {
-			for (final HousePart part : parts) {
-				if (part instanceof Foundation) {
-					((Foundation) part).scaleHouseForNewVersion(10);
-				}
-			}
-			cameraLocation = cameraLocation.multiply(10, null);
-			setAnnotationScale(1.0);
-		}
-
-		version = currentVersion;
 	}
 
 	public void connectWalls() {
@@ -1549,16 +1521,6 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().refresh();
 		}
 
-	}
-
-	public void setTextureMode(final TextureMode textureMode) {
-		this.textureMode = textureMode;
-		redrawAll();
-		Scene.getInstance().updateRoofDashLinesColor();
-	}
-
-	public TextureMode getTextureMode() {
-		return textureMode;
 	}
 
 	public void setHeliostatTextureType(final int heliostatTextureType) {

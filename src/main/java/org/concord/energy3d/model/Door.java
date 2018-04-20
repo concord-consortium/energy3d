@@ -160,7 +160,7 @@ public class Door extends HousePart implements Thermal {
 
 		mesh.updateModelBound();
 
-		if (Scene.getInstance().getTextureMode() == TextureMode.None || textureType == 0) {
+		if (textureType == TEXTURE_NONE) {
 
 			outlineMesh.getSceneHints().setCullHint(CullHint.Inherit);
 
@@ -211,20 +211,14 @@ public class Door extends HousePart implements Thermal {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
-		// updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), Scene.getInstance().getTextureMode());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), TextureMode.Full);
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		final TextureMode t = Scene.getInstance().getTextureMode();
-		if (t == TextureMode.None) {
-			return null;
-		}
-		if (t == TextureMode.Simple) {
-			return "door.png";
-		}
 		switch (textureType) {
+		case TEXTURE_EDGE:
+			return "door_edge.png";
 		case TEXTURE_01:
 			return "door_01.png";
 		case TEXTURE_02:

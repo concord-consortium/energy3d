@@ -11,8 +11,6 @@ import java.util.Map;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -239,7 +237,7 @@ public class MeshLib {
 		}
 	}
 
-	public static void applyHoles(final Node root, final List<Window> windows) {
+	public static void applyHoles(final Node root, final List<Window> windows, final int textureType) {
 		final Map<Window, List<ReadOnlyVector3>> holes = new HashMap<Window, List<ReadOnlyVector3>>();
 		for (final Window window : windows) {
 			final ArrayList<ReadOnlyVector3> hole = new ArrayList<ReadOnlyVector3>();
@@ -262,7 +260,7 @@ public class MeshLib {
 				final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
 
 				final ReadOnlyVector3 firstPoint = points3D.get(0);
-				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
+				final double scale = textureType == HousePart.TEXTURE_EDGE ? 0.5 : 0.1;
 				final TPoint o;
 				final TPoint u;
 				final TPoint v;

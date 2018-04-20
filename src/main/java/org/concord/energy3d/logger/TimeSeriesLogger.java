@@ -32,7 +32,6 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
@@ -329,26 +328,6 @@ public class TimeSeriesLogger {
 					stateValue += ", \"New Time\": \"" + (newCal.get(Calendar.HOUR_OF_DAY)) + ":" + newCal.get(Calendar.MINUTE) + "\"";
 					stateValue += ", \"Old Date\": \"" + (oldCal.get(Calendar.MONTH) + 1) + "/" + oldCal.get(Calendar.DAY_OF_MONTH) + "\"";
 					stateValue += ", \"New Date\": \"" + (newCal.get(Calendar.MONTH) + 1) + "/" + newCal.get(Calendar.DAY_OF_MONTH) + "\"}";
-				} else if (lastEdit instanceof ChangeBuildingTextureCommand) {
-					stateValue = "{\"Old Value\": ";
-					TextureMode textureMode = ((ChangeBuildingTextureCommand) lastEdit).getOldValue();
-					if (textureMode == TextureMode.Full) {
-						stateValue += "\"Full\"";
-					} else if (textureMode == TextureMode.Simple) {
-						stateValue += "\"Simple\"";
-					} else if (textureMode == TextureMode.None) {
-						stateValue += "\"None\"";
-					}
-					stateValue += ", \"New Value\": ";
-					textureMode = Scene.getInstance().getTextureMode();
-					if (textureMode == TextureMode.Full) {
-						stateValue += "\"Full\"";
-					} else if (textureMode == TextureMode.Simple) {
-						stateValue += "\"Simple\"";
-					} else if (textureMode == TextureMode.None) {
-						stateValue += "\"None\"";
-					}
-					stateValue += "}";
 				} else if (lastEdit instanceof ChangeThemeCommand) {
 					stateValue = "{\"Old Value\": " + ((ChangeThemeCommand) lastEdit).getOldValue() + ", \"New Value\": " + Scene.getInstance().getTheme() + "}";
 				}
@@ -376,15 +355,22 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\":" + f.getId() + "}";
 				}
 
-				/* colors */
+				/* colors and textures */
 
 				else if (lastEdit instanceof ChangePartColorCommand) {
 					final ChangePartColorCommand c = (ChangePartColorCommand) lastEdit;
 					final HousePart p = c.getPart();
 					final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-					stateValue = "{\"Building\": " + f.getId() + ", \"ID\": " + p.getId();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"ID\": " + p.getId();
 					stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
 					stateValue += ", \"Old Color\": \"" + Util.toString(c.getOldColor()) + "\", \"New Color\": \"" + Util.toString(p.getColor()) + "\"}";
+				} else if (lastEdit instanceof ChangeTextureCommand) {
+					final ChangeTextureCommand c = ((ChangeTextureCommand) lastEdit);
+					final HousePart p = c.getPart();
+					final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"ID\": " + p.getId();
+					stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
+					stateValue += ", \"Old Texture\": " + c.getOldValue() + ", \"New Texture\": " + p.getTextureType() + "}";
 				} else if (lastEdit instanceof ChangeContainerWindowColorCommand) {
 					final ChangeContainerWindowColorCommand cmd = (ChangeContainerWindowColorCommand) lastEdit;
 					final HousePart container = cmd.getContainer();

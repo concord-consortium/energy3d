@@ -90,7 +90,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -3516,11 +3515,11 @@ public class MainFrame extends JFrame {
 				}
 			};
 		} else {
-			if (Scene.getInstance().getTextureMode() != TextureMode.None) { // when the user wants to set the color, automatically switch to no texture
-				if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
+			if (selectedPart.getTextureType() != HousePart.TEXTURE_NONE && selectedPart.getTextureType() != HousePart.TEXTURE_EDGE) { // when the user wants to set the color, automatically switch to no texture
+				if (JOptionPane.showConfirmDialog(this, "To set color for the selected element, we have to remove its texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 					return;
 				}
-				Scene.getInstance().setTextureMode(TextureMode.None);
+				selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 			}
 			final ReadOnlyColorRGBA color = selectedPart.getColor();
 			if (color != null) {
@@ -3747,7 +3746,6 @@ public class MainFrame extends JFrame {
 						}
 					}
 
-					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 					if (restartPrintPreview && PrintController.getInstance().isPrintPreview()) {
 						PrintController.getInstance().restartAnimation();
 					}

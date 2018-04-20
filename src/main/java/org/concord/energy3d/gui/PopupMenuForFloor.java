@@ -26,9 +26,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -167,66 +165,33 @@ class PopupMenuForFloor extends PopupMenuFactory {
 
 			final JMenu textureMenu = new JMenu("Texture");
 			final ButtonGroup textureGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem rbmiTextureNone = new JRadioButtonMenuItem("No Texture");
-			rbmiTextureNone.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-						Scene.getInstance().setTextureMode(TextureMode.None);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			textureGroup.add(rbmiTextureNone);
-			textureMenu.add(rbmiTextureNone);
-
-			final JRadioButtonMenuItem rbmiTextureOutline = new JRadioButtonMenuItem("Outline Texture");
-			rbmiTextureOutline.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-						Scene.getInstance().setTextureMode(TextureMode.Simple);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			textureGroup.add(rbmiTextureOutline);
-			textureMenu.add(rbmiTextureOutline);
-			textureMenu.addSeparator();
-
+			final JRadioButtonMenuItem rbmiTextureNone = createTextureMenuItem(Floor.TEXTURE_NONE, null);
+			final JRadioButtonMenuItem rbmiTextureEdge = createTextureMenuItem(Floor.TEXTURE_EDGE, null);
 			final JRadioButtonMenuItem rbmiTexture01 = createTextureMenuItem(Floor.TEXTURE_01, "icons/floor_01.png");
+			textureGroup.add(rbmiTextureNone);
+			textureGroup.add(rbmiTextureEdge);
 			textureGroup.add(rbmiTexture01);
+			textureMenu.add(rbmiTextureNone);
+			textureMenu.add(rbmiTextureEdge);
+			textureMenu.addSeparator();
 			textureMenu.add(rbmiTexture01);
 
 			textureMenu.addMenuListener(new MenuListener() {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-						Util.selectSilently(rbmiTextureNone, true);
-						return;
-					}
-					if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
-						Util.selectSilently(rbmiTextureOutline, true);
-						return;
-					}
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Floor)) {
 						return;
 					}
 					final Floor floor = (Floor) selectedPart;
 					switch (floor.getTextureType()) {
+					case Floor.TEXTURE_EDGE:
+						Util.selectSilently(rbmiTextureEdge, true);
+						break;
+					case Floor.TEXTURE_NONE:
+						Util.selectSilently(rbmiTextureNone, true);
+						break;
 					case Floor.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
 						break;
@@ -269,8 +234,17 @@ class PopupMenuForFloor extends PopupMenuFactory {
 	}
 
 	private static JRadioButtonMenuItem createTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
+
+		final JRadioButtonMenuItem m;
+		if (type == HousePart.TEXTURE_NONE) {
+			m = new JRadioButtonMenuItem("No Texture");
+		} else if (type == HousePart.TEXTURE_EDGE) {
+			m = new JRadioButtonMenuItem("Edge Texture");
+		} else {
+			m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+			m.setText("Texture #" + type);
+		}
+
 		m.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
@@ -282,14 +256,8 @@ class PopupMenuForFloor extends PopupMenuFactory {
 					final Floor floor = (Floor) selectedPart;
 					final ChangeTextureCommand c = new ChangeTextureCommand(floor);
 					floor.setTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
+					floor.draw();
+					SceneManager.getInstance().refresh();
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 						MainPanel.getInstance().getEnergyButton().setSelected(false);
@@ -298,7 +266,9 @@ class PopupMenuForFloor extends PopupMenuFactory {
 				}
 			}
 		});
+
 		return m;
+
 	}
 
 }

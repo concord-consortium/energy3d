@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -771,8 +770,8 @@ public class Wall extends HousePart implements Thermal {
 		}
 
 		if (texture) {
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
-			final boolean fullTexture = Scene.getInstance().getTextureMode() == TextureMode.Full;
+			final double scale = textureType == TEXTURE_EDGE ? 1.0 : 8.0;
+			final boolean fullTexture = textureType > TEXTURE_NONE;
 			final ReadOnlyVector3 p0 = getAbsPoint(0);
 			final ReadOnlyVector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale * (fullTexture ? 1.5 : 1.0));
 			final ReadOnlyVector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale * (fullTexture ? 2.0 : 1.0));
@@ -1458,13 +1457,9 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		if (Scene.getInstance().getTextureMode() == TextureMode.None) { // backward compatibility
-			return null;
-		}
-		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
-			return "wall.png";
-		}
 		switch (textureType) {
+		case TEXTURE_EDGE:
+			return "wall_edge.png";
 		case TEXTURE_01:
 			return "wall_01.png";
 		case TEXTURE_02:

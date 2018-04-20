@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
@@ -258,7 +257,7 @@ public abstract class Roof extends HousePart implements Thermal {
 				windows.add((Window) part);
 			}
 		}
-		MeshLib.applyHoles(roofPartsRoot, windows);
+		MeshLib.applyHoles(roofPartsRoot, windows, textureType);
 		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 	}
 
@@ -714,13 +713,9 @@ public abstract class Roof extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		if (Scene.getInstance().getTextureMode() == TextureMode.None) { // backward compatibility
-			return null;
-		}
-		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
-			return "roof.png";
-		}
 		switch (textureType) {
+		case TEXTURE_EDGE:
+			return "roof_edge.png";
 		case TEXTURE_01:
 			return "roof_01.png";
 		case TEXTURE_02:
