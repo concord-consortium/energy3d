@@ -3574,6 +3574,17 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all walls on this foundation
 
+	public void setTextureForWalls(final int textureType) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Wall && p.getTopContainer() == this) {
+				final Wall w = (Wall) p;
+				w.setTextureType(textureType);
+				w.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setThicknessOfWalls(final double thickness) {
 		for (final HousePart p : children) {
 			if (p instanceof Wall) {

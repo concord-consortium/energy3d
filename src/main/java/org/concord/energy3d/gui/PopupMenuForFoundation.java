@@ -2460,7 +2460,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final List<HousePart> foundations = Scene.getInstance().getPartsOfSameTypeInBuilding(foundation);
+								final List<HousePart> foundations = Scene.getInstance().getAllPartsOfSameType(foundation);
 								final SetTextureForPartsCommand c = new SetTextureForPartsCommand(foundations);
 								for (final HousePart f : foundations) {
 									f.setTextureType(type);

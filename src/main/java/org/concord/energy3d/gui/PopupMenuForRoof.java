@@ -482,21 +482,6 @@ class PopupMenuForRoof extends PopupMenuFactory {
 						}
 					}
 
-					final ChangeTextureCommand c = new ChangeTextureCommand(roof);
-					roof.setTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			}
 		});

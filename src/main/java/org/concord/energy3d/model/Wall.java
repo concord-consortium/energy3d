@@ -1464,7 +1464,7 @@ public class Wall extends HousePart implements Thermal {
 		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
 			return "wall.png";
 		}
-		switch (Scene.getInstance().getWallTextureType()) {
+		switch (textureType) {
 		case TEXTURE_01:
 			return "wall_01.png";
 		case TEXTURE_02:

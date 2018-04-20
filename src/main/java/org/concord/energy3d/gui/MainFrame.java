@@ -119,14 +119,11 @@ import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
-import org.concord.energy3d.undo.ChangeWallTextureCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -245,7 +242,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
 	private JMenuItem zoomInMenuItem;
 	private JMenuItem zoomOutMenuItem;
-	private JMenu textureMenu;
 	private JMenu themeMenu;
 	private JRadioButtonMenuItem blueSkyMenuItem;
 	private JRadioButtonMenuItem desertMenuItem;
@@ -1746,7 +1742,6 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getGroundImageMenu());
 			viewMenu.add(getThemeMenu());
-			viewMenu.add(getTextureMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -1763,258 +1758,6 @@ public class MainFrame extends JFrame {
 
 		}
 		return viewMenu;
-	}
-
-	private JMenu getTextureMenu() {
-
-		if (textureMenu == null) {
-
-			textureMenu = new JMenu("Texture");
-
-			final JMenuItem removeBuildingTextureMenuItem = new JMenuItem("Remove Building Texture");
-			removeBuildingTextureMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.None);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			});
-			textureMenu.add(removeBuildingTextureMenuItem);
-
-			final JMenuItem outlineBuildingTextureMenuItem = new JMenuItem("Use Outline Building Texture");
-			outlineBuildingTextureMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.Simple);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			});
-			textureMenu.add(outlineBuildingTextureMenuItem);
-
-			textureMenu.addSeparator();
-
-			final JMenu wallTextureMenu = new JMenu("Walls");
-			textureMenu.add(wallTextureMenu);
-
-			final JRadioButtonMenuItem wallTexture01MenuItem = createWallTextureMenuItem(Wall.TEXTURE_01, "icons/wall_01.png");
-			final JRadioButtonMenuItem wallTexture02MenuItem = createWallTextureMenuItem(Wall.TEXTURE_02, "icons/wall_02.png");
-			final JRadioButtonMenuItem wallTexture03MenuItem = createWallTextureMenuItem(Wall.TEXTURE_03, "icons/wall_03.png");
-			final JRadioButtonMenuItem wallTexture04MenuItem = createWallTextureMenuItem(Wall.TEXTURE_04, "icons/wall_04.png");
-			final JRadioButtonMenuItem wallTexture05MenuItem = createWallTextureMenuItem(Wall.TEXTURE_05, "icons/wall_05.png");
-			final JRadioButtonMenuItem wallTexture06MenuItem = createWallTextureMenuItem(Wall.TEXTURE_06, "icons/wall_06.png");
-			final JRadioButtonMenuItem wallTexture07MenuItem = createWallTextureMenuItem(Wall.TEXTURE_07, "icons/wall_07.png");
-			final ButtonGroup wallTextureButtonGroup = new ButtonGroup();
-			wallTextureButtonGroup.add(wallTexture01MenuItem);
-			wallTextureButtonGroup.add(wallTexture02MenuItem);
-			wallTextureButtonGroup.add(wallTexture03MenuItem);
-			wallTextureButtonGroup.add(wallTexture04MenuItem);
-			wallTextureButtonGroup.add(wallTexture05MenuItem);
-			wallTextureButtonGroup.add(wallTexture06MenuItem);
-			wallTextureButtonGroup.add(wallTexture07MenuItem);
-			wallTextureMenu.add(wallTexture01MenuItem);
-			wallTextureMenu.add(wallTexture02MenuItem);
-			wallTextureMenu.add(wallTexture03MenuItem);
-			wallTextureMenu.add(wallTexture04MenuItem);
-			wallTextureMenu.add(wallTexture05MenuItem);
-			wallTextureMenu.add(wallTexture06MenuItem);
-			wallTextureMenu.add(wallTexture07MenuItem);
-			wallTextureMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					wallTextureButtonGroup.clearSelection();
-					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-						switch (Scene.getInstance().getWallTextureType()) {
-						case Wall.TEXTURE_01:
-							Util.selectSilently(wallTexture01MenuItem, true);
-							break;
-						case Wall.TEXTURE_02:
-							Util.selectSilently(wallTexture02MenuItem, true);
-							break;
-						case Wall.TEXTURE_03:
-							Util.selectSilently(wallTexture03MenuItem, true);
-							break;
-						case Wall.TEXTURE_04:
-							Util.selectSilently(wallTexture04MenuItem, true);
-							break;
-						case Wall.TEXTURE_05:
-							Util.selectSilently(wallTexture05MenuItem, true);
-							break;
-						case Wall.TEXTURE_06:
-							Util.selectSilently(wallTexture06MenuItem, true);
-							break;
-						case Wall.TEXTURE_07:
-							Util.selectSilently(wallTexture07MenuItem, true);
-							break;
-						}
-					}
-				}
-			});
-
-			textureMenu.addSeparator();
-
-			final JMenu heliostatTextureMenu = new JMenu("Heliostats");
-			textureMenu.add(heliostatTextureMenu);
-
-			final ButtonGroup heliostatTextureButtonGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem heliostat1MirrorTextureMenuItem = new JRadioButtonMenuItem("Whole Mirror");
-			heliostat1MirrorTextureMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_ONE_MIRROR);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						Scene.getInstance().redrawAll();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			heliostatTextureButtonGroup.add(heliostat1MirrorTextureMenuItem);
-
-			final JRadioButtonMenuItem heliostat2X1MirrorsTextureMenuItem = new JRadioButtonMenuItem("2 \u00D7 1 Mirrors");
-			heliostat2X1MirrorsTextureMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_2X1_MIRRORS);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						Scene.getInstance().redrawAll();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			heliostatTextureButtonGroup.add(heliostat2X1MirrorsTextureMenuItem);
-
-			final JRadioButtonMenuItem heliostat1X2MirrorsTextureMenuItem = new JRadioButtonMenuItem("1 \u00D7 2 Mirrors");
-			heliostat1X2MirrorsTextureMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_1X2_MIRRORS);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						Scene.getInstance().redrawAll();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			heliostatTextureButtonGroup.add(heliostat1X2MirrorsTextureMenuItem);
-
-			final JRadioButtonMenuItem heliostat7X5MirrorsTextureMenuItem = new JRadioButtonMenuItem("7 \u00D7 5 Mirrors");
-			heliostat7X5MirrorsTextureMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_7X5_MIRRORS);
-						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-							MainPanel.getInstance().getEnergyButton().setSelected(false);
-						}
-						Scene.getInstance().redrawAll();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			heliostatTextureButtonGroup.add(heliostat7X5MirrorsTextureMenuItem);
-
-			heliostatTextureMenu.add(heliostat1MirrorTextureMenuItem);
-			heliostatTextureMenu.add(heliostat2X1MirrorsTextureMenuItem);
-			heliostatTextureMenu.add(heliostat1X2MirrorsTextureMenuItem);
-			heliostatTextureMenu.add(heliostat7X5MirrorsTextureMenuItem);
-			heliostatTextureMenu.addMenuListener(new MenuListener() {
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					heliostatTextureButtonGroup.clearSelection();
-					switch (Scene.getInstance().getHeliostatTextureType()) {
-					default:
-						Util.selectSilently(heliostat1MirrorTextureMenuItem, true);
-						break;
-					case Mirror.TEXTURE_2X1_MIRRORS:
-						Util.selectSilently(heliostat2X1MirrorsTextureMenuItem, true);
-						break;
-					case Mirror.TEXTURE_1X2_MIRRORS:
-						Util.selectSilently(heliostat1X2MirrorsTextureMenuItem, true);
-						break;
-					case Mirror.TEXTURE_7X5_MIRRORS:
-						Util.selectSilently(heliostat7X5MirrorsTextureMenuItem, true);
-						break;
-					}
-				}
-			});
-
-		}
-
-		return textureMenu;
-
-	}
-
-	JRadioButtonMenuItem createWallTextureMenuItem(final int type, final String imageFile) {
-		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + type);
-		m.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final ChangeWallTextureCommand c = new ChangeWallTextureCommand();
-					Scene.getInstance().setWallTextureType(type);
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().setTextureMode(TextureMode.Full);
-							SceneManager.getInstance().refresh();
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			}
-		});
-		return m;
 	}
 
 	private JMenu getThemeMenu() {
