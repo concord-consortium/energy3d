@@ -15,14 +15,14 @@ public class Individual implements Comparable<Individual> {
 
 	public void setGene(final int i, final double g) {
 		if (i < 0 || i >= chromosome.length) {
-			throw new IllegalArgumentException("Gene position to set is out of bound: " + i);
+			throw new IllegalArgumentException("Gene index out of bound: " + i);
 		}
 		chromosome[i] = g;
 	}
 
 	public double getGene(final int i) {
 		if (i < 0 || i >= chromosome.length) {
-			throw new IllegalArgumentException("Gene position to set is out of bound: " + i);
+			throw new IllegalArgumentException("Gene index out of bound: " + i);
 		}
 		return chromosome[i];
 	}

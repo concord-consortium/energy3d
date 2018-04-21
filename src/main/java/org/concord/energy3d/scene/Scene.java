@@ -576,7 +576,8 @@ public class Scene implements Serializable {
 		Scene.getInstance().updateEditShapes();
 	}
 
-	public void importFile(final URL url) throws Exception {
+	public AddMultiplePartsCommand importFile(final URL url) throws Exception {
+		AddMultiplePartsCommand cmd = null;
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!PrintController.getInstance().isFinished()) {
@@ -604,7 +605,7 @@ public class Scene implements Serializable {
 			// instance.cleanup();
 
 			if (url != null) {
-				final AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
+				cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
 				double cx = 0;
 				double cy = 0;
 				int count = 0;
@@ -645,7 +646,7 @@ public class Scene implements Serializable {
 		} else {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "URL doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
-
+		return cmd;
 	}
 
 	public void importCollada(final File file) throws Exception {
@@ -1073,6 +1074,22 @@ public class Scene implements Serializable {
 		EnergyPanel.getInstance().update();
 	}
 
+	private boolean isTooFar(final Vector3 p) {
+		if (SceneManager.getInstance().isTopView()) {
+			return false;
+		}
+		final double rc = p.length();
+		final Rectangle2D bounds = getFoundationBounds(true);
+		double rmax = SceneManager.SKY_RADIUS / 1000;
+		if (!Util.isZero(bounds.getWidth() - 0.2) || !Util.isZero(bounds.getHeight() - 0.2)) {
+			final double b = 5 * (bounds.getWidth() + bounds.getHeight());
+			if (b > rmax) {
+				rmax = b;
+			}
+		}
+		return rc > rmax;
+	}
+
 	public void pasteToPickedLocationOnLand() {
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
@@ -1086,6 +1103,15 @@ public class Scene implements Serializable {
 		}
 		final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
 		if (position == null) {
+			return;
+		}
+		if (isTooFar(position)) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "This position to paste was not allowed because it was too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+				}
+			});
 			return;
 		}
 		if (c instanceof Tree || c instanceof Human) {

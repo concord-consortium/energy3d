@@ -67,6 +67,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
@@ -2267,7 +2268,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				try {
 					if (operation == Operation.ADD_BOX) {
-						Scene.getInstance().importFile(MainApplication.class.getResource("prefabs/box.ng3"));
+						final AddMultiplePartsCommand cmd = Scene.getInstance().importFile(MainApplication.class.getResource("prefabs/box.ng3"));
+						if (cmd != null) {
+							Foundation foundation = null;
+							final List<HousePart> parts = cmd.getParts();
+							for (final HousePart p : parts) {
+								if (p instanceof Foundation) {
+									foundation = (Foundation) p;
+									break;
+								}
+							}
+							if (foundation != null) {
+								setSelectedPart(foundation);
+								if (isTooFar(foundation)) {
+									cmd.undo();
+									EventQueue.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This position was not allowed because it was too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+										}
+									});
+								}
+							}
+						}
 						if (!operationStick) {
 							MainPanel.getInstance().defaultTool();
 							cameraControl.setLeftMouseButtonEnabled(true);
@@ -2352,9 +2375,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 													JOptionPane.showMessageDialog(MainFrame.getInstance(), "Adding " + name + " was not allowed because it was placed too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
 												}
 											});
-										} else
-
-										{
+										} else {
 											undoManager.addEdit(addPartCommand);
 											if (selectedPart instanceof Foundation) { // only when we add a new foundation do we ensure the order of its points (later a foundation can be rotated, altering the order)
 												((Foundation) selectedPart).ensureFoundationPointOrder();

@@ -1444,7 +1444,30 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			});
 
-			final JMenuItem miAddUtilityBill = new JMenuItem("Add Utility Bill");
+			final JMenu optimizeMenu = new JMenu("Optimize");
+
+			final JMenuItem miHeliostatField = new JMenuItem("Heliostat Field...");
+			miHeliostatField.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final List<Mirror> heliostats = foundation.getHeliostats();
+					if (heliostats.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+				}
+			});
+			optimizeMenu.add(miHeliostatField);
+
+			final JMenu utilityMenu = new JMenu("Utility Bill");
+
+			final JMenuItem miAddUtilityBill = new JMenuItem("Add");
+			utilityMenu.add(miAddUtilityBill);
 			miAddUtilityBill.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1465,7 +1488,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miDeleteUtilityBill = new JMenuItem("Delete Utility Bill");
+			final JMenuItem miDeleteUtilityBill = new JMenuItem("Delete");
+			utilityMenu.add(miDeleteUtilityBill);
 			miDeleteUtilityBill.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2058,6 +2082,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.add(layoutMenu);
+			popupMenuForFoundation.add(optimizeMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miDisableEditPoints);
 			popupMenuForFoundation.add(miEnableInset);
@@ -2071,9 +2096,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForFoundation.add(miThermostat);
-			popupMenuForFoundation.addSeparator();
-			popupMenuForFoundation.add(miAddUtilityBill);
-			popupMenuForFoundation.add(miDeleteUtilityBill);
+			popupMenuForFoundation.add(utilityMenu);
 			popupMenuForFoundation.addSeparator();
 
 			final JMenu analysisMenu = new JMenu("Analysis");
