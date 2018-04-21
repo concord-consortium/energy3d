@@ -17,6 +17,10 @@ public class Population {
 		}
 	}
 
+	public int getChromosomeLength() {
+		return individuals[0].getChromosomelength();
+	}
+
 	public Individual getIndividual(final int i) {
 		if (i < 0 || i >= individuals.length) {
 			throw new IllegalArgumentException("Individual index out of bound: " + i);
