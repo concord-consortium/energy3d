@@ -1461,17 +1461,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					final GeneticAlgorithm ga = new GeneticAlgorithm(100, 2);
-					final Vector3 v0 = foundation.getAbsPoint(0);
-					final Vector3 v1 = foundation.getAbsPoint(1);
-					final Vector3 v2 = foundation.getAbsPoint(2);
-					final Vector3 v3 = foundation.getAbsPoint(3);
-					final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getAnnotationScale();
-					final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
-					final double lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-					final double ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-					ga.setMinMax(0, cx - lx * 0.5, cx + lx * 0.5);
-					ga.setMinMax(1, cy - ly * 0.5, cy + ly * 0.5);
+					final GeneticAlgorithm ga = new GeneticAlgorithm(2, 2, foundation);
 					ga.evolve();
 				}
 			});

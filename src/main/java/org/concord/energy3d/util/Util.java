@@ -81,6 +81,14 @@ public class Util {
 		return false;
 	}
 
+	public static double sum(final double[] array) {
+		double s = 0;
+		for (final double x : array) {
+			s += x;
+		}
+		return s;
+	}
+
 	public static int countMatch(final Matcher m) {
 		int count = 0;
 		while (m.find()) {

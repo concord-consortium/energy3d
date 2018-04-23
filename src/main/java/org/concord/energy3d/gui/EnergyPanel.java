@@ -944,7 +944,6 @@ public class EnergyPanel extends JPanel {
 
 	public void computeNow() {
 		try {
-			System.out.println("EnergyPanel.computeNow()");
 			cancel = false;
 			EventQueue.invokeLater(new Runnable() {
 				@Override

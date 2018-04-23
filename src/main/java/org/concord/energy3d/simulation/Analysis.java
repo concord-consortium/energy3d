@@ -50,7 +50,6 @@ import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -106,7 +105,6 @@ public abstract class Analysis {
 		try {
 			EnergyPanel.getInstance().computeNow();
 		} catch (final Throwable e) {
-			BugReporter.report(e);
 			return e;
 		} finally {
 			EventQueue.invokeLater(new Runnable() {
