@@ -30,8 +30,8 @@ public class GeneticAlgorithm {
 	private double crossoverRate = 0.9;
 	private double selectionRate = 0.5;
 	private final Population population;
-	private int generationCounter;
-	private int individualCounter;
+	private int outsideGenerationCounter;
+	private int computeCounter;
 	private final double[] mins, maxs;
 	private final Foundation foundation;
 
@@ -55,32 +55,42 @@ public class GeneticAlgorithm {
 	}
 
 	public void evolve() {
-		generationCounter = 0;
-		individualCounter = 0;
+		outsideGenerationCounter = 0;
+		computeCounter = 0;
 		onStart();
 		final HeliostatObjectiveFunction of = new HeliostatObjectiveFunction();
 		final List<Mirror> heliostats = foundation.getHeliostats();
 		while (!shouldTerminate()) {
-			for (int i = 0; i < population.getSize(); i++) {
-				final int i2 = i;
+			for (int i = 0; i < population.size(); i++) {
+				final int indexOfIndividual = i;
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() {
-						final Individual indi = population.getIndividual(i2);
-						for (int j = 0; j < indi.getChromosomelength(); j++) {
-							// final double gene = indi.getGene(j);
+						final int generation = computeCounter / population.size();
+						final Individual individual = population.getIndividual(indexOfIndividual);
+						for (int j = 0; j < individual.getChromosomelength(); j++) {
+							final double gene = individual.getGene(j);
 							// final double val = (mins[j] + gene * (maxs[j] - mins[j]));
 							final int j2 = j / 2;
 							final Mirror m = heliostats.get(j2);
 							if (j % 2 == 0) {
-								m.getPoints().get(0).setX(Math.random());
+								m.getPoints().get(0).setX(gene);
 							} else {
-								m.getPoints().get(0).setY(Math.random());
+								m.getPoints().get(0).setY(gene);
 							}
 						}
 						Scene.getInstance().updateTrackables();
-						of.compute();
-						System.out.println("Generation " + (individualCounter / population.getSize()) + ", individual " + i2 + " = " + of.getResult());
+						individual.setFitness(of.compute());
+						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+
+						final boolean generationEnd = (computeCounter % population.size()) == (population.size() - 1);
+						if (generationEnd) {
+							population.select(selectionRate);
+							population.crossover(crossoverRate);
+							population.mutate(mutationRate);
+						}
+
+						// update graph
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						final Calendar today = (Calendar) c.clone();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -106,12 +116,15 @@ public class GeneticAlgorithm {
 								}
 							}
 						});
-						individualCounter++;
+
+						computeCounter++;
+
 						return null;
+
 					}
 				});
 			}
-			generationCounter++;
+			outsideGenerationCounter++;
 		}
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -128,7 +141,7 @@ public class GeneticAlgorithm {
 	}
 
 	private boolean shouldTerminate() {
-		return generationCounter >= MAX_GENERATION;
+		return outsideGenerationCounter >= MAX_GENERATION;
 	}
 
 	public void setMinMax(final int i, final double min, final double max) {

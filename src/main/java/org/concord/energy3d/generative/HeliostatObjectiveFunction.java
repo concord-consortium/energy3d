@@ -13,20 +13,15 @@ import org.concord.energy3d.util.Util;
  */
 public class HeliostatObjectiveFunction extends ObjectiveFunction {
 
-	private double result = 0;
-
 	public HeliostatObjectiveFunction() {
 
 	}
 
-	public double getResult() {
-		return result;
-	}
-
-	public void compute() {
+	@Override
+	public double compute() {
 		EnergyPanel.getInstance().computeNow();
 		final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
-		result = Util.sum(Scene.getInstance().getSolarResults()[month]);
+		return Util.sum(Scene.getInstance().getSolarResults()[month]);
 	}
 
 }

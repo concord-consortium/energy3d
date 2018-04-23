@@ -12,4 +12,6 @@ public abstract class ObjectiveFunction {
 		cancelled = true;
 	}
 
+	public abstract double compute();
+
 }
