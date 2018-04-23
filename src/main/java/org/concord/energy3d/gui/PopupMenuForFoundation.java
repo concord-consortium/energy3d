@@ -1461,7 +1461,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					final GeneticAlgorithm ga = new GeneticAlgorithm(4, 2, foundation);
+					final GeneticAlgorithm ga = new GeneticAlgorithm(16, foundation.getHeliostats().size() * 2, foundation);
 					ga.evolve();
 				}
 			});

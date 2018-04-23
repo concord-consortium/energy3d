@@ -85,7 +85,7 @@ public class GeneticAlgorithm {
 
 						final boolean generationEnd = (computeCounter % population.size()) == (population.size() - 1);
 						if (generationEnd) {
-							population.select(selectionRate);
+							population.selectSurvivors(selectionRate);
 							population.crossover(crossoverRate);
 							population.mutate(mutationRate);
 						}
