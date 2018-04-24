@@ -11,9 +11,21 @@ public class Individual implements Comparable<Individual> {
 
 	/** create an individual with the specified length and initialize its chromosome with random values between 0 and 1 */
 	public Individual(final int length) {
+		this(length, true);
+	}
+
+	/** @return a copy */
+	public Individual(final Individual original) {
+		this(original.chromosome.length, false);
+		System.arraycopy(original.chromosome, 0, chromosome, 0, chromosome.length);
+	}
+
+	private Individual(final int length, final boolean randomize) {
 		chromosome = new double[length];
-		for (int i = 0; i < length; i++) {
-			chromosome[i] = Math.random();
+		if (randomize) {
+			for (int i = 0; i < length; i++) {
+				chromosome[i] = Math.random();
+			}
 		}
 	}
 
@@ -31,7 +43,7 @@ public class Individual implements Comparable<Individual> {
 		return chromosome[i];
 	}
 
-	public int getChromosomelength() {
+	public int getChromosomeLength() {
 		return chromosome.length;
 	}
 

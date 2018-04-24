@@ -13,6 +13,8 @@ public class Population {
 	private final Individual[] individuals;
 	private final List<Individual> survivors = new ArrayList<Individual>();
 	private double beta = 0.5;
+	private final List<Individual> toMutate = new ArrayList<Individual>();
+	private final List<Individual> toMutateOriginal = new ArrayList<Individual>();
 
 	public Population(final int populationSize, final int chromosomeLength) {
 		individuals = new Individual[populationSize];
@@ -21,8 +23,12 @@ public class Population {
 		}
 	}
 
+	public int size() {
+		return individuals.length;
+	}
+
 	public int getChromosomeLength() {
-		return individuals[0].getChromosomelength();
+		return individuals[0].getChromosomeLength();
 	}
 
 	public Individual getIndividual(final int i) {
@@ -32,10 +38,14 @@ public class Population {
 		return individuals[i];
 	}
 
+	public void sort() {
+		Arrays.sort(individuals);
+	}
+
 	/** select the survivors based on elitism specified by the rate of selection */
 	public void selectSurvivors(final double selectionRate) {
 		survivors.clear();
-		Arrays.sort(individuals);
+		sort();
 		for (int i = 0; i < individuals.length; i++) {
 			if (i < selectionRate * individuals.length) {
 				survivors.add(individuals[i]);
@@ -105,7 +115,7 @@ public class Population {
 
 		int childIndex = numberOfSurvivers;
 		for (final Parents p : oldFolks) {
-			final int n = p.dad.getChromosomelength();
+			final int n = p.dad.getChromosomeLength();
 			final Individual child1 = new Individual(n);
 			final Individual child2 = new Individual(n);
 			beta = Math.random();
@@ -134,22 +144,31 @@ public class Population {
 		if (m == 0) { // ensure at least one mutant?
 			m = 1;
 		}
-		final List<Individual> toMutate = new ArrayList<Individual>(m);
+		toMutate.clear();
+		toMutateOriginal.clear();
 		while (toMutate.size() < m) {
 			final int k = (int) (1 + Math.random() * (individuals.length - 2));
 			if (!toMutate.contains(individuals[k])) {
 				toMutate.add(individuals[k]);
+				toMutateOriginal.add(new Individual(individuals[k]));
 			}
 		}
 		// randomly select a gene of a picked individual to mutate (only one gene to mutate at a time)
 		for (final Individual i : toMutate) {
-			final int n = (int) (Math.random() * (i.getChromosomelength() - 1));
+			final int n = (int) (Math.random() * (i.getChromosomeLength() - 1));
 			i.setGene(n, Math.random());
 		}
 	}
 
-	public int size() {
-		return individuals.length;
+	public void undoMutation() {
+		if (toMutateOriginal.isEmpty() || toMutate.isEmpty()) {
+			return;
+		}
+		for (final Individual ind : toMutate) {
+			for (int j = 0; j < ind.getChromosomeLength(); j++) {
+				ind.setGene(j, toMutateOriginal.get(toMutate.indexOf(ind)).getGene(j));
+			}
+		}
 	}
 
 }
