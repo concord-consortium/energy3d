@@ -25,7 +25,7 @@ import com.ardor3d.math.Vector3;
  */
 public class GeneticAlgorithm {
 
-	private final static int MAX_GENERATION = 5;
+	private final static int MAX_GENERATION = 10;
 
 	private double mutationRate = 0.1;
 	private double crossoverRate = 0.9;
@@ -80,7 +80,7 @@ public class GeneticAlgorithm {
 		computeCounter = 0;
 		final HeliostatObjectiveFunction of = new HeliostatObjectiveFunction();
 
-		while (!shouldTerminate()) {
+		while (!shouldTerminate()) { // the number of individuals to evaluate is MAX_GENERATION * population.size()
 			for (int i = 0; i < population.size(); i++) {
 				computeIndividual(i, of);
 			}
@@ -90,7 +90,6 @@ public class GeneticAlgorithm {
 		computeIndividual(0, of);
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
-
 			@Override
 			public Object call() {
 				EventQueue.invokeLater(new Runnable() {
@@ -101,7 +100,6 @@ public class GeneticAlgorithm {
 				});
 				return null;
 			}
-
 		});
 
 	}
@@ -123,12 +121,11 @@ public class GeneticAlgorithm {
 						m.getPoints().get(0).setY(gene);
 					}
 				}
-				Scene.getInstance().updateTrackables();
 				individual.setFitness(of.compute());
 				System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
 
-				final boolean generationEnd = (computeCounter % populationSize) == (populationSize - 1);
-				if (generationEnd) {
+				final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
+				if (isAtTheEndOfGeneration) {
 					population.selectSurvivors(selectionRate);
 					population.crossover(crossoverRate);
 					population.mutate(mutationRate);
@@ -152,7 +149,6 @@ public class GeneticAlgorithm {
 									if (c instanceof CircularBound) {
 										final CircularBound cb = (CircularBound) c;
 										if (!cb.meet(x[j2], y[j2])) {
-											population.undoMutation();
 											break;
 										}
 									}
@@ -162,33 +158,7 @@ public class GeneticAlgorithm {
 					}
 				}
 
-				// update graph
-				final Calendar c = Heliodon.getInstance().getCalendar();
-				final Calendar today = (Calendar) c.clone();
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart instanceof Foundation) { // synchronize with daily graph
-					final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
-					if (g.hasGraph()) {
-						g.setCalendar(today);
-						g.updateGraph();
-					}
-				}
-				final Calendar today2 = today;
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
-						if (selectedPart instanceof Foundation) {
-							final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
-							EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
-							if (!g.hasGraph()) {
-								g.setCalendar(today2);
-								g.addGraph((Foundation) selectedPart);
-							}
-						}
-					}
-				});
-
+				updateGraph();
 				computeCounter++;
 
 				return null;
@@ -196,6 +166,33 @@ public class GeneticAlgorithm {
 			}
 		});
 
+	}
+
+	private void updateGraph() {
+		final Calendar c = Heliodon.getInstance().getCalendar();
+		final Calendar today = (Calendar) c.clone();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof Foundation) { // synchronize with daily graph
+			final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
+			if (g.hasGraph()) {
+				g.setCalendar(today);
+				g.updateGraph();
+			}
+		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
+				if (selectedPart instanceof Foundation) {
+					final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
+					EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
+					if (!g.hasGraph()) {
+						g.setCalendar(today);
+						g.addGraph((Foundation) selectedPart);
+					}
+				}
+			}
+		});
 	}
 
 	public void addConstraint(final Constraint c) {

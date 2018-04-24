@@ -19,6 +19,7 @@ public class HeliostatObjectiveFunction extends ObjectiveFunction {
 
 	@Override
 	public double compute() {
+		Scene.getInstance().updateTrackables();
 		EnergyPanel.getInstance().computeNow();
 		final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
 		return Util.sum(Scene.getInstance().getSolarResults()[month]);

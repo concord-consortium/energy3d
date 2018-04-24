@@ -14,7 +14,6 @@ public class Population {
 	private final List<Individual> survivors = new ArrayList<Individual>();
 	private double beta = 0.5;
 	private final List<Individual> toMutate = new ArrayList<Individual>();
-	private final List<Individual> toMutateOriginal = new ArrayList<Individual>();
 
 	public Population(final int populationSize, final int chromosomeLength) {
 		individuals = new Individual[populationSize];
@@ -145,29 +144,16 @@ public class Population {
 			m = 1;
 		}
 		toMutate.clear();
-		toMutateOriginal.clear();
 		while (toMutate.size() < m) {
 			final int k = (int) (1 + Math.random() * (individuals.length - 2));
 			if (!toMutate.contains(individuals[k])) {
 				toMutate.add(individuals[k]);
-				toMutateOriginal.add(new Individual(individuals[k]));
 			}
 		}
 		// randomly select a gene of a picked individual to mutate (only one gene to mutate at a time)
 		for (final Individual i : toMutate) {
 			final int n = (int) (Math.random() * (i.getChromosomeLength() - 1));
 			i.setGene(n, Math.random());
-		}
-	}
-
-	public void undoMutation() {
-		if (toMutateOriginal.isEmpty() || toMutate.isEmpty()) {
-			return;
-		}
-		for (final Individual ind : toMutate) {
-			for (int j = 0; j < ind.getChromosomeLength(); j++) {
-				ind.setGene(j, toMutateOriginal.get(toMutate.indexOf(ind)).getGene(j));
-			}
 		}
 	}
 

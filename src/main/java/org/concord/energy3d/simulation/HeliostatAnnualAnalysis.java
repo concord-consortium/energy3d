@@ -74,7 +74,6 @@ public class HeliostatAnnualAnalysis extends AnnualAnalysis {
 								g.updateGraph();
 							}
 						}
-						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -83,7 +82,7 @@ public class HeliostatAnnualAnalysis extends AnnualAnalysis {
 									final CspProjectDailyEnergyGraph g = e.getCspProjectDailyEnergyGraph();
 									e.getCspProjectTabbedPane().setSelectedComponent(g);
 									if (!g.hasGraph()) {
-										g.setCalendar(today2);
+										g.setCalendar(today);
 										g.addGraph((Foundation) selectedPart);
 									}
 								}

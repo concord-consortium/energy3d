@@ -77,7 +77,6 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 								g.updateGraph();
 							}
 						}
-						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -86,7 +85,7 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 									final PvProjectDailyEnergyGraph g = e.getPvProjectDailyEnergyGraph();
 									e.getPvProjectTabbedPane().setSelectedComponent(g);
 									if (!g.hasGraph()) {
-										g.setCalendar(today2);
+										g.setCalendar(today);
 										g.addGraph((Foundation) selectedPart);
 									}
 								}

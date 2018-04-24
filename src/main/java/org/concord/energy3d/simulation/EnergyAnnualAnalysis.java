@@ -58,11 +58,10 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					Calendar today;
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
-						today = (Calendar) c.clone();
+						final Calendar today = (Calendar) c.clone();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();
@@ -80,7 +79,6 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 								e.getBuildingDailyEnergyGraph().updateGraph();
 							}
 						}
-						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -88,7 +86,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 								if (selectedPart instanceof Foundation) {
 									e.getBuildingTabbedPane().setSelectedComponent(e.getBuildingDailyEnergyGraph());
 									if (!e.getBuildingDailyEnergyGraph().hasGraph()) {
-										e.getBuildingDailyEnergyGraph().setCalendar(today2);
+										e.getBuildingDailyEnergyGraph().setCalendar(today);
 										e.getBuildingDailyEnergyGraph().addGraph((Foundation) selectedPart);
 									}
 								}
