@@ -205,6 +205,10 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			final JRadioButtonMenuItem rbmiTexture06 = createTextureMenuItem(Door.TEXTURE_06, "icons/door_06.png");
 			final JRadioButtonMenuItem rbmiTexture07 = createTextureMenuItem(Door.TEXTURE_07, "icons/door_07.png");
 			final JRadioButtonMenuItem rbmiTexture08 = createTextureMenuItem(Door.TEXTURE_08, "icons/door_08.png");
+			final JRadioButtonMenuItem rbmiTexture09 = createTextureMenuItem(Door.TEXTURE_09, "icons/door_09.png");
+			final JRadioButtonMenuItem rbmiTexture10 = createTextureMenuItem(Door.TEXTURE_10, "icons/door_10.png");
+			final JRadioButtonMenuItem rbmiTexture11 = createTextureMenuItem(Door.TEXTURE_11, "icons/door_11.png");
+			final JRadioButtonMenuItem rbmiTexture12 = createTextureMenuItem(Door.TEXTURE_12, "icons/door_12.png");
 			textureGroup.add(rbmiTextureNone);
 			textureGroup.add(rbmiTextureEdge);
 			textureGroup.add(rbmiTexture01);
@@ -215,6 +219,10 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			textureGroup.add(rbmiTexture06);
 			textureGroup.add(rbmiTexture07);
 			textureGroup.add(rbmiTexture08);
+			textureGroup.add(rbmiTexture09);
+			textureGroup.add(rbmiTexture10);
+			textureGroup.add(rbmiTexture11);
+			textureGroup.add(rbmiTexture12);
 			textureMenu.add(rbmiTextureNone);
 			textureMenu.add(rbmiTextureEdge);
 			textureMenu.addSeparator();
@@ -226,6 +234,10 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			textureMenu.add(rbmiTexture06);
 			textureMenu.add(rbmiTexture07);
 			textureMenu.add(rbmiTexture08);
+			textureMenu.add(rbmiTexture09);
+			textureMenu.add(rbmiTexture10);
+			textureMenu.add(rbmiTexture11);
+			textureMenu.add(rbmiTexture12);
 
 			textureMenu.addMenuListener(new MenuListener() {
 
@@ -263,6 +275,18 @@ class PopupMenuForDoor extends PopupMenuFactory {
 						break;
 					case Door.TEXTURE_08:
 						Util.selectSilently(rbmiTexture08, true);
+						break;
+					case Door.TEXTURE_09:
+						Util.selectSilently(rbmiTexture09, true);
+						break;
+					case Door.TEXTURE_10:
+						Util.selectSilently(rbmiTexture10, true);
+						break;
+					case Door.TEXTURE_11:
+						Util.selectSilently(rbmiTexture11, true);
+						break;
+					case Door.TEXTURE_12:
+						Util.selectSilently(rbmiTexture12, true);
 						break;
 					default:
 						textureGroup.clearSelection();

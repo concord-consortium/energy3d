@@ -25,7 +25,7 @@ import com.ardor3d.math.Vector3;
  */
 public class GeneticAlgorithm {
 
-	private final static int MAX_GENERATION = 10;
+	private final static int MAX_GENERATION = 5;
 
 	private double mutationRate = 0.1;
 	private double crossoverRate = 0.9;
@@ -129,33 +129,6 @@ public class GeneticAlgorithm {
 					population.selectSurvivors(selectionRate);
 					population.crossover(crossoverRate);
 					population.mutate(mutationRate);
-					final boolean processConstraints = false; // TODO
-					if (processConstraints) {
-						for (int k = 0; k < populationSize; k++) {
-							final Individual ind = population.getIndividual(k);
-							final double[] x = new double[chromosomeLength / 2];
-							final double[] y = new double[chromosomeLength / 2];
-							for (int j = 0; j < chromosomeLength; j++) {
-								final double gene = ind.getGene(j);
-								final int j2 = j / 2;
-								if (j % 2 == 0) {
-									x[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
-								} else {
-									y[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
-								}
-							}
-							for (int j2 = 0; j2 < x.length; j2++) {
-								for (final Constraint c : constraints) {
-									if (c instanceof CircularBound) {
-										final CircularBound cb = (CircularBound) c;
-										if (!cb.meet(x[j2], y[j2])) {
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 
 				updateGraph();
@@ -166,6 +139,31 @@ public class GeneticAlgorithm {
 			}
 		});
 
+	}
+
+	boolean meetConstraints(final Individual individual) {
+		final double[] x = new double[chromosomeLength / 2];
+		final double[] y = new double[chromosomeLength / 2];
+		for (int j = 0; j < chromosomeLength; j++) {
+			final double gene = individual.getGene(j);
+			final int j2 = j / 2;
+			if (j % 2 == 0) {
+				x[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
+			} else {
+				y[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
+			}
+		}
+		for (int j2 = 0; j2 < x.length; j2++) {
+			for (final Constraint c : constraints) {
+				if (c instanceof CircularBound) {
+					final CircularBound cb = (CircularBound) c;
+					if (!cb.meet(x[j2], y[j2])) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private void updateGraph() {

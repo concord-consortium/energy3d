@@ -30,6 +30,10 @@ public class Door extends HousePart implements Thermal {
 	public static final int TEXTURE_06 = 6;
 	public static final int TEXTURE_07 = 7;
 	public static final int TEXTURE_08 = 8;
+	public static final int TEXTURE_09 = 9;
+	public static final int TEXTURE_10 = 10;
+	public static final int TEXTURE_11 = 11;
+	public static final int TEXTURE_12 = 12;
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_DOOR_HEIGHT = 10;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
@@ -64,7 +68,7 @@ public class Door extends HousePart implements Thermal {
 		root.attachChild(mesh);
 
 		outlineMesh = new Line("Door (Outline)");
-		outlineMesh.setLineWidth(2);
+		outlineMesh.setLineWidth(1);
 		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6 + 2 * 4));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new BoundingBox());
@@ -159,25 +163,21 @@ public class Door extends HousePart implements Thermal {
 
 		mesh.updateModelBound();
 
+		outlineMesh.getSceneHints().setCullHint(CullHint.Inherit);
+		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
+		outlineBuffer.rewind();
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final Vector3 p3 = getAbsPoint(3);
+		outlineBuffer.put(p0.getXf()).put(p0.getYf()).put(p0.getZf());
+		outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		outlineBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		if (textureType == TEXTURE_NONE) {
-
-			outlineMesh.getSceneHints().setCullHint(CullHint.Inherit);
-
-			final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
-			outlineBuffer.rewind();
-			final Vector3 p0 = getAbsPoint(0);
-			final Vector3 p1 = getAbsPoint(1);
-			final Vector3 p2 = getAbsPoint(2);
-			final Vector3 p3 = getAbsPoint(3);
-			outlineBuffer.put(p0.getXf()).put(p0.getYf()).put(p0.getZf());
-			outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-			outlineBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-			outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-			outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-
 			final double dmin = 0.1 * Math.min(p0.distance(p1), p0.distance(p2));
-
 			final Vector3 d10 = p1.subtract(p0, null).normalizeLocal().multiplyLocal(dmin);
 			final Vector3 d20 = p2.subtract(p0, null).normalizeLocal().multiplyLocal(dmin);
 			final Vector3 v0 = p0.add(d10, null).addLocal(d20);
@@ -192,14 +192,8 @@ public class Door extends HousePart implements Thermal {
 			outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
 			outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
 			outlineBuffer.put(v3.getXf()).put(v3.getYf()).put(v3.getZf());
-
-			outlineMesh.updateModelBound();
-
-		} else {
-
-			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
-
 		}
+		outlineMesh.updateModelBound();
 
 	}
 
@@ -234,6 +228,14 @@ public class Door extends HousePart implements Thermal {
 			return "door_07.png";
 		case TEXTURE_08:
 			return "door_08.png";
+		case TEXTURE_09:
+			return "door_09.png";
+		case TEXTURE_10:
+			return "door_10.png";
+		case TEXTURE_11:
+			return "door_11.png";
+		case TEXTURE_12:
+			return "door_12.png";
 		}
 		return null;
 	}

@@ -11,9 +11,9 @@ import java.util.List;
 public class Population {
 
 	private final Individual[] individuals;
-	private final List<Individual> survivors = new ArrayList<Individual>();
 	private double beta = 0.5;
-	private final List<Individual> toMutate = new ArrayList<Individual>();
+	private final List<Individual> survivors = new ArrayList<Individual>();
+	private final List<Individual> mutants = new ArrayList<Individual>();
 
 	public Population(final int populationSize, final int chromosomeLength) {
 		individuals = new Individual[populationSize];
@@ -143,15 +143,15 @@ public class Population {
 		if (m == 0) { // ensure at least one mutant?
 			m = 1;
 		}
-		toMutate.clear();
-		while (toMutate.size() < m) {
+		mutants.clear();
+		while (mutants.size() < m) {
 			final int k = (int) (1 + Math.random() * (individuals.length - 2));
-			if (!toMutate.contains(individuals[k])) {
-				toMutate.add(individuals[k]);
+			if (!mutants.contains(individuals[k])) {
+				mutants.add(individuals[k]);
 			}
 		}
 		// randomly select a gene of a picked individual to mutate (only one gene to mutate at a time)
-		for (final Individual i : toMutate) {
+		for (final Individual i : mutants) {
 			final int n = (int) (Math.random() * (i.getChromosomeLength() - 1));
 			i.setGene(n, Math.random());
 		}
