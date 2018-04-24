@@ -107,6 +107,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static HeliostatRectangularFieldLayout heliostatRectangularFieldLayout = new HeliostatRectangularFieldLayout();
 	private static HeliostatCircularFieldLayout heliostatCircularFieldLayout = new HeliostatCircularFieldLayout();
 	private static HeliostatSpiralFieldLayout heliostatSpiralFieldLayout = new HeliostatSpiralFieldLayout();
+	private static int populationSize = 32;
+	private static int generationNumber = 5;
 
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
 
@@ -1462,8 +1464,52 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					final GeneticAlgorithm ga = new GeneticAlgorithm(64, foundation);
-					ga.evolve(ObjectiveFunction.DAILY);
+
+					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Type:"));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
+					panel.add(typeComboBox);
+					panel.add(new JLabel("Population size:"));
+					final JTextField populationField = new JTextField(populationSize + "");
+					panel.add(populationField);
+					panel.add(new JLabel("Generation number:"));
+					final JTextField generationField = new JTextField(generationNumber + "");
+					panel.add(generationField);
+					SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								populationSize = Integer.parseInt(populationField.getText());
+								generationNumber = Integer.parseInt(generationField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (populationSize <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (generationNumber <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Generation number must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									final GeneticAlgorithm ga = new GeneticAlgorithm(populationSize, foundation, generationNumber);
+									ga.evolve(ObjectiveFunction.DAILY);
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
 				}
 			});
 			optimizeMenu.add(miHeliostatDailyOutput);
@@ -1482,8 +1528,51 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					final GeneticAlgorithm ga = new GeneticAlgorithm(32, foundation);
-					ga.evolve(ObjectiveFunction.ANNUAl);
+					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Type:"));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
+					panel.add(typeComboBox);
+					panel.add(new JLabel("Population size:"));
+					final JTextField populationField = new JTextField(populationSize + "");
+					panel.add(populationField);
+					panel.add(new JLabel("Generation number:"));
+					final JTextField generationField = new JTextField(generationNumber + "");
+					panel.add(generationField);
+					SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								populationSize = Integer.parseInt(populationField.getText());
+								generationNumber = Integer.parseInt(generationField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (populationSize <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (generationNumber <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Generation number must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									final GeneticAlgorithm ga = new GeneticAlgorithm(populationSize, foundation, generationNumber);
+									ga.evolve(ObjectiveFunction.ANNUAl);
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
 				}
 			});
 			optimizeMenu.add(miHeliostatAnnualOutput);

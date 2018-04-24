@@ -25,8 +25,7 @@ import com.ardor3d.math.Vector3;
  */
 public class GeneticAlgorithm {
 
-	private final static int MAX_GENERATION = 5;
-
+	private int maximumGeneration = 5;
 	private double mutationRate = 0.1;
 	private double crossoverRate = 0.9;
 	private double selectionRate = 0.5;
@@ -39,9 +38,10 @@ public class GeneticAlgorithm {
 	private final int populationSize;
 	private final int chromosomeLength;
 
-	public GeneticAlgorithm(final int populationSize, final Foundation foundation) {
+	public GeneticAlgorithm(final int populationSize, final Foundation foundation, final int maximumGeneration) {
 		this.populationSize = populationSize;
 		this.foundation = foundation;
+		this.maximumGeneration = maximumGeneration;
 		chromosomeLength = foundation.getHeliostats().size() * 2;
 		population = new Population(populationSize, chromosomeLength);
 		Vector3 v0 = foundation.getAbsPoint(0);
@@ -138,7 +138,7 @@ public class GeneticAlgorithm {
 					population.mutate(mutationRate);
 				}
 
-				updateGraph();
+				updateInfo();
 				computeCounter++;
 
 				return null;
@@ -173,7 +173,12 @@ public class GeneticAlgorithm {
 		return true;
 	}
 
-	private void updateGraph() {
+	private void updateInfo() {
+		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
+		if (receiver != null) {
+			receiver.setLabelCustomText(EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			receiver.draw();
+		}
 		final Calendar c = Heliodon.getInstance().getCalendar();
 		final Calendar today = (Calendar) c.clone();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -205,7 +210,7 @@ public class GeneticAlgorithm {
 	}
 
 	private boolean shouldTerminate() {
-		return outsideGenerationCounter >= MAX_GENERATION;
+		return outsideGenerationCounter >= maximumGeneration;
 	}
 
 	public void setMinMax(final int i, final double min, final double max) {
