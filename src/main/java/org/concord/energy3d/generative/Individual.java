@@ -29,6 +29,10 @@ public class Individual implements Comparable<Individual> {
 		}
 	}
 
+	public void copyGenes(final Individual original) {
+		System.arraycopy(original.chromosome, 0, chromosome, 0, chromosome.length);
+	}
+
 	public void setGene(final int i, final double g) {
 		if (i < 0 || i >= chromosome.length) {
 			throw new IllegalArgumentException("Gene index out of bound: " + i);

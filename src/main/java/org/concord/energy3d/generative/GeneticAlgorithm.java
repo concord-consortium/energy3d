@@ -59,7 +59,8 @@ public class GeneticAlgorithm {
 			setMinMax(i + 1, cy - ly * 0.5, cy + ly * 0.5);
 		}
 		constraints = new ArrayList<Constraint>();
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
+		final Mirror heliostat = foundation.getHeliostats().get(0);
+		final Foundation receiver = heliostat.getReceiver();
 		if (receiver != null) {
 			v0 = receiver.getAbsPoint(0);
 			v1 = receiver.getAbsPoint(1);
@@ -69,7 +70,7 @@ public class GeneticAlgorithm {
 			cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
 			lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
 			ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-			addConstraint(new CircularBound(cx, cy, Math.max(lx, ly) * 0.5, false));
+			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getMirrorWidth(), ly + heliostat.getMirrorHeight()));
 		}
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
@@ -133,12 +134,15 @@ public class GeneticAlgorithm {
 
 				final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 				if (isAtTheEndOfGeneration) {
+					population.saveGenes();
 					population.selectSurvivors(selectionRate);
 					population.crossover(crossoverRate);
 					population.mutate(mutationRate);
+					detectViolations();
+					population.restoreGenes();
 				}
 
-				updateInfo();
+				updateInfo(of.getType());
 				computeCounter++;
 
 				return null;
@@ -148,35 +152,56 @@ public class GeneticAlgorithm {
 
 	}
 
-	boolean meetConstraints(final Individual individual) {
-		final double[] x = new double[chromosomeLength / 2];
-		final double[] y = new double[chromosomeLength / 2];
-		for (int j = 0; j < chromosomeLength; j++) {
-			final double gene = individual.getGene(j);
-			final int j2 = j / 2;
-			if (j % 2 == 0) {
-				x[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
-			} else {
-				y[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
-			}
-		}
-		for (int j2 = 0; j2 < x.length; j2++) {
-			for (final Constraint c : constraints) {
-				if (c instanceof CircularBound) {
-					final CircularBound cb = (CircularBound) c;
-					if (!cb.meet(x[j2], y[j2])) {
-						return false;
-					}
+	// if anyone in the current population doesn't meed the constraints, the entire population dies and the algorithm reverts to the previous generation -- not efficient
+	private void detectViolations() {
+		for (int i = 0; i < populationSize; i++) {
+			final Individual individual = population.getIndividual(i);
+			final double[] x = new double[chromosomeLength / 2];
+			final double[] y = new double[chromosomeLength / 2];
+			for (int j = 0; j < chromosomeLength; j++) {
+				final double gene = individual.getGene(j);
+				final int j2 = j / 2;
+				if (j % 2 == 0) {
+					x[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
+				} else {
+					y[j2] = (mins[j] + gene * (maxs[j] - mins[j]));
 				}
 			}
+			for (int j2 = 0; j2 < x.length; j2++) {
+				for (final Constraint c : constraints) {
+					if (c instanceof RectangularBound) {
+						final RectangularBound rb = (RectangularBound) c;
+						if (rb.contains(x[j2], y[j2])) {
+							population.setViolation(i, true);
+						}
+					}
+				}
+				// if (j2 > 0) { // detect position overlaps
+				// final double wj2 = Math.max(foundation.getHeliostats().get(j2).getMirrorWidth(), foundation.getHeliostats().get(j2).getMirrorHeight());
+				// for (int k2 = 0; k2 < j2; k2++) {
+				// final double wk2 = Math.max(foundation.getHeliostats().get(k2).getMirrorWidth(), foundation.getHeliostats().get(k2).getMirrorHeight());
+				// final double dx = x[j2] - x[k2];
+				// final double dy = y[j2] - y[k2];
+				// if (dx * dx + dy * dy < 0.49 * wj2 * wk2) {
+				// population.setViolation(i, true);
+				// }
+				// }
+				// }
+			}
 		}
-		return true;
 	}
 
-	private void updateInfo() {
+	private void updateInfo(final int type) {
 		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
 		if (receiver != null) {
-			receiver.setLabelCustomText(EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			switch (type) {
+			case ObjectiveFunction.DAILY:
+				receiver.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+				break;
+			case ObjectiveFunction.ANNUAl:
+				receiver.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
+				break;
+			}
 			receiver.draw();
 		}
 		final Calendar c = Heliodon.getInstance().getCalendar();

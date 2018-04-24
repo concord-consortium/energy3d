@@ -1466,16 +1466,22 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 
 					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Solution:"));
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
+					panel.add(solutionComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output" });
+					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
 					panel.add(new JLabel("Generation number:"));
 					final JTextField generationField = new JTextField(generationNumber + "");
 					panel.add(generationField);
-					SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 5, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1529,16 +1535,22 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						return;
 					}
 					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Solution:"));
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
+					panel.add(solutionComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Annual Output" });
+					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
 					panel.add(new JLabel("Generation number:"));
 					final JTextField generationField = new JTextField(generationNumber + "");
 					panel.add(generationField);
-					SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 5, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1576,6 +1588,31 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 			});
 			optimizeMenu.add(miHeliostatAnnualOutput);
+
+			optimizeMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					miHeliostatDailyOutput.setEnabled(foundation.getHeliostats().size() > 0);
+					miHeliostatAnnualOutput.setEnabled(foundation.getHeliostats().size() > 0);
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					optimizeMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					optimizeMenu.setEnabled(true);
+				}
+
+			});
 
 			final JMenu utilityMenu = new JMenu("Utility Bill");
 

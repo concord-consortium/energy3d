@@ -11,14 +11,20 @@ import java.util.List;
 public class Population {
 
 	private final Individual[] individuals;
+	private final Individual[] savedGeneration;
+	private final boolean[] violations;
 	private double beta = 0.5;
 	private final List<Individual> survivors = new ArrayList<Individual>();
 	private final List<Individual> mutants = new ArrayList<Individual>();
 
 	public Population(final int populationSize, final int chromosomeLength) {
 		individuals = new Individual[populationSize];
+		savedGeneration = new Individual[populationSize];
+		violations = new boolean[populationSize];
 		for (int i = 0; i < individuals.length; i++) {
 			individuals[i] = new Individual(chromosomeLength);
+			savedGeneration[i] = new Individual(chromosomeLength);
+			violations[i] = false;
 		}
 	}
 
@@ -39,6 +45,25 @@ public class Population {
 
 	public void sort() {
 		Arrays.sort(individuals);
+	}
+
+	public void setViolation(final int i, final boolean b) {
+		violations[i] = b;
+	}
+
+	public void saveGenes() {
+		for (int i = 0; i < individuals.length; i++) {
+			savedGeneration[i].copyGenes(individuals[i]);
+			violations[i] = false;
+		}
+	}
+
+	public void restoreGenes() {
+		for (int i = 0; i < individuals.length; i++) {
+			if (violations[i]) {
+				individuals[i].copyGenes(savedGeneration[i]);
+			}
+		}
 	}
 
 	/** select the survivors based on elitism specified by the rate of selection */
