@@ -37,6 +37,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.generative.GeneticAlgorithm;
+import org.concord.energy3d.generative.ObjectiveFunction;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -1447,8 +1448,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			final JMenu optimizeMenu = new JMenu("Optimize");
 
-			final JMenuItem miHeliostatField = new JMenuItem("Heliostat Field...");
-			miHeliostatField.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatDailyOutput = new JMenuItem("Daily Output of Heliostat Field...");
+			miHeliostatDailyOutput.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1461,11 +1462,31 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					final GeneticAlgorithm ga = new GeneticAlgorithm(64, foundation.getHeliostats().size() * 2, foundation);
-					ga.evolve();
+					final GeneticAlgorithm ga = new GeneticAlgorithm(64, foundation);
+					ga.evolve(ObjectiveFunction.DAILY);
 				}
 			});
-			optimizeMenu.add(miHeliostatField);
+			optimizeMenu.add(miHeliostatDailyOutput);
+
+			final JMenuItem miHeliostatAnnualOutput = new JMenuItem("Annual Output of Heliostat Field...");
+			miHeliostatAnnualOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final List<Mirror> heliostats = foundation.getHeliostats();
+					if (heliostats.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					final GeneticAlgorithm ga = new GeneticAlgorithm(32, foundation);
+					ga.evolve(ObjectiveFunction.ANNUAl);
+				}
+			});
+			optimizeMenu.add(miHeliostatAnnualOutput);
 
 			final JMenu utilityMenu = new JMenu("Utility Bill");
 

@@ -58,7 +58,7 @@ import org.concord.energy3d.util.Util;
  */
 public abstract class Analysis {
 
-	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
+	public final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	Graph graph;
 	volatile boolean analysisStopped;

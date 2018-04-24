@@ -39,10 +39,10 @@ public class GeneticAlgorithm {
 	private final int populationSize;
 	private final int chromosomeLength;
 
-	public GeneticAlgorithm(final int populationSize, final int chromosomeLength, final Foundation foundation) {
-		this.foundation = foundation;
+	public GeneticAlgorithm(final int populationSize, final Foundation foundation) {
 		this.populationSize = populationSize;
-		this.chromosomeLength = chromosomeLength;
+		this.foundation = foundation;
+		chromosomeLength = foundation.getHeliostats().size() * 2;
 		population = new Population(populationSize, chromosomeLength);
 		Vector3 v0 = foundation.getAbsPoint(0);
 		Vector3 v1 = foundation.getAbsPoint(1);
@@ -71,14 +71,21 @@ public class GeneticAlgorithm {
 			ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
 			addConstraint(new CircularBound(cx, cy, Math.max(lx, ly) * 0.5, false));
 		}
+		// initialize the population with the first-born being the current design
+		final Individual firstBorn = population.getIndividual(0);
+		int i = 0;
+		for (final Mirror m : foundation.getHeliostats()) {
+			firstBorn.setGene(i++, m.getPoints().get(0).getX());
+			firstBorn.setGene(i++, m.getPoints().get(0).getY());
+		}
 	}
 
-	public void evolve() {
+	public void evolve(final int type) {
 
 		onStart();
 		outsideGenerationCounter = 0;
 		computeCounter = 0;
-		final HeliostatObjectiveFunction of = new HeliostatObjectiveFunction();
+		final HeliostatObjectiveFunction of = new HeliostatObjectiveFunction(type);
 
 		while (!shouldTerminate()) { // the number of individuals to evaluate is MAX_GENERATION * population.size()
 			for (int i = 0; i < population.size(); i++) {
@@ -204,17 +211,6 @@ public class GeneticAlgorithm {
 	public void setMinMax(final int i, final double min, final double max) {
 		mins[i] = min;
 		maxs[i] = max;
-	}
-
-	// initialize the population with the first-born being the current design
-	public void initializePopulation(final double[] v) {
-		if (population.getChromosomeLength() != v.length) {
-			throw new IllegalArgumentException("Input data must have the same length as the chromosome length of the population");
-		}
-		final Individual firstBorn = population.getIndividual(0);
-		for (int i = 0; i < v.length; i++) {
-			firstBorn.setGene(i, v[i]);
-		}
 	}
 
 	public Population getPopulation() {

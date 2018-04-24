@@ -101,7 +101,7 @@ public class SolarRadiation {
 	}
 
 	public void compute() {
-		System.out.println("Compute solar radiation...");
+		System.out.println("Compute solar radiation for " + Heliodon.getInstance().getCalendar().getTime() + "...");
 		initCollidables();
 		onMesh.clear();
 		final int n = Math.round(MINUTES_OF_DAY / (float) Scene.getInstance().getTimeStep());
