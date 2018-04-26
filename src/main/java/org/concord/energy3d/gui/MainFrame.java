@@ -1636,7 +1636,7 @@ public class MainFrame extends JFrame {
 
 			final JMenu designMethodMenu = new JMenu("Methods of Engineering Design");
 			tutorialsMenu.add(designMethodMenu);
-			addModel(designMethodMenu, "Single-Objective Optimization", "tutorials/optimization-single-heliostat.ng3");
+			addModel(designMethodMenu, "Single-Objective Optimization: A Single Heliostat", "tutorials/optimization-single-heliostat.ng3");
 
 			tutorialsMenu.addSeparator();
 

@@ -366,11 +366,6 @@ public class Scene implements Serializable {
 
 		instance.init();
 		instance.applyGroundImage();
-		for (final HousePart part : instance.parts) { // FIXME: Not sure why sometimes normal can be null when loading
-			if (part.getNormal() == null) {
-				part.draw();
-			}
-		}
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
 			@Override

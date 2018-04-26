@@ -154,8 +154,12 @@ public class Population {
 					child2.setGene(i, beta * di + (1 - beta) * mi);
 				}
 			}
-			individuals[childIndex] = child1;
-			individuals[childIndex + 1] = child2;
+			if (childIndex < individuals.length) {
+				individuals[childIndex] = child1;
+			}
+			if (childIndex + 1 < individuals.length) {
+				individuals[childIndex + 1] = child2;
+			}
 			childIndex += 2;
 		}
 

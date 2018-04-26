@@ -275,6 +275,7 @@ public class GeneticAlgorithm {
 		EnergyPanel.getInstance().progress(0);
 		EnergyPanel.getInstance().disableDateSpinner(false);
 		SceneManager.setExecuteAllTask(true);
+		EnergyPanel.getInstance().cancel();
 	}
 
 	private void onStart() {
