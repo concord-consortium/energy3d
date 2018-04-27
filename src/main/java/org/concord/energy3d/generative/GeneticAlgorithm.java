@@ -27,7 +27,7 @@ public class GeneticAlgorithm {
 
 	private int maximumGeneration = 5;
 	private double mutationRate = 0.1;
-	private double crossoverRate = 0.9;
+	private double crossoverRate = 0.5;
 	private double selectionRate = 0.5;
 	private final Population population;
 	private int outsideGenerationCounter;
@@ -38,12 +38,12 @@ public class GeneticAlgorithm {
 	private final int populationSize;
 	private final int chromosomeLength;
 
-	public GeneticAlgorithm(final int populationSize, final Foundation foundation, final int maximumGeneration) {
+	public GeneticAlgorithm(final int populationSize, final Foundation foundation, final int maximumGeneration, final int selectionMethod) {
 		this.populationSize = populationSize;
 		this.foundation = foundation;
 		this.maximumGeneration = maximumGeneration;
 		chromosomeLength = foundation.getHeliostats().size() * 2;
-		population = new Population(populationSize, chromosomeLength);
+		population = new Population(populationSize, chromosomeLength, selectionMethod);
 		Vector3 v0 = foundation.getAbsPoint(0);
 		Vector3 v1 = foundation.getAbsPoint(1);
 		Vector3 v2 = foundation.getAbsPoint(2);

@@ -10,14 +10,18 @@ import java.util.List;
  */
 public class Population {
 
+	public final static int ROULETTE_WHEEL = 0;
+	public final static int TOURNAMENT = 1;
+
 	private final Individual[] individuals;
 	private final Individual[] savedGeneration;
 	private final boolean[] violations;
 	private double beta = 0.5;
 	private final List<Individual> survivors = new ArrayList<Individual>();
 	private final List<Individual> mutants = new ArrayList<Individual>();
+	private int selectionMethod = ROULETTE_WHEEL;
 
-	public Population(final int populationSize, final int chromosomeLength) {
+	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod) {
 		individuals = new Individual[populationSize];
 		savedGeneration = new Individual[populationSize];
 		violations = new boolean[populationSize];
@@ -26,6 +30,7 @@ public class Population {
 			savedGeneration[i] = new Individual(chromosomeLength);
 			violations[i] = false;
 		}
+		this.selectionMethod = selectionMethod;
 	}
 
 	public int size() {
@@ -73,12 +78,14 @@ public class Population {
 		for (int i = 0; i < individuals.length; i++) {
 			if (i < selectionRate * individuals.length) {
 				survivors.add(individuals[i]);
+			} else {
+				break;
 			}
 		}
 	}
 
 	// select a parent by the roulette wheel rule (fitness proportionate selection)
-	private Parents selectParents(final double lowestFitness, final double sumOfFitness) {
+	private Parents selectParentsByRouletteWheel(final double lowestFitness, final double sumOfFitness) {
 		// spin the wheel to find dad
 		Individual dad = null;
 		double roulettWheelPosition = Math.random() * sumOfFitness;
@@ -99,7 +106,7 @@ public class Population {
 			if (spinWheel >= roulettWheelPosition) {
 				if (s != dad) {
 					mom = s;
-				} else {
+				} else { // just select dad's neighbor in the survivors if the wheel hits dad again
 					final int index = survivors.indexOf(s);
 					if (index == 0) {
 						mom = survivors.get(1);
@@ -113,6 +120,35 @@ public class Population {
 			}
 		}
 		return new Parents(dad, mom);
+	}
+
+	// select a parent by tournament
+	private Parents selectParentsByTournament() {
+		final int numberOfSurvivers = survivors.size();
+		if (numberOfSurvivers <= 1) {
+			throw new RuntimeException("Must have at least two survivors to be used as parents");
+		}
+		int i = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+		int j;
+		do {
+			j = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+		} while (j == i);
+		final int d = survivors.get(i).getFitness() > survivors.get(j).getFitness() ? i : j;
+		i = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+		do {
+			j = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+		} while (j == i);
+		int m = survivors.get(i).getFitness() > survivors.get(j).getFitness() ? i : j;
+		if (m == d) {// just select dad's neighbor in the survivors
+			if (d == 0) {
+				m = 1;
+			} else if (d == numberOfSurvivers - 1) {
+				m = numberOfSurvivers - 2;
+			} else {
+				m = Math.random() < 0.5 ? d - 1 : d + 1;
+			}
+		}
+		return new Parents(survivors.get(d), survivors.get(m));
 	}
 
 	/** roulette wheel selection for uniform crossover */
@@ -131,7 +167,14 @@ public class Population {
 		final int newBorn = individuals.length - numberOfSurvivers;
 		final List<Parents> oldFolks = new ArrayList<Parents>(newBorn);
 		while (oldFolks.size() * 2 < newBorn) { // multiplying 2 because each couple produces two children as shown in the mating algorithm below
-			final Parents p = selectParents(lowestFitness, sumOfFitness);
+			final Parents p;
+			switch (selectionMethod) {
+			case TOURNAMENT:
+				p = selectParentsByTournament();
+				break;
+			default:
+				p = selectParentsByRouletteWheel(lowestFitness, sumOfFitness);
+			}
 			if (!oldFolks.contains(p)) {
 				oldFolks.add(p);
 			}
@@ -146,7 +189,7 @@ public class Population {
 			for (int i = 0; i < n; i++) {
 				final double di = p.dad.getGene(i);
 				final double mi = p.mom.getGene(i);
-				if (Math.random() < 0.5) {
+				if (Math.random() < crossoverRate) {
 					child1.setGene(i, beta * di + (1 - beta) * mi);
 					child2.setGene(i, beta * mi + (1 - beta) * di);
 				} else {
