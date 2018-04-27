@@ -37,13 +37,14 @@ public class GeneticAlgorithm {
 	private final List<Constraint> constraints;
 	private final int populationSize;
 	private final int chromosomeLength;
+	private volatile boolean converged;
 
-	public GeneticAlgorithm(final int populationSize, final Foundation foundation, final int maximumGeneration, final int selectionMethod) {
+	public GeneticAlgorithm(final int populationSize, final Foundation foundation, final int maximumGeneration, final int selectionMethod, final double convergenceThreshold) {
 		this.populationSize = populationSize;
 		this.foundation = foundation;
 		this.maximumGeneration = maximumGeneration;
 		chromosomeLength = foundation.getHeliostats().size() * 2;
-		population = new Population(populationSize, chromosomeLength, selectionMethod);
+		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
 		Vector3 v0 = foundation.getAbsPoint(0);
 		Vector3 v1 = foundation.getAbsPoint(1);
 		Vector3 v2 = foundation.getAbsPoint(2);
@@ -117,36 +118,38 @@ public class GeneticAlgorithm {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				final int generation = computeCounter / populationSize;
-				final Individual individual = population.getIndividual(indexOfIndividual);
-				for (int j = 0; j < individual.getChromosomeLength(); j++) {
-					final double gene = individual.getGene(j);
-					final int j2 = j / 2;
-					final Mirror m = foundation.getHeliostats().get(j2);
-					if (j % 2 == 0) {
-						m.getPoints().get(0).setX(gene);
-					} else {
-						m.getPoints().get(0).setY(gene);
+				if (!converged) {
+					final int generation = computeCounter / populationSize;
+					final Individual individual = population.getIndividual(indexOfIndividual);
+					for (int j = 0; j < individual.getChromosomeLength(); j++) {
+						final double gene = individual.getGene(j);
+						final int j2 = j / 2;
+						final Mirror m = foundation.getHeliostats().get(j2);
+						if (j % 2 == 0) {
+							m.getPoints().get(0).setX(gene);
+						} else {
+							m.getPoints().get(0).setY(gene);
+						}
 					}
+					individual.setFitness(of.compute());
+					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
+					if (isAtTheEndOfGeneration) {
+						population.saveGenes();
+						population.selectSurvivors(selectionRate);
+						population.crossover(crossoverRate);
+						population.mutate(mutationRate);
+						detectViolations();
+						population.restoreGenes();
+						converged = population.isConverged();
+					}
+					computeCounter++;
+				} else {
+					SceneManager.getTaskManager().clearTasks();
+					onCompletion();
 				}
-				individual.setFitness(of.compute());
-				System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
-
-				final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
-				if (isAtTheEndOfGeneration) {
-					population.saveGenes();
-					population.selectSurvivors(selectionRate);
-					population.crossover(crossoverRate);
-					population.mutate(mutationRate);
-					detectViolations();
-					population.restoreGenes();
-				}
-
 				updateInfo(of.getType());
-				computeCounter++;
-
 				return null;
-
 			}
 		});
 

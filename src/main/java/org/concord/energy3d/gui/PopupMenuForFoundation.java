@@ -107,8 +107,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static HeliostatRectangularFieldLayout heliostatRectangularFieldLayout = new HeliostatRectangularFieldLayout();
 	private static HeliostatCircularFieldLayout heliostatCircularFieldLayout = new HeliostatCircularFieldLayout();
 	private static HeliostatSpiralFieldLayout heliostatSpiralFieldLayout = new HeliostatSpiralFieldLayout();
-	private static int populationSize = 32;
-	private static int generationNumber = 5;
 
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
 
@@ -1458,6 +1456,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
+				private int populationSize = 32;
+				private int generationNumber = 5;
+				private double convergenceThreshold = 0.01;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1493,7 +1494,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Generation number:"));
 					final JTextField generationField = new JTextField(generationNumber + "");
 					panel.add(generationField);
-					SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
+					panel.add(new JLabel("Convergence threshold:"));
+					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
+					panel.add(convergenceThresholdField);
+					SpringUtilities.makeCompactGrid(panel, 7, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1509,6 +1513,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							try {
 								populationSize = Integer.parseInt(populationField.getText());
 								generationNumber = Integer.parseInt(generationField.getText());
+								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1521,7 +1526,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final GeneticAlgorithm ga = new GeneticAlgorithm(populationSize, foundation, generationNumber, selectedSelectionMethod);
+									final GeneticAlgorithm ga = new GeneticAlgorithm(populationSize, foundation, generationNumber, selectedSelectionMethod, convergenceThreshold);
 									switch (selectedFitnessFunction) {
 									case 0:
 										ga.evolve(ObjectiveFunction.DAILY);

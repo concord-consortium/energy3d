@@ -20,8 +20,9 @@ public class Population {
 	private final List<Individual> survivors = new ArrayList<Individual>();
 	private final List<Individual> mutants = new ArrayList<Individual>();
 	private int selectionMethod = ROULETTE_WHEEL;
+	private double convergenceThreshold = 0.01;
 
-	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod) {
+	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
 		individuals = new Individual[populationSize];
 		savedGeneration = new Individual[populationSize];
 		violations = new boolean[populationSize];
@@ -31,6 +32,7 @@ public class Population {
 			violations[i] = false;
 		}
 		this.selectionMethod = selectionMethod;
+		this.convergenceThreshold = convergenceThreshold;
 	}
 
 	public int size() {
@@ -39,6 +41,28 @@ public class Population {
 
 	public int getChromosomeLength() {
 		return individuals[0].getChromosomeLength();
+	}
+
+	// check convergence bitwisely
+	public boolean isConverged() {
+		if (survivors.size() < 2) {
+			return true;
+		}
+		final int n = getChromosomeLength();
+		final int m = Math.max(2, survivors.size() / 2);
+		for (int i = 0; i < n; i++) {
+			double average = 0;
+			for (int j = 0; j < m; j++) {
+				average += survivors.get(j).getGene(i);
+			}
+			average /= m;
+			for (int j = 0; j < m; j++) {
+				if (Math.abs(survivors.get(j).getGene(i) / average - 1.0) > convergenceThreshold) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public Individual getIndividual(final int i) {
