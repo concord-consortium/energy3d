@@ -1,7 +1,8 @@
-package org.concord.energy3d.generative;
+package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.util.Calendar;
 
+import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
@@ -12,9 +13,9 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class HeliostatObjectiveFunction extends ObjectiveFunction {
+public class HeliostatFieldObjectiveFunction extends ObjectiveFunction {
 
-	public HeliostatObjectiveFunction(final int type) {
+	public HeliostatFieldObjectiveFunction(final int type) {
 		this.type = type;
 	}
 

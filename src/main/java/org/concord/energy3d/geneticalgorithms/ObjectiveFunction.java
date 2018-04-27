@@ -1,4 +1,4 @@
-package org.concord.energy3d.generative;
+package org.concord.energy3d.geneticalgorithms;
 
 /**
  * @author Charles Xie
@@ -9,9 +9,9 @@ public abstract class ObjectiveFunction {
 	public final static int DAILY = 0;
 	public final static int ANNUAl = 1;
 
-	int type = DAILY;
+	protected int type = DAILY;
 
-	volatile boolean cancelled;
+	protected volatile boolean cancelled;
 
 	public void cancel() {
 		cancelled = true;

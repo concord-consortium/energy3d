@@ -36,8 +36,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.generative.GeneticAlgorithm;
-import org.concord.energy3d.generative.ObjectiveFunction;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatFieldOptimizer;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -1526,15 +1525,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final GeneticAlgorithm ga = new GeneticAlgorithm(populationSize, foundation, generationNumber, selectedSelectionMethod, convergenceThreshold);
-									switch (selectedFitnessFunction) {
-									case 0:
-										ga.evolve(ObjectiveFunction.DAILY);
-										break;
-									case 1:
-										ga.evolve(ObjectiveFunction.ANNUAl);
-										break;
-									}
+									new HeliostatFieldOptimizer(populationSize, foundation, generationNumber, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction).evolve();
 									if (choice == options[0]) {
 										break;
 									}

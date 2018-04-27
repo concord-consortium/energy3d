@@ -1,4 +1,4 @@
-package org.concord.energy3d.generative;
+package org.concord.energy3d.geneticalgorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;

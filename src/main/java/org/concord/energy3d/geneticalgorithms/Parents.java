@@ -1,4 +1,4 @@
-package org.concord.energy3d.generative;
+package org.concord.energy3d.geneticalgorithms;
 
 import java.util.Objects;
 
@@ -6,11 +6,11 @@ import java.util.Objects;
  * @author Charles Xie
  *
  */
-class Parents {
+public class Parents {
 
-	final Individual dad, mom;
+	public final Individual dad, mom;
 
-	Parents(final Individual dad, final Individual mom) {
+	public Parents(final Individual dad, final Individual mom) {
 		this.dad = dad;
 		this.mom = mom;
 	}
