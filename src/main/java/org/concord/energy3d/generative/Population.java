@@ -175,7 +175,7 @@ public class Population {
 		return new Parents(survivors.get(d), survivors.get(m));
 	}
 
-	/** roulette wheel selection for uniform crossover */
+	/** uniform crossover */
 	public void crossover(final double crossoverRate) {
 		final int numberOfSurvivers = survivors.size();
 		if (numberOfSurvivers <= 1) {
