@@ -707,8 +707,6 @@ public class SolarRadiation {
 			data = initMeshTextureDataOnRectangle(mesh, nx, ny);
 		}
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
-
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
@@ -754,7 +752,7 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
 					final PickResults pickResults = new PrimitivePickResults();
@@ -830,8 +828,6 @@ public class SolarRadiation {
 			data = initMeshTextureDataOnRectangle(mesh, nx, ny);
 		}
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
-
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
@@ -878,7 +874,7 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
 					final PickResults pickResults = new PrimitivePickResults();
@@ -949,7 +945,7 @@ public class SolarRadiation {
 			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(0.5, null);
 
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
@@ -1025,7 +1021,8 @@ public class SolarRadiation {
 			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
+		// if a solar panel is on a roof or a wall, move the pick ray a bit towards the sun to ensure that it is picked first before its container
+		final ReadOnlyVector3 offset = panel.getContainer() instanceof Foundation ? null : directionTowardSun.multiply(1, null);
 
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
@@ -1059,7 +1056,10 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final Vector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+				if (offset != null) {
+					p.addLocal(offset);
+				}
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -1107,7 +1107,10 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final Vector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+				if (offset != null) {
+					p.addLocal(offset);
+				}
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -1234,7 +1237,8 @@ public class SolarRadiation {
 			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
+		// if a rack is on a roof or a wall, move the pick ray a bit towards the sun to ensure that it is picked first before its container
+		final ReadOnlyVector3 offset = rack.getContainer() instanceof Foundation ? null : directionTowardSun.multiply(1, null);
 
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
@@ -1268,7 +1272,10 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final Vector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+				if (offset != null) {
+					p.addLocal(offset);
+				}
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -1330,7 +1337,10 @@ public class SolarRadiation {
 					}
 					final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 					final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-					final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+					final Vector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+					if (offset != null) {
+						p.addLocal(offset);
+					}
 					final Ray3 pickRay = new Ray3(p, directionTowardSun);
 					double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 					if (dot > 0) {
@@ -1452,7 +1462,10 @@ public class SolarRadiation {
 					}
 					final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 					final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-					final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+					final Vector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+					if (offset != null) {
+						p.addLocal(offset);
+					}
 					final Ray3 pickRay = new Ray3(p, directionTowardSun);
 					double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 					if (dot > 0) {

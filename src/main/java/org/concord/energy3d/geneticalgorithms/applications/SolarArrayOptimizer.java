@@ -6,45 +6,27 @@ import java.util.concurrent.Callable;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
-import org.concord.energy3d.geneticalgorithms.RectangularBound;
-import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PvProjectDailyEnergyGraph;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-
-import com.ardor3d.math.Vector3;
 
 /**
  * @author Charles Xie
  *
  */
-public class HeliostatFieldOptimizer extends Optimizer {
+public class SolarArrayOptimizer extends Optimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGeneration, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
+	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGeneration, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
 		super(populationSize, chromosomeLength, foundation, maximumGeneration, selectionMethod, convergenceThreshold, objectiveFunctionType);
-		final Mirror heliostat = foundation.getHeliostats().get(0);
-		final Foundation receiver = heliostat.getReceiver();
-		if (receiver != null) {
-			final Vector3 v0 = receiver.getAbsPoint(0);
-			final Vector3 v1 = receiver.getAbsPoint(1);
-			final Vector3 v2 = receiver.getAbsPoint(2);
-			final Vector3 v3 = receiver.getAbsPoint(3);
-			final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getAnnotationScale();
-			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
-			final double lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-			final double ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getMirrorWidth(), ly + heliostat.getMirrorHeight()));
-		}
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
-		for (final Mirror m : foundation.getHeliostats()) {
-			firstBorn.setGene(i++, m.getPoints().get(0).getX());
-			firstBorn.setGene(i++, m.getPoints().get(0).getY());
+		for (final Rack r : foundation.getRacks()) {
+			firstBorn.setGene(i++, 0.5 * (1.0 + r.getTiltAngle() / 90.0));
 		}
 	}
 
@@ -59,13 +41,8 @@ public class HeliostatFieldOptimizer extends Optimizer {
 					final Individual individual = population.getIndividual(indexOfIndividual);
 					for (int j = 0; j < individual.getChromosomeLength(); j++) {
 						final double gene = individual.getGene(j);
-						final int j2 = j / 2;
-						final Mirror m = foundation.getHeliostats().get(j2);
-						if (j % 2 == 0) {
-							m.getPoints().get(0).setX(gene);
-						} else {
-							m.getPoints().get(0).setY(gene);
-						}
+						final Rack rack = foundation.getRacks().get(j);
+						rack.setTiltAngle((2 * gene - 1) * 90);
 					}
 					individual.setFitness(objectiveFunction.compute());
 					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
@@ -93,23 +70,20 @@ public class HeliostatFieldOptimizer extends Optimizer {
 
 	@Override
 	void updateInfo() {
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
-		if (receiver != null) {
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				receiver.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
-				break;
-			case ObjectiveFunction.ANNUAl:
-				receiver.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
-				break;
-			}
-			receiver.draw();
+		switch (objectiveFunction.getType()) {
+		case ObjectiveFunction.DAILY:
+			foundation.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			break;
+		case ObjectiveFunction.ANNUAl:
+			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
+			break;
 		}
+		foundation.draw();
 		final Calendar c = Heliodon.getInstance().getCalendar();
 		final Calendar today = (Calendar) c.clone();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) { // synchronize with daily graph
-			final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
+			final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
 			if (g.hasGraph()) {
 				g.setCalendar(today);
 				g.updateGraph();
@@ -120,8 +94,8 @@ public class HeliostatFieldOptimizer extends Optimizer {
 			public void run() {
 				EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
 				if (selectedPart instanceof Foundation) {
-					final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
-					EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
+					final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
+					EnergyPanel.getInstance().getPvProjectTabbedPane().setSelectedComponent(g);
 					if (!g.hasGraph()) {
 						g.setCalendar(today);
 						g.addGraph((Foundation) selectedPart);

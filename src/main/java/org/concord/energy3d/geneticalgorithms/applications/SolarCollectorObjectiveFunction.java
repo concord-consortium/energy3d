@@ -13,9 +13,9 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class HeliostatFieldObjectiveFunction extends ObjectiveFunction {
+public class SolarCollectorObjectiveFunction extends ObjectiveFunction {
 
-	public HeliostatFieldObjectiveFunction(final int type) {
+	public SolarCollectorObjectiveFunction(final int type) {
 		this.type = type;
 	}
 

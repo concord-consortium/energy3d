@@ -37,6 +37,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatFieldOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarArrayOptimizer;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -1450,8 +1451,96 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			final JMenu optimizeMenu = new JMenu("Optimize");
 
-			final JMenuItem miHeliostatDailyOutput = new JMenuItem("Heliostat Field...");
-			miHeliostatDailyOutput.addActionListener(new ActionListener() {
+			final JMenuItem miSolarArrayOutput = new JMenuItem("Solar Arrays...");
+			miSolarArrayOutput.addActionListener(new ActionListener() {
+
+				private int selectedFitnessFunction = 0;
+				private int selectedSelectionMethod = 0;
+				private int populationSize = 32;
+				private int generationNumber = 5;
+				private double convergenceThreshold = 0.01;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final List<Rack> racks = foundation.getRacks();
+					if (racks.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel rack on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+
+					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Solution:"));
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
+					panel.add(solutionComboBox);
+					panel.add(new JLabel("Type:"));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
+					panel.add(typeComboBox);
+					panel.add(new JLabel("Selection:"));
+					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
+					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
+					panel.add(selectionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
+					panel.add(new JLabel("Population size:"));
+					final JTextField populationField = new JTextField(populationSize + "");
+					panel.add(populationField);
+					panel.add(new JLabel("Generation number:"));
+					final JTextField generationField = new JTextField(generationNumber + "");
+					panel.add(generationField);
+					panel.add(new JLabel("Convergence threshold:"));
+					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
+					panel.add(convergenceThresholdField);
+					SpringUtilities.makeCompactGrid(panel, 7, 2, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								populationSize = Integer.parseInt(populationField.getText());
+								generationNumber = Integer.parseInt(generationField.getText());
+								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (populationSize <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (generationNumber <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Generation number must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
+									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), foundation, generationNumber, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									op.evolve();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+			optimizeMenu.add(miSolarArrayOutput);
+
+			final JMenuItem miHeliostatFieldOutput = new JMenuItem("Heliostat Field...");
+			miHeliostatFieldOutput.addActionListener(new ActionListener() {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
@@ -1525,7 +1614,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									new HeliostatFieldOptimizer(populationSize, foundation, generationNumber, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction).evolve();
+									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, foundation, generationNumber, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									op.setupFoundationConstraint();
+									op.evolve();
 									if (choice == options[0]) {
 										break;
 									}
@@ -1535,7 +1626,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			optimizeMenu.add(miHeliostatDailyOutput);
+			optimizeMenu.add(miHeliostatFieldOutput);
 
 			optimizeMenu.addMenuListener(new MenuListener() {
 
@@ -1546,7 +1637,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						return;
 					}
 					final Foundation foundation = (Foundation) selectedPart;
-					miHeliostatDailyOutput.setEnabled(foundation.getHeliostats().size() > 0);
+					miSolarArrayOutput.setEnabled(foundation.getRacks().size() > 0);
+					miHeliostatFieldOutput.setEnabled(foundation.getHeliostats().size() > 0);
 				}
 
 				@Override
