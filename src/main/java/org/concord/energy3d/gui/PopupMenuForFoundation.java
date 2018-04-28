@@ -1475,7 +1475,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Solution:"));
-					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Tilt Angles" });
 					panel.add(solutionComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
@@ -1500,8 +1500,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					SpringUtilities.makeCompactGrid(panel, 7, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
-					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options");
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Solar Panel Arrays");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -1588,8 +1588,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					SpringUtilities.makeCompactGrid(panel, 7, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
-					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options");
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Heliostat Fields");
 
 					while (true) {
 						dialog.setVisible(true);
