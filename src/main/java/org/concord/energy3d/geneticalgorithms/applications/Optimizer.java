@@ -25,7 +25,7 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
-	int maximumGeneration = 5;
+	int maximumGenerations = 5;
 	double mutationRate = 0.1;
 	double crossoverRate = 0.5;
 	double selectionRate = 0.5;
@@ -42,10 +42,10 @@ public abstract class Optimizer {
 	volatile boolean converged;
 	ObjectiveFunction objectiveFunction;
 
-	public Optimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGeneration, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
+	public Optimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGenerations, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
 		this.populationSize = populationSize;
 		this.foundation = foundation;
-		this.maximumGeneration = maximumGeneration;
+		this.maximumGenerations = maximumGenerations;
 		this.objectiveFunctionType = objectiveFunctionType;
 		this.chromosomeLength = chromosomeLength;
 		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
@@ -137,7 +137,7 @@ public abstract class Optimizer {
 	}
 
 	boolean shouldTerminate() {
-		return outsideGenerationCounter >= maximumGeneration;
+		return outsideGenerationCounter >= maximumGenerations;
 	}
 
 	public void setMinMax(final int i, final double min, final double max) {

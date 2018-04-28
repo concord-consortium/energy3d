@@ -24,8 +24,8 @@ import com.ardor3d.math.Vector3;
  */
 public class HeliostatFieldOptimizer extends Optimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGeneration, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
-		super(populationSize, chromosomeLength, foundation, maximumGeneration, selectionMethod, convergenceThreshold, objectiveFunctionType);
+	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGenerations, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
+		super(populationSize, chromosomeLength, foundation, maximumGenerations, selectionMethod, convergenceThreshold, objectiveFunctionType);
 		final Mirror heliostat = foundation.getHeliostats().get(0);
 		final Foundation receiver = heliostat.getReceiver();
 		if (receiver != null) {
