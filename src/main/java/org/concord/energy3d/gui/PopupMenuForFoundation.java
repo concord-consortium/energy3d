@@ -1485,7 +1485,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
@@ -1576,7 +1576,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));

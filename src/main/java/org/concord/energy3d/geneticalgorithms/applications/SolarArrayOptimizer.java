@@ -77,6 +77,9 @@ public class SolarArrayOptimizer extends Optimizer {
 		case ObjectiveFunction.ANNUAl:
 			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
 			break;
+		case ObjectiveFunction.RANDOM:
+			foundation.setLabelCustomText(null);
+			break;
 		}
 		foundation.draw();
 		final Calendar c = Heliodon.getInstance().getCalendar();

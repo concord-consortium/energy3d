@@ -102,6 +102,9 @@ public class HeliostatFieldOptimizer extends Optimizer {
 			case ObjectiveFunction.ANNUAl:
 				receiver.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
 				break;
+			case ObjectiveFunction.RANDOM:
+				receiver.setLabelCustomText(null);
+				break;
 			}
 			receiver.draw();
 		}
