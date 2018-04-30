@@ -243,7 +243,7 @@ public class Scene implements Serializable {
 				public Object call() throws Exception {
 					instance.add(new Human(0, 1));
 					final Foundation f = new Foundation(80, 60);
-					f.setColor(instance.getFoundationColor());
+					f.setColor(instance.getDefaultFoundationColor());
 					instance.add(f, true);
 					return null;
 				}
@@ -2349,7 +2349,7 @@ public class Scene implements Serializable {
 	}
 
 	/** get the default color for foundations */
-	public ReadOnlyColorRGBA getFoundationColor() {
+	public ReadOnlyColorRGBA getDefaultFoundationColor() {
 		if (foundationColor == null) {
 			return Util.getColorRGB(180, 180, 180);
 		}
@@ -2357,12 +2357,12 @@ public class Scene implements Serializable {
 	}
 
 	/** set the default color for foundations */
-	public void setFoundationColor(final ReadOnlyColorRGBA foundationColor) {
+	public void setDefaultFoundationColor(final ReadOnlyColorRGBA foundationColor) {
 		this.foundationColor = foundationColor;
 	}
 
 	/** get the default color for walls */
-	public ReadOnlyColorRGBA getWallColor() {
+	public ReadOnlyColorRGBA getDefaultWallColor() {
 		if (wallColor == null) {
 			return Util.getColorRGB(241, 237, 225);
 		}
@@ -2370,12 +2370,12 @@ public class Scene implements Serializable {
 	}
 
 	/** set the default color for walls */
-	public void setWallColor(final ReadOnlyColorRGBA wallColor) {
+	public void setDefaultWallColor(final ReadOnlyColorRGBA wallColor) {
 		this.wallColor = wallColor;
 	}
 
 	/** get the default color for doors */
-	public ReadOnlyColorRGBA getDoorColor() {
+	public ReadOnlyColorRGBA getDefaultDoorColor() {
 		if (doorColor == null) {
 			return ColorRGBA.WHITE;
 		}
@@ -2383,12 +2383,12 @@ public class Scene implements Serializable {
 	}
 
 	/** set the default color for doors */
-	public void setDoorColor(final ReadOnlyColorRGBA doorColor) {
+	public void setDefaultDoorColor(final ReadOnlyColorRGBA doorColor) {
 		this.doorColor = doorColor;
 	}
 
 	/** get the default color for floors */
-	public ReadOnlyColorRGBA getFloorColor() {
+	public ReadOnlyColorRGBA getDefaultFloorColor() {
 		if (floorColor == null) {
 			return ColorRGBA.WHITE;
 		}
@@ -2396,12 +2396,12 @@ public class Scene implements Serializable {
 	}
 
 	/** set the default color for floors */
-	public void setFloorColor(final ReadOnlyColorRGBA floorColor) {
+	public void setDefaultFloorColor(final ReadOnlyColorRGBA floorColor) {
 		this.floorColor = floorColor;
 	}
 
 	/** get the default color for roofs */
-	public ReadOnlyColorRGBA getRoofColor() {
+	public ReadOnlyColorRGBA getDefaultRoofColor() {
 		if (roofColor == null) {
 			return Util.getColorRGB(90, 97, 116);
 		}
@@ -2409,7 +2409,7 @@ public class Scene implements Serializable {
 	}
 
 	/** set the default color for roofs */
-	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {
+	public void setDefaultRoofColor(final ReadOnlyColorRGBA roofColor) {
 		this.roofColor = roofColor;
 	}
 
@@ -2479,11 +2479,13 @@ public class Scene implements Serializable {
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation) {
 			part.setColor(color);
+			part.setTextureType(HousePart.TEXTURE_NONE);
 			part.draw();
 		} else {
 			for (final HousePart p : parts) {
 				if (p.getTopContainer() == part.getTopContainer() && p.getClass().equals(part.getClass())) {
 					p.setColor(color);
+					part.setTextureType(HousePart.TEXTURE_NONE);
 					p.draw();
 				}
 			}
@@ -2496,6 +2498,9 @@ public class Scene implements Serializable {
 			for (final HousePart p : parts) {
 				if (p instanceof Roof) {
 					p.setColor(color);
+					if (p.getTextureType() > HousePart.TEXTURE_NONE) {
+						p.setTextureType(HousePart.TEXTURE_NONE);
+					}
 					p.draw();
 				}
 			}
@@ -2503,6 +2508,9 @@ public class Scene implements Serializable {
 			for (final HousePart p : parts) {
 				if (p.getClass().equals(part.getClass())) {
 					p.setColor(color);
+					if (p.getTextureType() > HousePart.TEXTURE_NONE) {
+						p.setTextureType(HousePart.TEXTURE_NONE);
+					}
 					p.draw();
 				}
 			}
@@ -3484,6 +3492,7 @@ public class Scene implements Serializable {
 			@Override
 			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
 				currentWall.setColor(color);
+				currentWall.setTextureType(HousePart.TEXTURE_NONE);
 				currentWall.draw();
 			}
 		});

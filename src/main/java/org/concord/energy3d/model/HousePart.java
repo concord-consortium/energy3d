@@ -230,13 +230,13 @@ public abstract class HousePart implements Serializable {
 
 		if (color == null) {
 			if (this instanceof Foundation) {
-				color = Scene.getInstance().getFoundationColor();
+				color = Scene.getInstance().getDefaultFoundationColor();
 			} else if (this instanceof Door) {
-				color = Scene.getInstance().getDoorColor();
+				color = Scene.getInstance().getDefaultDoorColor();
 			} else if (this instanceof Roof) {
-				color = Scene.getInstance().getRoofColor();
+				color = Scene.getInstance().getDefaultRoofColor();
 			} else if (this instanceof Wall) {
-				color = Scene.getInstance().getWallColor();
+				color = Scene.getInstance().getDefaultWallColor();
 			} else {
 				color = ColorRGBA.LIGHT_GRAY;
 			}
@@ -1063,13 +1063,13 @@ public abstract class HousePart implements Serializable {
 			c = color;
 		} else {
 			if (this instanceof Foundation) {
-				c = Scene.getInstance().getFoundationColor();
+				c = Scene.getInstance().getDefaultFoundationColor();
 			} else if (this instanceof Door) {
-				c = Scene.getInstance().getDoorColor();
+				c = Scene.getInstance().getDefaultDoorColor();
 			} else if (this instanceof Roof) {
-				c = Scene.getInstance().getRoofColor();
+				c = Scene.getInstance().getDefaultRoofColor();
 			} else if (this instanceof Wall) {
-				c = Scene.getInstance().getWallColor();
+				c = Scene.getInstance().getDefaultWallColor();
 			} else {
 				c = ColorRGBA.LIGHT_GRAY;
 			}

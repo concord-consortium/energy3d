@@ -204,7 +204,7 @@ public class Door extends HousePart implements Thermal {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDefaultDoorColor() : getColor());
 	}
 
 	@Override

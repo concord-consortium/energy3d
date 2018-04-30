@@ -3519,7 +3519,6 @@ public class MainFrame extends JFrame {
 				if (JOptionPane.showConfirmDialog(this, "To set color for the selected element, we have to remove its texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 					return;
 				}
-				selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 			}
 			final ReadOnlyColorRGBA color = selectedPart.getColor();
 			if (color != null) {
@@ -3537,7 +3536,7 @@ public class MainFrame extends JFrame {
 					}
 					final Color c = colorChooser.getColor();
 					final float[] newColor = c.getComponents(null);
-					final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+					final boolean restartPrintPreview = Scene.getInstance().getDefaultRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 					final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -3573,6 +3572,7 @@ public class MainFrame extends JFrame {
 									if (changed) {
 										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 										selectedPart.setColor(color);
+										selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 										selectedPart.draw();
 										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
@@ -3623,7 +3623,7 @@ public class MainFrame extends JFrame {
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
 									}
 								}
-								Scene.getInstance().setWallColor(color); // remember the color decision for the next wall to be added
+								Scene.getInstance().setDefaultWallColor(color); // remember the color decision for the next wall to be added
 								if (choice == options[0]) {
 									break;
 								}
@@ -3654,6 +3654,7 @@ public class MainFrame extends JFrame {
 									if (changed) {
 										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 										selectedPart.setColor(color);
+										selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 										selectedPart.draw();
 										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
@@ -3673,7 +3674,7 @@ public class MainFrame extends JFrame {
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
 									}
 								}
-								Scene.getInstance().setRoofColor(color); // remember the color decision for the next roof to be added
+								Scene.getInstance().setDefaultRoofColor(color); // remember the color decision for the next roof to be added
 								if (choice == options[0]) {
 									break;
 								}
@@ -3704,6 +3705,7 @@ public class MainFrame extends JFrame {
 									if (changed) {
 										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 										selectedPart.setColor(color);
+										selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 										selectedPart.draw();
 										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
@@ -3723,7 +3725,7 @@ public class MainFrame extends JFrame {
 										SceneManager.getInstance().getUndoManager().addEdit(cmd);
 									}
 								}
-								Scene.getInstance().setFoundationColor(color); // remember the color decision for the next foundation to be added
+								Scene.getInstance().setDefaultFoundationColor(color); // remember the color decision for the next foundation to be added
 								if (choice == options[0]) {
 									break;
 								}
@@ -3735,13 +3737,14 @@ public class MainFrame extends JFrame {
 						if (changed) {
 							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 							selectedPart.setColor(color);
+							selectedPart.setTextureType(HousePart.TEXTURE_NONE);
 							selectedPart.draw();
 							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							if (selectedPart instanceof Door) { // remember the color decision for the next part
-								Scene.getInstance().setDoorColor(color);
+								Scene.getInstance().setDefaultDoorColor(color);
 							} else if (selectedPart instanceof Floor) {
-								Scene.getInstance().setFloorColor(color);
+								Scene.getInstance().setDefaultFloorColor(color);
 							}
 						}
 					}

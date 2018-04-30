@@ -12,11 +12,13 @@ public class ChangePartColorCommand extends MyAbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA oldColor;
 	private ReadOnlyColorRGBA newColor;
+	private final int oldTexture;
 	private final HousePart part;
 
 	public ChangePartColorCommand(final HousePart part) {
 		this.part = part;
 		oldColor = part.getColor();
+		oldTexture = part.getTextureType();
 	}
 
 	public HousePart getPart() {
@@ -32,6 +34,7 @@ public class ChangePartColorCommand extends MyAbstractUndoableEdit {
 		super.undo();
 		newColor = part.getColor();
 		part.setColor(oldColor);
+		part.setTextureType(oldTexture);
 		part.draw();
 	}
 
@@ -39,6 +42,7 @@ public class ChangePartColorCommand extends MyAbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		part.setColor(newColor);
+		part.setTextureType(HousePart.TEXTURE_NONE);
 		part.draw();
 	}
 

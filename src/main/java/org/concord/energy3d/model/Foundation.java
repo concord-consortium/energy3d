@@ -1493,10 +1493,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	@Override
 	public void updateTextureAndColor() {
 		for (final Mesh mesh : sideMesh) {
-			mesh.setDefaultColor(getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+			mesh.setDefaultColor(getColor() == null ? Scene.getInstance().getDefaultFoundationColor() : getColor());
 			updateTextureAndColor(mesh, mesh.getDefaultColor());
 		}
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDefaultFoundationColor() : getColor());
 		if (!SceneManager.getInstance().getSolarHeatMap() && importedNodes != null) {
 			final int n = importedNodes.size();
 			if (n > 0) {

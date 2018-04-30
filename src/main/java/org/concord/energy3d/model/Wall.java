@@ -1593,7 +1593,7 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getWallColor() : getColor());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDefaultWallColor() : getColor());
 	}
 
 	public void connectWithOtherWalls(final Foundation foundation) {

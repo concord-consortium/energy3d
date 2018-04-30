@@ -18,6 +18,7 @@ public class ChangeColorOfConnectedWallsCommand extends MyAbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA[] oldColors;
 	private ReadOnlyColorRGBA[] newColors;
+	private final int[] oldTextures;
 	private final Wall wall;
 	private final List<Wall> walls;
 
@@ -32,8 +33,10 @@ public class ChangeColorOfConnectedWallsCommand extends MyAbstractUndoableEdit {
 		});
 		final int n = walls.size();
 		oldColors = new ReadOnlyColorRGBA[n];
+		oldTextures = new int[n];
 		for (int i = 0; i < n; i++) {
 			oldColors[i] = walls.get(i).getColor();
+			oldTextures[i] = walls.get(i).getTextureType();
 		}
 	}
 
@@ -54,6 +57,7 @@ public class ChangeColorOfConnectedWallsCommand extends MyAbstractUndoableEdit {
 			final Wall w = walls.get(i);
 			newColors[i] = w.getColor();
 			w.setColor(oldColors[i]);
+			w.setTextureType(oldTextures[i]);
 			w.draw();
 		}
 	}
@@ -65,6 +69,7 @@ public class ChangeColorOfConnectedWallsCommand extends MyAbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			final HousePart w = walls.get(i);
 			w.setColor(newColors[i]);
+			w.setTextureType(HousePart.TEXTURE_NONE);
 			w.draw();
 		}
 	}

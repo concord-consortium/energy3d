@@ -253,7 +253,7 @@ public class Floor extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFloorColor() : getColor());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDefaultFloorColor() : getColor());
 	}
 
 	@Override

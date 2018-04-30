@@ -1535,30 +1535,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setGridsVisible(false);
 		if (operation == Operation.DRAW_EXTERIOR_WALL) {
 			drawn = new Wall();
-			drawn.setColor(Scene.getInstance().getWallColor());
+			drawn.setColor(Scene.getInstance().getDefaultWallColor());
 		} else if (operation == Operation.DRAW_DOOR) {
 			drawn = new Door();
-			drawn.setColor(Scene.getInstance().getDoorColor());
+			drawn.setColor(Scene.getInstance().getDefaultDoorColor());
 		} else if (operation == Operation.DRAW_WINDOW) {
 			drawn = new Window();
 		} else if (operation == Operation.ADD_ROOF_PYRAMID) {
 			drawn = new PyramidRoof();
-			drawn.setColor(Scene.getInstance().getRoofColor());
+			drawn.setColor(Scene.getInstance().getDefaultRoofColor());
 		} else if (operation == Operation.ADD_ROOF_HIP) {
 			drawn = new HipRoof();
-			drawn.setColor(Scene.getInstance().getRoofColor());
+			drawn.setColor(Scene.getInstance().getDefaultRoofColor());
 		} else if (operation == Operation.ADD_ROOF_SHED) {
 			drawn = new ShedRoof();
-			drawn.setColor(Scene.getInstance().getRoofColor());
+			drawn.setColor(Scene.getInstance().getDefaultRoofColor());
 		} else if (operation == Operation.ADD_ROOF_GAMBREL) {
 			drawn = new GambrelRoof();
-			drawn.setColor(Scene.getInstance().getRoofColor());
+			drawn.setColor(Scene.getInstance().getDefaultRoofColor());
 		} else if (operation == Operation.ADD_ROOF_CUSTOM) {
 			drawn = new CustomRoof();
-			drawn.setColor(Scene.getInstance().getRoofColor());
+			drawn.setColor(Scene.getInstance().getDefaultRoofColor());
 		} else if (operation == Operation.ADD_FLOOR) {
 			drawn = new Floor();
-			drawn.setColor(Scene.getInstance().getFloorColor());
+			drawn.setColor(Scene.getInstance().getDefaultFloorColor());
 		} else if (operation == Operation.ADD_SOLAR_PANEL) {
 			drawn = new SolarPanel();
 		} else if (operation == Operation.ADD_RACK) {
@@ -1576,7 +1576,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
 			setGridsVisible(Scene.getInstance().isSnapToGrids());
-			drawn.setColor(Scene.getInstance().getFoundationColor());
+			drawn.setColor(Scene.getInstance().getDefaultFoundationColor());
 		} else if (operation == Operation.ADD_PLANT) {
 			drawn = new Tree();
 			setGridsVisible(true);
