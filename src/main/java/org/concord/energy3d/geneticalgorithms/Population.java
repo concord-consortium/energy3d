@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.concord.energy3d.util.Util;
+
 /**
  * @author Charles Xie
  *
@@ -234,6 +236,9 @@ public class Population {
 
 	// elitism: don't mutate the top one
 	public void mutate(final double mutationRate) {
+		if (Util.isZero(mutationRate)) {
+			return;
+		}
 		// randomly select a number of individual to mutate based on the mutation rate
 		int m = (int) Math.round(mutationRate * (individuals.length - 1));
 		if (m == 0) { // ensure at least one mutant?

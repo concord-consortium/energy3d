@@ -1459,6 +1459,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private int populationSize = 32;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
+				private double mutationRate = 0.1;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1494,13 +1495,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Maximum generations:"));
 					final JTextField generationField = new JTextField(maximumGenerations + "");
 					panel.add(generationField);
+					panel.add(new JLabel("Mutation rate:"));
+					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
 					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 8, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1517,6 +1521,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								populationSize = Integer.parseInt(populationField.getText());
 								maximumGenerations = Integer.parseInt(generationField.getText());
 								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
+								mutationRate = Double.parseDouble(mutationRateField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1526,10 +1531,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (maximumGenerations <= 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum generations must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (mutationRate < 0 || mutationRate > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), foundation, maximumGenerations, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									op.setMutationRate(mutationRate);
 									op.evolve();
 									if (choice == options[0]) {
 										break;
@@ -1550,6 +1560,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private int populationSize = 32;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
+				private double mutationRate = 0.1;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1585,13 +1596,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Maximum generations:"));
 					final JTextField generationField = new JTextField(maximumGenerations + "");
 					panel.add(generationField);
+					panel.add(new JLabel("Mutation rate:"));
+					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
 					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 8, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1608,6 +1622,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								populationSize = Integer.parseInt(populationField.getText());
 								maximumGenerations = Integer.parseInt(generationField.getText());
 								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
+								mutationRate = Double.parseDouble(mutationRateField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1617,10 +1632,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (maximumGenerations <= 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum generations must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (mutationRate < 0 || mutationRate > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, foundation, maximumGenerations, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									op.setMutationRate(mutationRate);
 									op.setupFoundationConstraint();
 									op.evolve();
 									if (choice == options[0]) {
