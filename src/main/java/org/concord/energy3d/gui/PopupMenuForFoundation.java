@@ -1538,8 +1538,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), foundation, maximumGenerations, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), selectedSelectionMethod, convergenceThreshold);
+									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
+									op.setOjectiveFunction(selectedFitnessFunction);
+									op.setFoundation(foundation);
 									op.evolve();
 									if (choice == options[0]) {
 										break;
@@ -1639,8 +1642,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, foundation, maximumGenerations, selectedSelectionMethod, convergenceThreshold, selectedFitnessFunction);
+									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold);
+									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
+									op.setOjectiveFunction(selectedFitnessFunction);
+									op.setFoundation(foundation);
 									op.setupFoundationConstraint();
 									op.evolve();
 									if (choice == options[0]) {

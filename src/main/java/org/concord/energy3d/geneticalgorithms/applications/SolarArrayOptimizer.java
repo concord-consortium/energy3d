@@ -20,8 +20,13 @@ import org.concord.energy3d.shapes.Heliodon;
  */
 public class SolarArrayOptimizer extends Optimizer {
 
-	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGenerations, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
-		super(populationSize, chromosomeLength, foundation, maximumGenerations, selectionMethod, convergenceThreshold, objectiveFunctionType);
+	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
+		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	}
+
+	@Override
+	public void setFoundation(final Foundation foundation) {
+		super.setFoundation(foundation);
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
@@ -37,6 +42,7 @@ public class SolarArrayOptimizer extends Optimizer {
 			@Override
 			public Object call() {
 				if (!converged) {
+					final int populationSize = population.size();
 					final int generation = computeCounter / populationSize;
 					final Individual individual = population.getIndividual(indexOfIndividual);
 					for (int j = 0; j < individual.getChromosomeLength(); j++) {
@@ -52,8 +58,9 @@ public class SolarArrayOptimizer extends Optimizer {
 						population.selectSurvivors(selectionRate);
 						population.crossover(crossoverRate);
 						population.mutate(mutationRate);
-						detectViolations();
-						population.restoreGenes();
+						if (detectViolations()) {
+							population.restoreGenes();
+						}
 						converged = population.isConverged();
 					}
 					computeCounter++;

@@ -25,10 +25,10 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
-	int maximumGenerations = 5;
 	double mutationRate = 0.1;
 	double crossoverRate = 0.5;
 	double selectionRate = 0.5;
+	int maximumGenerations = 5;
 	Population population;
 	int outsideGenerationCounter;
 	int computeCounter;
@@ -36,21 +36,24 @@ public abstract class Optimizer {
 	Foundation foundation;
 	double cx, cy, lx, ly;
 	List<Constraint> constraints;
-	int populationSize;
-	int chromosomeLength;
-	int objectiveFunctionType = ObjectiveFunction.DAILY;
 	volatile boolean converged;
 	ObjectiveFunction objectiveFunction;
 
-	public Optimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGenerations, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
-		this.populationSize = populationSize;
-		this.foundation = foundation;
-		this.maximumGenerations = maximumGenerations;
-		this.objectiveFunctionType = objectiveFunctionType;
-		this.chromosomeLength = chromosomeLength;
+	public Optimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
 		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
-		objectiveFunction = new SolarCollectorObjectiveFunction(objectiveFunctionType);
 		constraints = new ArrayList<Constraint>();
+	}
+
+	public void setMaximumGenerations(final int maximumGenerations) {
+		this.maximumGenerations = maximumGenerations;
+	}
+
+	public void setFoundation(final Foundation foundation) {
+		this.foundation = foundation;
+	}
+
+	public void setOjectiveFunction(final int objectiveFunctionType) {
+		objectiveFunction = new SolarCollectorObjectiveFunction(objectiveFunctionType);
 	}
 
 	public void setupFoundationConstraint() {
@@ -62,6 +65,7 @@ public abstract class Optimizer {
 		cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
 		lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
 		ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
+		final int chromosomeLength = population.getChromosomeLength();
 		mins = new double[chromosomeLength];
 		maxs = new double[chromosomeLength];
 		for (int i = 0; i < chromosomeLength; i += 2) {
@@ -103,8 +107,11 @@ public abstract class Optimizer {
 	}
 
 	// if anyone in the current population doesn't meed the constraints, the entire population dies and the algorithm reverts to the previous generation -- not efficient
-	void detectViolations() {
+	boolean detectViolations() {
+		boolean detected = false;
 		if (mins != null && maxs != null) {
+			final int chromosomeLength = population.getChromosomeLength();
+			final int populationSize = population.size();
 			for (int i = 0; i < populationSize; i++) {
 				final Individual individual = population.getIndividual(i);
 				final double[] x = new double[chromosomeLength / 2];
@@ -124,12 +131,14 @@ public abstract class Optimizer {
 							final RectangularBound rb = (RectangularBound) c;
 							if (rb.contains(x[j2], y[j2])) {
 								population.setViolation(i, true);
+								detected = true;
 							}
 						}
 					}
 				}
 			}
 		}
+		return detected;
 	}
 
 	public void addConstraint(final Constraint c) {
@@ -148,6 +157,26 @@ public abstract class Optimizer {
 	public Population getPopulation() {
 		return population;
 	}
+
+	void onCompletion() {
+		EnergyPanel.getInstance().progress(0);
+		EnergyPanel.getInstance().disableDateSpinner(false);
+		SceneManager.setExecuteAllTask(true);
+		EnergyPanel.getInstance().cancel();
+	}
+
+	void onStart() {
+		EnergyPanel.getInstance().disableDateSpinner(true);
+		SceneManager.getInstance().setHeatFluxDaily(true);
+		Util.selectSilently(MainPanel.getInstance().getEnergyButton(), true);
+		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
+		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
+		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
+		SceneManager.setExecuteAllTask(false);
+		Scene.getInstance().redrawAllNow();
+	}
+
+	abstract void updateInfo();
 
 	public void setCrossoverRate(final double crossoverRate) {
 		this.crossoverRate = crossoverRate;
@@ -172,25 +201,5 @@ public abstract class Optimizer {
 	public double getSelectionRate() {
 		return selectionRate;
 	}
-
-	void onCompletion() {
-		EnergyPanel.getInstance().progress(0);
-		EnergyPanel.getInstance().disableDateSpinner(false);
-		SceneManager.setExecuteAllTask(true);
-		EnergyPanel.getInstance().cancel();
-	}
-
-	void onStart() {
-		EnergyPanel.getInstance().disableDateSpinner(true);
-		SceneManager.getInstance().setHeatFluxDaily(true);
-		Util.selectSilently(MainPanel.getInstance().getEnergyButton(), true);
-		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
-		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
-		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
-		SceneManager.setExecuteAllTask(false);
-		Scene.getInstance().redrawAllNow();
-	}
-
-	abstract void updateInfo();
 
 }

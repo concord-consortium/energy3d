@@ -24,8 +24,13 @@ import com.ardor3d.math.Vector3;
  */
 public class HeliostatFieldOptimizer extends Optimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final Foundation foundation, final int maximumGenerations, final int selectionMethod, final double convergenceThreshold, final int objectiveFunctionType) {
-		super(populationSize, chromosomeLength, foundation, maximumGenerations, selectionMethod, convergenceThreshold, objectiveFunctionType);
+	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
+		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	}
+
+	@Override
+	public void setFoundation(final Foundation foundation) {
+		super.setFoundation(foundation);
 		final Mirror heliostat = foundation.getHeliostats().get(0);
 		final Foundation receiver = heliostat.getReceiver();
 		if (receiver != null) {
@@ -55,6 +60,7 @@ public class HeliostatFieldOptimizer extends Optimizer {
 			@Override
 			public Object call() {
 				if (!converged) {
+					final int populationSize = population.size();
 					final int generation = computeCounter / populationSize;
 					final Individual individual = population.getIndividual(indexOfIndividual);
 					for (int j = 0; j < individual.getChromosomeLength(); j++) {
@@ -75,8 +81,9 @@ public class HeliostatFieldOptimizer extends Optimizer {
 						population.selectSurvivors(selectionRate);
 						population.crossover(crossoverRate);
 						population.mutate(mutationRate);
-						detectViolations();
-						population.restoreGenes();
+						if (detectViolations()) {
+							population.restoreGenes();
+						}
 						converged = population.isConverged();
 					}
 					computeCounter++;
