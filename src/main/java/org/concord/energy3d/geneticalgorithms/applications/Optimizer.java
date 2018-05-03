@@ -20,6 +20,8 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.math.Vector3;
 
 /**
+ * If the population size is less than 10, we use the micro genetic algorithm. Otherwise, we use the standard genetic algorithm.
+ * 
  * @author Charles Xie
  *
  */

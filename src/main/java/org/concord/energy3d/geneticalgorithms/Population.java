@@ -67,6 +67,23 @@ public class Population {
 		return true;
 	}
 
+	public boolean isMicroGAConverged() {
+		final int n = getChromosomeLength();
+		for (int i = 0; i < n; i++) {
+			double average = 0;
+			for (int j = 0; j < individuals.length; j++) {
+				average += individuals[j].getGene(i);
+			}
+			average /= individuals.length;
+			for (int j = 0; j < individuals.length; j++) {
+				if (Math.abs(individuals[j].getGene(i) / average - 1.0) > convergenceThreshold) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public Individual getIndividual(final int i) {
 		if (i < 0 || i >= individuals.length) {
 			throw new IllegalArgumentException("Individual index out of bound: " + i);
@@ -106,6 +123,54 @@ public class Population {
 				survivors.add(individuals[i]);
 			} else {
 				break;
+			}
+		}
+	}
+
+	public void restart() {
+		sort();
+		for (int k = 1; k < individuals.length; k++) {
+			individuals[k] = new Individual(individuals[0].getChromosomeLength());
+		}
+	}
+
+	public void microGA() {
+		final int size = individuals.length;
+		if (size < 5) {
+			throw new RuntimeException("Must have at least five individuals for micro GA");
+		}
+		System.out.println("****mGA = " + size);
+		sort();
+		final int n = individuals[0].getChromosomeLength();
+		final Individual[] originals = new Individual[size];
+		for (int k = 0; k < size; k++) {
+			originals[k] = new Individual(individuals[k]);
+		}
+		for (int k = 1; k < size; k++) {
+			int i = (int) Math.round(Math.random() * (size - 1));
+			int j;
+			do {
+				j = (int) Math.round(Math.random() * (size - 1));
+			} while (j == i);
+			final int d = individuals[i].getFitness() > individuals[j].getFitness() ? i : j;
+			i = (int) Math.round(Math.random() * (size - 1));
+			do {
+				j = (int) Math.round(Math.random() * (size - 1));
+			} while (j == i);
+			int m = individuals[i].getFitness() > individuals[j].getFitness() ? i : j;
+			if (m == d) {// just select dad's neighbor
+				if (d == 0) {
+					m = 1;
+				} else if (d == size - 1) {
+					m = size - 2;
+				} else {
+					m = Math.random() < 0.5 ? d - 1 : d + 1;
+				}
+			}
+			for (i = 0; i < n; i++) {
+				final double di = originals[d].getGene(i);
+				final double mi = originals[m].getGene(i);
+				individuals[k].setGene(i, beta * di + (1 - beta) * mi);
 			}
 		}
 	}

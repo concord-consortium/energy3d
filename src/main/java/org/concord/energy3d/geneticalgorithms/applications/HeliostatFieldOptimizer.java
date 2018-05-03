@@ -53,46 +53,75 @@ public class HeliostatFieldOptimizer extends Optimizer {
 		}
 	}
 
+	private void computeIndividualFitness(final Individual individual) {
+		for (int j = 0; j < individual.getChromosomeLength(); j++) {
+			final double gene = individual.getGene(j);
+			final int j2 = j / 2;
+			final Mirror m = foundation.getHeliostats().get(j2);
+			if (j % 2 == 0) {
+				m.getPoints().get(0).setX(gene);
+			} else {
+				m.getPoints().get(0).setY(gene);
+			}
+		}
+		individual.setFitness(objectiveFunction.compute());
+	}
+
 	@Override
 	void computeIndividual(final int indexOfIndividual) {
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				if (!converged) {
-					final int populationSize = population.size();
-					final int generation = computeCounter / populationSize;
-					final Individual individual = population.getIndividual(indexOfIndividual);
-					for (int j = 0; j < individual.getChromosomeLength(); j++) {
-						final double gene = individual.getGene(j);
-						final int j2 = j / 2;
-						final Mirror m = foundation.getHeliostats().get(j2);
-						if (j % 2 == 0) {
-							m.getPoints().get(0).setX(gene);
-						} else {
-							m.getPoints().get(0).setY(gene);
+
+				final int populationSize = population.size();
+
+				if (populationSize > 9) { // implement standard GA
+
+					if (!converged) {
+						final Individual individual = population.getIndividual(indexOfIndividual);
+						computeIndividualFitness(individual);
+						final int generation = computeCounter / populationSize;
+						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
+						if (isAtTheEndOfGeneration) {
+							population.saveGenes();
+							population.selectSurvivors(selectionRate);
+							population.crossover(crossoverRate);
+							population.mutate(mutationRate);
+							if (detectViolations()) {
+								population.restoreGenes();
+							}
+							converged = population.isConverged();
 						}
+					} else {
+						SceneManager.getTaskManager().clearTasks();
+						onCompletion();
 					}
-					individual.setFitness(objectiveFunction.compute());
+
+				} else { // implement micro GA -- it doesn't exit when converged; At convergence, we restart by mating the winner with four new individuals that are randomly chosen
+
+					final Individual individual = population.getIndividual(indexOfIndividual);
+					computeIndividualFitness(individual);
+					final int generation = computeCounter / populationSize;
 					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
 					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 					if (isAtTheEndOfGeneration) {
-						population.saveGenes();
-						population.selectSurvivors(selectionRate);
-						population.crossover(crossoverRate);
-						population.mutate(mutationRate);
-						if (detectViolations()) {
-							population.restoreGenes();
+						population.microGA();
+						if (population.isMicroGAConverged()) {
+							population.restart();
 						}
-						converged = population.isConverged();
+						if (detectViolations()) {
+							population.restart();
+						}
 					}
-					computeCounter++;
-				} else {
-					SceneManager.getTaskManager().clearTasks();
-					onCompletion();
+
 				}
+
+				computeCounter++;
 				updateInfo();
 				return null;
+
 			}
 		});
 
