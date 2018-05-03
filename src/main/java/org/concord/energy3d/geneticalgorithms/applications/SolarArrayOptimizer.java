@@ -35,41 +35,70 @@ public class SolarArrayOptimizer extends Optimizer {
 		}
 	}
 
+	private void computeIndividualFitness(final Individual individual) {
+		for (int j = 0; j < individual.getChromosomeLength(); j++) {
+			final double gene = individual.getGene(j);
+			final Rack rack = foundation.getRacks().get(j);
+			rack.setTiltAngle((2 * gene - 1) * 90);
+		}
+		individual.setFitness(objectiveFunction.compute());
+	}
+
 	@Override
 	void computeIndividual(final int indexOfIndividual) {
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				if (!converged) {
-					final int populationSize = population.size();
-					final int generation = computeCounter / populationSize;
-					final Individual individual = population.getIndividual(indexOfIndividual);
-					for (int j = 0; j < individual.getChromosomeLength(); j++) {
-						final double gene = individual.getGene(j);
-						final Rack rack = foundation.getRacks().get(j);
-						rack.setTiltAngle((2 * gene - 1) * 90);
+
+				final int populationSize = population.size();
+
+				if (populationSize > 9) { // implement standard GA
+
+					if (!converged) {
+						final Individual individual = population.getIndividual(indexOfIndividual);
+						computeIndividualFitness(individual);
+						final int generation = computeCounter / populationSize;
+						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
+						if (isAtTheEndOfGeneration) {
+							population.saveGenes();
+							population.runSGA(selectionRate, crossoverRate, mutationRate);
+							if (detectViolations()) {
+								population.restoreGenes();
+							}
+							converged = population.isSGAConverged();
+						}
+					} else {
+						SceneManager.getTaskManager().clearTasks();
+						onCompletion();
 					}
-					individual.setFitness(objectiveFunction.compute());
+
+				} else { // implement micro GA -- it doesn't exit when converged; At convergence, we restart by mating the winner with four new individuals that are randomly chosen
+
+					final Individual individual = population.getIndividual(indexOfIndividual);
+					computeIndividualFitness(individual);
+					final int generation = computeCounter / populationSize;
 					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
 					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 					if (isAtTheEndOfGeneration) {
 						population.saveGenes();
-						population.selectSurvivors(selectionRate);
-						population.crossover(crossoverRate);
-						population.mutate(mutationRate);
+						population.runMGA();
 						if (detectViolations()) {
 							population.restoreGenes();
+						} else {
+							if (population.isMGAConverged()) {
+								population.restartMGA();
+							}
 						}
-						converged = population.isConverged();
 					}
-					computeCounter++;
-				} else {
-					SceneManager.getTaskManager().clearTasks();
-					onCompletion();
+
 				}
+
+				computeCounter++;
 				updateInfo();
 				return null;
+
 			}
 		});
 

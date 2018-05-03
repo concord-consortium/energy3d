@@ -7,6 +7,8 @@ import java.util.List;
 import org.concord.energy3d.util.Util;
 
 /**
+ * This class implements standard genetic algorithm (SGA) and micro genetic algorithm (MGA).
+ * 
  * @author Charles Xie
  *
  */
@@ -45,45 +47,6 @@ public class Population {
 		return individuals[0].getChromosomeLength();
 	}
 
-	// check convergence bitwisely
-	public boolean isConverged() {
-		if (survivors.size() < 2) {
-			return true;
-		}
-		final int n = getChromosomeLength();
-		final int m = Math.max(2, survivors.size() / 2);
-		for (int i = 0; i < n; i++) {
-			double average = 0;
-			for (int j = 0; j < m; j++) {
-				average += survivors.get(j).getGene(i);
-			}
-			average /= m;
-			for (int j = 0; j < m; j++) {
-				if (Math.abs(survivors.get(j).getGene(i) / average - 1.0) > convergenceThreshold) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	public boolean isMicroGAConverged() {
-		final int n = getChromosomeLength();
-		for (int i = 0; i < n; i++) {
-			double average = 0;
-			for (int j = 0; j < individuals.length; j++) {
-				average += individuals[j].getGene(i);
-			}
-			average /= individuals.length;
-			for (int j = 0; j < individuals.length; j++) {
-				if (Math.abs(individuals[j].getGene(i) / average - 1.0) > convergenceThreshold) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	public Individual getIndividual(final int i) {
 		if (i < 0 || i >= individuals.length) {
 			throw new IllegalArgumentException("Individual index out of bound: " + i);
@@ -114,32 +77,20 @@ public class Population {
 		}
 	}
 
-	/** select the survivors based on elitism specified by the rate of selection */
-	public void selectSurvivors(final double selectionRate) {
-		survivors.clear();
-		sort();
-		for (int i = 0; i < individuals.length; i++) {
-			if (i < selectionRate * individuals.length) {
-				survivors.add(individuals[i]);
-			} else {
-				break;
-			}
-		}
-	}
+	/* Implement micro genetic algorithm (MGA) */
 
-	public void restart() {
+	public void restartMGA() {
 		sort();
 		for (int k = 1; k < individuals.length; k++) {
 			individuals[k] = new Individual(individuals[0].getChromosomeLength());
 		}
 	}
 
-	public void microGA() {
+	public void runMGA() {
 		final int size = individuals.length;
 		if (size < 5) {
 			throw new RuntimeException("Must have at least five individuals for micro GA");
 		}
-		System.out.println("****mGA = " + size);
 		sort();
 		final int n = individuals[0].getChromosomeLength();
 		final Individual[] originals = new Individual[size];
@@ -167,10 +118,50 @@ public class Population {
 					m = Math.random() < 0.5 ? d - 1 : d + 1;
 				}
 			}
+			beta = Math.random();
 			for (i = 0; i < n; i++) {
 				final double di = originals[d].getGene(i);
 				final double mi = originals[m].getGene(i);
 				individuals[k].setGene(i, beta * di + (1 - beta) * mi);
+			}
+		}
+	}
+
+	// check convergence bitwisely
+	public boolean isMGAConverged() {
+		final int n = getChromosomeLength();
+		for (int i = 0; i < n; i++) {
+			double average = 0;
+			for (int j = 0; j < individuals.length; j++) {
+				average += individuals[j].getGene(i);
+			}
+			average /= individuals.length;
+			for (int j = 0; j < individuals.length; j++) {
+				if (Math.abs(individuals[j].getGene(i) / average - 1.0) > convergenceThreshold) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/* Implement standard genetic algorithm (SGA) */
+
+	public void runSGA(final double selectionRate, final double crossoverRate, final double mutationRate) {
+		selectSurvivors(selectionRate);
+		crossover(crossoverRate);
+		mutate(mutationRate);
+	}
+
+	// select the survivors based on elitism specified by the rate of selection
+	private void selectSurvivors(final double selectionRate) {
+		survivors.clear();
+		sort();
+		for (int i = 0; i < individuals.length; i++) {
+			if (i < selectionRate * individuals.length) {
+				survivors.add(individuals[i]);
+			} else {
+				break;
 			}
 		}
 	}
@@ -242,8 +233,8 @@ public class Population {
 		return new Parents(survivors.get(d), survivors.get(m));
 	}
 
-	/** uniform crossover */
-	public void crossover(final double crossoverRate) {
+	// uniform crossover
+	private void crossover(final double crossoverRate) {
 		final int numberOfSurvivers = survivors.size();
 		if (numberOfSurvivers <= 1) {
 			return;
@@ -300,7 +291,7 @@ public class Population {
 	}
 
 	// elitism: don't mutate the top one
-	public void mutate(final double mutationRate) {
+	private void mutate(final double mutationRate) {
 		if (Util.isZero(mutationRate)) {
 			return;
 		}
@@ -321,6 +312,28 @@ public class Population {
 			final int n = (int) (Math.random() * (i.getChromosomeLength() - 1));
 			i.setGene(n, Math.random());
 		}
+	}
+
+	// check convergence bitwisely
+	public boolean isSGAConverged() {
+		if (survivors.size() < 2) {
+			return true;
+		}
+		final int n = getChromosomeLength();
+		final int m = Math.max(2, survivors.size() / 2);
+		for (int i = 0; i < n; i++) {
+			double average = 0;
+			for (int j = 0; j < m; j++) {
+				average += survivors.get(j).getGene(i);
+			}
+			average /= m;
+			for (int j = 0; j < m; j++) {
+				if (Math.abs(survivors.get(j).getGene(i) / average - 1.0) > convergenceThreshold) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

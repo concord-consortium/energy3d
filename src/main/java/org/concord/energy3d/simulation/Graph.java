@@ -1010,6 +1010,8 @@ public abstract class Graph extends JPanel {
 				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
 				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
+				s = "Solar";
+				s = isAngularGraph ? s : s + " (" + FIVE_DECIMALS.format(getSum(s)) + ")";
 				legendText += "<li>" + s;
 			}
 			s = "Heat Gain";

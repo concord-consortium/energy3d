@@ -86,13 +86,12 @@ public class HeliostatFieldOptimizer extends Optimizer {
 						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
-							population.selectSurvivors(selectionRate);
-							population.crossover(crossoverRate);
-							population.mutate(mutationRate);
+							population.runSGA(selectionRate, crossoverRate, mutationRate);
 							if (detectViolations()) {
 								population.restoreGenes();
+							} else {
+								converged = population.isSGAConverged();
 							}
-							converged = population.isConverged();
 						}
 					} else {
 						SceneManager.getTaskManager().clearTasks();
@@ -107,12 +106,14 @@ public class HeliostatFieldOptimizer extends Optimizer {
 					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
 					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 					if (isAtTheEndOfGeneration) {
-						population.microGA();
-						if (population.isMicroGAConverged()) {
-							population.restart();
-						}
+						population.saveGenes();
+						population.runMGA();
 						if (detectViolations()) {
-							population.restart();
+							population.restoreGenes();
+						} else {
+							if (population.isMGAConverged()) {
+								population.restartMGA();
+							}
 						}
 					}
 
