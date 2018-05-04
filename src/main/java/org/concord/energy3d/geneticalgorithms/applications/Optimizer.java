@@ -90,8 +90,6 @@ public abstract class Optimizer {
 			}
 			outsideGenerationCounter++;
 		}
-		population.sort();
-		computeIndividual(0);
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -100,6 +98,8 @@ public abstract class Optimizer {
 					@Override
 					public void run() {
 						onCompletion();
+						population.sort();
+						computeIndividual(0);
 					}
 				});
 				return null;

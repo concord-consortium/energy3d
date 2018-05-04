@@ -71,7 +71,12 @@ public class SolarArrayOptimizer extends Optimizer {
 						}
 					} else {
 						SceneManager.getTaskManager().clearTasks();
-						onCompletion();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								onCompletion();
+							}
+						});
 					}
 
 				} else { // implement micro GA -- it doesn't exit when converged; At convergence, we restart by mating the winner with four new individuals that are randomly chosen
@@ -118,25 +123,19 @@ public class SolarArrayOptimizer extends Optimizer {
 			break;
 		}
 		foundation.draw();
-		final Calendar c = Heliodon.getInstance().getCalendar();
-		final Calendar today = (Calendar) c.clone();
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Foundation) { // synchronize with daily graph
-			final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
-			if (g.hasGraph()) {
-				g.setCalendar(today);
-				g.updateGraph();
-			}
-		}
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
-				if (selectedPart instanceof Foundation) {
+				final Calendar today = Heliodon.getInstance().getCalendar();
+				EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) { // synchronize with daily graph
 					final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
+					g.setCalendar(today);
 					EnergyPanel.getInstance().getPvProjectTabbedPane().setSelectedComponent(g);
-					if (!g.hasGraph()) {
-						g.setCalendar(today);
+					if (g.hasGraph()) {
+						g.updateGraph();
+					} else {
 						g.addGraph((Foundation) selectedPart);
 					}
 				}
