@@ -77,7 +77,7 @@ public class Population {
 		}
 	}
 
-	private Individual getFittest() {
+	public Individual getFittest() {
 		double max = -Double.MAX_VALUE;
 		Individual best = null;
 		for (final Individual i : individuals) {
@@ -87,18 +87,6 @@ public class Population {
 			}
 		}
 		return best;
-	}
-
-	public int getFittestIndex() {
-		double max = -Double.MAX_VALUE;
-		int index = -1;
-		for (int i = 0; i < individuals.length; i++) {
-			if (individuals[i].getFitness() > max) {
-				max = individuals[i].getFitness();
-				index = i;
-			}
-		}
-		return index;
 	}
 
 	/* Implement micro genetic algorithm (MGA) */
@@ -313,7 +301,6 @@ public class Population {
 
 	}
 
-	// elitism: don't mutate the top one
 	public void mutate(final double mutationRate) {
 		if (Util.isZero(mutationRate)) {
 			return;
@@ -325,7 +312,7 @@ public class Population {
 		}
 		mutants.clear();
 		while (mutants.size() < m) {
-			final int k = (int) (1 + Math.random() * (individuals.length - 2));
+			final int k = (int) (1 + Math.random() * (individuals.length - 2)); // elitism: don't mutate the top one
 			if (!mutants.contains(individuals[k])) {
 				mutants.add(individuals[k]);
 			}

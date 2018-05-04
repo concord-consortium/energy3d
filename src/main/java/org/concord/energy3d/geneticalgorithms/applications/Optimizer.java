@@ -76,6 +76,8 @@ public abstract class Optimizer {
 		}
 	}
 
+	public abstract void applyFittest();
+
 	abstract void computeIndividual(final int indexOfIndividual);
 
 	public void evolve() {
@@ -90,11 +92,11 @@ public abstract class Optimizer {
 			}
 			outsideGenerationCounter++;
 		}
-		computeIndividual(population.getFittestIndex()); // show the fittest state
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
+				applyFittest(); // show the fittest
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {

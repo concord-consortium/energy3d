@@ -68,6 +68,45 @@ public class HeliostatFieldOptimizer extends Optimizer {
 	}
 
 	@Override
+	public void applyFittest() {
+		final Individual best = population.getFittest();
+		for (int j = 0; j < best.getChromosomeLength(); j++) {
+			final double gene = best.getGene(j);
+			final int j2 = j / 2;
+			final Mirror m = foundation.getHeliostats().get(j2);
+			if (j % 2 == 0) {
+				m.getPoints().get(0).setX(gene);
+			} else {
+				m.getPoints().get(0).setY(gene);
+			}
+		}
+		System.out.println("Fittest: " + individualToString(best));
+	}
+
+	private String individualToString(final Individual individual) {
+		String s = "(";
+		for (int j = 0; j < individual.getChromosomeLength(); j++) {
+			final double gene = individual.getGene(j);
+			if (j % 2 == 0) {
+				if (mins != null && maxs != null) {
+					s += (mins[j] + gene * (maxs[j] - mins[j]));
+				} else {
+					s += gene;
+				}
+				s += ", ";
+			} else {
+				if (mins != null && maxs != null) {
+					s += (mins[j] + gene * (maxs[j] - mins[j]));
+				} else {
+					s += gene;
+				}
+				s += " | ";
+			}
+		}
+		return s.substring(0, s.length() - 3) + ") = " + individual.getFitness();
+	}
+
+	@Override
 	void computeIndividual(final int indexOfIndividual) {
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -82,7 +121,7 @@ public class HeliostatFieldOptimizer extends Optimizer {
 						final Individual individual = population.getIndividual(indexOfIndividual);
 						computeIndividualFitness(individual);
 						final int generation = computeCounter / populationSize;
-						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
 						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
@@ -102,6 +141,7 @@ public class HeliostatFieldOptimizer extends Optimizer {
 							@Override
 							public void run() {
 								onCompletion();
+								applyFittest();
 							}
 						});
 					}
@@ -111,7 +151,7 @@ public class HeliostatFieldOptimizer extends Optimizer {
 					final Individual individual = population.getIndividual(indexOfIndividual);
 					computeIndividualFitness(individual);
 					final int generation = computeCounter / populationSize;
-					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
 					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 					if (isAtTheEndOfGeneration) {
 						population.saveGenes();

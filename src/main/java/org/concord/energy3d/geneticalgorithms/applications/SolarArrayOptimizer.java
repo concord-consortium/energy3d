@@ -45,6 +45,27 @@ public class SolarArrayOptimizer extends Optimizer {
 	}
 
 	@Override
+	public void applyFittest() {
+		final Individual best = population.getFittest();
+		for (int j = 0; j < best.getChromosomeLength(); j++) {
+			final double gene = best.getGene(j);
+			final Rack rack = foundation.getRacks().get(j);
+			rack.setTiltAngle((2 * gene - 1) * 90);
+			rack.draw();
+		}
+		System.out.println("Fittest: " + individualToString(best));
+	}
+
+	private String individualToString(final Individual individual) {
+		String s = "(";
+		for (int i = 0; i < individual.getChromosomeLength(); i++) {
+			final double gene = individual.getGene(i);
+			s += (2 * gene - 1) * 90 + ", ";
+		}
+		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
+	}
+
+	@Override
 	void computeIndividual(final int indexOfIndividual) {
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -59,7 +80,7 @@ public class SolarArrayOptimizer extends Optimizer {
 						final Individual individual = population.getIndividual(indexOfIndividual);
 						computeIndividualFitness(individual);
 						final int generation = computeCounter / populationSize;
-						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
 						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
@@ -79,6 +100,7 @@ public class SolarArrayOptimizer extends Optimizer {
 							@Override
 							public void run() {
 								onCompletion();
+								applyFittest();
 							}
 						});
 					}
@@ -88,7 +110,7 @@ public class SolarArrayOptimizer extends Optimizer {
 					final Individual individual = population.getIndividual(indexOfIndividual);
 					computeIndividualFitness(individual);
 					final int generation = computeCounter / populationSize;
-					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " = " + individual.getFitness());
+					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
 					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 					if (isAtTheEndOfGeneration) {
 						population.saveGenes();
