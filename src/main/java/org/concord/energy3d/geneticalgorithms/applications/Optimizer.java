@@ -90,6 +90,7 @@ public abstract class Optimizer {
 			}
 			outsideGenerationCounter++;
 		}
+		computeIndividual(population.getFittestIndex()); // show the fittest state
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -98,8 +99,6 @@ public abstract class Optimizer {
 					@Override
 					public void run() {
 						onCompletion();
-						population.sort();
-						computeIndividual(0);
 					}
 				});
 				return null;

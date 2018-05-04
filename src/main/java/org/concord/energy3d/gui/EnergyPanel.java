@@ -928,7 +928,8 @@ public class EnergyPanel extends JPanel {
 		final int cellCount = (int) (Scene.getInstance().getTotalFoundationAreas() / (cellSize * cellSize));
 		final int maxCells = 100000; // should we make this dependent of project type?
 		if (cellCount > maxCells) {
-			final int x = JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			final Object[] options = new Object[] { "OK, adjust it!", "No, just go with it!" };
+			final int x = JOptionPane.showOptionDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 			if (x == JOptionPane.YES_OPTION) {
 				final VisualizationSettingsDialog v = new VisualizationSettingsDialog();
 				v.getCellSizeField().selectAll();

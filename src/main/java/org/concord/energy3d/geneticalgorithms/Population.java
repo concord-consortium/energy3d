@@ -54,7 +54,7 @@ public class Population {
 		return individuals[i];
 	}
 
-	public void sort() {
+	private void sort() {
 		Arrays.sort(individuals);
 	}
 
@@ -77,10 +77,34 @@ public class Population {
 		}
 	}
 
+	private Individual getFittest() {
+		double max = -Double.MAX_VALUE;
+		Individual best = null;
+		for (final Individual i : individuals) {
+			if (i.getFitness() > max) {
+				max = i.getFitness();
+				best = i;
+			}
+		}
+		return best;
+	}
+
+	public int getFittestIndex() {
+		double max = -Double.MAX_VALUE;
+		int index = -1;
+		for (int i = 0; i < individuals.length; i++) {
+			if (individuals[i].getFitness() > max) {
+				max = individuals[i].getFitness();
+				index = i;
+			}
+		}
+		return index;
+	}
+
 	/* Implement micro genetic algorithm (MGA) */
 
 	public void restartMGA() {
-		sort();
+		individuals[0] = getFittest();
 		for (int k = 1; k < individuals.length; k++) {
 			individuals[k] = new Individual(individuals[0].getChromosomeLength());
 		}
@@ -147,10 +171,9 @@ public class Population {
 
 	/* Implement standard genetic algorithm (SGA) */
 
-	public void runSGA(final double selectionRate, final double crossoverRate, final double mutationRate) {
+	public void runSGA(final double selectionRate, final double crossoverRate) {
 		selectSurvivors(selectionRate);
 		crossover(crossoverRate);
-		mutate(mutationRate);
 	}
 
 	// select the survivors based on elitism specified by the rate of selection
@@ -291,7 +314,7 @@ public class Population {
 	}
 
 	// elitism: don't mutate the top one
-	private void mutate(final double mutationRate) {
+	public void mutate(final double mutationRate) {
 		if (Util.isZero(mutationRate)) {
 			return;
 		}

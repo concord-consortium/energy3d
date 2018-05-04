@@ -86,11 +86,14 @@ public class HeliostatFieldOptimizer extends Optimizer {
 						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
-							population.runSGA(selectionRate, crossoverRate, mutationRate);
+							population.runSGA(selectionRate, crossoverRate);
 							if (detectViolations()) {
 								population.restoreGenes();
 							} else {
 								converged = population.isSGAConverged();
+								if (!converged) {
+									population.mutate(mutationRate);
+								}
 							}
 						}
 					} else {
