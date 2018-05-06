@@ -2,6 +2,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.Calendar;
+import java.util.List;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -18,6 +19,10 @@ import org.concord.energy3d.shapes.Heliodon;
 import com.ardor3d.math.Vector3;
 
 /**
+ * Chromosome of an individual is encoded as follows:
+ * 
+ * heliostat[0].x, heliostat[0].y, ..., heliostat[n].x, heliostat[n].y
+ * 
  * @author Charles Xie
  *
  */
@@ -30,7 +35,8 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 	@Override
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
-		final Mirror heliostat = foundation.getHeliostats().get(0);
+		final List<Mirror> heliostats = foundation.getHeliostats();
+		final Mirror heliostat = heliostats.get(0);
 		final Foundation receiver = heliostat.getReceiver();
 		if (receiver != null) {
 			final Vector3 v0 = receiver.getAbsPoint(0);
@@ -46,7 +52,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
-		for (final Mirror m : foundation.getHeliostats()) {
+		for (final Mirror m : heliostats) {
 			firstBorn.setGene(i++, m.getPoints().get(0).getX());
 			firstBorn.setGene(i++, m.getPoints().get(0).getY());
 		}
@@ -54,10 +60,10 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 
 	@Override
 	void computeIndividualFitness(final Individual individual) {
+		final List<Mirror> heliostats = foundation.getHeliostats();
 		for (int j = 0; j < individual.getChromosomeLength(); j++) {
 			final double gene = individual.getGene(j);
-			final int j2 = j / 2;
-			final Mirror m = foundation.getHeliostats().get(j2);
+			final Mirror m = heliostats.get(j / 2);
 			if (j % 2 == 0) {
 				m.getPoints().get(0).setX(gene);
 			} else {
@@ -70,10 +76,10 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 	@Override
 	public void applyFittest() {
 		final Individual best = population.getFittest();
+		final List<Mirror> heliostats = foundation.getHeliostats();
 		for (int j = 0; j < best.getChromosomeLength(); j++) {
 			final double gene = best.getGene(j);
-			final int j2 = j / 2;
-			final Mirror m = foundation.getHeliostats().get(j2);
+			final Mirror m = heliostats.get(j / 2);
 			if (j % 2 == 0) {
 				m.getPoints().get(0).setX(gene);
 			} else {

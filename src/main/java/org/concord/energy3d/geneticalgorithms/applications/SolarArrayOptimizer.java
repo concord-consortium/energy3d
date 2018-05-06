@@ -2,6 +2,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.Calendar;
+import java.util.List;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -14,6 +15,10 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 
 /**
+ * Chromosome of an individual is encoded as follows:
+ * 
+ * rack[0].tiltAngle, ..., rack[n].tiltAngle
+ * 
  * @author Charles Xie
  *
  */
@@ -29,16 +34,18 @@ public class SolarArrayOptimizer extends SolarOutputOptimizer {
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
-		for (final Rack r : foundation.getRacks()) {
+		final List<Rack> racks = foundation.getRacks();
+		for (final Rack r : racks) {
 			firstBorn.setGene(i++, 0.5 * (1.0 + r.getTiltAngle() / 90.0));
 		}
 	}
 
 	@Override
 	void computeIndividualFitness(final Individual individual) {
+		final List<Rack> racks = foundation.getRacks();
 		for (int j = 0; j < individual.getChromosomeLength(); j++) {
 			final double gene = individual.getGene(j);
-			final Rack rack = foundation.getRacks().get(j);
+			final Rack rack = racks.get(j);
 			rack.setTiltAngle((2 * gene - 1) * 90);
 		}
 		individual.setFitness(objectiveFunction.compute());
@@ -46,10 +53,11 @@ public class SolarArrayOptimizer extends SolarOutputOptimizer {
 
 	@Override
 	public void applyFittest() {
+		final List<Rack> racks = foundation.getRacks();
 		final Individual best = population.getFittest();
 		for (int j = 0; j < best.getChromosomeLength(); j++) {
 			final double gene = best.getGene(j);
-			final Rack rack = foundation.getRacks().get(j);
+			final Rack rack = racks.get(j);
 			rack.setTiltAngle((2 * gene - 1) * 90);
 			rack.draw();
 		}

@@ -926,7 +926,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public boolean isDrawable() {
-		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= getGridSize() && getAbsPoint(0).distance(getAbsPoint(1)) >= getGridSize();
+		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= 0.1 * getGridSize() && getAbsPoint(0).distance(getAbsPoint(1)) >= 0.1 * getGridSize();
 	}
 
 	public void setPrintVertical(final boolean isVertical) {

@@ -41,7 +41,7 @@ public class NetEnergyObjectiveFunction extends ObjectiveFunction {
 			result = foundation.getTotalEnergyToday();
 			break;
 		}
-		return result;
+		return -result;
 	}
 
 }
