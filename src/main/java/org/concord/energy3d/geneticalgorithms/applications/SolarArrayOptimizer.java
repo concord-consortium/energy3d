@@ -2,7 +2,6 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.Calendar;
-import java.util.concurrent.Callable;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -18,7 +17,7 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  *
  */
-public class SolarArrayOptimizer extends Optimizer {
+public class SolarArrayOptimizer extends SolarOutputOptimizer {
 
 	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
@@ -35,7 +34,8 @@ public class SolarArrayOptimizer extends Optimizer {
 		}
 	}
 
-	private void computeIndividualFitness(final Individual individual) {
+	@Override
+	void computeIndividualFitness(final Individual individual) {
 		for (int j = 0; j < individual.getChromosomeLength(); j++) {
 			final double gene = individual.getGene(j);
 			final Rack rack = foundation.getRacks().get(j);
@@ -56,83 +56,14 @@ public class SolarArrayOptimizer extends Optimizer {
 		System.out.println("Fittest: " + individualToString(best));
 	}
 
-	private String individualToString(final Individual individual) {
+	@Override
+	String individualToString(final Individual individual) {
 		String s = "(";
 		for (int i = 0; i < individual.getChromosomeLength(); i++) {
 			final double gene = individual.getGene(i);
 			s += (2 * gene - 1) * 90 + ", ";
 		}
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
-	}
-
-	@Override
-	void computeIndividual(final int indexOfIndividual) {
-
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-
-				final int populationSize = population.size();
-
-				if (populationSize > 9) { // implement standard GA
-
-					if (!converged) {
-						final Individual individual = population.getIndividual(indexOfIndividual);
-						computeIndividualFitness(individual);
-						final int generation = computeCounter / populationSize;
-						System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
-						final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
-						if (isAtTheEndOfGeneration) {
-							population.saveGenes();
-							population.runSGA(selectionRate, crossoverRate);
-							if (detectViolations()) {
-								population.restoreGenes();
-							} else {
-								converged = population.isSGAConverged();
-								if (!converged) {
-									population.mutate(mutationRate);
-								}
-							}
-						}
-					} else {
-						SceneManager.getTaskManager().clearTasks();
-						EventQueue.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								onCompletion();
-								applyFittest();
-							}
-						});
-					}
-
-				} else { // implement micro GA -- it doesn't exit when converged; At convergence, we restart by mating the winner with four new individuals that are randomly chosen
-
-					final Individual individual = population.getIndividual(indexOfIndividual);
-					computeIndividualFitness(individual);
-					final int generation = computeCounter / populationSize;
-					System.out.println("Generation " + generation + ", individual " + indexOfIndividual + " : " + individualToString(individual));
-					final boolean isAtTheEndOfGeneration = (computeCounter % populationSize) == (populationSize - 1);
-					if (isAtTheEndOfGeneration) {
-						population.saveGenes();
-						population.runMGA();
-						if (detectViolations()) {
-							population.restoreGenes();
-						} else {
-							if (population.isMGAConverged()) {
-								population.restartMGA();
-							}
-						}
-					}
-
-				}
-
-				computeCounter++;
-				updateInfo();
-				return null;
-
-			}
-		});
-
 	}
 
 	@Override

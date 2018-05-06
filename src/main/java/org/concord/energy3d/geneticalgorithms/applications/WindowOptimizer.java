@@ -5,51 +5,22 @@ import java.util.Calendar;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
-import org.concord.energy3d.geneticalgorithms.RectangularBound;
 import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-
-import com.ardor3d.math.Vector3;
 
 /**
  * @author Charles Xie
  *
  */
-public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
+public class WindowOptimizer extends NetEnergyOptimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
+	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
-	}
-
-	@Override
-	public void setFoundation(final Foundation foundation) {
-		super.setFoundation(foundation);
-		final Mirror heliostat = foundation.getHeliostats().get(0);
-		final Foundation receiver = heliostat.getReceiver();
-		if (receiver != null) {
-			final Vector3 v0 = receiver.getAbsPoint(0);
-			final Vector3 v1 = receiver.getAbsPoint(1);
-			final Vector3 v2 = receiver.getAbsPoint(2);
-			final Vector3 v3 = receiver.getAbsPoint(3);
-			final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getAnnotationScale();
-			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
-			final double lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-			final double ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getMirrorWidth(), ly + heliostat.getMirrorHeight()));
-		}
-		// initialize the population with the first-born being the current design
-		final Individual firstBorn = population.getIndividual(0);
-		int i = 0;
-		for (final Mirror m : foundation.getHeliostats()) {
-			firstBorn.setGene(i++, m.getPoints().get(0).getX());
-			firstBorn.setGene(i++, m.getPoints().get(0).getY());
-		}
 	}
 
 	@Override
