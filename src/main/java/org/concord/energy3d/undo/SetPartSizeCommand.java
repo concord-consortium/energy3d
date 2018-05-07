@@ -3,6 +3,7 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
@@ -122,6 +123,9 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			d.getContainer().draw();
 		}
 		part.draw();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
@@ -161,13 +165,16 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			d.getContainer().draw();
 		}
 		part.draw();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public String getPresentationName() {
 		if (part instanceof Mirror) {
-			return "Set Size for Selected Mirror";
+			return "Set Size for Selected Heliostat";
 		}
 		if (part instanceof ParabolicTrough) {
 			return "Set Size for Selected Parabolic Trough";

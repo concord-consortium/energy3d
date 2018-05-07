@@ -3,12 +3,14 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 
@@ -37,6 +39,9 @@ public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 		wall.setHeight(oldValue, true);
 		Scene.getInstance().redrawAllWallsNow();
 		updateLinkedObjects();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -45,6 +50,9 @@ public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 		wall.setHeight(newValue, true);
 		Scene.getInstance().redrawAllWallsNow();
 		updateLinkedObjects();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	private void updateLinkedObjects() {

@@ -7,7 +7,7 @@ package org.concord.energy3d.geneticalgorithms;
 public class Individual implements Comparable<Individual> {
 
 	private final double[] chromosome;
-	private double fitness; // store the fitness value evaluated by the objective function
+	private double fitness = Double.NaN; // store the fitness value evaluated by the objective function
 
 	/** create an individual with the specified length and initialize its chromosome with random values between 0 and 1 */
 	public Individual(final int length) {

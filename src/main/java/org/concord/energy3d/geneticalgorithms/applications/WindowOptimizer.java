@@ -113,6 +113,8 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 				w.setWindowHeight(hmin + gene * (hmax - hmin));
 				break;
 			}
+			w.draw();
+			wall.draw();
 		}
 		System.out.println("Fittest: " + individualToString(best));
 	}

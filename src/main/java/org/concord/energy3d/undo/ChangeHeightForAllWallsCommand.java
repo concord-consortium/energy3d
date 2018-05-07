@@ -5,9 +5,11 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeHeightForAllWallsCommand extends MyAbstractUndoableEdit {
 
@@ -40,6 +42,9 @@ public class ChangeHeightForAllWallsCommand extends MyAbstractUndoableEdit {
 			w.setHeight(oldValues[i], true);
 		}
 		Scene.getInstance().redrawAllWallsNow();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -51,6 +56,9 @@ public class ChangeHeightForAllWallsCommand extends MyAbstractUndoableEdit {
 			w.setHeight(newValues[i], true);
 		}
 		Scene.getInstance().redrawAllWallsNow();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

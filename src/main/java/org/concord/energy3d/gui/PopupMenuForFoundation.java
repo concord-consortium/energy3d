@@ -1775,6 +1775,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						return;
 					}
 					final Foundation foundation = (Foundation) selectedPart;
+					miWindows.setEnabled(foundation.getWindows().size() > 0);
 					miSolarArrayOutput.setEnabled(foundation.getRacks().size() > 0);
 					miHeliostatFieldOutput.setEnabled(foundation.getHeliostats().size() > 0);
 				}

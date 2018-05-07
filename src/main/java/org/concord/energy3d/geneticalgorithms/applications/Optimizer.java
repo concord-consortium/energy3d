@@ -110,7 +110,7 @@ public abstract class Optimizer {
 
 	abstract void computeIndividualFitness(final Individual individual);
 
-	void computeIndividual(final int indexOfIndividual) {
+	private void computeIndividual(final int indexOfIndividual) {
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -140,11 +140,11 @@ public abstract class Optimizer {
 						}
 					} else {
 						SceneManager.getTaskManager().clearTasks();
+						applyFittest();
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								onCompletion();
-								applyFittest();
 							}
 						});
 					}

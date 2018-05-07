@@ -81,6 +81,9 @@ public class Population {
 		double max = -Double.MAX_VALUE;
 		Individual best = null;
 		for (final Individual i : individuals) {
+			if (Double.isNaN(i.getFitness())) { // fitness not computed yet, skip
+				continue;
+			}
 			if (i.getFitness() > max) {
 				max = i.getFitness();
 				best = i;

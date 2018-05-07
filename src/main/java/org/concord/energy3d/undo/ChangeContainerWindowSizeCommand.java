@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -50,6 +51,9 @@ public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 			w.draw();
 		}
 		container.draw();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
@@ -64,6 +68,9 @@ public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 			w.draw();
 		}
 		container.draw();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		SceneManager.getInstance().refresh();
 	}
 

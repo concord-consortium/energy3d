@@ -85,6 +85,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			} else {
 				m.getPoints().get(0).setY(gene);
 			}
+			m.draw();
 		}
 		System.out.println("Fittest: " + individualToString(best));
 	}
