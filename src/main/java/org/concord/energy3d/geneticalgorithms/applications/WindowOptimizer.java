@@ -12,8 +12,11 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+
+import com.ardor3d.math.Vector3;
 
 /**
  * Chromosome of an individual is encoded as follows:
@@ -54,14 +57,29 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		for (final Window w : windows) {
 			if (w.getContainer() instanceof Wall) {
 				final Wall wall = (Wall) w.getContainer();
-				final double wmin = minimumRatioWidth * wall.getWallWidth();
-				final double wmax = maximumRatioWidth * wall.getWallWidth();
+				final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
+				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
+				final double wmin = minimumRatioWidth * wmax;
+				wmax *= maximumRatioWidth;
 				double val = (w.getWindowWidth() - wmin) / (wmax - wmin);
-				firstBorn.setGene(i++, Math.min(1, val));
-				final double hmin = minimumRatioHeight * wall.getWallHeight();
-				final double hmax = maximumRatioHeight * wall.getWallHeight();
+				if (val < 0) {
+					val = 0;
+				} else if (val > 1) {
+					val = 1;
+				}
+				firstBorn.setGene(i++, val);
+				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
+				final double hmin = minimumRatioHeight * hmax;
+				hmax *= maximumRatioHeight;
 				val = (w.getWindowHeight() - hmin) / (hmax - hmin);
-				firstBorn.setGene(i++, Math.min(1, val));
+				if (val < 0) {
+					val = 0;
+				} else if (val > 1) {
+					val = 1;
+				}
+				firstBorn.setGene(i++, val);
 			} else {
 				throw new RuntimeException("Windows must be on walls!");
 			}
@@ -75,15 +93,20 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 			final double gene = individual.getGene(j);
 			final Window w = windows.get(j / 2);
 			final Wall wall = (Wall) w.getContainer();
+			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
 			switch (j % 2) {
 			case 0:
-				final double wmin = minimumRatioWidth * wall.getWallWidth();
-				final double wmax = maximumRatioWidth * wall.getWallWidth();
+				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
+				final double wmin = minimumRatioWidth * wmax;
+				wmax *= maximumRatioWidth;
 				w.setWindowWidth(wmin + gene * (wmax - wmin));
 				break;
 			case 1:
-				final double hmin = minimumRatioHeight * wall.getWallHeight();
-				final double hmax = maximumRatioHeight * wall.getWallHeight();
+				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
+				final double hmin = minimumRatioHeight * hmax;
+				hmax *= maximumRatioHeight;
 				w.setWindowHeight(hmin + gene * (hmax - hmin));
 				break;
 			}
@@ -101,15 +124,20 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 			final double gene = best.getGene(j);
 			final Window w = windows.get(j / 2);
 			final Wall wall = (Wall) w.getContainer();
+			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
 			switch (j % 2) {
 			case 0:
-				final double wmin = minimumRatioWidth * wall.getWallWidth();
-				final double wmax = maximumRatioWidth * wall.getWallWidth();
+				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
+				final double wmin = minimumRatioWidth * wmax;
+				wmax *= maximumRatioWidth;
 				w.setWindowWidth(wmin + gene * (wmax - wmin));
 				break;
 			case 1:
-				final double hmin = minimumRatioHeight * wall.getWallHeight();
-				final double hmax = maximumRatioHeight * wall.getWallHeight();
+				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
+				final double hmin = minimumRatioHeight * hmax;
+				hmax *= maximumRatioHeight;
 				w.setWindowHeight(hmin + gene * (hmax - hmin));
 				break;
 			}
@@ -127,15 +155,20 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 			final double gene = individual.getGene(j);
 			final Window w = windows.get(j / 2);
 			final Wall wall = (Wall) w.getContainer();
+			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
 			switch (j % 2) {
 			case 0:
-				final double wmin = minimumRatioWidth * wall.getWallWidth();
-				final double wmax = maximumRatioWidth * wall.getWallWidth();
+				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
+				final double wmin = minimumRatioWidth * wmax;
+				wmax *= maximumRatioWidth;
 				s += (wmin + gene * (wmax - wmin)) + ", ";
 				break;
 			case 1:
-				final double hmin = minimumRatioHeight * wall.getWallHeight();
-				final double hmax = maximumRatioHeight * wall.getWallHeight();
+				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
+				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
+				final double hmin = minimumRatioHeight * hmax;
+				hmax *= maximumRatioHeight;
 				s += (hmin + gene * (hmax - hmin)) + " | ";
 				break;
 			}
