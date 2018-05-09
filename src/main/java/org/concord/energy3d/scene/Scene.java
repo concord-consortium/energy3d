@@ -1179,7 +1179,7 @@ public class Scene implements Serializable {
 			return;
 		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) {
+		if (c == null || c instanceof Wall) {
 			return;
 		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
@@ -1238,7 +1238,7 @@ public class Scene implements Serializable {
 			return;
 		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) {
+		if (c == null || c instanceof Roof) {
 			return;
 		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnRoof();
@@ -1289,7 +1289,7 @@ public class Scene implements Serializable {
 			return;
 		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) {
+		if (c == null || c instanceof Floor) {
 			return;
 		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnFloor();
@@ -1408,7 +1408,7 @@ public class Scene implements Serializable {
 		} else {
 			if (copyBuffer != null) {
 				final HousePart c = copyBuffer.copy(false);
-				if (c == null) {
+				if (c == null || c instanceof Foundation) {
 					return;
 				}
 				Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
