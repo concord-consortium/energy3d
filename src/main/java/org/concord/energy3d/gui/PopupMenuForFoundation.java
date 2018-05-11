@@ -1540,7 +1540,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final WindowOptimizer op = new WindowOptimizer(populationSize, foundation.getWindows().size() * 2, selectedSelectionMethod, convergenceThreshold);
+									final WindowOptimizer op = new WindowOptimizer(populationSize, foundation.getWindows().size() * 2, selectedSelectionMethod, convergenceThreshold, 10);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setFoundation(foundation);
@@ -1644,7 +1644,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), selectedSelectionMethod, convergenceThreshold);
+									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setOjectiveFunction(selectedFitnessFunction);
@@ -1748,7 +1748,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold);
+									final HeliostatFieldOptimizer op = new HeliostatFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setOjectiveFunction(selectedFitnessFunction);

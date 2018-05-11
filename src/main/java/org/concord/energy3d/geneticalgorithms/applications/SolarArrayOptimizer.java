@@ -24,8 +24,8 @@ import org.concord.energy3d.shapes.Heliodon;
  */
 public class SolarArrayOptimizer extends SolarOutputOptimizer {
 
-	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
 	@Override

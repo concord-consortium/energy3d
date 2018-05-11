@@ -25,18 +25,20 @@ public class Population {
 	private final List<Individual> mutants = new ArrayList<Individual>();
 	private int selectionMethod = ROULETTE_WHEEL;
 	private double convergenceThreshold = 0.01;
+	private final int discretizationSteps;
 
-	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
+	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		individuals = new Individual[populationSize];
 		savedGeneration = new Individual[populationSize];
 		violations = new boolean[populationSize];
 		for (int i = 0; i < individuals.length; i++) {
-			individuals[i] = new Individual(chromosomeLength);
-			savedGeneration[i] = new Individual(chromosomeLength);
+			individuals[i] = new Individual(chromosomeLength, discretizationSteps);
+			savedGeneration[i] = new Individual(chromosomeLength, discretizationSteps);
 			violations[i] = false;
 		}
 		this.selectionMethod = selectionMethod;
 		this.convergenceThreshold = convergenceThreshold;
+		this.discretizationSteps = discretizationSteps;
 	}
 
 	public int size() {
@@ -97,7 +99,7 @@ public class Population {
 	public void restartMGA() {
 		individuals[0] = getFittest();
 		for (int k = 1; k < individuals.length; k++) {
-			individuals[k] = new Individual(individuals[0].getChromosomeLength());
+			individuals[k] = new Individual(individuals[0].getChromosomeLength(), discretizationSteps);
 		}
 	}
 
@@ -279,8 +281,8 @@ public class Population {
 		int childIndex = numberOfSurvivers;
 		for (final Parents p : oldFolks) {
 			final int n = p.dad.getChromosomeLength();
-			final Individual child1 = new Individual(n);
-			final Individual child2 = new Individual(n);
+			final Individual child1 = new Individual(n, discretizationSteps);
+			final Individual child2 = new Individual(n, discretizationSteps);
 			beta = Math.random();
 			for (int i = 0; i < n; i++) {
 				final double di = p.dad.getGene(i);

@@ -42,8 +42,8 @@ public abstract class Optimizer {
 	ObjectiveFunction objectiveFunction;
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
-	public Optimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
-		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	public Optimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
 	}
 

@@ -2413,69 +2413,6 @@ public class Scene implements Serializable {
 		this.roofColor = roofColor;
 	}
 
-	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, final boolean shutter) {
-		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container) {
-				final Window w = (Window) p;
-				if (shutter) {
-					w.setShutterColor(c);
-				} else {
-					w.setColor(c);
-				}
-				w.draw();
-			}
-		}
-	}
-
-	public void setShutterLengthInContainer(final HousePart container, final double length) {
-		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container) {
-				final Window w = (Window) p;
-				w.setShutterLength(length);
-				w.draw();
-			}
-		}
-	}
-
-	public void setWindowSizeInContainer(final HousePart container, final double width, final double height) {
-		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container) {
-				final Window w = (Window) p;
-				w.setWindowWidth(width);
-				w.setWindowHeight(height);
-				w.draw();
-				w.getContainer().draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
-		if (part instanceof Foundation) {
-			return;
-		}
-		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
-				final Window w = (Window) p;
-				w.setShutterColor(color);
-				w.draw();
-			}
-		}
-	}
-
-	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
-		if (part instanceof Foundation) {
-			return;
-		}
-		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
-				final Window w = (Window) p;
-				w.setShutterLength(length);
-				w.draw();
-			}
-		}
-	}
-
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation) {
 			part.setColor(color);
@@ -2572,6 +2509,116 @@ public class Scene implements Serializable {
 						((Thermal) p).setUValue(uValue);
 					}
 				}
+			}
+		}
+	}
+
+	// windows
+
+	public List<Window> getAllWindows() {
+		final List<Window> list = new ArrayList<Window>();
+		for (final HousePart p : parts) {
+			if (p instanceof Window) {
+				list.add((Window) p);
+			}
+		}
+		return list;
+	}
+
+	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, final String type) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				final Window w = (Window) p;
+				if ("shutter".equals(type)) {
+					w.setShutterColor(c);
+				} else if ("muntin".equals(type)) {
+					w.setMuntinColor(c);
+				} else {
+					w.setColor(c);
+				}
+				w.draw();
+			}
+		}
+	}
+
+	public void setShutterLengthInContainer(final HousePart container, final double length) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				final Window w = (Window) p;
+				w.setShutterLength(length);
+				w.draw();
+			}
+		}
+	}
+
+	public void setWindowSizeInContainer(final HousePart container, final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				final Window w = (Window) p;
+				w.setWindowWidth(width);
+				w.setWindowHeight(height);
+				w.draw();
+				w.getContainer().draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setMuntinColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
+		if (part instanceof Foundation) {
+			return;
+		}
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
+				final Window w = (Window) p;
+				w.setMuntinColor(color);
+				w.draw();
+			}
+		}
+	}
+
+	public void setMuntinColorForAllWindows(final ReadOnlyColorRGBA color) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window) {
+				final Window w = (Window) p;
+				w.setMuntinColor(color);
+				w.draw();
+			}
+		}
+	}
+
+	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
+		if (part instanceof Foundation) {
+			return;
+		}
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
+				final Window w = (Window) p;
+				w.setShutterColor(color);
+				w.draw();
+			}
+		}
+	}
+
+	public void setShutterColorForAllWindows(final ReadOnlyColorRGBA color) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window) {
+				final Window w = (Window) p;
+				w.setShutterColor(color);
+				w.draw();
+			}
+		}
+	}
+
+	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
+		if (part instanceof Foundation) {
+			return;
+		}
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
+				final Window w = (Window) p;
+				w.setShutterLength(length);
+				w.draw();
 			}
 		}
 	}

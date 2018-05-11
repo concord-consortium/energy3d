@@ -28,8 +28,8 @@ import com.ardor3d.math.Vector3;
  */
 public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
 	@Override

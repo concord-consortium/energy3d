@@ -33,8 +33,8 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 	private double maximumRatioHeight = 0.9;
 	private double minimumRatioHeight = 0.1;
 
-	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold);
+	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
 	public void setWidthBounds(final double minimumRatioWidth, final double maximumRatioWidth) {

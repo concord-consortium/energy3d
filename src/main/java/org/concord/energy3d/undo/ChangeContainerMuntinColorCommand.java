@@ -12,7 +12,7 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeContainerShutterColorCommand extends MyAbstractUndoableEdit {
+public class ChangeContainerMuntinColorCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA[] oldColors;
@@ -20,13 +20,13 @@ public class ChangeContainerShutterColorCommand extends MyAbstractUndoableEdit {
 	private final HousePart container;
 	private final List<Window> windows;
 
-	public ChangeContainerShutterColorCommand(final HousePart container) {
+	public ChangeContainerMuntinColorCommand(final HousePart container) {
 		this.container = container;
 		windows = Scene.getInstance().getWindowsOnContainer(container);
 		final int n = windows.size();
 		oldColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			oldColors[i] = windows.get(i).getShutterColor();
+			oldColors[i] = windows.get(i).getMuntinColor();
 		}
 	}
 
@@ -41,8 +41,8 @@ public class ChangeContainerShutterColorCommand extends MyAbstractUndoableEdit {
 		newColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
 			final Window w = windows.get(i);
-			newColors[i] = windows.get(i).getShutterColor();
-			w.setShutterColor(oldColors[i]);
+			newColors[i] = windows.get(i).getMuntinColor();
+			w.setMuntinColor(oldColors[i]);
 			w.draw();
 		}
 	}
@@ -53,14 +53,14 @@ public class ChangeContainerShutterColorCommand extends MyAbstractUndoableEdit {
 		final int n = windows.size();
 		for (int i = 0; i < n; i++) {
 			final Window w = windows.get(i);
-			w.setShutterColor(newColors[i]);
+			w.setMuntinColor(newColors[i]);
 			w.draw();
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Shutter Color Change for All Windows on Container";
+		return "Muntin Color Change for All Windows on Container";
 	}
 
 }

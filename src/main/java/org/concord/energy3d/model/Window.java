@@ -56,6 +56,7 @@ public class Window extends HousePart implements Thermal {
 	private int style = MORE_MUNTIN_BARS;
 	private boolean noHorizontalBars; // has to use negative as serialization defaults to false
 	private boolean noVerticalBars;
+	private ReadOnlyColorRGBA muntinColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA glassColor;
 	private transient Mesh leftShutter;
 	private transient Mesh rightShutter;
@@ -95,6 +96,9 @@ public class Window extends HousePart implements Thermal {
 		if (shutterColor == null) {
 			shutterColor = ColorRGBA.DARK_GRAY;
 		}
+		if (muntinColor == null) {
+			muntinColor = ColorRGBA.WHITE;
+		}
 
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -127,6 +131,7 @@ public class Window extends HousePart implements Thermal {
 
 		bars = new Line("Window (bars)");
 		bars.setLineWidth(3);
+		bars.setDefaultColor(muntinColor);
 		bars.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
@@ -837,6 +842,17 @@ public class Window extends HousePart implements Thermal {
 			return false;
 		}
 		return super.isDrawable();
+	}
+
+	public void setMuntinColor(final ReadOnlyColorRGBA muntinColor) {
+		this.muntinColor = muntinColor;
+		if (bars != null) {
+			bars.setDefaultColor(muntinColor);
+		}
+	}
+
+	public ReadOnlyColorRGBA getMuntinColor() {
+		return muntinColor;
 	}
 
 	public void setHorizontalBars(final boolean horizontalBars) {

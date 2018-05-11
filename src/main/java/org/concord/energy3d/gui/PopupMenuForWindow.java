@@ -36,14 +36,19 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeBuildingMuntinColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerMuntinColorCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowSizeCommand;
+import org.concord.energy3d.undo.ChangeMuntinColorCommand;
+import org.concord.energy3d.undo.ChangeMuntinColorForAllWindowsCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
+import org.concord.energy3d.undo.ChangeShutterColorForAllWindowsCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
@@ -62,6 +67,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
+			final JMenu muntinMenu = new JMenu("Muntins");
 			final JMenu shutterMenu = new JMenu("Shutters");
 
 			popupMenuForWindow = createPopupMenu(true, true, new Runnable() {
@@ -73,8 +79,6 @@ class PopupMenuForWindow extends PopupMenuFactory {
 					}
 				}
 			});
-
-			final JMenu muntinMenu = new JMenu("Muntins");
 
 			final JCheckBoxMenuItem cbmiHorizontalBars = new JCheckBoxMenuItem("Horizontal Bars");
 			cbmiHorizontalBars.addItemListener(new ItemListener() {
@@ -167,6 +171,154 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			});
 			muntinButtonGroup.add(miLessBars);
 			muntinMenu.add(miLessBars);
+			muntinMenu.addSeparator();
+
+			final JMenuItem miMuntinColor = new JMenuItem("Color...");
+			miMuntinColor.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window)) {
+						return;
+					}
+					final Window window = (Window) selectedPart;
+					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
+					final ReadOnlyColorRGBA color = window.getMuntinColor();
+					if (color != null) {
+						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					}
+					final ActionListener actionListener = new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final Color c = colorChooser.getColor();
+							final float[] newColor = c.getComponents(null);
+							final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], 1);
+							final JPanel panel = new JPanel();
+							panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+							panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+							final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
+							final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
+							final JRadioButton rb4 = new JRadioButton("All Windows");
+							panel.add(rb1);
+							panel.add(rb2);
+							panel.add(rb3);
+							panel.add(rb4);
+							final ButtonGroup bg = new ButtonGroup();
+							bg.add(rb1);
+							bg.add(rb2);
+							bg.add(rb3);
+							bg.add(rb4);
+							switch (selectedScopeIndex) {
+							case 0:
+								rb1.setSelected(true);
+								break;
+							case 1:
+								rb2.setSelected(true);
+								break;
+							case 2:
+								rb3.setSelected(true);
+								break;
+							case 3:
+								rb4.setSelected(true);
+								break;
+							}
+
+							final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+							final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Muntin Color");
+
+							while (true) {
+								dialog.setVisible(true);
+								final Object choice = optionPane.getValue();
+								if (choice == options[1] || choice == null) {
+									break;
+								} else {
+									boolean changed = !color.equals(window.getMuntinColor());
+									if (rb1.isSelected()) { // apply to only this window
+										if (changed) {
+											final ChangeMuntinColorCommand cmd = new ChangeMuntinColorCommand(window);
+											window.setMuntinColor(color);
+											window.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (!color.equals(x.getMuntinColor())) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (!color.equals(x.getMuntinColor())) {
+														changed = true;
+														break;
+													}
+												}
+											}
+										}
+										if (changed) {
+											final ChangeContainerMuntinColorCommand cmd = new ChangeContainerMuntinColorCommand(window.getContainer());
+											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, "muntin");
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final Foundation foundation = window.getTopContainer();
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (!color.equals(x.getMuntinColor())) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeBuildingMuntinColorCommand cmd = new ChangeBuildingMuntinColorCommand(window);
+											Scene.getInstance().setMuntinColorOfBuilding(window, color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 2;
+									} else {
+										if (!changed) {
+											for (final Window x : Scene.getInstance().getAllWindows()) {
+												if (!color.equals(x.getMuntinColor())) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeMuntinColorForAllWindowsCommand cmd = new ChangeMuntinColorForAllWindowsCommand();
+											Scene.getInstance().setMuntinColorForAllWindows(color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 3;
+									}
+									if (changed) {
+										Scene.getInstance().setEdited(true);
+										SceneManager.getInstance().refresh();
+									}
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					};
+					JColorChooser.createDialog(MainFrame.getInstance(), "Select Muntin Color", true, colorChooser, actionListener, null).setVisible(true);
+				}
+			});
+			muntinMenu.add(miMuntinColor);
 
 			muntinMenu.addMenuListener(new MenuListener() {
 
@@ -293,13 +445,16 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
 							final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
 							final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
+							final JRadioButton rb4 = new JRadioButton("All Windows");
 							panel.add(rb1);
 							panel.add(rb2);
 							panel.add(rb3);
+							panel.add(rb4);
 							final ButtonGroup bg = new ButtonGroup();
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
+							bg.add(rb4);
 							switch (selectedScopeIndex) {
 							case 0:
 								rb1.setSelected(true);
@@ -309,6 +464,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								break;
 							case 2:
 								rb3.setSelected(true);
+								break;
+							case 3:
+								rb4.setSelected(true);
 								break;
 							}
 
@@ -353,11 +511,11 @@ class PopupMenuForWindow extends PopupMenuFactory {
 										}
 										if (changed) {
 											final ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
-											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
+											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, "shutter");
 											SceneManager.getInstance().getUndoManager().addEdit(cmd);
 										}
 										selectedScopeIndex = 1;
-									} else {
+									} else if (rb3.isSelected()) {
 										final Foundation foundation = window.getTopContainer();
 										if (!changed) {
 											for (final Window x : foundation.getWindows()) {
@@ -373,6 +531,21 @@ class PopupMenuForWindow extends PopupMenuFactory {
 											SceneManager.getInstance().getUndoManager().addEdit(cmd);
 										}
 										selectedScopeIndex = 2;
+									} else {
+										if (!changed) {
+											for (final Window x : Scene.getInstance().getAllWindows()) {
+												if (!color.equals(x.getShutterColor())) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeShutterColorForAllWindowsCommand cmd = new ChangeShutterColorForAllWindowsCommand();
+											Scene.getInstance().setShutterColorForAllWindows(color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 3;
 									}
 									if (changed) {
 										Scene.getInstance().setEdited(true);
@@ -766,7 +939,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 										}
 										if (changed) {
 											final ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
-											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
+											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, "tint");
 											SceneManager.getInstance().getUndoManager().addEdit(cmd);
 										}
 										selectedScopeIndex = 1;
