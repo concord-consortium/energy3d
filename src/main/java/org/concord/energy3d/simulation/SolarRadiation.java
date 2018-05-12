@@ -3,6 +3,7 @@ package org.concord.energy3d.simulation;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +83,7 @@ public class SolarRadiation {
 	private double peakRadiation;
 	private double[] dailyAirTemperatures; // daily air temperature high and low
 	private double[][] cellOutputs; // cache the intermediate calculated solar radiation on the solar cells of a solar panel or rack
+	private int hourOfDay, minuteOfHour;
 
 	private class MeshDataStore { // renamed this to avoid name conflict with MeshData
 		public Vector3 p0;
@@ -106,7 +108,11 @@ public class SolarRadiation {
 		onMesh.clear();
 		final int n = Math.round(MINUTES_OF_DAY / (float) Scene.getInstance().getTimeStep());
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			part.setSolarPotential(new double[n]);
+			if (part.getSolarPotential() != null && part.getSolarPotential().length == n) {
+				Arrays.fill(part.getSolarPotential(), 0);
+			} else {
+				part.setSolarPotential(new double[n]);
+			}
 		}
 		computeToday();
 		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
@@ -190,8 +196,6 @@ public class SolarRadiation {
 			}
 		}
 	}
-
-	private int hourOfDay, minuteOfHour;
 
 	private void computeToday() {
 
@@ -442,7 +446,7 @@ public class SolarRadiation {
 				if (data.solarPotential != null) {
 					data.solarPotential[minute / timeStep] += radiation * scaledArea;
 				}
-				if (!(housePart instanceof Foundation)) { // exclude radiation on foundation
+				if (!(housePart instanceof Foundation)) { // exclude radiation on foundation; radiation may be overestimated when the solar step is much larger than the actual size
 					housePart.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
 				}
 			}

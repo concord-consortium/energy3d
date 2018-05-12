@@ -150,7 +150,7 @@ public class Scene implements Serializable {
 	private int latitude; // Legacy: Do NOT use this in the calculation -- use geoLocation.getLatitude() instead
 	private int solarContrast;
 	private int theme;
-	private double annotationScale = 0.2;
+	private double annotationScale = 0.2; // TODO: this is a mistake, but it is not easy to fix
 	private double heatVectorLength = 2000;
 	private double heatFluxGridSize = 2;
 	private boolean isAnnotationsVisible;

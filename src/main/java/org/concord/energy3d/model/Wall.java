@@ -1670,20 +1670,6 @@ public class Wall extends HousePart implements Thermal {
 	}
 
 	@Override
-	public double getArea() {
-		double areaWithoutWindows = area;
-		for (final HousePart child : children) {
-			if (child instanceof Window || child instanceof Door) {
-				areaWithoutWindows -= child.getArea();
-			}
-		}
-		if (areaWithoutWindows < 0) {
-			areaWithoutWindows = 0;
-		}
-		return areaWithoutWindows;
-	}
-
-	@Override
 	protected boolean isHorizontal() {
 		return false;
 	}

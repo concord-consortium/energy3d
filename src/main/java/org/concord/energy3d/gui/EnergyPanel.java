@@ -1668,7 +1668,7 @@ public class EnergyPanel extends JPanel {
 						public void run() {
 							partPanelBorder.setTitle("Wall (" + wall.getId() + ")");
 							partProperty1Label.setText("  Size & Center:");
-							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + " \u00B2, " + "(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
+							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + "\u00B2 (eff. " + TWO_DECIMALS.format(wall.getArea()) + "), (" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
 							partProperty1TextField.putClientProperty("tooltip", "The width, height, and center of the wall");
 							partProperty2Label.setText("  Thermal:");
 							partProperty3Label.setText("  Solar:");

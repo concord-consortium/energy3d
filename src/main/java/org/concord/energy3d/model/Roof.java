@@ -1233,7 +1233,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		}
 	}
 
-	// return the area WITH overhang
+	// return the roof area WITH overhang (skylight windows excluded)
 	@Override
 	public double getArea() {
 		if (areaByPartWithOverhang == null) {
@@ -1253,6 +1253,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		return a;
 	}
 
+	// return the roof area WITHOUT overhang (skylight windows excluded)
 	public double getAreaWithoutOverhang(final Mesh mesh) {
 		if (areaByPartWithoutOverhang == null) {
 			return 0;
