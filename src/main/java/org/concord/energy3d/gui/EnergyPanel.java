@@ -240,6 +240,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().updateTreeLeaves();
 					Scene.getInstance().updateTrackables();
 					Scene.getInstance().setEdited(true);
+					updateWeatherData();
 					updateThermostat();
 					EnergyPanel.this.validate();
 					lastDate = d;
@@ -290,6 +291,7 @@ public class EnergyPanel extends JPanel {
 					}
 					Scene.getInstance().updateTrackables();
 					Scene.getInstance().updateTreeLeaves();
+					updateWeatherData();
 					Scene.getInstance().setEdited(true);
 				}
 			}

@@ -847,28 +847,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		Scene.getInstance().setDisallowFoundationOverlap(currentOverlapAllowance);
 	}
 
-	/** Scale house for upgrading to new version. This can be removed in 2017. Don't call this if you intend to scale a building. Call rescale instead. */
-	public void scaleHouseForNewVersion(final double scale) {
-		final double h = points.get(4).getZ() - height;
-		applyNewHeight(h, h * 10, true);
-		final double oldHeight = height;
-		height *= scale;
-		final double addHeight = height - oldHeight;
-		for (final HousePart wall : children) {
-			for (final Vector3 point : wall.points) {
-				point.addLocal(0, 0, addHeight);
-			}
-			for (final HousePart floor : wall.children) {
-				if (floor instanceof Floor) {
-					floor.setHeight(floor.getHeight() + addHeight);
-				}
-			}
-		}
-		for (int i = 0; i < points.size(); i++) {
-			points.get(i).multiplyLocal(10);
-		}
-	}
-
 	@Override
 	protected void drawMesh() {
 		if (boundingHeight == 0) {

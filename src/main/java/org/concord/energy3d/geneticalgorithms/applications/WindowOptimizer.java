@@ -12,11 +12,8 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-
-import com.ardor3d.math.Vector3;
 
 /**
  * Chromosome of an individual is encoded as follows:
@@ -28,121 +25,208 @@ import com.ardor3d.math.Vector3;
  */
 public class WindowOptimizer extends NetEnergyOptimizer {
 
-	private double maximumRatioWidth = 0.9;
-	private double minimumRatioWidth = 0.1;
-	private double maximumRatioHeight = 0.9;
-	private double minimumRatioHeight = 0.1;
+	private double maximumWidthRelative = 0.15;
+	private double minimumWidthRelative = 0.01;
+	private double maximumHeightRelative = 0.4;
+	private double minimumHeightRelative = 0.01;
+	private boolean optimizeIndividualWindows;
 
 	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
-	public void setWidthBounds(final double minimumRatioWidth, final double maximumRatioWidth) {
-		this.minimumRatioWidth = minimumRatioWidth;
-		this.maximumRatioWidth = maximumRatioWidth;
+	public void setOptimizeIndividualWindows(final boolean optimizeIndividualWindows) {
+		this.optimizeIndividualWindows = optimizeIndividualWindows;
 	}
 
-	public void setHeightBounds(final double minimumRatioHeight, final double maximumRatioHeight) {
-		this.minimumRatioHeight = minimumRatioHeight;
-		this.maximumRatioHeight = maximumRatioHeight;
+	public boolean getOptimizeIndividualWindows() {
+		return optimizeIndividualWindows;
+	}
+
+	public void setMinimumWidthRelative(final double minimumWidthRelative) {
+		this.minimumWidthRelative = minimumWidthRelative;
+	}
+
+	public void setMaximumWidthRelative(final double maximumWidthRelative) {
+		this.maximumWidthRelative = maximumWidthRelative;
+	}
+
+	public void setMinimumHeightRelative(final double minimumHeightRelative) {
+		this.minimumHeightRelative = minimumHeightRelative;
+	}
+
+	public void setMaximumHeightRelative(final double maximumHeightRelative) {
+		this.maximumHeightRelative = maximumHeightRelative;
 	}
 
 	@Override
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
-		final List<Window> windows = foundation.getWindows();
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
-		int i = 0;
-		for (final Window w : windows) {
-			if (w.getContainer() instanceof Wall) {
-				final Wall wall = (Wall) w.getContainer();
-				final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
-				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
-				final double wmin = minimumRatioWidth * wmax;
-				wmax *= maximumRatioWidth;
-				double val = (w.getWindowWidth() - wmin) / (wmax - wmin);
-				if (val < 0) {
-					val = 0;
-				} else if (val > 1) {
-					val = 1;
+		if (optimizeIndividualWindows) {
+			final List<Window> windows = foundation.getWindows();
+			int i = 0;
+			for (final Window w : windows) {
+				if (w.getContainer() instanceof Wall) {
+					final Wall wall = (Wall) w.getContainer();
+					final double wallWidth = wall.getWallWidth();
+					final double wallHeight = wall.getWallHeight();
+					final double minWidth = minimumWidthRelative * wallWidth;
+					final double maxWidth = maximumWidthRelative * wallWidth;
+					final double minHeight = minimumHeightRelative * wallHeight;
+					final double maxHeight = maximumHeightRelative * wallHeight;
+					double val = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
+					if (val < 0) {
+						val = 0;
+					} else if (val > 1) {
+						val = 1;
+					}
+					firstBorn.setGene(i++, val);
+					val = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
+					if (val < 0) {
+						val = 0;
+					} else if (val > 1) {
+						val = 1;
+					}
+					firstBorn.setGene(i++, val);
+				} else {
+					throw new RuntimeException("Windows must be on walls!");
 				}
-				firstBorn.setGene(i++, val);
-				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
-				final double hmin = minimumRatioHeight * hmax;
-				hmax *= maximumRatioHeight;
-				val = (w.getWindowHeight() - hmin) / (hmax - hmin);
-				if (val < 0) {
-					val = 0;
-				} else if (val > 1) {
-					val = 1;
+			}
+		} else {
+			final List<Wall> walls = foundation.getWalls();
+			int i = 0;
+			for (final Wall wall : walls) {
+				final List<Window> windows = wall.getWindows();
+				if (!windows.isEmpty()) {
+					final double wallWidth = wall.getWallWidth();
+					final double wallHeight = wall.getWallHeight();
+					final double minWidth = minimumWidthRelative * wallWidth;
+					final double maxWidth = maximumWidthRelative * wallWidth;
+					final double minHeight = minimumHeightRelative * wallHeight;
+					final double maxHeight = maximumHeightRelative * wallHeight;
+					final Window w = windows.get(0);
+					double val = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
+					if (val < 0) {
+						val = 0;
+					} else if (val > 1) {
+						val = 1;
+					}
+					firstBorn.setGene(i++, val);
+					val = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
+					if (val < 0) {
+						val = 0;
+					} else if (val > 1) {
+						val = 1;
+					}
+					firstBorn.setGene(i++, val);
 				}
-				firstBorn.setGene(i++, val);
-			} else {
-				throw new RuntimeException("Windows must be on walls!");
 			}
 		}
 	}
 
 	@Override
 	void computeIndividualFitness(final Individual individual) {
-		final List<Window> windows = foundation.getWindows();
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			final Window w = windows.get(j / 2);
-			final Wall wall = (Wall) w.getContainer();
-			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
-			switch (j % 2) {
-			case 0:
-				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
-				final double wmin = minimumRatioWidth * wmax;
-				wmax *= maximumRatioWidth;
-				w.setWindowWidth(wmin + gene * (wmax - wmin));
-				break;
-			case 1:
-				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
-				final double hmin = minimumRatioHeight * hmax;
-				hmax *= maximumRatioHeight;
-				w.setWindowHeight(hmin + gene * (hmax - hmin));
-				break;
+		if (optimizeIndividualWindows) {
+			final List<Window> windows = foundation.getWindows();
+			for (int i = 0; i < individual.getChromosomeLength(); i++) {
+				final double gene = individual.getGene(i);
+				final Window w = windows.get(i / 2);
+				final Wall wall = (Wall) w.getContainer();
+				final double wallWidth = wall.getWallWidth();
+				final double wallHeight = wall.getWallHeight();
+				final double minWidth = minimumWidthRelative * wallWidth;
+				final double maxWidth = maximumWidthRelative * wallWidth;
+				final double minHeight = minimumHeightRelative * wallHeight;
+				final double maxHeight = maximumHeightRelative * wallHeight;
+				switch (i % 2) {
+				case 0:
+					w.setWindowWidth(minWidth + gene * (maxWidth - minWidth));
+					break;
+				case 1:
+					w.setWindowHeight(minHeight + gene * (maxHeight - minHeight));
+					break;
+				}
+				w.draw();
+				wall.draw();
 			}
-			w.draw();
-			wall.draw();
+		} else {
+			int i = 0;
+			final List<Wall> walls = foundation.getWalls();
+			for (final Wall wall : walls) {
+				final List<Window> windows = wall.getWindows();
+				if (!windows.isEmpty()) {
+					final double geneWidth = individual.getGene(i * 2);
+					final double geneHeight = individual.getGene(i * 2 + 1);
+					final double wallWidth = wall.getWallWidth();
+					final double wallHeight = wall.getWallHeight();
+					final double minWidth = minimumWidthRelative * wallWidth;
+					final double maxWidth = maximumWidthRelative * wallWidth;
+					final double minHeight = minimumHeightRelative * wallHeight;
+					final double maxHeight = maximumHeightRelative * wallHeight;
+					for (final Window w : windows) {
+						w.setWindowWidth(minWidth + geneWidth * (maxWidth - minWidth));
+						w.setWindowHeight(minHeight + geneHeight * (maxHeight - minHeight));
+						w.draw();
+					}
+					wall.draw();
+					i++;
+				}
+			}
 		}
 		individual.setFitness(objectiveFunction.compute());
 	}
 
 	@Override
 	public void applyFittest() {
-		final List<Window> windows = foundation.getWindows();
 		final Individual best = population.getFittest();
-		for (int j = 0; j < best.getChromosomeLength(); j++) {
-			final double gene = best.getGene(j);
-			final Window w = windows.get(j / 2);
-			final Wall wall = (Wall) w.getContainer();
-			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
-			switch (j % 2) {
-			case 0:
-				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
-				final double wmin = minimumRatioWidth * wmax;
-				wmax *= maximumRatioWidth;
-				w.setWindowWidth(wmin + gene * (wmax - wmin));
-				break;
-			case 1:
-				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
-				final double hmin = minimumRatioHeight * hmax;
-				hmax *= maximumRatioHeight;
-				w.setWindowHeight(hmin + gene * (hmax - hmin));
-				break;
+		if (optimizeIndividualWindows) {
+			final List<Window> windows = foundation.getWindows();
+			for (int i = 0; i < best.getChromosomeLength(); i++) {
+				final double gene = best.getGene(i);
+				final Window w = windows.get(i / 2);
+				final Wall wall = (Wall) w.getContainer();
+				final double wallWidth = wall.getWallWidth();
+				final double wallHeight = wall.getWallHeight();
+				final double minWidth = minimumWidthRelative * wallWidth;
+				final double maxWidth = maximumWidthRelative * wallWidth;
+				final double minHeight = minimumHeightRelative * wallHeight;
+				final double maxHeight = maximumHeightRelative * wallHeight;
+				switch (i % 2) {
+				case 0:
+					w.setWindowWidth(minWidth + gene * (maxWidth - minWidth));
+					break;
+				case 1:
+					w.setWindowHeight(minHeight + gene * (maxHeight - minHeight));
+					break;
+				}
+				w.draw();
+				wall.draw();
 			}
-			w.draw();
-			wall.draw();
+		} else {
+			int i = 0;
+			final List<Wall> walls = foundation.getWalls();
+			for (final Wall wall : walls) {
+				final List<Window> windows = wall.getWindows();
+				if (!windows.isEmpty()) {
+					final double geneWidth = best.getGene(2 * i);
+					final double geneHeight = best.getGene(2 * i + 1);
+					final double wallWidth = wall.getWallWidth();
+					final double wallHeight = wall.getWallHeight();
+					final double minWidth = minimumWidthRelative * wallWidth;
+					final double maxWidth = maximumWidthRelative * wallWidth;
+					final double minHeight = minimumHeightRelative * wallHeight;
+					final double maxHeight = maximumHeightRelative * wallHeight;
+					for (final Window w : windows) {
+						w.setWindowWidth(minWidth + geneWidth * (maxWidth - minWidth));
+						w.setWindowHeight(minHeight + geneHeight * (maxHeight - minHeight));
+						w.draw();
+					}
+					wall.draw();
+					i++;
+				}
+			}
 		}
 		System.out.println("Fittest: " + individualToString(best));
 	}
@@ -150,27 +234,45 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 	@Override
 	String individualToString(final Individual individual) {
 		String s = "(";
-		final List<Window> windows = foundation.getWindows();
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			final Window w = windows.get(j / 2);
-			final Wall wall = (Wall) w.getContainer();
-			final Vector3 d = w.getAbsCenter().subtractLocal(wall.getAbsCenter());
-			switch (j % 2) {
-			case 0:
-				final Vector3 px = wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double wmax = wall.getWallWidth() - 2 * Math.abs(d.dot(px)) * Scene.getInstance().getAnnotationScale();
-				final double wmin = minimumRatioWidth * wmax;
-				wmax *= maximumRatioWidth;
-				s += (wmin + gene * (wmax - wmin)) + ", ";
-				break;
-			case 1:
-				final Vector3 py = wall.getAbsPoint(1).subtractLocal(wall.getAbsPoint(0)).normalizeLocal();
-				double hmax = wall.getWallHeight() - 2 * Math.abs(d.dot(py)) * Scene.getInstance().getAnnotationScale();
-				final double hmin = minimumRatioHeight * hmax;
-				hmax *= maximumRatioHeight;
-				s += (hmin + gene * (hmax - hmin)) + " | ";
-				break;
+		if (optimizeIndividualWindows) {
+			final List<Window> windows = foundation.getWindows();
+			for (int i = 0; i < individual.getChromosomeLength(); i++) {
+				final double gene = individual.getGene(i);
+				final Window w = windows.get(i / 2);
+				final Wall wall = (Wall) w.getContainer();
+				final double wallWidth = wall.getWallWidth();
+				final double wallHeight = wall.getWallHeight();
+				final double minWidth = minimumWidthRelative * wallWidth;
+				final double maxWidth = maximumWidthRelative * wallWidth;
+				final double minHeight = minimumHeightRelative * wallHeight;
+				final double maxHeight = maximumHeightRelative * wallHeight;
+				switch (i % 2) {
+				case 0:
+					s += (minWidth + gene * (maxWidth - minWidth)) + ", ";
+					break;
+				case 1:
+					s += (minHeight + gene * (maxHeight - minHeight)) + " | ";
+					break;
+				}
+			}
+		} else {
+			int i = 0;
+			final List<Wall> walls = foundation.getWalls();
+			for (final Wall wall : walls) {
+				final List<Window> windows = wall.getWindows();
+				if (!windows.isEmpty()) {
+					final double geneWidth = individual.getGene(2 * i);
+					final double geneHeight = individual.getGene(2 * i + 1);
+					final double wallWidth = wall.getWallWidth();
+					final double wallHeight = wall.getWallHeight();
+					final double minWidth = minimumWidthRelative * wallWidth;
+					final double maxWidth = maximumWidthRelative * wallWidth;
+					final double minHeight = minimumHeightRelative * wallHeight;
+					final double maxHeight = maximumHeightRelative * wallHeight;
+					s += (minWidth + geneWidth * (maxWidth - minWidth)) + ", ";
+					s += (minHeight + geneHeight * (maxHeight - minHeight)) + " | ";
+					i++;
+				}
 			}
 		}
 		return s.substring(0, s.length() - 3) + ") = " + individual.getFitness();

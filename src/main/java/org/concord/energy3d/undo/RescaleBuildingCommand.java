@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -72,6 +73,9 @@ public class RescaleBuildingCommand extends MyAbstractUndoableEdit {
 			foundation.draw();
 			foundation.drawChildren();
 		}
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
@@ -91,6 +95,9 @@ public class RescaleBuildingCommand extends MyAbstractUndoableEdit {
 			foundation.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
 			foundation.draw();
 			foundation.drawChildren();
+		}
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
 		}
 		SceneManager.getInstance().refresh();
 	}

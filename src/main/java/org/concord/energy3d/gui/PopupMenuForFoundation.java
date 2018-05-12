@@ -54,6 +54,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -196,6 +197,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						return;
 					}
 					new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						EnergyPanel.getInstance().updateRadiationHeatMap();
+					}
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -1462,6 +1466,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
+				private double minimumWidthRelative = 0.01;
+				private double maximumWidthRelative = 0.15;
+				private double minimumHeightRelative = 0.01;
+				private double maximumHeightRelative = 0.4;
+				private boolean optimizeIndividualWindows;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1506,7 +1515,24 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
+					panel.add(new JLabel("Optimize individual windows:"));
+					final JComboBox<String> optimizeIndividualWindowsComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+					optimizeIndividualWindowsComboBox.setSelectedIndex(optimizeIndividualWindows ? 1 : 0);
+					panel.add(optimizeIndividualWindowsComboBox);
+					panel.add(new JLabel("Minimum width (relative to wall width):"));
+					final JTextField minimumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumWidthRelative));
+					panel.add(minimumWidthField);
+					panel.add(new JLabel("Maximum width (relative to wall width):"));
+					final JTextField maximumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumWidthRelative));
+					panel.add(maximumWidthField);
+					panel.add(new JLabel("Minimum height (relative to wall height):"));
+					final JTextField minimumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumHeightRelative));
+					panel.add(minimumHeightField);
+					panel.add(new JLabel("Maximum height (relative to wall height):"));
+					final JTextField maximumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumHeightRelative));
+					panel.add(maximumHeightField);
+
+					SpringUtilities.makeCompactGrid(panel, 14, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1524,6 +1550,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								maximumGenerations = Integer.parseInt(generationField.getText());
 								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 								mutationRate = Double.parseDouble(mutationRateField.getText());
+								minimumWidthRelative = Double.parseDouble(minimumWidthField.getText());
+								maximumWidthRelative = Double.parseDouble(maximumWidthField.getText());
+								minimumHeightRelative = Double.parseDouble(minimumHeightField.getText());
+								maximumHeightRelative = Double.parseDouble(maximumHeightField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1540,7 +1570,26 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final WindowOptimizer op = new WindowOptimizer(populationSize, foundation.getWindows().size() * 2, selectedSelectionMethod, convergenceThreshold, 10);
+									optimizeIndividualWindows = optimizeIndividualWindowsComboBox.getSelectedIndex() == 1;
+									int chromesomeLength;
+									if (optimizeIndividualWindows) {
+										chromesomeLength = foundation.getWindows().size() * 2;
+									} else {
+										final List<Wall> walls = foundation.getWalls();
+										int numberOfWallsWithWindows = 0;
+										for (final Wall wall : walls) {
+											if (!wall.getWindows().isEmpty()) {
+												numberOfWallsWithWindows++;
+											}
+										}
+										chromesomeLength = numberOfWallsWithWindows * 2;
+									}
+									final WindowOptimizer op = new WindowOptimizer(populationSize, chromesomeLength, selectedSelectionMethod, convergenceThreshold, 10);
+									op.setOptimizeIndividualWindows(optimizeIndividualWindows);
+									op.setMinimumWidthRelative(minimumWidthRelative);
+									op.setMaximumWidthRelative(maximumWidthRelative);
+									op.setMinimumHeightRelative(minimumHeightRelative);
+									op.setMaximumHeightRelative(maximumHeightRelative);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setFoundation(foundation);
