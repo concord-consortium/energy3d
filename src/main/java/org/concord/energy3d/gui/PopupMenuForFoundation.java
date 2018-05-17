@@ -1497,7 +1497,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
@@ -1584,7 +1584,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										}
 										chromesomeLength = numberOfWallsWithWindows * 2;
 									}
-									final WindowOptimizer op = new WindowOptimizer(populationSize, chromesomeLength, selectedSelectionMethod, convergenceThreshold, 10);
+									final WindowOptimizer op = new WindowOptimizer(populationSize, chromesomeLength, selectedSelectionMethod, convergenceThreshold, 20);
 									op.setOptimizeIndividualWindows(optimizeIndividualWindows);
 									op.setMinimumWidthRelative(minimumWidthRelative);
 									op.setMaximumWidthRelative(maximumWidthRelative);
