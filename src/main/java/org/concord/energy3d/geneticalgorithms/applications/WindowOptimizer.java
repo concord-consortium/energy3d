@@ -26,9 +26,9 @@ import org.concord.energy3d.shapes.Heliodon;
 public class WindowOptimizer extends NetEnergyOptimizer {
 
 	private double maximumWidthRelative = 0.15;
-	private double minimumWidthRelative = 0.01;
+	private double minimumWidthRelative = 0.05;
 	private double maximumHeightRelative = 0.4;
-	private double minimumHeightRelative = 0.01;
+	private double minimumHeightRelative = 0.05;
 	private boolean optimizeIndividualWindows;
 
 	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
@@ -283,10 +283,10 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		if (foundation != null) {
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
-				foundation.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+				foundation.setLabelCustomText("Daily Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
 				break;
 			case ObjectiveFunction.ANNUAl:
-				foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
+				foundation.setLabelCustomText("Annual Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
 				break;
 			case ObjectiveFunction.RANDOM:
 				foundation.setLabelCustomText(null);

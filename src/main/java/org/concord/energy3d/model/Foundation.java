@@ -1546,6 +1546,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public void move(final Vector3 v, final double steplength) {
 		v.normalizeLocal();
 		v.multiplyLocal(steplength);
+		move(v);
+	}
+
+	public void move(final Vector3 v) {
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points) {
 			movePoints.add(p.clone());
