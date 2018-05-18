@@ -38,23 +38,25 @@ public class Building {
 		walls = new ArrayList<Wall>();
 		windows = new ArrayList<Window>();
 		solarPanels = new ArrayList<SolarPanel>();
-		for (HousePart x : Scene.getInstance().getParts()) {
+		for (final HousePart x : Scene.getInstance().getParts()) {
 			if (x instanceof Wall && x.getTopContainer() == foundation) {
 				walls.add((Wall) x);
-				for (HousePart y : x.getChildren()) {
-					if (y instanceof Window)
+				for (final HousePart y : x.getChildren()) {
+					if (y instanceof Window) {
 						windows.add((Window) y);
-					else if (y instanceof SolarPanel)
+					} else if (y instanceof SolarPanel) {
 						solarPanels.add((SolarPanel) y);
+					}
 				}
 			}
 		}
 		wallVertices = new ArrayList<Vector2>();
-		if (walls.isEmpty())
+		if (walls.isEmpty()) {
 			return;
+		}
 		roof = walls.get(0).getRoof();
 		if (roof != null) {
-			for (HousePart x : roof.getChildren()) {
+			for (final HousePart x : roof.getChildren()) {
 				if (x instanceof SolarPanel) {
 					solarPanels.add((SolarPanel) x);
 				} else if (x instanceof Window) {
@@ -66,8 +68,9 @@ public class Building {
 			@Override
 			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
 				int pointIndex = 0;
-				if (next != null)
+				if (next != null) {
 					pointIndex = next.getSnapPointIndexOf(currentWall);
+				}
 				pointIndex++;
 				if (currentWall.isDrawCompleted()) {
 					addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
@@ -84,8 +87,9 @@ public class Building {
 						break;
 					}
 				}
-				if (!b)
+				if (!b) {
 					wallVertices.add(v2);
+				}
 			}
 		});
 		wallAcceptable = walls.size() == wallVertices.size();
@@ -104,13 +108,14 @@ public class Building {
 	}
 
 	/** @return false if the building does not conform */
-	public boolean calculate() {
+	public boolean calculate(final boolean areaOnly) {
 
 		final double scale = Scene.getInstance().getAnnotationScale();
 		height = foundation.getBoundingHeight() * scale;
 
-		if (!wallAcceptable)
+		if (!wallAcceptable) {
 			return false;
+		}
 
 		final int n = wallVertices.size();
 
@@ -144,17 +149,17 @@ public class Building {
 		cy *= scale;
 		area = Math.abs(area) * scale * scale;
 
-		wallArea = 0;
-		for (Wall w : walls) {
-			wallArea += w.getArea();
+		if (!areaOnly) {
+			wallArea = 0;
+			for (final Wall w : walls) {
+				wallArea += w.getArea();
+			}
+			windowArea = 0;
+			for (final Window w : windows) {
+				windowArea += w.getArea();
+			}
+			windowToFloorRatio = windowArea / (area * height / STORY_HEIGHT);
 		}
-
-		windowArea = 0;
-		for (Window w : windows) {
-			windowArea += w.getArea();
-		}
-
-		windowToFloorRatio = windowArea / (area * height / STORY_HEIGHT);
 
 		return true;
 
@@ -208,16 +213,19 @@ public class Building {
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {
-		if (!wallAcceptable)
+		if (!wallAcceptable) {
 			return false;
+		}
 		final int n = wallVertices.size();
-		if (n == 0)
+		if (n == 0) {
 			return false;
+		}
 		if (init) {
-			if (wallPath == null)
+			if (wallPath == null) {
 				wallPath = new Path2D.Double();
-			else
+			} else {
 				wallPath.reset();
+			}
 			Vector2 v = wallVertices.get(0);
 			wallPath.moveTo(v.getX(), v.getY());
 			for (int i = 1; i < n; i++) {
@@ -233,8 +241,9 @@ public class Building {
 
 	@Override
 	public boolean equals(final Object o) {
-		if ((!(o instanceof Building)))
+		if ((!(o instanceof Building))) {
 			return false;
+		}
 		final Building b = (Building) o;
 		return b.foundation == foundation;
 	}
@@ -245,7 +254,7 @@ public class Building {
 	}
 
 	public String geometryToJson() {
-		if (calculate()) {
+		if (calculate(false)) {
 			String s = "\"Height\": " + FORMAT1.format(height);
 			s += ", \"Area\": " + FORMAT1.format(area);
 			s += ", \"CenterX\": " + FORMAT1.format(cx);
@@ -258,7 +267,7 @@ public class Building {
 	@Override
 	public String toString() {
 		String s = "(ID=" + foundation.getId();
-		if (calculate()) {
+		if (calculate(false)) {
 			s += " #wall=" + walls.size();
 			s += " #window=" + windows.size();
 			s += " height=" + FORMAT1.format(height);
@@ -274,27 +283,31 @@ public class Building {
 	}
 
 	public static long getBuildingId(final HousePart p) {
-		if (p == null)
+		if (p == null) {
 			return -1;
-		if (p instanceof Foundation)
+		}
+		if (p instanceof Foundation) {
 			return p.getId();
+		}
 		final HousePart x = p.getTopContainer();
 		return x == null ? -1 : x.getId();
 	}
 
 	public static Foundation getBuildingFoundation(final HousePart p) {
-		if (p == null)
+		if (p == null) {
 			return null;
-		if (p instanceof Foundation)
+		}
+		if (p instanceof Foundation) {
 			return (Foundation) p;
+		}
 		return p.getTopContainer();
 	}
 
 	public static String getBuildingSolarPotentials() {
-		List<Building> buildings = new ArrayList<Building>();
-		for (HousePart p : Scene.getInstance().getParts()) {
+		final List<Building> buildings = new ArrayList<Building>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
-				Building b = new Building((Foundation) p);
+				final Building b = new Building((Foundation) p);
 				if (b.areWallsAcceptable() && !buildings.contains(b)) {
 					buildings.add(b);
 				}
@@ -303,8 +316,9 @@ public class Building {
 		String result = null;
 		if (!buildings.isEmpty()) {
 			result = "[";
-			for (Building b : buildings)
+			for (final Building b : buildings) {
 				result += "{\"Building\": " + b.getFoundation().getId() + ", \"Daily\": " + ENERGY_FORMAT.format(b.getFoundation().getSolarPotentialToday()) + "}, ";
+			}
 			result = result.trim().substring(0, result.length() - 2);
 			result += "]";
 		}

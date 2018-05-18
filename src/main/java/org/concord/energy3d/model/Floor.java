@@ -269,7 +269,7 @@ public class Floor extends HousePart {
 	protected void computeArea() {
 		final Building b = new Building(getTopContainer());
 		if (b.areWallsAcceptable()) {
-			b.calculate();
+			b.calculate(true);
 			area = b.getArea();
 		} else {
 			area = -1; // return a negative number to indicate problems
