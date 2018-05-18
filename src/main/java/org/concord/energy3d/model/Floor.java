@@ -76,11 +76,11 @@ public class Floor extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		pickContainer(x, y, Wall.class); // pick container even for disabled foundations
 		final Foundation foundation = getTopContainer();
 		if (foundation != null && foundation.getLockEdit()) {
 			return;
 		}
-		pickContainer(x, y, Wall.class);
 		if (container != null) {
 			final ReadOnlyVector3 base = getCenter();
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);

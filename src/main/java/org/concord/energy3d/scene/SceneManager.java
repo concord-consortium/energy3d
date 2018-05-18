@@ -2451,7 +2451,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void deleteCurrentSelection() {
-		if (selectedPart == null || selectedPart.getLockEdit()) {
+		if (selectedPart == null || selectedPart.getLockEdit() || (selectedPart.getTopContainer() != null && selectedPart.getTopContainer().getLockEdit() && !(selectedPart instanceof SolarCollector))) {
 			return;
 		}
 		if (selectedPart instanceof Foundation) {

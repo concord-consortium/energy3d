@@ -169,10 +169,12 @@ public class Window extends HousePart implements Thermal {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class }); // pick container even for disabled foundations
 		final Foundation foundation = getTopContainer();
 		if (foundation != null && foundation.getLockEdit()) {
 			return;
 		}
+
 		int index = editPointIndex;
 		if (index == -1) {
 			if (isFirstPointInserted()) {
@@ -181,7 +183,7 @@ public class Window extends HousePart implements Thermal {
 				index = 0;
 			}
 		}
-		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class });
+
 		Vector3 p = points.get(index);
 		if (pick != null && !(pick.getUserData().getHousePart() instanceof Roof && isNormalHorizontal(pick))) {
 			p.set(pick.getPoint());

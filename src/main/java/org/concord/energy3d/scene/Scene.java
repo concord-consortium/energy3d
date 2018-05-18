@@ -1192,6 +1192,8 @@ public class Scene implements Serializable {
 				((Window) c).moveTo(wall);
 			} else if (c instanceof SolarPanel) {
 				((SolarPanel) c).moveTo(wall);
+			} else if (c instanceof Rack) {
+				((Rack) c).moveTo(wall);
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
