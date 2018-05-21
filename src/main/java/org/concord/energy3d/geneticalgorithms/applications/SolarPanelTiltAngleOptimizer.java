@@ -22,9 +22,9 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  *
  */
-public class SolarArrayOptimizer extends SolarOutputOptimizer {
+public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 
-	public SolarArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+	public SolarPanelTiltAngleOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 

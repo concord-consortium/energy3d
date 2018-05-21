@@ -38,7 +38,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatFieldOptimizer;
-import org.concord.energy3d.geneticalgorithms.applications.SolarArrayOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
@@ -1487,7 +1487,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Solution:"));
-					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Solar Potential" });
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Locations" });
 					panel.add(solutionComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
@@ -1736,7 +1736,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			optimizeMenu.add(miWindows);
 
-			final JMenuItem miSolarArrayOutput = new JMenuItem("Solar Arrays...");
+			final JMenuItem miSolarArrayOutput = new JMenuItem("Solar Panel Tilt Angles...");
 			miSolarArrayOutput.addActionListener(new ActionListener() {
 
 				private int selectedFitnessFunction = 0;
@@ -1823,7 +1823,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final SolarArrayOptimizer op = new SolarArrayOptimizer(populationSize, foundation.getRacks().size(), selectedSelectionMethod, convergenceThreshold, 0);
+									final SolarPanelTiltAngleOptimizer op = new SolarPanelTiltAngleOptimizer(populationSize, foundation.getRacks().size(), selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setOjectiveFunction(selectedFitnessFunction);
