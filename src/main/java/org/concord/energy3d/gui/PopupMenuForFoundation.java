@@ -36,6 +36,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
 import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatFieldOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
@@ -1876,7 +1877,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Average Daily Output", "Average Annual Output" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
@@ -1931,7 +1932,20 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									final SolarPanelArrayOptimizer op = new SolarPanelArrayOptimizer(populationSize, 2, selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
-									op.setOjectiveFunction(selectedFitnessFunction);
+									switch (selectedFitnessFunction) {
+									case 0:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										break;
+									case 1:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										break;
+									case 2:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										break;
+									case 3:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										break;
+									}
 									op.setFoundation(foundation);
 									op.evolve();
 									if (choice == options[0]) {
