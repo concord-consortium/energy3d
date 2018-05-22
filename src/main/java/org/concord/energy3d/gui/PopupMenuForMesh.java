@@ -68,7 +68,7 @@ class PopupMenuForMesh extends PopupMenuFactory {
 							final Node n = m.getParent();
 							final String title = "<html>Adjust the distance between two mesh faces to create some thickness<br>A larger thickness also mitigates the z-fighting effect.</html>";
 							while (true) {
-								final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, f.getMeshThickness(n) * Scene.getInstance().getAnnotationScale());
+								final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, f.getMeshThickness(n) * Scene.getInstance().getScale());
 								if (newValue == null) {
 									break;
 								} else {
@@ -80,7 +80,7 @@ class PopupMenuForMesh extends PopupMenuFactory {
 											SceneManager.getTaskManager().update(new Callable<Object>() {
 												@Override
 												public Object call() throws Exception {
-													f.setMeshThickness(n, val / Scene.getInstance().getAnnotationScale());
+													f.setMeshThickness(n, val / Scene.getInstance().getScale());
 													f.draw();
 													return null;
 												}

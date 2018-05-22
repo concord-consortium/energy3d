@@ -247,7 +247,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rw = p.distance(p1) * Scene.getInstance().getScale();
 					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 					if (rw > pw) {
 						final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
@@ -269,7 +269,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rh = p.distance(p1) * Scene.getInstance().getScale();
 					final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 					if (rh > ph) {
 						final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
@@ -433,7 +433,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		surround.setData(new Vector3(0, 0, 0), 0.5 * rackWidth / annotationScale, 0.5 * rackHeight / annotationScale, 0.15);
 		surround.updateModelBound();
 
@@ -623,7 +623,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth()) / Scene.getInstance().getAnnotationScale();
+			final double shift = (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth()) / Scene.getInstance().getScale();
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -726,7 +726,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 
 	@Override
 	public double getGridSize() {
-		return Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return Math.min(rackWidth, rackHeight) / Scene.getInstance().getScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
 	}
 
 	@Override
@@ -754,13 +754,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	private double copyOverlap() { // assume that we copy in the direction of shorter side
-		final double w1 = Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale();
+		final double w1 = Math.min(rackWidth, rackHeight) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
-					final double w2 = Math.min(s2.rackWidth, s2.rackHeight) / Scene.getInstance().getAnnotationScale();
+					final double w2 = Math.min(s2.rackWidth, s2.rackHeight) / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -807,11 +807,11 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		if (nearest != null) { // use the nearest rack as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			length = d.length();
-			if (rackHeight > length * Scene.getInstance().getAnnotationScale()) {
+			if (rackHeight > length * Scene.getInstance().getScale()) {
 				inHeight = false;
 			}
-			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getAnnotationScale()) {
-				length = (1 + copyLayoutGap) * rackHeight / Scene.getInstance().getAnnotationScale();
+			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getScale()) {
+				length = (1 + copyLayoutGap) * rackHeight / Scene.getInstance().getScale();
 				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
 				final double vx = v.getX();
@@ -830,7 +830,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				s = Math.signum(d.dot(v));
 			}
 		} else {
-			length = (1 + copyLayoutGap) * rackHeight / Scene.getInstance().getAnnotationScale();
+			length = (1 + copyLayoutGap) * rackHeight / Scene.getInstance().getScale();
 			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		}
 		final double tx = length / p0.distance(p2);
@@ -856,13 +856,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	private double checkCopyOverlap(final boolean inHeight) { // copy only in the direction of rack height
-		final double w1 = (inHeight ? rackHeight : rackWidth) / Scene.getInstance().getAnnotationScale();
+		final double w1 = (inHeight ? rackHeight : rackWidth) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
-					final double w2 = (inHeight ? s2.rackHeight : s2.rackWidth) / Scene.getInstance().getAnnotationScale();
+					final double w2 = (inHeight ? s2.rackHeight : s2.rackWidth) / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -883,7 +883,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			d.set(1, 0, 0);
 		}
 		final double s = Math.signum(roof.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
-		d.multiplyLocal((1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackWidth / Scene.getInstance().getAnnotationScale());
+		d.multiplyLocal((1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackWidth / Scene.getInstance().getScale());
 		d.addLocal(getContainerRelative().getPoints().get(0));
 		final Vector3 v = toRelative(d);
 		rack.points.get(0).setX(points.get(0).getX() + s * v.getX());
@@ -909,7 +909,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			d.set(1, 0, 0);
 		}
 		final double s = Math.signum(floor.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
-		d.multiplyLocal((1 + copyLayoutGap) * rackHeight / Scene.getInstance().getAnnotationScale());
+		d.multiplyLocal((1 + copyLayoutGap) * rackHeight / Scene.getInstance().getScale());
 		d.addLocal(getContainerRelative().getPoints().get(0));
 		final Vector3 v = toRelative(d);
 		rack.points.get(0).setX(points.get(0).getX() + s * v.getX());
@@ -1140,11 +1140,11 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			final double remainderX = rackWidth - rows * a;
 			final double remainderY = rackHeight - cols * b;
 			final Vector3 p0 = getAbsPoint(0);
-			final double w = a / Scene.getInstance().getAnnotationScale();
-			final double h = b / Scene.getInstance().getAnnotationScale();
+			final double w = a / Scene.getInstance().getScale();
+			final double h = b / Scene.getInstance().getScale();
 			final double costilt = Math.cos(Math.toRadians(monthlyTiltAngles[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)]));
-			final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getAnnotationScale();
-			final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale() * costilt;
+			final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getScale();
+			final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getScale() * costilt;
 			for (int r = 0; r < rows; r++) {
 				for (int c = 0; c < cols; c++) {
 					final double x = x0 + w * (r + 0.5);
@@ -1438,8 +1438,8 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 		final int nw = (int) Math.round(rackWidth / a);
 		final int nh = (int) Math.round(rackHeight / b);
-		a /= Scene.getInstance().getAnnotationScale();
-		b /= Scene.getInstance().getAnnotationScale();
+		a /= Scene.getInstance().getScale();
+		b /= Scene.getInstance().getScale();
 		final int bufferSize = (nw + nh - 2) * 6;
 		FloatBuffer vertices = solarPanelOutlines.getMeshData().getVertexBuffer();
 		if (vertices.capacity() != bufferSize) {

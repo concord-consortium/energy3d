@@ -121,7 +121,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		}
 		detailed = Scene.getInstance().countParts(getClass()) < 500;
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		mesh = new Paraboloid("Paraboloid", rimRadius / annotationScale, 2.0 * Math.sqrt(focalLength / annotationScale), nAxialSections, nRadialSections);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
@@ -265,7 +265,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		dish.setRimRadius(rimRadius / annotationScale);
 		dish.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
@@ -405,7 +405,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		double dx;
 		double dz;
 		sunLocation.multiplyLocal(10000);
-		final Vector3 f = getAbsPoint(0).addLocal(mesh.getRotation().applyPost(new Vector3(0, 0, focalLength / Scene.getInstance().getAnnotationScale()), null));
+		final Vector3 f = getAbsPoint(0).addLocal(mesh.getRotation().applyPost(new Vector3(0, 0, focalLength / Scene.getInstance().getScale()), null));
 		for (int i = 0; i <= nBeams; i++) {
 			dx = dish.getRimRadius() * (1 - 2.0 * i / nBeams) * 0.9;
 			dz = dx / dish.getCurvatureParameter();
@@ -448,7 +448,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = focalLength / Scene.getInstance().getAnnotationScale() + receiver.getHeight() * 2;
+			final double shift = focalLength / Scene.getInstance().getScale() + receiver.getHeight() * 2;
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -500,7 +500,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 	@Override
 	public double getGridSize() {
-		return rimRadius / (Scene.getInstance().getAnnotationScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
+		return rimRadius / (Scene.getInstance().getScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
 	}
 
 	@Override
@@ -528,13 +528,13 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	}
 
 	private double checkCopyOverlap() {
-		final double w1 = rimRadius / Scene.getInstance().getAnnotationScale();
+		final double w1 = rimRadius / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicDish) {
 					final ParabolicDish s2 = (ParabolicDish) p;
-					final double w2 = s2.rimRadius / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.rimRadius / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -568,7 +568,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		if (nearest != null) {
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			final double distance = d.length();
-			if (distance < rimRadius * 10 / Scene.getInstance().getAnnotationScale()) {
+			if (distance < rimRadius * 10 / Scene.getInstance().getScale()) {
 				defaultPositioning = false;
 				final double tx = d.getX() / p0.distance(p2);
 				final double ty = d.getY() / p0.distance(p1);
@@ -587,7 +587,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		if (defaultPositioning) {
 			final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 			final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-			final double length = (1 + copyLayoutGap) * rimRadius * 2 / Scene.getInstance().getAnnotationScale();
+			final double length = (1 + copyLayoutGap) * rimRadius * 2 / Scene.getInstance().getScale();
 			final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			final double tx = length / p0.distance(p2);
 			final double ty = length / p0.distance(p1);
@@ -725,7 +725,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 	public void setFocalLength(final double focalLength) {
 		this.focalLength = focalLength;
-		dish.setCurvatureParameter(2.0 * Math.sqrt(focalLength / Scene.getInstance().getAnnotationScale()));
+		dish.setCurvatureParameter(2.0 * Math.sqrt(focalLength / Scene.getInstance().getScale()));
 	}
 
 	public double getFocalLength() {

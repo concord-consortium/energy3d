@@ -876,7 +876,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelPowerTowerHeight) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale()) + " m";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight(0) * Scene.getInstance().getScale()) + " m";
 		}
 		if (labelPowerTowerOutput) {
 			final double output = getPowerTowerOutputToday();
@@ -1799,7 +1799,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			final Vector3 p1 = getAbsPoint(1);
 			final Vector3 p2 = getAbsPoint(2);
 			final double C = 100.0;
-			final double scale = Scene.getInstance().getAnnotationScale();
+			final double scale = Scene.getInstance().getScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * scale * C) / C * Math.round(p1.subtract(p0, null).length() * scale * C) / C * C) / C;
 		} else {
 			area = 0.0;
@@ -2276,7 +2276,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		m.points.get(0).setZ(height);
 		m.setMirrorWidth(w);
 		m.setMirrorHeight(h);
-		m.setBaseHeight(baseHeight / Scene.getInstance().getAnnotationScale());
+		m.setBaseHeight(baseHeight / Scene.getInstance().getScale());
 		m.draw();
 	}
 
@@ -2286,11 +2286,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		final double w = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
-		final double h = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double w = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
+		final double h = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
-		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
+		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
 		switch (layout.getType()) {
 		case EQUAL_AZIMUTHAL_SPACING:
 			for (int r = nrows - 1; r >= 0; r--) {
@@ -2316,7 +2316,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			break;
 		case RADIAL_STAGGER: // http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
 			final double rmin = a * (1.0 - (nrows - 5) / rows);
-			final int n = (int) (rmin / layout.getApertureWidth() * Scene.getInstance().getAnnotationScale());
+			final int n = (int) (rmin / layout.getApertureWidth() * Scene.getInstance().getScale());
 			for (int i = 0; i < n; i++) {
 				double theta = i * 2.0 * Math.PI / n;
 				double az = Math.toDegrees(theta);
@@ -2354,10 +2354,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getAnnotationScale();
+		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		final double theta0 = layout.getStartTurn() * 2 * Math.PI;
-		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
+		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < 10000; i++) {
@@ -2406,8 +2406,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		final double w = (layout.getApertureWidth() + layout.getColumnSpacing()) / Scene.getInstance().getAnnotationScale();
-		final double h = (layout.getApertureHeight() + layout.getRowSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double w = (layout.getApertureWidth() + layout.getColumnSpacing()) / Scene.getInstance().getScale();
+		final double h = (layout.getApertureHeight() + layout.getRowSpacing()) / Scene.getInstance().getScale();
 		switch (layout.getRowAxis()) {
 		case 0: // north-south axis
 			int rows = (int) Math.floor(b / w);
@@ -2535,8 +2535,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		final double w = colSpacing / Scene.getInstance().getAnnotationScale();
-		final double h = rowSpacing / Scene.getInstance().getAnnotationScale();
+		final double w = colSpacing / Scene.getInstance().getScale();
+		final double h = rowSpacing / Scene.getInstance().getScale();
 		Path2D.Double path = null;
 		if (foundationPolygon != null && foundationPolygon.isVisible()) {
 			path = new Path2D.Double();
@@ -2635,8 +2635,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double y1 = Math.max(Math.max(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
 		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
 		final double rackHeight = panelHeight * panelRowsPerRack;
-		final double halfHeight = 0.5 * rackHeight / Scene.getInstance().getAnnotationScale();
-		final double h = rowSpacing / Scene.getInstance().getAnnotationScale();
+		final double halfHeight = 0.5 * rackHeight / Scene.getInstance().getScale();
+		final double h = rowSpacing / Scene.getInstance().getScale();
 		double rackWidth, rows;
 		final Vector3 center = new Vector3();
 		final Vector3 v1 = new Vector3();
@@ -2646,7 +2646,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		switch (rowAxis) {
 		case 1:
 			center.setX((x0 + x1) * 0.5);
-			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
+			rackWidth = a * Scene.getInstance().getScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
 			double margin = (b - rows * h) * 0.5;
 			for (int r = 0; r < rows; r++) {
@@ -2666,7 +2666,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 						for (int i = 0; i < n; i += 2) {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
-							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
 							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
 							rack.draw();
 						}
@@ -2679,7 +2679,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			break;
 		case 0:
 			center.setY((y0 + y1) * 0.5);
-			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
+			rackWidth = b * Scene.getInstance().getScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
 			margin = (a - rows * h) * 0.5;
 			for (int r = 0; r < rows; r++) {
@@ -2699,7 +2699,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 						for (int i = 0; i < n; i += 2) {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
-							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
 							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
 							rack.draw();
 						}
@@ -2734,7 +2734,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		rack.roundUpRackWidth();
 		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
-		rack.setBaseHeight(baseHeight / Scene.getInstance().getAnnotationScale());
+		rack.setBaseHeight(baseHeight / Scene.getInstance().getScale());
 		rack.setPoleDistanceX(poleDistanceX);
 		rack.setPoleDistanceY(poleDistanceY);
 		Scene.getInstance().add(rack, false);
@@ -3780,7 +3780,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (sourceFile.exists()) {
 			final double az = Math.toRadians(getAzimuth());
 			final boolean zeroAz = Util.isZero(az);
-			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+			final double scale = Scene.getInstance().getScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(sourceFile.toURI().toURL()));
 			final Node originalNode = storage.getScene();
 			originalNode.setScale(scale);

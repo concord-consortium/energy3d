@@ -75,8 +75,8 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getAnnotationScale();
-		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getAnnotationScale();
+		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getScale();
+		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getScale();
 
 		mesh = new Quad("Tree Quad", treeWidth, treeHeight);
 		mesh.setModelBound(new BoundingBox());
@@ -187,7 +187,7 @@ public class Tree extends HousePart {
 	protected void drawMesh() {
 		billboard.setTranslation(getAbsPoint(0));
 		collisionRoot.setTranslation(getAbsPoint(0));
-		final double scale = 0.2 / Scene.getInstance().getAnnotationScale();
+		final double scale = 0.2 / Scene.getInstance().getScale();
 		billboard.setScale(scale);
 		collisionRoot.setScale(scale);
 	}
@@ -277,8 +277,8 @@ public class Tree extends HousePart {
 				collisionRoot.attachChild(crown);
 			}
 		}
-		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getAnnotationScale();
-		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getAnnotationScale();
+		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getScale();
+		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getScale();
 		if (mesh instanceof Quad) {
 			((Quad) mesh).resize(treeWidth, treeHeight);
 		}

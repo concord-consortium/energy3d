@@ -62,10 +62,10 @@ public abstract class Optimizer {
 		final Vector3 v1 = foundation.getAbsPoint(1);
 		final Vector3 v2 = foundation.getAbsPoint(2);
 		final Vector3 v3 = foundation.getAbsPoint(3);
-		cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getAnnotationScale();
-		cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
-		lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-		ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
+		cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getScale();
+		cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getScale();
+		lx = v0.distance(v2) * Scene.getInstance().getScale();
+		ly = v0.distance(v1) * Scene.getInstance().getScale();
 		final int chromosomeLength = population.getChromosomeLength();
 		mins = new double[chromosomeLength];
 		maxs = new double[chromosomeLength];

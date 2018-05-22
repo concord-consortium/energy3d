@@ -259,7 +259,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rl = p.distance(p1) * Scene.getInstance().getScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
@@ -278,7 +278,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rw = p.distance(p1) * Scene.getInstance().getScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
@@ -330,7 +330,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final double az = Math.toRadians(relativeAzimuth);
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		reflector.setSize(apertureWidth / annotationScale, troughLength / annotationScale);
 		reflector.setSemilatusRectum(semilatusRectum / annotationScale);
 		reflector.updateModelBound();
@@ -619,7 +619,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 
 	@Override
 	public double getGridSize() {
-		return Math.min(troughLength, apertureWidth) / (Scene.getInstance().getAnnotationScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
+		return Math.min(troughLength, apertureWidth) / (Scene.getInstance().getScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
 	}
 
 	@Override
@@ -652,13 +652,13 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 	}
 
 	private double checkCopyOverlap(final boolean inWidth) {
-		final double w1 = (inWidth ? apertureWidth : troughLength) / Scene.getInstance().getAnnotationScale();
+		final double w1 = (inWidth ? apertureWidth : troughLength) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicTrough) {
 					final ParabolicTrough s2 = (ParabolicTrough) p;
-					final double w2 = (inWidth ? s2.apertureWidth : s2.troughLength) / Scene.getInstance().getAnnotationScale();
+					final double w2 = (inWidth ? s2.apertureWidth : s2.troughLength) / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -696,11 +696,11 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		if (nearest != null) { // use the nearest reflector as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			len = d.length();
-			if (apertureWidth > len * Scene.getInstance().getAnnotationScale()) {
+			if (apertureWidth > len * Scene.getInstance().getScale()) {
 				inWidth = false;
 			}
-			if (len > Math.min(apertureWidth, troughLength) * 5 / Scene.getInstance().getAnnotationScale()) {
-				len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+			if (len > Math.min(apertureWidth, troughLength) * 5 / Scene.getInstance().getScale()) {
+				len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getScale();
 				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
 				final double vx = v.getX();
@@ -719,7 +719,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 				s = Math.signum(d.dot(v));
 			}
 		} else {
-			len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+			len = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getScale();
 			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		}
 		final double tx = len / p0.distance(p2);
@@ -911,8 +911,8 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final double halfWidth = 0.5 * apertureWidth / Scene.getInstance().getAnnotationScale();
-		final double dy = halfWidth * halfWidth / (2 * (semilatusRectum / Scene.getInstance().getAnnotationScale()));
+		final double halfWidth = 0.5 * apertureWidth / Scene.getInstance().getScale();
+		final double dy = halfWidth * halfWidth / (2 * (semilatusRectum / Scene.getInstance().getScale()));
 		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
 		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();

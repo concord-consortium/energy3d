@@ -154,7 +154,7 @@ public class BuildingInfoPanel extends JPanel {
 		solarPanelCountBar.setValue(foundation.getNumberOfSolarPanels());
 		windowCountBar.setValue(foundation.countParts(Window.class));
 		wallCountBar.setValue(foundation.countParts(Wall.class));
-		final double height = Scene.getInstance().getAnnotationScale() * foundation.getBoundingHeight();
+		final double height = Scene.getInstance().getScale() * foundation.getBoundingHeight();
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			heightBar.setValue((float) height);

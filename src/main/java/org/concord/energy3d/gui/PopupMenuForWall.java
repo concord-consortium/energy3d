@@ -154,7 +154,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getThickness() * Scene.getInstance().getAnnotationScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getThickness() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -181,7 +181,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 								if (val < 0.1 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The thickness of a wall must be between 0.1 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									val /= Scene.getInstance().getAnnotationScale();
+									val /= Scene.getInstance().getScale();
 									Wall.setDefaultThickess(val);
 									boolean changed = Math.abs(val - w.getThickness()) > 0.000001;
 									if (rb1.isSelected()) {
@@ -288,7 +288,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 						rb4.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getHeight() * Scene.getInstance().getAnnotationScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -314,7 +314,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 								if (val < 1 || val > 1000) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The height of a wall must be between 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									val /= Scene.getInstance().getAnnotationScale();
+									val /= Scene.getInstance().getScale();
 									changed = Math.abs(val - w.getHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {

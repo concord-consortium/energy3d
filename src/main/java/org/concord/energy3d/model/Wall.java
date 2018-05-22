@@ -1847,11 +1847,11 @@ public class Wall extends HousePart implements Thermal {
 	}
 
 	public double getWallWidth() {
-		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getScale();
 	}
 
 	public double getWallHeight() {
-		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getScale();
 	}
 
 	public List<Window> getWindows() {

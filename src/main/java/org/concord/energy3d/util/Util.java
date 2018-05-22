@@ -837,7 +837,7 @@ public class Util {
 	}
 
 	private static double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
 	}
 

@@ -391,7 +391,7 @@ public class SolarRadiation {
 
 		final int timeStep = Scene.getInstance().getTimeStep();
 		final double solarStep = Scene.getInstance().getSolarStep();
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo(); // a window itself doesn't really absorb solar energy, but it passes the energy into the house to be absorbed
 
@@ -499,7 +499,7 @@ public class SolarRadiation {
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double solarStep = Scene.getInstance().getSolarStep();
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final float absorption = 1 - foundation.getAlbedo();
 
@@ -646,8 +646,8 @@ public class SolarRadiation {
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
 		}
 
-		final double radius = dish.getRimRadius() / Scene.getInstance().getAnnotationScale();
-		final double depth = dish.getRimRadius() * dish.getRimRadius() / (4 * dish.getFocalLength() * Scene.getInstance().getAnnotationScale());
+		final double radius = dish.getRimRadius() / Scene.getInstance().getScale();
+		final double depth = dish.getRimRadius() * dish.getRimRadius() / (4 * dish.getFocalLength() * Scene.getInstance().getScale());
 		final Vector3 center = new Vector3(0, 0, depth); // center of the rim circle
 		final Vector3 q = center.clone();
 		final double spacing = 2 * radius / n;
@@ -791,7 +791,7 @@ public class SolarRadiation {
 								}
 							}
 							if (pickResultsToReceiver.getNumber() == 0) {
-								final double r = directRadiation * Atmosphere.getTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								final double r = directRadiation * Atmosphere.getTransmittance(toReceiver.length() * Scene.getInstance().getScale() * 0.001, false);
 								mirror.getSolarPotential()[iMinute] += r * a;
 								if (reflectionMapOnly) {
 									data.dailySolarIntensity[x][y] += r;
@@ -916,7 +916,7 @@ public class SolarRadiation {
 								}
 							}
 							if (pickResultsToAbsorber.getNumber() == 0) {
-								final double r = directRadiation * Atmosphere.getTransmittance(toAbsorber.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								final double r = directRadiation * Atmosphere.getTransmittance(toAbsorber.length() * Scene.getInstance().getScale() * 0.001, false);
 								reflector.getSolarPotential()[iMinute] += r * a;
 								if (reflectionMapOnly) {
 									data.dailySolarIntensity[x][y] += r;
@@ -1447,7 +1447,7 @@ public class SolarRadiation {
 
 		} else { // for simulation speed, approximate rack model doesn't compute panel by panel and cell by cell
 
-			ySpacing = xSpacing = Scene.getInstance().getRackCellSize() / Scene.getInstance().getAnnotationScale();
+			ySpacing = xSpacing = Scene.getInstance().getRackCellSize() / Scene.getInstance().getScale();
 			nx = Math.max(2, (int) (d20 / xSpacing)); // swap the x and y back to correct order
 			ny = Math.max(2, (int) (d10 / ySpacing));
 			// nx*ny*60: dividing the total rack area by nx*ny gets the unit cell area of the nx*ny grid; 60 converts the unit of timeStep from minute to kWh

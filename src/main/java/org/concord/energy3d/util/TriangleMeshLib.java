@@ -139,7 +139,7 @@ public class TriangleMeshLib {
 		final Node newNode = new Node();
 		final List<Mesh> oldMeshes = new ArrayList<Mesh>();
 		Util.getMeshes(oldNode, oldMeshes);
-		final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+		final double scale = Scene.getInstance().getScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 		for (final Mesh m : oldMeshes) {
 			m.setUserData(new UserData(foundation)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 			final MeshData md = m.getMeshData();

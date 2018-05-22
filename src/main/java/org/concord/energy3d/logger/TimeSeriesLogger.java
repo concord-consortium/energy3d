@@ -257,7 +257,7 @@ public class TimeSeriesLogger {
 
 				else if (lastEdit instanceof RescaleCommand) {
 					final RescaleCommand c = (RescaleCommand) lastEdit;
-					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getAnnotationScale() + "}";
+					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getScale() + "}";
 				} else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
 					final ChangeBackgroundAlbedoCommand c = (ChangeBackgroundAlbedoCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getGround().getAlbedo() + "}";
@@ -338,8 +338,8 @@ public class TimeSeriesLogger {
 					final ChangeRoofOverhangCommand c = (ChangeRoofOverhangCommand) lastEdit;
 					final Roof r = c.getRoof();
 					stateValue = "{\"Building\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
-					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
-					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
+					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getScale();
+					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getScale() + "}";
 				} else if (lastEdit instanceof ChangeFoundationSizeCommand) {
 					final ChangeFoundationSizeCommand c = (ChangeFoundationSizeCommand) lastEdit;
 					final Foundation f = c.getFoundation();

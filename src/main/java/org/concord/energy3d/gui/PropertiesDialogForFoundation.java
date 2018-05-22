@@ -42,7 +42,7 @@ class PropertiesDialogForFoundation extends PropertiesDialogFactory {
 		scroller.setPreferredSize(new Dimension(300, 120));
 		dialog.getContentPane().add(scroller, BorderLayout.CENTER);
 
-		final double s = Scene.getInstance().getAnnotationScale();
+		final double s = Scene.getInstance().getScale();
 		final Vector3 v0 = foundation.getAbsPoint(0);
 		final Vector3 v1 = foundation.getAbsPoint(1);
 		final Vector3 v2 = foundation.getAbsPoint(2);

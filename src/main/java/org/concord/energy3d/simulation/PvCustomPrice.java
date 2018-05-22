@@ -85,7 +85,7 @@ public class PvCustomPrice implements Serializable {
 			flat = true;
 		}
 		if (flat) {
-			final double baseHeight = r.getBaseHeight() * Scene.getInstance().getAnnotationScale();
+			final double baseHeight = r.getBaseHeight() * Scene.getInstance().getScale();
 			if (baseHeight > 1) {
 				cost += solarPanelRackHeightPrice * (baseHeight - 1);
 			}
@@ -116,7 +116,7 @@ public class PvCustomPrice implements Serializable {
 			}
 		}
 		cost += solarPanelRackBasePrice;
-		final double baseHeight = s.getBaseHeight() * Scene.getInstance().getAnnotationScale();
+		final double baseHeight = s.getBaseHeight() * Scene.getInstance().getScale();
 		if (baseHeight > 1) {
 			cost += solarPanelRackHeightPrice * (baseHeight - 1);
 		}

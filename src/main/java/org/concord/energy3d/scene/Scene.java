@@ -1745,11 +1745,11 @@ public class Scene implements Serializable {
 		return unit;
 	}
 
-	public void setAnnotationScale(final double scale) {
+	public void setScale(final double scale) {
 		annotationScale = scale;
 	}
 
-	public double getAnnotationScale() {
+	public double getScale() {
 		if (annotationScale == 0) {
 			annotationScale = 10;
 		}

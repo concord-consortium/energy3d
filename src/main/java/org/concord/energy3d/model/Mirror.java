@@ -179,7 +179,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		surround.setData(new Vector3(), 0.5 * mirrorWidth / annotationScale, 0.5 * mirrorHeight / annotationScale, 0.15);
 		surround.updateModelBound();
 
@@ -313,7 +313,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 0.5 * Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale();
+			final double shift = 0.5 * Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getScale();
 			label.setTranslation(getAbsCenter().addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -384,7 +384,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 	@Override
 	public double getGridSize() {
-		return Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 50.0 : 10.0);
+		return Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getScale() / (SceneManager.getInstance().isFineGrid() ? 50.0 : 10.0);
 	}
 
 	@Override
@@ -412,13 +412,13 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	}
 
 	private double overlap() {
-		final double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
+		final double w1 = mirrorWidth / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof Mirror) {
 					final Mirror s2 = (Mirror) p;
-					final double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.mirrorWidth / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -452,7 +452,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (nearest != null) {
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			final double distance = d.length();
-			if (distance < mirrorWidth * 10 / Scene.getInstance().getAnnotationScale()) {
+			if (distance < mirrorWidth * 10 / Scene.getInstance().getScale()) {
 				defaultPositioning = false;
 				final double tx = d.getX() / p0.distance(p2);
 				final double ty = d.getY() / p0.distance(p1);
@@ -471,7 +471,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (defaultPositioning) {
 			final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 			final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-			final double length = (1 + layoutGap) * mirrorWidth * 2 / Scene.getInstance().getAnnotationScale();
+			final double length = (1 + layoutGap) * mirrorWidth * 2 / Scene.getInstance().getScale();
 			final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			final double tx = length / p0.distance(p2);
 			final double ty = length / p0.distance(p1);

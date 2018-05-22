@@ -252,7 +252,7 @@ public class Door extends HousePart implements Thermal {
 			final Vector3 p1 = getAbsPoint(1);
 			final Vector3 p2 = getAbsPoint(2);
 			final double C = 100.0;
-			final double annotationScale = Scene.getInstance().getAnnotationScale();
+			final double annotationScale = Scene.getInstance().getScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
 		} else {
 			area = 0.0;
@@ -293,7 +293,7 @@ public class Door extends HousePart implements Thermal {
 	}
 
 	public void setDoorWidth(final double width) {
-		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (width - getDoorWidth()) / Scene.getInstance().getAnnotationScale()));
+		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (width - getDoorWidth()) / Scene.getInstance().getScale()));
 		points.get(0).subtractLocal(a);
 		points.get(1).subtractLocal(a);
 		points.get(2).addLocal(a);
@@ -301,17 +301,17 @@ public class Door extends HousePart implements Thermal {
 	}
 
 	public double getDoorWidth() {
-		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getScale();
 	}
 
 	public void setDoorHeight(final double height) {
-		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(height / Scene.getInstance().getAnnotationScale()));
+		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(height / Scene.getInstance().getScale()));
 		points.get(1).set(points.get(0).add(a, null));
 		points.get(3).set(points.get(2).add(a, null));
 	}
 
 	public double getDoorHeight() {
-		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getScale();
 	}
 
 	private boolean overlap() {

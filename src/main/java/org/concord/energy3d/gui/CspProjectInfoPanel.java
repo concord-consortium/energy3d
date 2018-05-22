@@ -181,12 +181,12 @@ public class CspProjectInfoPanel extends JPanel {
 						cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
 						if (!towers.isEmpty()) {
 							for (final Foundation tower : towers) {
-								cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+								cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
 							}
 						}
 					} else {
 						if (foundation.hasSolarReceiver()) {
-							cost += price.getTowerUnitPrice() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+							cost += price.getTowerUnitPrice() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
 						}
 					}
 					costBar.setValue(Math.round(cost));

@@ -115,7 +115,7 @@ public class FoundationPolygon extends HousePart {
 			x[i] = v.getX();
 			y[i] = v.getY();
 		}
-		final double scale = Scene.getInstance().getAnnotationScale();
+		final double scale = Scene.getInstance().getScale();
 		area = Util.getAreaOf2DPolygon(x, y) * scale * scale;
 	}
 

@@ -43,10 +43,10 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			final Vector3 v1 = receiver.getAbsPoint(1);
 			final Vector3 v2 = receiver.getAbsPoint(2);
 			final Vector3 v3 = receiver.getAbsPoint(3);
-			final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getAnnotationScale();
-			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getAnnotationScale();
-			final double lx = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-			final double ly = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
+			final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getScale();
+			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getScale();
+			final double lx = v0.distance(v2) * Scene.getInstance().getScale();
+			final double ly = v0.distance(v1) * Scene.getInstance().getScale();
 			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getMirrorWidth(), ly + heliostat.getMirrorHeight()));
 		}
 		// initialize the population with the first-born being the current design

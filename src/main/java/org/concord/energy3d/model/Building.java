@@ -110,7 +110,7 @@ public class Building {
 	/** @return false if the building does not conform */
 	public boolean calculate(final boolean areaOnly) {
 
-		final double scale = Scene.getInstance().getAnnotationScale();
+		final double scale = Scene.getInstance().getScale();
 		height = foundation.getBoundingHeight() * scale;
 
 		if (!wallAcceptable) {

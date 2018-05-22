@@ -356,7 +356,7 @@ public class PrintController implements Updater {
 		spaceBetweenParts = Scene.getInstance().areAnnotationsVisible() ? 3.0 : 0;
 		double fromPageToWorldCoord;
 		if (!isScaleToFit) {
-			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);
+			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getScale() / 10.0);
 		} else {
 			double maxWidth = 0;
 			double maxHeight = 0;

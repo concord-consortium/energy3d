@@ -1013,7 +1013,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					}
 					final JPanel gui = new JPanel(new BorderLayout());
 					gui.add(panel, BorderLayout.CENTER);
-					final JTextField inputField = new JTextField(rack.getBaseHeight() * Scene.getInstance().getAnnotationScale() + "");
+					final JTextField inputField = new JTextField(rack.getBaseHeight() * Scene.getInstance().getScale() + "");
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -1031,13 +1031,13 @@ class PopupMenuForRack extends PopupMenuFactory {
 							boolean ok = true;
 							double val = 0;
 							try {
-								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getScale();
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = val != rack.getBaseHeight();

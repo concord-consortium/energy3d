@@ -108,22 +108,22 @@ class PopupMenuForRoof extends PopupMenuFactory {
 					final Roof roof = (Roof) selectedPart;
 					while (true) {
 						SceneManager.getInstance().refresh(1);
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Overhang Length (m)", roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Overhang Length (m)", roof.getOverhangLength() * Scene.getInstance().getScale());
 						if (newValue == null) {
 							break;
 						} else {
 							try {
 								double val = Double.parseDouble(newValue);
-								final double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale() * 10;
+								final double min = Roof.OVERHANG_MIN * Scene.getInstance().getScale() * 10;
 								if (val < min && val >= 0) {
 									val = min;
 								}
 								if (val < 0 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 10.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									if (Math.abs(val - roof.getOverhangLength() * Scene.getInstance().getAnnotationScale()) > 0.000001) {
+									if (Math.abs(val - roof.getOverhangLength() * Scene.getInstance().getScale()) > 0.000001) {
 										final ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
-										roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+										roof.setOverhangLength(val / Scene.getInstance().getScale());
 										roof.draw();
 										final Foundation f = roof.getTopContainer();
 										f.drawChildren();

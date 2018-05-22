@@ -800,7 +800,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getBaseHeight() * Scene.getInstance().getAnnotationScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getBaseHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -818,13 +818,13 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 							double val = 0;
 							boolean ok = true;
 							try {
-								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getScale();
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = Math.abs(val - t.getBaseHeight()) > 0.000001;

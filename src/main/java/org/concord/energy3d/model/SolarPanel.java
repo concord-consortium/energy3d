@@ -366,7 +366,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 		updateEditShapes();
 
-		final double annotationScaleFactor = 0.5 / Scene.getInstance().getAnnotationScale();
+		final double annotationScaleFactor = 0.5 / Scene.getInstance().getScale();
 		if (rotated) {
 			surround.setData(new Vector3(), panelHeight * annotationScaleFactor, panelWidth * annotationScaleFactor, 0.15);
 		} else {
@@ -501,7 +501,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 0.5 * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+			final double shift = 0.5 * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getScale();
 			label.setTranslation((onFlatSurface ? getAbsCenter().addLocal(0, 0, baseHeight) : getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -564,7 +564,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			p = o.add(0, 0, baseHeight, null);
 		}
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
-		final double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+		final double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getScale();
 		dir.normalizeLocal().multiplyLocal(w * 0.5);
 		final Vector3 v1 = p.add(dir, null);
 		dir.negateLocal();
@@ -764,7 +764,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	@Override
 	public double getGridSize() {
-		return Math.min(panelWidth, panelHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 50.0 : 10.0);
+		return Math.min(panelWidth, panelHeight) / Scene.getInstance().getScale() / (SceneManager.getInstance().isFineGrid() ? 50.0 : 10.0);
 	}
 
 	@Override
@@ -792,13 +792,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	}
 
 	private double overlap() {
-		final double w1 = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+		final double w1 = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof SolarPanel) {
 					final SolarPanel s2 = (SolarPanel) p;
-					final double w2 = (s2.rotated ? s2.panelHeight : s2.panelWidth) / Scene.getInstance().getAnnotationScale();
+					final double w2 = (s2.rotated ? s2.panelHeight : s2.panelWidth) / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -815,7 +815,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		c.meshLocator = meshLocator; // deepy copy creates a copy of the foundation, we don't want that
 		if (check) {
 			// normal = c.computeNormalAndKeepOnSurface();
-			final double annotationScale = Scene.getInstance().getAnnotationScale();
+			final double annotationScale = Scene.getInstance().getScale();
 			if (container instanceof Roof || container instanceof Rack) {
 				if (normal == null) {
 					// don't remove this error message just in case this happens again
@@ -1180,7 +1180,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	}
 
 	public List<SolarPanel> getRow() {
-		final double minDistance = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale() * 1.05;
+		final double minDistance = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getScale() * 1.05;
 		final List<SolarPanel> panels = getTopContainer().getSolarPanels();
 		final List<SolarPanel> row = new ArrayList<SolarPanel>();
 		row.add(this);

@@ -199,7 +199,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rw = p.distance(p1) * Scene.getInstance().getScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
@@ -218,7 +218,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rl = p.distance(p1) * Scene.getInstance().getScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
@@ -274,7 +274,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		points.get(0).setZ(baseZ + baseHeight);
 
 		final Vector3 center = getAbsPoint(0);
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		reflector.setData(new Vector3(), 0.5 * moduleWidth / annotationScale, 0.5 * length / annotationScale, 0.15);
 		reflector.updateModelBound();
 
@@ -532,7 +532,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 
 	@Override
 	public double getGridSize() {
-		return Math.min(length, moduleWidth) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return Math.min(length, moduleWidth) / Scene.getInstance().getScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
 	}
 
 	@Override
@@ -586,11 +586,11 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		if (nearest != null) { // use the nearest reflector as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			len = d.length();
-			if (moduleWidth > len * Scene.getInstance().getAnnotationScale()) {
+			if (moduleWidth > len * Scene.getInstance().getScale()) {
 				inWidth = false;
 			}
-			if (len > Math.min(moduleWidth, length) * 5 / Scene.getInstance().getAnnotationScale()) {
-				len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+			if (len > Math.min(moduleWidth, length) * 5 / Scene.getInstance().getScale()) {
+				len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getScale();
 				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
 				final double vx = v.getX();
@@ -609,7 +609,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 				s = Math.signum(d.dot(v));
 			}
 		} else {
-			len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+			len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getScale();
 			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		}
 		final double tx = len / p0.distance(p2);
@@ -635,13 +635,13 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	}
 
 	private double checkCopyOverlap(final boolean inWidth) { // copy only in the direction of module width
-		final double w1 = (inWidth ? moduleWidth : length) / Scene.getInstance().getAnnotationScale();
+		final double w1 = (inWidth ? moduleWidth : length) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof FresnelReflector) {
 					final FresnelReflector s2 = (FresnelReflector) p;
-					final double w2 = (inWidth ? s2.moduleWidth : s2.length) / Scene.getInstance().getAnnotationScale();
+					final double w2 = (inWidth ? s2.moduleWidth : s2.length) / Scene.getInstance().getScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;

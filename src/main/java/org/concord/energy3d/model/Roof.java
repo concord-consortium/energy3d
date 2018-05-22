@@ -1223,7 +1223,7 @@ public abstract class Roof extends HousePart implements Thermal {
 							}
 						}
 						result.add(result.get(0));
-						final double annotationScale = Scene.getInstance().getAnnotationScale();
+						final double annotationScale = Scene.getInstance().getScale();
 						final double a = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
 						areaByPartWithoutOverhang.put(roofPartMesh, a);
 						this.area += a;

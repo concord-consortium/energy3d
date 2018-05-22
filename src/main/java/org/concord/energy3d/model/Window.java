@@ -476,7 +476,7 @@ public class Window extends HousePart implements Thermal {
 			if (reversedFace) {
 				xy = v02.length() - xy;
 			}
-			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (p0.getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
+			label1.setText("(" + Math.round(Scene.getInstance().getScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getScale() * 10.0 * (p0.getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
 			label1.setTranslation(p0);
 			label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		}
@@ -617,7 +617,7 @@ public class Window extends HousePart implements Thermal {
 			final Vector3 p1 = getAbsPoint(1);
 			final Vector3 p2 = getAbsPoint(2);
 			final double C = 100.0;
-			final double annotationScale = Scene.getInstance().getAnnotationScale();
+			final double annotationScale = Scene.getInstance().getScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
 		} else {
 			area = 0.0;
@@ -906,7 +906,7 @@ public class Window extends HousePart implements Thermal {
 	}
 
 	public void setWindowWidth(final double width) {
-		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (width - getWindowWidth()) / Scene.getInstance().getAnnotationScale()));
+		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (width - getWindowWidth()) / Scene.getInstance().getScale()));
 		points.get(0).subtractLocal(a);
 		points.get(1).subtractLocal(a);
 		points.get(2).addLocal(a);
@@ -914,11 +914,11 @@ public class Window extends HousePart implements Thermal {
 	}
 
 	public double getWindowWidth() {
-		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getScale();
 	}
 
 	public void setWindowHeight(final double height) {
-		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (height - getWindowHeight()) / Scene.getInstance().getAnnotationScale()));
+		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (height - getWindowHeight()) / Scene.getInstance().getScale()));
 		points.get(0).subtractLocal(a);
 		points.get(2).subtractLocal(a);
 		points.get(1).addLocal(a);
@@ -926,7 +926,7 @@ public class Window extends HousePart implements Thermal {
 	}
 
 	public double getWindowHeight() {
-		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getScale();
 	}
 
 	@Override

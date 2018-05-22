@@ -46,9 +46,9 @@ class VisualizationSettingsDialog extends JDialog {
 		final JTextField solarPanelNyTextField = new JTextField(s.getSolarPanelNy() + "", 6);
 		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
 		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
-		cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale()));
+		cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getScale()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
-		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
+		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getScale()));
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
@@ -102,13 +102,13 @@ class VisualizationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				s.setSolarStep(cellSize / Scene.getInstance().getAnnotationScale());
+				s.setSolarStep(cellSize / Scene.getInstance().getScale());
 				s.setSolarPanelNx(solarPanelNx);
 				s.setSolarPanelNy(solarPanelNy);
 				s.setRackNx(rackNx);
 				s.setRackNy(rackNy);
 				s.setHeatVectorLength(heatVectorLength);
-				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
+				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getScale());
 				s.setEdited(true);
 				if (SceneManager.getInstance().getSolarHeatMap()) {
 					EnergyPanel.getInstance().updateRadiationHeatMap();

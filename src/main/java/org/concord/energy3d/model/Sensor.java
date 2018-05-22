@@ -116,7 +116,7 @@ public class Sensor extends HousePart implements SolarCollector {
 		}
 		updateEditShapes();
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScale = Scene.getInstance().getScale();
 		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.02); // last arg sets close to zero so the sensor doesn't cast shadow
 		surround.updateModelBound();
 
@@ -230,7 +230,7 @@ public class Sensor extends HousePart implements SolarCollector {
 
 	@Override
 	public double getGridSize() {
-		return WIDTH / Scene.getInstance().getAnnotationScale();
+		return WIDTH / Scene.getInstance().getScale();
 	}
 
 	@Override

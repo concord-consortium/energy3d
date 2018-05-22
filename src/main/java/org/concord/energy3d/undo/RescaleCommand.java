@@ -12,7 +12,7 @@ public class RescaleCommand extends MyAbstractUndoableEdit {
 	private double newValue;
 
 	public RescaleCommand() {
-		oldValue = Scene.getInstance().getAnnotationScale();
+		oldValue = Scene.getInstance().getScale();
 	}
 
 	public double getOldValue() {
@@ -22,15 +22,15 @@ public class RescaleCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = Scene.getInstance().getAnnotationScale();
-		Scene.getInstance().setAnnotationScale(oldValue);
+		newValue = Scene.getInstance().getScale();
+		Scene.getInstance().setScale(oldValue);
 		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setAnnotationScale(newValue);
+		Scene.getInstance().setScale(newValue);
 		Scene.getInstance().redrawAll();
 	}
 

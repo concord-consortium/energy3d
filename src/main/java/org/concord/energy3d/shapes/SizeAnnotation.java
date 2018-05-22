@@ -98,7 +98,7 @@ public class SizeAnnotation extends Annotation {
 
 		label.setTranslation(middle);
 		final DecimalFormat df = new DecimalFormat("#.##");
-		double length = to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale();
+		double length = to.subtract(from, null).length() * Scene.getInstance().getScale();
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			label.setText(df.format(length) + " m");

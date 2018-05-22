@@ -125,7 +125,7 @@ public class Human extends HousePart {
 	@Override
 	protected void drawMesh() {
 		billboard.setTranslation(getAbsPoint(0));
-		billboard.setScale(0.2 / Scene.getInstance().getAnnotationScale());
+		billboard.setScale(0.2 / Scene.getInstance().getScale());
 	}
 
 	@Override

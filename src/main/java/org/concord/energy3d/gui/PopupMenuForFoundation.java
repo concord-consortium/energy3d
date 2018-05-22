@@ -833,7 +833,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					sp.setPanelHeight(solarPanelHeight);
 					sp.setNumberOfCellsInX(numberOfCellsInX);
 					sp.setNumberOfCellsInY(numberOfCellsInY);
-					sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getAnnotationScale());
+					sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getScale());
 					sp.setShadeTolerance(solarPanelShadeTolerance);
 					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
@@ -2070,7 +2070,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 					final Foundation f = (Foundation) selectedPart;
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Grid Size (m)", f.getChildGridSize() * Scene.getInstance().getAnnotationScale());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Grid Size (m)", f.getChildGridSize() * Scene.getInstance().getScale());
 						if (newValue == null) {
 							break;
 						} else {
@@ -2079,7 +2079,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								if (val < 0.1 || val > 5) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Grid size must be between 0.1 and 5 m.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									f.setChildGridSize(val / Scene.getInstance().getAnnotationScale());
+									f.setChildGridSize(val / Scene.getInstance().getScale());
 									updateAfterEdit();
 									break;
 								}
@@ -2182,9 +2182,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final Vector3 v0 = f.getAbsPoint(0);
 					final Vector3 v1 = f.getAbsPoint(1);
 					final Vector3 v2 = f.getAbsPoint(2);
-					double lx0 = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-					double ly0 = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-					double lz0 = f.getHeight() * Scene.getInstance().getAnnotationScale();
+					double lx0 = v0.distance(v2) * Scene.getInstance().getScale();
+					double ly0 = v0.distance(v1) * Scene.getInstance().getScale();
+					double lz0 = f.getHeight() * Scene.getInstance().getScale();
 
 					final JPanel gui = new JPanel(new BorderLayout());
 					final String title = "<html>Size of Foundation #" + f.getId() + " (in meters)</html>";
@@ -2240,7 +2240,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									if (lx1 != lx0 || ly1 != ly0 || lz1 != lz0) {
 										f.rescale(lx1 / lx0, ly1 / ly0, 1);
-										f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
+										f.setHeight(lz1 / Scene.getInstance().getScale());
 										f.draw();
 										f.drawChildren();
 										SceneManager.getInstance().refresh();

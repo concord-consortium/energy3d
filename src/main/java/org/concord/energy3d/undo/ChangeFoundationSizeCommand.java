@@ -58,7 +58,7 @@ public class ChangeFoundationSizeCommand extends MyAbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		foundation.rescale(oldLength / newLength, oldWidth / newWidth, 1);
-		foundation.setHeight(oldHeight / Scene.getInstance().getAnnotationScale());
+		foundation.setHeight(oldHeight / Scene.getInstance().getScale());
 		foundation.draw();
 		foundation.drawChildren();
 		SceneManager.getInstance().refresh();
@@ -68,7 +68,7 @@ public class ChangeFoundationSizeCommand extends MyAbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		foundation.rescale(newLength / oldLength, newWidth / oldWidth, 1);
-		foundation.setHeight(newHeight / Scene.getInstance().getAnnotationScale());
+		foundation.setHeight(newHeight / Scene.getInstance().getScale());
 		foundation.draw();
 		foundation.drawChildren();
 		SceneManager.getInstance().refresh();

@@ -166,7 +166,7 @@ class ScaleDialog extends JDialog {
 								scale = Double.parseDouble(scaleTextField.getText());
 							}
 							final RescaleCommand c = new RescaleCommand();
-							Scene.getInstance().setAnnotationScale(Scene.getInstance().getAnnotationScale() * scale);
+							Scene.getInstance().setScale(Scene.getInstance().getScale() * scale);
 							Scene.getInstance().setEdited(true);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							ScaleDialog.this.dispose();

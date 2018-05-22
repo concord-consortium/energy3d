@@ -926,7 +926,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	boolean adjustCellSize() {
-		final double cellSize = Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale();
+		final double cellSize = Scene.getInstance().getSolarStep() * Scene.getInstance().getScale();
 		final int cellCount = (int) (Scene.getInstance().getTotalFoundationAreas() / (cellSize * cellSize));
 		final int maxCells = 100000; // should we make this dependent of project type?
 		if (cellCount > maxCells) {
@@ -1171,7 +1171,7 @@ public class EnergyPanel extends JPanel {
 			meterToFoot = 1;
 			lengthUnit = "m";
 		}
-		final double scale = Scene.getInstance().getAnnotationScale() * meterToFoot;
+		final double scale = Scene.getInstance().getScale() * meterToFoot;
 
 		final TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
 		if (selectedPart != null) {

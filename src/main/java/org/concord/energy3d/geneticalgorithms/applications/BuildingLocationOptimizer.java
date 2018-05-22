@@ -72,8 +72,8 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		// initialize the population with the first-born being the current design
 		final Vector3 center = foundation.getAbsCenter();
 		final Individual firstBorn = population.getIndividual(0);
-		firstBorn.setGene(0, (center.getX() * Scene.getInstance().getAnnotationScale() - xmin) / (xmax - xmin));
-		firstBorn.setGene(1, (center.getY() * Scene.getInstance().getAnnotationScale() - ymin) / (ymax - ymin));
+		firstBorn.setGene(0, (center.getX() * Scene.getInstance().getScale() - xmin) / (xmax - xmin));
+		firstBorn.setGene(1, (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin));
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		final double geneX = individual.getGene(0);
 		final double geneY = individual.getGene(1);
 		final Vector3 displacement = foundation.getAbsCenter();
-		displacement.subtractLocal((xmin + geneX * (xmax - xmin)) / Scene.getInstance().getAnnotationScale(), (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getAnnotationScale(), 0).negateLocal();
+		displacement.subtractLocal((xmin + geneX * (xmax - xmin)) / Scene.getInstance().getScale(), (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getScale(), 0).negateLocal();
 		foundation.move(displacement);
 		individual.setFitness(objectiveFunction.compute());
 	}
@@ -92,7 +92,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		final double geneX = best.getGene(0);
 		final double geneY = best.getGene(1);
 		final Vector3 displacement = foundation.getAbsCenter();
-		displacement.subtractLocal((xmin + geneX * (xmax - xmin)) / Scene.getInstance().getAnnotationScale(), (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getAnnotationScale(), 0).negateLocal();
+		displacement.subtractLocal((xmin + geneX * (xmax - xmin)) / Scene.getInstance().getScale(), (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getScale(), 0).negateLocal();
 		foundation.move(displacement);
 		foundation.draw();
 		System.out.println("Fittest: " + individualToString(best));
