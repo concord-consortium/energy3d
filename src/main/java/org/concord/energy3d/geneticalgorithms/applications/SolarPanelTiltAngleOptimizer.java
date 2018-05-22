@@ -43,9 +43,9 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 	@Override
 	void computeIndividualFitness(final Individual individual) {
 		final List<Rack> racks = foundation.getRacks();
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			final Rack rack = racks.get(j);
+		for (int i = 0; i < individual.getChromosomeLength(); i++) {
+			final double gene = individual.getGene(i);
+			final Rack rack = racks.get(i);
 			rack.setTiltAngle((2 * gene - 1) * 90);
 		}
 		individual.setFitness(objectiveFunction.compute());
@@ -55,9 +55,9 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 	public void applyFittest() {
 		final List<Rack> racks = foundation.getRacks();
 		final Individual best = population.getFittest();
-		for (int j = 0; j < best.getChromosomeLength(); j++) {
-			final double gene = best.getGene(j);
-			final Rack rack = racks.get(j);
+		for (int i = 0; i < best.getChromosomeLength(); i++) {
+			final double gene = best.getGene(i);
+			final Rack rack = racks.get(i);
 			rack.setTiltAngle((2 * gene - 1) * 90);
 			rack.draw();
 		}

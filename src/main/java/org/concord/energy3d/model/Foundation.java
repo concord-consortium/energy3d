@@ -1895,6 +1895,20 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return list;
 	}
 
+	public int countSolarPanels() {
+		int count = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == this) {
+				if (p instanceof SolarPanel) {
+					count++;
+				} else if (p instanceof Rack) {
+					count += ((Rack) p).getNumberOfSolarPanels();
+				}
+			}
+		}
+		return count;
+	}
+
 	public int countParts(final Class<?> clazz) {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -2613,6 +2627,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		});
 	}
 
+	// used by the layout manager
 	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
@@ -2667,13 +2682,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setY(y0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
+					addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
 				}
 			}
 			break;
@@ -2700,13 +2715,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setX(x0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
+					addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
 				}
 			}
 			break;
@@ -2724,7 +2739,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		});
 	}
 
-	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final int rowAxis, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
 		final Rack rack = new Rack();
 		rack.setContainer(this);
 		rack.setSolarPanel((SolarPanel) panel.copy(false));
@@ -2737,6 +2752,134 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		rack.setBaseHeight(baseHeight / Scene.getInstance().getScale());
 		rack.setPoleDistanceX(poleDistanceX);
 		rack.setPoleDistanceY(poleDistanceY);
+		Scene.getInstance().add(rack, false);
+		rack.complete();
+		if (rotate90) {
+			rack.setRelativeAzimuth(90);
+		}
+		return rack;
+	}
+
+	// used by GA
+	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
+		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
+		removeChildrenOfClass(clazz);
+		final double az = Math.toRadians(getAzimuth());
+		if (!Util.isZero(az)) {
+			rotate(az, null, false);
+		}
+		if (Util.isZero(tiltAngle - 90)) {
+			tiltAngle = 89.999;
+		} else if (Util.isZero(tiltAngle + 90)) {
+			tiltAngle = -89.999;
+		}
+		final Vector3 p0 = getAbsPoint(0);
+		final double a = p0.distance(getAbsPoint(2));
+		final double b = p0.distance(getAbsPoint(1));
+		double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		final double x1 = Math.max(Math.max(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		final double y1 = Math.max(Math.max(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
+		final double rackHeight = panelHeight * panelRowsPerRack;
+		final double halfHeight = 0.5 * rackHeight / Scene.getInstance().getScale();
+		final double h = rowSpacing / Scene.getInstance().getScale();
+		double rackWidth, rows;
+		final Vector3 center = new Vector3();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
+		double[] bounds = null;
+		switch (rowAxis) {
+		case 1:
+			center.setX((x0 + x1) * 0.5);
+			rackWidth = a * Scene.getInstance().getScale() - panelHeight;
+			rows = (int) Math.floor(b / h);
+			double margin = (b - rows * h) * 0.5;
+			for (int r = 0; r < rows; r++) {
+				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					if (bounds == null) {
+						bounds = foundationPolygon.getBounds();
+					}
+					x0 = Math.max(x0, bounds[0]);
+					y0 = Math.max(y0, bounds[2]);
+					center.setY(y0 + halfHeight + h * r);
+					v1.set(x0, center.getY(), 0);
+					v2.set(x1, center.getY(), 0);
+					intersections.clear();
+					intersections.addAll(foundationPolygon.getIntersectingPoints(v1, v2));
+					final int n = intersections.size();
+					if (n >= 2) {
+						for (int i = 0; i < n; i += 2) {
+							final Point2D.Double pd1 = intersections.get(i);
+							final Point2D.Double pd2 = intersections.get(i + 1);
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							rack.draw();
+						}
+					}
+				} else {
+					center.setY(y0 + margin + h * (r + 0.5));
+					addRack(panel, tiltAngle, baseHeight, center, rackWidth, rackHeight, false).draw();
+				}
+			}
+			break;
+		case 0:
+			center.setY((y0 + y1) * 0.5);
+			rackWidth = b * Scene.getInstance().getScale() - panelHeight;
+			rows = (int) Math.floor(a / h);
+			margin = (a - rows * h) * 0.5;
+			for (int r = 0; r < rows; r++) {
+				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					if (bounds == null) {
+						bounds = foundationPolygon.getBounds();
+					}
+					x0 = Math.max(x0, bounds[0]);
+					y0 = Math.max(y0, bounds[2]);
+					center.setX(x0 + halfHeight + h * r);
+					v1.set(center.getX(), y0, 0);
+					v2.set(center.getX(), y1, 0);
+					intersections.clear();
+					intersections.addAll(foundationPolygon.getIntersectingPoints(v1, v2));
+					final int n = intersections.size();
+					if (n >= 2) {
+						for (int i = 0; i < n; i += 2) {
+							final Point2D.Double pd1 = intersections.get(i);
+							final Point2D.Double pd2 = intersections.get(i + 1);
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							rack.draw();
+						}
+					}
+				} else {
+					center.setX(x0 + margin + h * (r + 0.5));
+					addRack(panel, tiltAngle, baseHeight, center, rackWidth, rackHeight, true).draw();
+				}
+			}
+			break;
+		}
+		if (!Util.isZero(az)) {
+			rotate(-az, null, false);
+		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
+	}
+
+	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+		final Rack rack = new Rack();
+		rack.setContainer(this);
+		rack.setSolarPanel((SolarPanel) panel.copy(false));
+		rack.setMonolithic(true);
+		rack.set(center, rackWidth, rackHeight);
+		rack.points.get(0).setZ(height);
+		rack.roundUpRackWidth();
+		// rack.roundUpRackHeight();
+		rack.setTiltAngle(tiltAngle);
+		rack.setBaseHeight(baseHeight / Scene.getInstance().getScale());
 		Scene.getInstance().add(rack, false);
 		rack.complete();
 		if (rotate90) {

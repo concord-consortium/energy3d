@@ -1568,7 +1568,11 @@ public class EnergyPanel extends JPanel {
 									partProperty3TextField.putClientProperty("tooltip", "Normal vector and vertex count of the selected mesh");
 								}
 							} else {
-								partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
+								int solarPanelCount = 0;
+								if (Scene.getInstance().getProjectType() == Foundation.TYPE_PV_PROJECT) {
+									solarPanelCount = foundation.countSolarPanels();
+								}
+								partPanelBorder.setTitle("Foundation (id = " + foundation.getId() + (solarPanelCount > 0 ? ", " + solarPanelCount + " solar panels" : "") + ")");
 								partProperty1Label.setText("  Size:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + "\u00d7" + (TWO_DECIMALS.format(lz * scale)) + lengthUnit + ", Area\u2248" + ONE_DECIMAL.format(lx * ly * scale * scale) + landArea + lengthUnit + "\u00B2");
 								partProperty1TextField.putClientProperty("tooltip", "The length and width of the foundation");

@@ -11,6 +11,7 @@ import org.concord.energy3d.gui.PvProjectDailyEnergyGraph;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -20,7 +21,7 @@ import com.ardor3d.math.Vector3;
 /**
  * Chromosome of an individual is encoded as follows:
  * 
- * inter-row spacing (d), tilt angle (a)
+ * row spacing (d), tilt angle (a)
  *
  * assuming the base height is fixed and the number of rows on each rack increases when the tilt angle decreases (otherwise the maximum inter-row spacing would always be preferred)
  * 
@@ -28,6 +29,12 @@ import com.ardor3d.math.Vector3;
  *
  */
 public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
+
+	private double minimumRowSpacing;
+	private double maximumRowSpacing;
+	private double baseHeight;
+	private SolarPanel solarPanel;
+	private int panelRowsPerRack;
 
 	public SolarPanelArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
@@ -43,46 +50,41 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 		final Vector3 p = foundation.getAbsPoint(1).subtract(foundation.getAbsPoint(0), null);
 		final Rack rack = racks.get(0);
+		solarPanel = rack.getSolarPanel();
+		baseHeight = rack.getBaseHeight() * Scene.getInstance().getScale();
+		panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 		final Vector3 q = rack.getAbsCenter().subtractLocal(racks.get(1).getAbsCenter());
-		final double interrowSpacing = Math.abs(q.dot(p.normalize(null))) * Scene.getInstance().getScale();
-		final double maximumInterrowSpacing = p.length() * Scene.getInstance().getScale();
+		final double rowSpacing = Math.abs(q.dot(p.normalize(null))) * Scene.getInstance().getScale();
+		maximumRowSpacing = p.length() * Scene.getInstance().getScale();
+		minimumRowSpacing = rack.getRackHeight();
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
-		firstBorn.setGene(0, interrowSpacing / maximumInterrowSpacing);
+		firstBorn.setGene(0, (rowSpacing - minimumRowSpacing) / maximumRowSpacing);
 		firstBorn.setGene(1, 0.5 * (1.0 + rack.getTiltAngle() / 90.0));
 	}
 
 	@Override
 	void computeIndividualFitness(final Individual individual) {
-		final List<Rack> racks = foundation.getRacks();
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			final Rack rack = racks.get(j);
-			rack.setTiltAngle((2 * gene - 1) * 90);
-		}
+		final double rowSpacing = minimumRowSpacing + individual.getGene(0) * maximumRowSpacing;
+		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
+		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		individual.setFitness(objectiveFunction.compute());
 	}
 
 	@Override
 	public void applyFittest() {
-		final List<Rack> racks = foundation.getRacks();
 		final Individual best = population.getFittest();
-		for (int j = 0; j < best.getChromosomeLength(); j++) {
-			final double gene = best.getGene(j);
-			final Rack rack = racks.get(j);
-			rack.setTiltAngle((2 * gene - 1) * 90);
-			rack.draw();
-		}
+		final double rowSpacing = minimumRowSpacing + best.getGene(0) * maximumRowSpacing;
+		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
+		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		System.out.println("Fittest: " + individualToString(best));
 	}
 
 	@Override
 	String individualToString(final Individual individual) {
 		String s = "(";
-		for (int i = 0; i < individual.getChromosomeLength(); i++) {
-			final double gene = individual.getGene(i);
-			s += (2 * gene - 1) * 90 + ", ";
-		}
+		s += (minimumRowSpacing + individual.getGene(0) * maximumRowSpacing) + ", ";
+		s += (2 * individual.getGene(1) - 1) * 90 + ", ";
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
 	}
 
