@@ -110,7 +110,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			foundation.setLabelCustomText("Daily Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
 			break;
 		case ObjectiveFunction.ANNUAl:
-			foundation.setLabelCustomText("Annual Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
+			foundation.setLabelCustomText("Annual Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
 			break;
 		case ObjectiveFunction.RANDOM:
 			foundation.setLabelCustomText(null);

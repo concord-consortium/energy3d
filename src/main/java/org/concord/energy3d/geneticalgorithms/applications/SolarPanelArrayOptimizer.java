@@ -68,6 +68,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double rowSpacing = minimumRowSpacing + individual.getGene(0) * maximumRowSpacing;
 		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		foundation.draw();
+		SceneManager.getInstance().refresh();
 		individual.setFitness(objectiveFunction.compute());
 	}
 
@@ -77,6 +79,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double rowSpacing = minimumRowSpacing + best.getGene(0) * maximumRowSpacing;
 		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		SceneManager.getInstance().refresh();
 		System.out.println("Fittest: " + individualToString(best));
 	}
 
@@ -95,7 +98,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			foundation.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
 			break;
 		case ObjectiveFunction.ANNUAl:
-			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 30));
+			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
 			break;
 		case ObjectiveFunction.RANDOM:
 			foundation.setLabelCustomText(null);
