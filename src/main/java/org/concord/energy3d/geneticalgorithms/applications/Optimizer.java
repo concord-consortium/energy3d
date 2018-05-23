@@ -77,6 +77,8 @@ public abstract class Optimizer {
 
 	public abstract void applyFittest();
 
+	public abstract void displayFittest();
+
 	public void evolve() {
 
 		onStart();

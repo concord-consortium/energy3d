@@ -229,6 +229,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 			}
 		}
 		System.out.println("Fittest: " + individualToString(best));
+		displayFittest();
 	}
 
 	@Override
@@ -279,31 +280,35 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 	}
 
 	@Override
-	void updateInfo(final Individual individual) {
-		if (foundation != null) {
-			final Individual best = population.getIndividual(0);
-			String s = null;
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				s = "Daily Energy Use";
-				if (Double.isNaN(individual.getFitness())) {
-					s += ": " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
-				} else {
-					s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(-individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
-				}
-				break;
-			case ObjectiveFunction.ANNUAl:
-				s = "Annual Energy Use";
-				if (Double.isNaN(individual.getFitness())) {
-					s += ": " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
-				} else {
-					s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
-				}
-				break;
-			}
-			foundation.setLabelCustomText(s);
-			foundation.draw();
+	public void displayFittest() {
+		final Individual best = population.getIndividual(0);
+		String s = null;
+		switch (objectiveFunction.getType()) {
+		case ObjectiveFunction.DAILY:
+			s = "Daily Energy Use: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
+			break;
+		case ObjectiveFunction.ANNUAl:
+			s = "Annual Energy Use: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+			break;
 		}
+		foundation.setLabelCustomText(s);
+		foundation.draw();
+	}
+
+	@Override
+	void updateInfo(final Individual individual) {
+		final Individual best = population.getIndividual(0);
+		String s = null;
+		switch (objectiveFunction.getType()) {
+		case ObjectiveFunction.DAILY:
+			s = "Daily Energy Use\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(-individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
+			break;
+		case ObjectiveFunction.ANNUAl:
+			s = "Annual Energy Use\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+			break;
+		}
+		foundation.setLabelCustomText(s);
+		foundation.draw();
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {

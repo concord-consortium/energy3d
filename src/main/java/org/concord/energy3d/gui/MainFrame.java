@@ -3780,7 +3780,7 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	private void openModel(final URL url) {
+	public void openModel(final URL url) {
 		boolean ok = false;
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);

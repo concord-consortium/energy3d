@@ -93,15 +93,18 @@ public class MyEditorPane {
 								String s = v.toString();
 								if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) { // ad hoc protocols
 									if (s.startsWith("href=goto://")) {
-										s = s.substring(12);
-										EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s.trim());
+										s = s.substring(12).trim();
+										EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s);
 									} else if (s.startsWith("href=date://")) {
-										s = s.substring(12);
+										s = s.substring(12).trim();
 										try {
-											EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s.trim()));
+											EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
 										} catch (final ParseException e1) {
 											e1.printStackTrace();
 										}
+									} else if (s.startsWith("href=menu://")) {
+										s = s.substring(12).trim();
+										MainFrame.getInstance().openModel(MainApplication.class.getResource(s));
 									}
 								} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 									editorPane.setToolTipText(s);

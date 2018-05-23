@@ -139,6 +139,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + best.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		System.out.println("Fittest: " + individualToString(best));
+		displayFittest();
 	}
 
 	@Override
@@ -147,6 +148,36 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		s += (minimumRowSpacing + individual.getGene(0) * (maximumRowSpacing - minimumRowSpacing)) + ", ";
 		s += (2 * individual.getGene(1) - 1) * 90 + ", ";
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
+	}
+
+	@Override
+	public void displayFittest() {
+		final Individual best = population.getIndividual(0);
+		String s = null;
+		switch (objectiveFunction.getType()) {
+		case ObjectiveFunction.DAILY:
+			if (netProfit) {
+				s = "Net Daily Profit";
+			} else if (outputPerSolarPanel) {
+				s = "Daily Output per Solar Panel";
+			} else {
+				s = "Total Daily Output";
+			}
+			s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+			break;
+		case ObjectiveFunction.ANNUAl:
+			if (netProfit) {
+				s = "Net Annual Profit";
+			} else if (outputPerSolarPanel) {
+				s = "Annual Output per Solar Panel";
+			} else {
+				s = "Total Annual Output";
+			}
+			s += ": " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+			break;
+		}
+		foundation.setLabelCustomText(s);
+		foundation.draw();
 	}
 
 	@Override
@@ -162,11 +193,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			} else {
 				s = "Total Daily Output";
 			}
-			if (Double.isNaN(individual.getFitness())) {
-				s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-			} else {
-				s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-			}
+			s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 			break;
 		case ObjectiveFunction.ANNUAl:
 			if (netProfit) {
@@ -176,11 +203,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			} else {
 				s = "Total Annual Output";
 			}
-			if (Double.isNaN(individual.getFitness())) {
-				s += ": " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-			} else {
-				s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-			}
+			s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
 			break;
 		}
 		foundation.setLabelCustomText(s);

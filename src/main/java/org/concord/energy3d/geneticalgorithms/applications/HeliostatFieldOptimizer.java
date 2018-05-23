@@ -88,6 +88,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			m.draw();
 		}
 		System.out.println("Fittest: " + individualToString(best));
+		displayFittest();
 	}
 
 	@Override
@@ -115,6 +116,25 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 	}
 
 	@Override
+	public void displayFittest() {
+		final Individual best = population.getIndividual(0);
+		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
+		if (receiver != null) {
+			String s = null;
+			switch (objectiveFunction.getType()) {
+			case ObjectiveFunction.DAILY:
+				s = "Daily Output: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+				break;
+			case ObjectiveFunction.ANNUAl:
+				s = "Annual Output: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+				break;
+			}
+			receiver.setLabelCustomText(s);
+			receiver.draw();
+		}
+	}
+
+	@Override
 	void updateInfo(final Individual individual) {
 		final Individual best = population.getIndividual(0);
 		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
@@ -122,20 +142,10 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			String s = null;
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
-				s = "Daily Output";
-				if (Double.isNaN(individual.getFitness())) {
-					s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				} else {
-					s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				}
+				s = "Daily Output\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 				break;
 			case ObjectiveFunction.ANNUAl:
-				s = "Annual Output";
-				if (Double.isNaN(individual.getFitness())) {
-					s += ": " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				} else {
-					s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				}
+				s = "Annual Output\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
 				break;
 			}
 			receiver.setLabelCustomText(s);
