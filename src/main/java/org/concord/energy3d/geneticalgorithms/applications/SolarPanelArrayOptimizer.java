@@ -35,6 +35,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 	private double baseHeight;
 	private SolarPanel solarPanel;
 	private int panelRowsPerRack;
+	private boolean outputPerSolarPanel;
+	private boolean netProfit;
+	private double pricePerKWh = 0.225;
+	private double dailyCostPerSolarPanel = 0.15;
 
 	public SolarPanelArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
@@ -46,13 +50,13 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final Vector3 p = foundation.getAbsPoint(1).subtract(foundation.getAbsPoint(0), null);
 		final List<Rack> racks = foundation.getRacks();
 		final int n = racks.size();
-		if (n >= 1) {
+		if (n > 0) {
 			final Rack rack = racks.get(0);
 			solarPanel = rack.getSolarPanel();
 			baseHeight = rack.getBaseHeight() * Scene.getInstance().getScale();
 			panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
-			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight();
-			minimumRowSpacing = rack.getRackHeight();
+			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
+			minimumRowSpacing = rack.getRackHeight(); // two racks that border each other
 			final Individual firstBorn = population.getIndividual(0); // initialize the population with the first-born being the current design
 			if (n > 1) {
 				final Vector3 q = rack.getAbsCenter().subtractLocal(racks.get(1).getAbsCenter());
@@ -67,12 +71,40 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 	}
 
+	public void setPricePerKWh(final double x) {
+		pricePerKWh = x;
+	}
+
+	public void setDailyCostPerSolarPanel(final double x) {
+		dailyCostPerSolarPanel = x;
+	}
+
+	public void setOutputPerSolarPanel(final boolean b) {
+		outputPerSolarPanel = b;
+	}
+
+	public void setNetProfit(final boolean b) {
+		netProfit = b;
+	}
+
 	@Override
 	void computeIndividualFitness(final Individual individual) {
 		final double rowSpacing = minimumRowSpacing + individual.getGene(0) * (maximumRowSpacing - minimumRowSpacing);
 		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
-		individual.setFitness(objectiveFunction.compute() / foundation.countSolarPanels());
+		final double output = objectiveFunction.compute();
+		final int count = foundation.countSolarPanels();
+		if (netProfit) {
+			double cost = dailyCostPerSolarPanel;
+			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+				cost *= 12;
+			}
+			individual.setFitness(output * pricePerKWh - cost * count);
+		} else if (outputPerSolarPanel) {
+			individual.setFitness(output / count);
+		} else {
+			individual.setFitness(output);
+		}
 	}
 
 	@Override
@@ -96,13 +128,25 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 	void updateInfo() {
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
-			foundation.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			String s;
+			if (netProfit) {
+				s = "Net Daily Profit";
+			} else if (outputPerSolarPanel) {
+				s = "Daily Output per Solar Panel";
+			} else {
+				s = "Total Daily Output";
+			}
+			foundation.setLabelCustomText(s + " = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
 			break;
 		case ObjectiveFunction.ANNUAl:
-			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
-			break;
-		case ObjectiveFunction.RANDOM:
-			foundation.setLabelCustomText(null);
+			if (netProfit) {
+				s = "Net Annual Profit";
+			} else if (outputPerSolarPanel) {
+				s = "Annual Output per Solar Panel";
+			} else {
+				s = "Total Annual Output";
+			}
+			foundation.setLabelCustomText(s + " = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
 			break;
 		}
 		foundation.draw();

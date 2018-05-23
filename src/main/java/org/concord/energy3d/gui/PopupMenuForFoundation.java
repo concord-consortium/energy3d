@@ -1465,7 +1465,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
-				private int populationSize = 32;
+				private int populationSize = 20;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
@@ -1491,6 +1491,22 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Solution:"));
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Locations" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
+					panel.add(new JLabel("Minimum X (m):"));
+					final JTextField minimumXField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumX));
+					panel.add(minimumXField);
+					panel.add(new JLabel("Maximum X (m):"));
+					final JTextField maximumXField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumX));
+					panel.add(maximumXField);
+					panel.add(new JLabel("Minimum Y (m):"));
+					final JTextField minimumYField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumY));
+					panel.add(minimumYField);
+					panel.add(new JLabel("Maximum Y (m):"));
+					final JTextField maximumYField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumY));
+					panel.add(maximumYField);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1498,10 +1514,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
-					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
-					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
@@ -1517,18 +1529,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					panel.add(new JLabel("Minimum X (m):"));
-					final JTextField minimumXField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumX));
-					panel.add(minimumXField);
-					panel.add(new JLabel("Maximum X (m):"));
-					final JTextField maximumXField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumX));
-					panel.add(maximumXField);
-					panel.add(new JLabel("Minimum Y (m):"));
-					final JTextField minimumYField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumY));
-					panel.add(minimumYField);
-					panel.add(new JLabel("Maximum Y (m):"));
-					final JTextField maximumYField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumY));
-					panel.add(maximumYField);
 
 					SpringUtilities.makeCompactGrid(panel, 13, 2, 6, 6, 6, 6);
 
@@ -1594,7 +1594,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
-				private int populationSize = 32;
+				private int populationSize = 20;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
@@ -1621,6 +1621,22 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Solution:"));
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Window Sizes" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
+					panel.add(new JLabel("Minimum width (relative to wall width):"));
+					final JTextField minimumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumWidthRelative));
+					panel.add(minimumWidthField);
+					panel.add(new JLabel("Maximum width (relative to wall width):"));
+					final JTextField maximumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumWidthRelative));
+					panel.add(maximumWidthField);
+					panel.add(new JLabel("Minimum height (relative to wall height):"));
+					final JTextField minimumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumHeightRelative));
+					panel.add(minimumHeightField);
+					panel.add(new JLabel("Maximum height (relative to wall height):"));
+					final JTextField maximumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumHeightRelative));
+					panel.add(maximumHeightField);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1628,10 +1644,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
-					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
-					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
@@ -1651,18 +1663,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> optimizeIndividualWindowsComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
 					optimizeIndividualWindowsComboBox.setSelectedIndex(optimizeIndividualWindows ? 1 : 0);
 					panel.add(optimizeIndividualWindowsComboBox);
-					panel.add(new JLabel("Minimum width (relative to wall width):"));
-					final JTextField minimumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumWidthRelative));
-					panel.add(minimumWidthField);
-					panel.add(new JLabel("Maximum width (relative to wall width):"));
-					final JTextField maximumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumWidthRelative));
-					panel.add(maximumWidthField);
-					panel.add(new JLabel("Minimum height (relative to wall height):"));
-					final JTextField minimumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumHeightRelative));
-					panel.add(minimumHeightField);
-					panel.add(new JLabel("Maximum height (relative to wall height):"));
-					final JTextField maximumHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumHeightRelative));
-					panel.add(maximumHeightField);
 
 					SpringUtilities.makeCompactGrid(panel, 14, 2, 6, 6, 6, 6);
 
@@ -1743,7 +1743,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
-				private int populationSize = 32;
+				private int populationSize = 20;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
@@ -1765,6 +1765,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Solution:"));
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Tilt Angles" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1772,10 +1776,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
-					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
-					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
@@ -1847,10 +1847,12 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
-				private int populationSize = 32;
+				private int populationSize = 20;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
+				private double pricePerKWh = 0.225;
+				private double dailyCostPerPanel = 0.15;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1867,8 +1869,18 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Solution:"));
-					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Row Spacing & Tilt Angle" });
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Solar Panel Array Layout" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Daily Output per Solar Panel", "Annual Output per Solar Panel", "Net Daily Profit", "Net Annual Profit" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
+					panel.add(new JLabel("Electricity price ($/kWh):"));
+					final JTextField priceField = new JTextField(pricePerKWh + "");
+					panel.add(priceField);
+					panel.add(new JLabel("Daily cost per solar panel ($):"));
+					final JTextField dailyCostField = new JTextField(dailyCostPerPanel + "");
+					panel.add(dailyCostField);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1876,10 +1888,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
-					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Average Daily Output", "Average Annual Output" });
-					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
@@ -1895,7 +1903,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 11, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1913,6 +1921,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								maximumGenerations = Integer.parseInt(generationField.getText());
 								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 								mutationRate = Double.parseDouble(mutationRateField.getText());
+								pricePerKWh = Double.parseDouble(priceField.getText());
+								dailyCostPerPanel = Double.parseDouble(dailyCostField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1932,6 +1942,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									final SolarPanelArrayOptimizer op = new SolarPanelArrayOptimizer(populationSize, 2, selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
+									op.setPricePerKWh(pricePerKWh);
+									op.setDailyCostPerSolarPanel(dailyCostPerPanel);
 									switch (selectedFitnessFunction) {
 									case 0:
 										op.setOjectiveFunction(ObjectiveFunction.DAILY);
@@ -1941,9 +1953,19 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										break;
 									case 2:
 										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setOutputPerSolarPanel(true);
 										break;
 									case 3:
 										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setOutputPerSolarPanel(true);
+										break;
+									case 4:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setNetProfit(true);
+										break;
+									case 5:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setNetProfit(true);
 										break;
 									}
 									op.setFoundation(foundation);
@@ -1964,7 +1986,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
-				private int populationSize = 32;
+				private int populationSize = 20;
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
@@ -1986,6 +2008,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Solution:"));
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1993,10 +2019,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
-					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
-					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
@@ -2073,10 +2095,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						return;
 					}
 					final Foundation foundation = (Foundation) selectedPart;
-					miBuildingLocation.setEnabled(foundation.getWalls().size() > 0);
+					miBuildingLocation.setEnabled(!foundation.getLockEdit() && foundation.getWalls().size() > 0);
 					miWindows.setEnabled(foundation.getWindows().size() > 0);
 					miSolarPanelTiltAngle.setEnabled(foundation.getRacks().size() > 0);
-					miSolarPanelArrays.setEnabled(foundation.getRacks().size() > 0);
+					miSolarArray.setEnabled(foundation.getRacks().size() > 0);
 					miHeliostatFieldOutput.setEnabled(foundation.getHeliostats().size() > 0);
 				}
 

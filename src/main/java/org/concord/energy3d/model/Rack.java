@@ -66,7 +66,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private ReadOnlyVector3 previousNormal;
-	private double rackWidth = 4.95; // 5x1 0.99x1.65 solar panels by default (use only one row so that it can fit a small roof)
+	private double rackWidth = 4.95; // 5x1 0.99m x 1.65m solar panels by default (use only one row so that it can fit a small roof)
 	private double rackHeight = 1.65;
 	private double relativeAzimuth;
 	private transient double oldRelativeAzimuth;
