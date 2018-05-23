@@ -1995,7 +1995,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final static double MERCATOR_PROJECTION_SCALE_CONSTANT = BOSTON_MAP_SCALE_FACTOR / Math.cos(Math.toRadians(Heliodon.DEFAULT_LATITUDE));
 
 	private void initGroundImageLand(final double scale) {
-		final double d = BOSTON_MAP_SCALE_FACTOR / 0.2 * scale; // 0.2 is the obsolete annotation scale by default, can't call Scene.getAnnotationScale() yet
+		final double d = BOSTON_MAP_SCALE_FACTOR / 0.2 * scale; // 0.2 is the obsolete annotation scale by default, can't call Scene.getSceneScale() yet
 		groundImageLand.resize(d, d);
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);

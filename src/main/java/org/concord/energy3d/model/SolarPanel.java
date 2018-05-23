@@ -366,11 +366,11 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 		updateEditShapes();
 
-		final double annotationScaleFactor = 0.5 / Scene.getInstance().getScale();
+		final double sceneScaleFactor = 0.5 / Scene.getInstance().getScale();
 		if (rotated) {
-			surround.setData(new Vector3(), panelHeight * annotationScaleFactor, panelWidth * annotationScaleFactor, 0.15);
+			surround.setData(new Vector3(), panelHeight * sceneScaleFactor, panelWidth * sceneScaleFactor, 0.15);
 		} else {
-			surround.setData(new Vector3(), panelWidth * annotationScaleFactor, panelHeight * annotationScaleFactor, 0.15);
+			surround.setData(new Vector3(), panelWidth * sceneScaleFactor, panelHeight * sceneScaleFactor, 0.15);
 		}
 		surround.updateModelBound();
 
@@ -815,7 +815,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		c.meshLocator = meshLocator; // deepy copy creates a copy of the foundation, we don't want that
 		if (check) {
 			// normal = c.computeNormalAndKeepOnSurface();
-			final double annotationScale = Scene.getInstance().getScale();
+			final double sceneScale = Scene.getInstance().getScale();
 			if (container instanceof Roof || container instanceof Rack) {
 				if (normal == null) {
 					// don't remove this error message just in case this happens again
@@ -829,7 +829,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 					final Vector3 p2 = foundation.getAbsPoint(2);
 					final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 					final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-					final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / annotationScale;
+					final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / sceneScale;
 					final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 					final double tx = length / p0.distance(p2);
 					final double ty = length / p0.distance(p1);
@@ -844,7 +844,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 						d.set(1, 0, 0);
 					}
 					final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
-					d.multiplyLocal((1 + layoutGap) * (rotated ? panelHeight : panelWidth) / annotationScale);
+					d.multiplyLocal((1 + layoutGap) * (rotated ? panelHeight : panelWidth) / sceneScale);
 					d.addLocal(getContainerRelative().getPoints().get(0));
 					final Vector3 v = toRelative(d);
 					c.points.get(0).setX(points.get(0).getX() + s * v.getX());
@@ -855,8 +855,8 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 				if (container instanceof Roof) {
 					isOutside = !((Roof) c.container).insideWallsPolygon(c.getAbsCenter());
 				} else if (container instanceof Rack) {
-					final double panelDx = (rotated ? panelHeight : panelWidth) / 2 / annotationScale;
-					final double rackDx = ((Rack) container).getRackWidth() / 2 / annotationScale;
+					final double panelDx = (rotated ? panelHeight : panelWidth) / 2 / sceneScale;
+					final double rackDx = ((Rack) container).getRackWidth() / 2 / sceneScale;
 					isOutside = c.getAbsPoint(0).multiplyLocal(1, 1, 0).distance(container.getAbsPoint(0).multiplyLocal(1, 1, 0)) > rackDx - panelDx;
 				} else {
 					isOutside = false;
@@ -876,7 +876,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 				final Vector3 p2 = container.getAbsPoint(2);
 				final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 				final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / annotationScale;
+				final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / sceneScale;
 				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 				final double tx = length / p0.distance(p2);
 				final double ty = length / p0.distance(p1);
@@ -899,7 +899,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 				}
 			} else if (container instanceof Wall) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * annotationScale);
+				final double shift = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * sceneScale);
 				final double newX = points.get(0).getX() + s * shift;
 				if (newX > 1 - shift / 2 || newX < shift / 2) {
 					return null;

@@ -391,8 +391,8 @@ public class SolarRadiation {
 
 		final int timeStep = Scene.getInstance().getTimeStep();
 		final double solarStep = Scene.getInstance().getSolarStep();
-		final double annotationScale = Scene.getInstance().getScale();
-		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final double sceneScale = Scene.getInstance().getScale();
+		final double scaleFactor = sceneScale * sceneScale / 60 * timeStep;
 		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo(); // a window itself doesn't really absorb solar energy, but it passes the energy into the house to be absorbed
 
 		if (housePart instanceof Roof) { // for now, only store this for roofs that have different meshes
@@ -499,8 +499,8 @@ public class SolarRadiation {
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double solarStep = Scene.getInstance().getSolarStep();
-		final double annotationScale = Scene.getInstance().getScale();
-		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final double sceneScale = Scene.getInstance().getScale();
+		final double scaleFactor = sceneScale * sceneScale / 60 * timeStep;
 		final float absorption = 1 - foundation.getAlbedo();
 
 		for (int col = 0; col < data.cols; col++) {

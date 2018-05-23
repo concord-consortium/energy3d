@@ -116,8 +116,8 @@ public class Sensor extends HousePart implements SolarCollector {
 		}
 		updateEditShapes();
 
-		final double annotationScale = Scene.getInstance().getScale();
-		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.02); // last arg sets close to zero so the sensor doesn't cast shadow
+		final double sceneScale = Scene.getInstance().getScale();
+		surround.setData(Vector3.ZERO, WIDTH / 2.0 / sceneScale, HEIGHT / 2.0 / sceneScale, 0.02); // last arg sets close to zero so the sensor doesn't cast shadow
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();

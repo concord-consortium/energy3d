@@ -433,8 +433,8 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 
-		final double annotationScale = Scene.getInstance().getScale();
-		surround.setData(new Vector3(0, 0, 0), 0.5 * rackWidth / annotationScale, 0.5 * rackHeight / annotationScale, 0.15);
+		final double sceneScale = Scene.getInstance().getScale();
+		surround.setData(new Vector3(0, 0, 0), 0.5 * rackWidth / sceneScale, 0.5 * rackHeight / sceneScale, 0.15);
 		surround.updateModelBound();
 
 		final boolean heatMap = SceneManager.getInstance().getSolarHeatMap();
@@ -510,16 +510,16 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 					final double halfRackHeightHorizontal = 0.5 * rackHeightHorizontal;
 					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
 						for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
-							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double vFactor = (v - halfRackHeightHorizontal) / sceneScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / sceneScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 							final double dz = tanTiltAngle * vFactor;
 							if (baseHeight > dz) {
 								addPole(position, baseHeight - dz, baseZ);
 							}
 						}
 						for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
-							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double vFactor = (v - halfRackHeightHorizontal) / sceneScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / sceneScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 							final double dz = tanTiltAngle * vFactor;
 							if (baseHeight > dz) {
 								addPole(position, baseHeight - dz, baseZ);
@@ -528,16 +528,16 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 					}
 					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
 						for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
-							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double vFactor = (v - halfRackHeightHorizontal) / sceneScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / sceneScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 							final double dz = tanTiltAngle * vFactor;
 							if (baseHeight > dz) {
 								addPole(position, baseHeight - dz, baseZ);
 							}
 						}
 						for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
-							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double vFactor = (v - halfRackHeightHorizontal) / sceneScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / sceneScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 							final double dz = tanTiltAngle * vFactor;
 							if (baseHeight > dz) {
 								addPole(position, baseHeight - dz, baseZ);
@@ -557,10 +557,10 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 					final double halfLength = rackWidth * 0.5;
 					final Vector3 qd = new Matrix3().applyRotationZ(az).applyPost(pd, null);
 					for (double u = halfLength; u < rackWidth; u += poleDistanceX) {
-						addPole(qd.multiply((u - halfLength) / annotationScale, null).addLocal(center), baseHeight, baseZ);
+						addPole(qd.multiply((u - halfLength) / sceneScale, null).addLocal(center), baseHeight, baseZ);
 					}
 					for (double u = halfLength - poleDistanceX; u > 0; u -= poleDistanceX) {
-						addPole(qd.multiply((u - halfLength) / annotationScale, null).addLocal(center), baseHeight, baseZ);
+						addPole(qd.multiply((u - halfLength) / sceneScale, null).addLocal(center), baseHeight, baseZ);
 					}
 				} else {
 					addPole(center, baseHeight, baseZ);

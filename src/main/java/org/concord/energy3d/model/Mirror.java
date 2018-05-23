@@ -179,8 +179,8 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
-		final double annotationScale = Scene.getInstance().getScale();
-		surround.setData(new Vector3(), 0.5 * mirrorWidth / annotationScale, 0.5 * mirrorHeight / annotationScale, 0.15);
+		final double sceneScale = Scene.getInstance().getScale();
+		surround.setData(new Vector3(), 0.5 * mirrorWidth / sceneScale, 0.5 * mirrorHeight / sceneScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();

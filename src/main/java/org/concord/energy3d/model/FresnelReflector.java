@@ -274,8 +274,8 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		points.get(0).setZ(baseZ + baseHeight);
 
 		final Vector3 center = getAbsPoint(0);
-		final double annotationScale = Scene.getInstance().getScale();
-		reflector.setData(new Vector3(), 0.5 * moduleWidth / annotationScale, 0.5 * length / annotationScale, 0.15);
+		final double sceneScale = Scene.getInstance().getScale();
+		reflector.setData(new Vector3(), 0.5 * moduleWidth / sceneScale, 0.5 * length / sceneScale, 0.15);
 		reflector.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = reflector.getMeshData().getVertexBuffer();
@@ -332,7 +332,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			final Vector3 pm = p2.add(p0, null).multiplyLocal(0.5);
 			final Vector3 pn = p2.subtract(p0, null).multiplyLocal(0.5);
 			for (double u = moduleLength; u < length; u += moduleLength) { // outline buffer will be rotated later
-				final Vector3 p = pd.multiply(u / annotationScale, null).addLocal(pm);
+				final Vector3 p = pd.multiply(u / sceneScale, null).addLocal(pm);
 				final Vector3 q = p.add(pn, null);
 				outlineBuffer.put(q.getXf()).put(q.getYf()).put(q.getZf());
 				p.subtractLocal(pn);
@@ -340,7 +340,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			}
 			final Vector3 qd = new Matrix3().applyRotationZ(-absoluteAzimuth).applyPost(pd, null);
 			for (double u = moduleLength; u < length; u += moduleLength) {
-				addPole(qd.multiply((u - 0.5 * length) / annotationScale, null).addLocal(center), baseHeight, baseZ);
+				addPole(qd.multiply((u - 0.5 * length) / sceneScale, null).addLocal(center), baseHeight, baseZ);
 			}
 		} else {
 			addPole(center, baseHeight, baseZ);

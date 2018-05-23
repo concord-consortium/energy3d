@@ -330,9 +330,9 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final double az = Math.toRadians(relativeAzimuth);
 
-		final double annotationScale = Scene.getInstance().getScale();
-		reflector.setSize(apertureWidth / annotationScale, troughLength / annotationScale);
-		reflector.setSemilatusRectum(semilatusRectum / annotationScale);
+		final double sceneScale = Scene.getInstance().getScale();
+		reflector.setSize(apertureWidth / sceneScale, troughLength / sceneScale);
+		reflector.setSemilatusRectum(semilatusRectum / sceneScale);
 		reflector.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
@@ -385,7 +385,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		// draw seam lines between units
 		if (nModules > 1) { // if there is only one module, don't draw
 			for (int k = 1; k < nModules; k++) {
-				final double ua = k * moduleLength / annotationScale;
+				final double ua = k * moduleLength / sceneScale;
 				for (int i = 0; i < vertexCount - 1; i++) {
 					i3 = i * 3;
 					final Vector3 v1 = new Vector3(vertexBuffer.get(i3), vertexBuffer.get(i3 + 1), vertexBuffer.get(i3 + 2));
@@ -413,7 +413,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		if (nModules > 1) {
 			final Vector3 qd = new Matrix3().applyRotationZ(-az).applyPost(pd, null);
 			for (double u = moduleLength; u < troughLength; u += moduleLength) {
-				final double step = (u - halfLength) / annotationScale;
+				final double step = (u - halfLength) / sceneScale;
 				final Vector3 p = pd.multiply(step, null);
 				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));

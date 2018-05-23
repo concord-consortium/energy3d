@@ -121,8 +121,8 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		}
 		detailed = Scene.getInstance().countParts(getClass()) < 500;
 
-		final double annotationScale = Scene.getInstance().getScale();
-		mesh = new Paraboloid("Paraboloid", rimRadius / annotationScale, 2.0 * Math.sqrt(focalLength / annotationScale), nAxialSections, nRadialSections);
+		final double sceneScale = Scene.getInstance().getScale();
+		mesh = new Paraboloid("Paraboloid", rimRadius / sceneScale, 2.0 * Math.sqrt(focalLength / sceneScale), nAxialSections, nRadialSections);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -265,8 +265,8 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
 
-		final double annotationScale = Scene.getInstance().getScale();
-		dish.setRimRadius(rimRadius / annotationScale);
+		final double sceneScale = Scene.getInstance().getScale();
+		dish.setRimRadius(rimRadius / sceneScale);
 		dish.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
@@ -334,7 +334,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		p.setZ(baseZ + post.getHeight() / 2);
 		post.setTranslation(p);
 
-		final double flScaled = focalLength / annotationScale;
+		final double flScaled = focalLength / sceneScale;
 		receiver.setRotation(rotation);
 		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
 

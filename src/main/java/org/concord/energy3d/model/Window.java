@@ -617,8 +617,8 @@ public class Window extends HousePart implements Thermal {
 			final Vector3 p1 = getAbsPoint(1);
 			final Vector3 p2 = getAbsPoint(2);
 			final double C = 100.0;
-			final double annotationScale = Scene.getInstance().getScale();
-			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
+			final double sceneScale = Scene.getInstance().getScale();
+			area = Math.round(Math.round(p2.subtract(p0, null).length() * sceneScale * C) / C * Math.round(p1.subtract(p0, null).length() * sceneScale * C) / C * C) / C;
 		} else {
 			area = 0.0;
 		}
