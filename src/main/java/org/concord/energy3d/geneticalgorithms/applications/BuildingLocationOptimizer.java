@@ -72,8 +72,20 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		// initialize the population with the first-born being the current design
 		final Vector3 center = foundation.getAbsCenter();
 		final Individual firstBorn = population.getIndividual(0);
-		firstBorn.setGene(0, (center.getX() * Scene.getInstance().getScale() - xmin) / (xmax - xmin));
-		firstBorn.setGene(1, (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin));
+		double normalizedValue = (center.getX() * Scene.getInstance().getScale() - xmin) / (xmax - xmin);
+		if (normalizedValue < 0) {
+			normalizedValue = 0;
+		} else if (normalizedValue > 1) {
+			normalizedValue = 1;
+		}
+		firstBorn.setGene(0, normalizedValue);
+		normalizedValue = (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin);
+		if (normalizedValue < 0) {
+			normalizedValue = 0;
+		} else if (normalizedValue > 1) {
+			normalizedValue = 1;
+		}
+		firstBorn.setGene(1, normalizedValue);
 	}
 
 	@Override
@@ -104,18 +116,28 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 	}
 
 	@Override
-	void updateInfo() {
+	void updateInfo(final Individual individual) {
+		final Individual best = population.getIndividual(0);
+		String s = null;
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
-			foundation.setLabelCustomText("Daily Energy Use = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
+			s = "Daily Energy Use";
+			if (Double.isNaN(individual.getFitness())) {
+				s += ": " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness());
+			} else {
+				s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness()) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness());
+			}
 			break;
 		case ObjectiveFunction.ANNUAl:
-			foundation.setLabelCustomText("Annual Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
-			break;
-		case ObjectiveFunction.RANDOM:
-			foundation.setLabelCustomText(null);
+			s = "Annual Energy Use";
+			if (Double.isNaN(individual.getFitness())) {
+				s += ": " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+			} else {
+				s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness() * 365.0 / 12.0) + "\nTop: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+			}
 			break;
 		}
+		foundation.setLabelCustomText(s);
 		foundation.draw();
 		EventQueue.invokeLater(new Runnable() {
 			@Override

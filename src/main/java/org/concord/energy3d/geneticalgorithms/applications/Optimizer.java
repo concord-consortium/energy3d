@@ -171,7 +171,7 @@ public abstract class Optimizer {
 				}
 
 				computeCounter++;
-				updateInfo();
+				updateInfo(population.getIndividual(indexOfIndividual));
 				return null;
 
 			}
@@ -249,7 +249,7 @@ public abstract class Optimizer {
 		Scene.getInstance().redrawAllNow();
 	}
 
-	abstract void updateInfo();
+	abstract void updateInfo(Individual individual);
 
 	public void setCrossoverRate(final double crossoverRate) {
 		this.crossoverRate = crossoverRate;

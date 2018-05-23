@@ -1853,6 +1853,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private double mutationRate = 0.1;
 				private double pricePerKWh = 0.225;
 				private double dailyCostPerPanel = 0.15;
+				private int minimumPanelRows = 1;
+				private int maximumPanelRows = 5;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1881,6 +1883,12 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Daily cost per solar panel ($):"));
 					final JTextField dailyCostField = new JTextField(dailyCostPerPanel + "");
 					panel.add(dailyCostField);
+					panel.add(new JLabel("Minimum rows of solar panels on a rack:"));
+					final JTextField minimumPanelRowsField = new JTextField(minimumPanelRows + "");
+					panel.add(minimumPanelRowsField);
+					panel.add(new JLabel("Maximum rows of solar panels on a rack:"));
+					final JTextField maximumPanelRowsField = new JTextField(maximumPanelRows + "");
+					panel.add(maximumPanelRowsField);
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
@@ -1903,7 +1911,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 11, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 13, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -1923,6 +1931,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								mutationRate = Double.parseDouble(mutationRateField.getText());
 								pricePerKWh = Double.parseDouble(priceField.getText());
 								dailyCostPerPanel = Double.parseDouble(dailyCostField.getText());
+								minimumPanelRows = Integer.parseInt(minimumPanelRowsField.getText());
+								maximumPanelRows = Integer.parseInt(maximumPanelRowsField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -1936,6 +1946,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumPanelRows < 1 || maximumPanelRows < 1 || maximumPanelRows <= minimumPanelRows || maximumPanelRows > 8 || minimumPanelRows > 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problems in minimum or maximum rows of solar panels on a rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
@@ -1944,6 +1956,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									op.setMutationRate(mutationRate);
 									op.setPricePerKWh(pricePerKWh);
 									op.setDailyCostPerSolarPanel(dailyCostPerPanel);
+									op.setMinimumPanelRows(minimumPanelRows);
+									op.setMaximumPanelRows(maximumPanelRows);
 									switch (selectedFitnessFunction) {
 									case 0:
 										op.setOjectiveFunction(ObjectiveFunction.DAILY);

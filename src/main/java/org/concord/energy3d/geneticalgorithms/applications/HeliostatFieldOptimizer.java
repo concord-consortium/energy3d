@@ -115,20 +115,30 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 	}
 
 	@Override
-	void updateInfo() {
+	void updateInfo(final Individual individual) {
+		final Individual best = population.getIndividual(0);
 		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
 		if (receiver != null) {
+			String s = null;
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
-				receiver.setLabelCustomText("Daily Output = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
+				s = "Daily Output";
+				if (Double.isNaN(individual.getFitness())) {
+					s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+				} else {
+					s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+				}
 				break;
 			case ObjectiveFunction.ANNUAl:
-				receiver.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
-				break;
-			case ObjectiveFunction.RANDOM:
-				receiver.setLabelCustomText(null);
+				s = "Annual Output";
+				if (Double.isNaN(individual.getFitness())) {
+					s += ": " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+				} else {
+					s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+				}
 				break;
 			}
+			receiver.setLabelCustomText(s);
 			receiver.draw();
 		}
 		EventQueue.invokeLater(new Runnable() {

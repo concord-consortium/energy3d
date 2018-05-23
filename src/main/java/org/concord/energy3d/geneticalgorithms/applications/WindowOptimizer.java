@@ -76,20 +76,20 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 					final double maxWidth = maximumWidthRelative * wallWidth;
 					final double minHeight = minimumHeightRelative * wallHeight;
 					final double maxHeight = maximumHeightRelative * wallHeight;
-					double val = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
-					if (val < 0) {
-						val = 0;
-					} else if (val > 1) {
-						val = 1;
+					double normalizedValue = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
+					if (normalizedValue < 0) {
+						normalizedValue = 0;
+					} else if (normalizedValue > 1) {
+						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, val);
-					val = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
-					if (val < 0) {
-						val = 0;
-					} else if (val > 1) {
-						val = 1;
+					firstBorn.setGene(i++, normalizedValue);
+					normalizedValue = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
+					if (normalizedValue < 0) {
+						normalizedValue = 0;
+					} else if (normalizedValue > 1) {
+						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, val);
+					firstBorn.setGene(i++, normalizedValue);
 				} else {
 					throw new RuntimeException("Windows must be on walls!");
 				}
@@ -107,20 +107,20 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 					final double minHeight = minimumHeightRelative * wallHeight;
 					final double maxHeight = maximumHeightRelative * wallHeight;
 					final Window w = windows.get(0);
-					double val = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
-					if (val < 0) {
-						val = 0;
-					} else if (val > 1) {
-						val = 1;
+					double normalizedValue = (w.getWindowWidth() - minWidth) / (maxWidth - minWidth);
+					if (normalizedValue < 0) {
+						normalizedValue = 0;
+					} else if (normalizedValue > 1) {
+						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, val);
-					val = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
-					if (val < 0) {
-						val = 0;
-					} else if (val > 1) {
-						val = 1;
+					firstBorn.setGene(i++, normalizedValue);
+					normalizedValue = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
+					if (normalizedValue < 0) {
+						normalizedValue = 0;
+					} else if (normalizedValue > 1) {
+						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, val);
+					firstBorn.setGene(i++, normalizedValue);
 				}
 			}
 		}
@@ -279,19 +279,29 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 	}
 
 	@Override
-	void updateInfo() {
+	void updateInfo(final Individual individual) {
 		if (foundation != null) {
+			final Individual best = population.getIndividual(0);
+			String s = null;
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
-				foundation.setLabelCustomText("Daily Energy Use = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
+				s = "Daily Energy Use";
+				if (Double.isNaN(individual.getFitness())) {
+					s += ": " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
+				} else {
+					s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(-individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
+				}
 				break;
 			case ObjectiveFunction.ANNUAl:
-				foundation.setLabelCustomText("Annual Energy Use = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
-				break;
-			case ObjectiveFunction.RANDOM:
-				foundation.setLabelCustomText(null);
+				s = "Annual Energy Use";
+				if (Double.isNaN(individual.getFitness())) {
+					s += ": " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+				} else {
+					s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
+				}
 				break;
 			}
+			foundation.setLabelCustomText(s);
 			foundation.draw();
 		}
 		EventQueue.invokeLater(new Runnable() {

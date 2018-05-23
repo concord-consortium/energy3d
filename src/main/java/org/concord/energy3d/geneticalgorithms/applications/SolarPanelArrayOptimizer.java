@@ -32,8 +32,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 
 	private double minimumRowSpacing;
 	private double maximumRowSpacing;
-	private final int minimumPanelRows = 1;
-	private final int maximumPanelRows = 5;
+	private int minimumPanelRows = 1;
+	private int maximumPanelRows = 5;
 	private double baseHeight;
 	private SolarPanel solarPanel;
 	private boolean outputPerSolarPanel;
@@ -58,19 +58,40 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			final int panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
 			minimumRowSpacing = rack.getRackHeight(); // two racks that border each other
+			double normalizedValue;
 			final Individual firstBorn = population.getIndividual(0); // initialize the population with the first-born being the current design
 			if (n > 1) {
 				final Vector3 q = rack.getAbsCenter().subtractLocal(racks.get(1).getAbsCenter());
 				final double rowSpacing = Math.abs(q.dot(p.normalize(null))) * Scene.getInstance().getScale();
-				firstBorn.setGene(0, (rowSpacing - minimumRowSpacing) / (maximumRowSpacing - minimumRowSpacing));
+				normalizedValue = (rowSpacing - minimumRowSpacing) / (maximumRowSpacing - minimumRowSpacing);
+				if (normalizedValue < 0) {
+					normalizedValue = 0;
+				} else if (normalizedValue > 1) {
+					normalizedValue = 1;
+				}
+				firstBorn.setGene(0, normalizedValue);
 			} else {
 				firstBorn.setGene(0, 1);
 			}
 			firstBorn.setGene(1, 0.5 * (1.0 + rack.getTiltAngle() / 90.0));
-			firstBorn.setGene(2, (double) (panelRowsPerRack - minimumPanelRows) / (double) (maximumPanelRows - minimumPanelRows));
+			normalizedValue = (double) (panelRowsPerRack - minimumPanelRows) / (double) (maximumPanelRows - minimumPanelRows);
+			if (normalizedValue < 0) {
+				normalizedValue = 0;
+			} else if (normalizedValue > 1) {
+				normalizedValue = 1;
+			}
+			firstBorn.setGene(2, normalizedValue);
 		} else {
 			throw new RuntimeException("Must have at least one solar panel rack on this foundation");
 		}
+	}
+
+	public void setMinimumPanelRows(final int min) {
+		minimumPanelRows = min;
+	}
+
+	public void setMaximumPanelRows(final int max) {
+		maximumPanelRows = max;
 	}
 
 	public void setPricePerKWh(final double x) {
@@ -129,10 +150,11 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 	}
 
 	@Override
-	void updateInfo() {
+	void updateInfo(final Individual individual) {
+		final Individual best = population.getIndividual(0);
+		String s = null;
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
-			String s;
 			if (netProfit) {
 				s = "Net Daily Profit";
 			} else if (outputPerSolarPanel) {
@@ -140,7 +162,11 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			} else {
 				s = "Total Daily Output";
 			}
-			foundation.setLabelCustomText(s + " = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
+			if (Double.isNaN(individual.getFitness())) {
+				s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+			} else {
+				s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+			}
 			break;
 		case ObjectiveFunction.ANNUAl:
 			if (netProfit) {
@@ -150,9 +176,14 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			} else {
 				s = "Total Annual Output";
 			}
-			foundation.setLabelCustomText(s + " = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
+			if (Double.isNaN(individual.getFitness())) {
+				s += ": " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+			} else {
+				s += "\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+			}
 			break;
 		}
+		foundation.setLabelCustomText(s);
 		foundation.draw();
 		EventQueue.invokeLater(new Runnable() {
 			@Override
