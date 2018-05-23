@@ -78,8 +78,8 @@ class VisualizationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.01-100 meters (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (heatVectorLength < 1000) {
-					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Heat arrow length must be greater than 1000.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (heatVectorLength < 100) {
+					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Heat arrow length must be greater than 100.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (heatVectorGridSize < 0.4) {

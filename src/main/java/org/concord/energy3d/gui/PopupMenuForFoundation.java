@@ -1939,7 +1939,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final SolarPanelArrayOptimizer op = new SolarPanelArrayOptimizer(populationSize, 2, selectedSelectionMethod, convergenceThreshold, 0);
+									final SolarPanelArrayOptimizer op = new SolarPanelArrayOptimizer(populationSize, 3, selectedSelectionMethod, convergenceThreshold, 0);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
 									op.setPricePerKWh(pricePerKWh);

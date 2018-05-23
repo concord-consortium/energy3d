@@ -78,7 +78,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 	void updateInfo() {
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
-			foundation.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			foundation.setLabelCustomText("Daily Output = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
 			break;
 		case ObjectiveFunction.ANNUAl:
 			foundation.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));

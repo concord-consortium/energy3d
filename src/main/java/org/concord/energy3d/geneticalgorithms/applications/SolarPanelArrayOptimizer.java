@@ -21,7 +21,7 @@ import com.ardor3d.math.Vector3;
 /**
  * Chromosome of an individual is encoded as follows:
  * 
- * row spacing (d), tilt angle (a)
+ * row spacing (d), tilt angle (a), panel row number on rack (r)
  *
  * assuming the base height is fixed and the number of rows on each rack increases when the tilt angle decreases (otherwise the maximum inter-row spacing would always be preferred)
  * 
@@ -32,9 +32,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 
 	private double minimumRowSpacing;
 	private double maximumRowSpacing;
+	private final int minimumPanelRows = 1;
+	private final int maximumPanelRows = 5;
 	private double baseHeight;
 	private SolarPanel solarPanel;
-	private int panelRowsPerRack;
 	private boolean outputPerSolarPanel;
 	private boolean netProfit;
 	private double pricePerKWh = 0.225;
@@ -54,7 +55,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			final Rack rack = racks.get(0);
 			solarPanel = rack.getSolarPanel();
 			baseHeight = rack.getBaseHeight() * Scene.getInstance().getScale();
-			panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
+			final int panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
 			minimumRowSpacing = rack.getRackHeight(); // two racks that border each other
 			final Individual firstBorn = population.getIndividual(0); // initialize the population with the first-born being the current design
@@ -66,6 +67,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				firstBorn.setGene(0, 1);
 			}
 			firstBorn.setGene(1, 0.5 * (1.0 + rack.getTiltAngle() / 90.0));
+			firstBorn.setGene(2, (double) (panelRowsPerRack - minimumPanelRows) / (double) (maximumPanelRows - minimumPanelRows));
 		} else {
 			throw new RuntimeException("Must have at least one solar panel rack on this foundation");
 		}
@@ -91,6 +93,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 	void computeIndividualFitness(final Individual individual) {
 		final double rowSpacing = minimumRowSpacing + individual.getGene(0) * (maximumRowSpacing - minimumRowSpacing);
 		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
+		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + individual.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		final double output = objectiveFunction.compute();
 		final int count = foundation.countSolarPanels();
@@ -112,6 +115,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final Individual best = population.getFittest();
 		final double rowSpacing = minimumRowSpacing + best.getGene(0) * (maximumRowSpacing - minimumRowSpacing);
 		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
+		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + best.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		System.out.println("Fittest: " + individualToString(best));
 	}
@@ -136,7 +140,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			} else {
 				s = "Total Daily Output";
 			}
-			foundation.setLabelCustomText(s + " = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+			foundation.setLabelCustomText(s + " = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
 			break;
 		case ObjectiveFunction.ANNUAl:
 			if (netProfit) {

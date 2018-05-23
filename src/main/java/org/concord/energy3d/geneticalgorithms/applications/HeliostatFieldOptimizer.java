@@ -120,7 +120,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 		if (receiver != null) {
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
-				receiver.setLabelCustomText("Daily Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness()));
+				receiver.setLabelCustomText("Daily Output = " + EnergyPanel.TWO_DECIMALS.format(population.getIndividual(0).getFitness()));
 				break;
 			case ObjectiveFunction.ANNUAl:
 				receiver.setLabelCustomText("Annual Output = " + EnergyPanel.ONE_DECIMAL.format(population.getIndividual(0).getFitness() * 365.0 / 12.0));
