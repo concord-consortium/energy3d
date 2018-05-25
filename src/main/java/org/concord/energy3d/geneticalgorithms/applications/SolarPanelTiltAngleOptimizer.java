@@ -89,6 +89,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 		}
 		foundation.setLabelCustomText(s);
 		foundation.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

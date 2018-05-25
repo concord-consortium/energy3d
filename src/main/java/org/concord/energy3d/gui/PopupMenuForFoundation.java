@@ -1874,7 +1874,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Solar Panel Array Layout" });
 					panel.add(solutionComboBox);
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Daily Output per Solar Panel", "Annual Output per Solar Panel", "Net Daily Profit", "Net Annual Profit" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Daily Output per Solar Panel", "Annual Output per Solar Panel", "Daily Profit", "Annual Profit" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel("Electricity price ($/kWh):"));

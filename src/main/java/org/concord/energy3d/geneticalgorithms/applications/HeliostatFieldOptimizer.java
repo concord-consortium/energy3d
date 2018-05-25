@@ -132,6 +132,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			receiver.setLabelCustomText(s);
 			receiver.draw();
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

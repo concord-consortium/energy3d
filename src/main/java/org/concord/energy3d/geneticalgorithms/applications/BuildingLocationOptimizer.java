@@ -109,6 +109,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		displayFittest();
 		foundation.draw();
 		System.out.println("Fittest: " + individualToString(best));
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

@@ -178,6 +178,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 		foundation.setLabelCustomText(s);
 		foundation.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

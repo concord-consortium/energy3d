@@ -293,6 +293,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		}
 		foundation.setLabelCustomText(s);
 		foundation.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
