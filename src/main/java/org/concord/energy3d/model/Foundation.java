@@ -48,6 +48,7 @@ import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
@@ -2303,7 +2304,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final List<HousePart> removed = removeChildrenOfClass(clazz);
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
-			receiver = oldMirror.getReceiver();
+			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
@@ -2336,7 +2337,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 			break;
-		case RADIAL_STAGGER: // http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
+		case RADIAL_STAGGER: // TODO: http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
 			final double rmin = a * (1.0 - (nrows - 5) / rows);
 			final int n = (int) (rmin / layout.getApertureWidth() * Scene.getInstance().getScale());
 			for (int i = 0; i < n; i++) {
@@ -2378,14 +2379,17 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final List<HousePart> removed = removeChildrenOfClass(clazz);
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
-			receiver = oldMirror.getReceiver();
+			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
-		final double theta0 = layout.getStartTurn() * 2 * Math.PI;
+		final double theta0 = layout.getStartTurn() * MathUtils.TWO_PI; // don't normalize it to [-pi, pi] as it is used to calculate the spiral
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
+		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
+		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
+		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < 10000; i++) {
@@ -2398,15 +2402,25 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				if (theta < theta0) {
 					continue;
 				}
-				final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / r));
+				final double roadAngle = Util.isZero(roadHalfWidth) ? 0 : Math.toDegrees(Math.atan(roadHalfWidth / r));
 				double az = Math.toDegrees(theta);
 				az = az % 360;
-				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
-					if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
-						continue;
+				if (sameSign) {
+					if (az >= startAngle && az < endAngle) {
+						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
+							continue;
+						}
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
-					final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+				} else { // not the same sign, so we have to reverse the order
+					if (az < endAngle || az >= startAngle) {
+						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
+							continue;
+						}
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					}
 				}
 			}
 			break;
@@ -2428,7 +2442,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final List<HousePart> removed = removeChildrenOfClass(clazz);
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
-			receiver = oldMirror.getReceiver();
+			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double az = Math.toRadians(getAzimuth());

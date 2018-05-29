@@ -8,8 +8,8 @@ public abstract class HeliostatFieldLayout {
 
 	double apertureWidth = 5;
 	double apertureHeight = 3;
-	double startAngle = 0;
-	double endAngle = 360;
+	double startAngle = -180;
+	double endAngle = 180;
 	double axisRoadWidth = 0;
 	double baseHeight = 2;
 

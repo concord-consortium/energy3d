@@ -1417,10 +1417,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing increment ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatSpiralFieldLayout.getStartAngle() < 0 || heliostatSpiralFieldLayout.getStartAngle() > 360) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatSpiralFieldLayout.getEndAngle() < 0 || heliostatSpiralFieldLayout.getEndAngle() > 360) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getStartAngle() < -360 || heliostatSpiralFieldLayout.getStartAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between -360 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getEndAngle() < -360 || heliostatSpiralFieldLayout.getEndAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between -360 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getEndAngle() <= heliostatSpiralFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getApertureWidth() < 1 || heliostatSpiralFieldLayout.getApertureWidth() > 50) {
