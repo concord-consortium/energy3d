@@ -1880,7 +1880,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Electricity price ($/kWh):"));
 					final JTextField priceField = new JTextField(pricePerKWh + "");
 					panel.add(priceField);
-					panel.add(new JLabel("Daily cost per solar panel ($):"));
+					panel.add(new JLabel("Cost per solar panel ($/day):"));
 					final JTextField dailyCostField = new JTextField(dailyCostPerPanel + "");
 					panel.add(dailyCostField);
 					panel.add(new JLabel("Minimum rows of solar panels on a rack:"));

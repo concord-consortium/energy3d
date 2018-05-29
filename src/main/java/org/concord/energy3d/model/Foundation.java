@@ -2278,7 +2278,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return Math.abs(x) < eps || Math.abs(x - 90) < eps || Math.abs(x - 180) < eps || Math.abs(x - 270) < eps || Math.abs(x - 360) < eps;
 	}
 
-	private void addMirror(final Vector3 p, final double baseHeight, final double w, final double h, final double az) {
+	private Mirror addMirror(final Vector3 p, final double baseHeight, final double w, final double h, final double az, final Foundation receiver) {
 		final Mirror m = new Mirror();
 		m.setContainer(this);
 		Scene.getInstance().add(m, false);
@@ -2291,13 +2291,21 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		m.setMirrorWidth(w);
 		m.setMirrorHeight(h);
 		m.setBaseHeight(baseHeight / Scene.getInstance().getScale());
+		m.setReceiver(receiver);
 		m.draw();
+		return m;
 	}
 
 	public int addCircularHeliostatArrays(final HeliostatCircularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
+		Foundation receiver = null;
+		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		if (!removed.isEmpty()) {
+			final Mirror oldMirror = (Mirror) removed.get(0);
+			receiver = oldMirror.getReceiver();
+		}
+		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		final double w = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
@@ -2323,7 +2331,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							continue;
 						}
 						final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2338,7 +2346,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows);
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 				theta = (i + 0.5) * 2.0 * Math.PI / n;
@@ -2347,7 +2355,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows) - 0.5 * h;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2366,7 +2374,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public int addSpiralHeliostatArrays(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
+		Foundation receiver = null;
+		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		if (!removed.isEmpty()) {
+			final Mirror oldMirror = (Mirror) removed.get(0);
+			receiver = oldMirror.getReceiver();
+		}
+		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
@@ -2392,7 +2406,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 						continue;
 					}
 					final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 				}
 			}
 			break;
@@ -2410,7 +2424,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public int addRectangularHeliostatArrays(final HeliostatRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
+		Foundation receiver = null;
+		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		if (!removed.isEmpty()) {
+			final Mirror oldMirror = (Mirror) removed.get(0);
+			receiver = oldMirror.getReceiver();
+		}
+		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);
@@ -2429,7 +2449,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 				}
 			}
 			break;
@@ -2439,7 +2459,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 				}
 			}
 			break;

@@ -144,7 +144,7 @@ public class Population {
 		}
 	}
 
-	// check convergence bitwisely
+	// check convergence bitwisely (so-called nominal convergence)
 	public boolean isMGAConverged() {
 		final int n = getChromosomeLength();
 		for (int i = 0; i < n; i++) {
@@ -329,7 +329,7 @@ public class Population {
 		}
 	}
 
-	// check convergence bitwisely
+	// check convergence bitwisely (so-called nominal convergence)
 	public boolean isSGAConverged() {
 		if (survivors.size() < 2) {
 			return true;
