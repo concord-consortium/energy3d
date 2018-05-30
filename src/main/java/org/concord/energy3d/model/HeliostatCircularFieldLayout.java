@@ -7,7 +7,7 @@ package org.concord.energy3d.model;
 public class HeliostatCircularFieldLayout extends HeliostatFieldLayout {
 
 	private double radialSpacing = 1;
-	private double radialSpacingIncrement = 0;
+	private double radialExpansionRatio = 0;
 	private double azimuthalSpacing = 1;
 	private int type = Foundation.EQUAL_AZIMUTHAL_SPACING;
 
@@ -27,12 +27,12 @@ public class HeliostatCircularFieldLayout extends HeliostatFieldLayout {
 		return radialSpacing;
 	}
 
-	public void setRadialSpacingIncrement(final double radialSpacingIncrement) {
-		this.radialSpacingIncrement = radialSpacingIncrement;
+	public void setRadialExpansionRatio(final double radialExpansionRatio) {
+		this.radialExpansionRatio = radialExpansionRatio;
 	}
 
-	public double getRadialSpacingIncrement() {
-		return radialSpacingIncrement;
+	public double getRadialExpansionRatio() {
+		return radialExpansionRatio;
 	}
 
 	public void setAzimuthalSpacing(final double azimuthalSpacing) {

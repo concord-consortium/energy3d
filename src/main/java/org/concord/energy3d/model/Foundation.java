@@ -2296,7 +2296,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return m;
 	}
 
-	public int addCircularHeliostatArrays(final HeliostatCircularFieldLayout layout) {
+	// used by the layout manager
+	public int addHeliostats(final HeliostatCircularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
@@ -2312,26 +2313,31 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double h = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
-		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
+		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
+		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
+		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
 		switch (layout.getType()) {
 		case EQUAL_AZIMUTHAL_SPACING:
 			for (int r = nrows - 1; r >= 0; r--) {
 				double b = a * (1.0 - r / rows);
-				b += b * b * layout.getRadialSpacingIncrement();
+				b += b * layout.getRadialExpansionRatio();
 				if (b > a) {
 					break;
 				}
-				final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / b));
 				final int n = (int) (2 * Math.PI * b / w);
 				for (int i = 0; i < n; i++) {
-					final double theta = i * 2.0 * Math.PI / n;
+					final double theta = i * MathUtils.TWO_PI / n - Math.PI;
 					final double az = Math.toDegrees(theta);
-					if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
-						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
-							continue;
+					if (sameSign) {
+						if (az >= startAngle && az < endAngle) {
+							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
+							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 						}
-						final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					} else { // not the same sign, so we have to reverse the order
+						if (az < endAngle || az >= startAngle) {
+							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
+							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						}
 					}
 				}
 			}
@@ -2372,7 +2378,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by the layout manager
-	public int addSpiralHeliostatArrays(final HeliostatSpiralFieldLayout layout) {
+	public int addHeliostats(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
@@ -2386,7 +2392,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		final double theta0 = layout.getStartTurn() * MathUtils.TWO_PI; // don't normalize it to [-pi, pi] as it is used to calculate the spiral
-		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
 		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
 		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
@@ -2402,22 +2407,15 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				if (theta < theta0) {
 					continue;
 				}
-				final double roadAngle = Util.isZero(roadHalfWidth) ? 0 : Math.toDegrees(Math.atan(roadHalfWidth / r));
 				double az = Math.toDegrees(theta);
 				az = az % 360;
 				if (sameSign) {
 					if (az >= startAngle && az < endAngle) {
-						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
-							continue;
-						}
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
 						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				} else { // not the same sign, so we have to reverse the order
 					if (az < endAngle || az >= startAngle) {
-						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
-							continue;
-						}
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
 						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
@@ -2436,7 +2434,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by GA
-	public void addHeliostatSpiralField(final HeliostatSpiralFieldLayout layout) {
+	public void generateHeliostatField(final HeliostatSpiralFieldLayout layout) {
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
 		final List<HousePart> removed = removeChildrenOfClass(clazz);
@@ -2487,7 +2485,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		});
 	}
 
-	public int addRectangularHeliostatArrays(final HeliostatRectangularFieldLayout layout) {
+	// used by the layout manager
+	public int addHeliostats(final HeliostatRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;

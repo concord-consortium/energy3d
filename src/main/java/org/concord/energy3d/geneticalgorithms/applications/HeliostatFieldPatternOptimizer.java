@@ -99,7 +99,7 @@ public class HeliostatFieldPatternOptimizer extends SolarOutputOptimizer {
 		layout.setApertureHeight(minimumApertureHeight + individual.getGene(1) * (maximumApertureHeight - minimumApertureHeight));
 		layout.setDivergence(minimumDivergenceAngle + individual.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle));
 		layout.setRadialExpansionRatio(minimumRadialExpansion + individual.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion));
-		foundation.addHeliostatSpiralField(layout);
+		foundation.generateHeliostatField(layout);
 		final double output = objectiveFunction.compute();
 		individual.setFitness(output);
 	}
@@ -112,7 +112,7 @@ public class HeliostatFieldPatternOptimizer extends SolarOutputOptimizer {
 		layout.setApertureHeight(minimumApertureHeight + best.getGene(1) * (maximumApertureHeight - minimumApertureHeight));
 		layout.setDivergence(minimumDivergenceAngle + best.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle));
 		layout.setRadialExpansionRatio(minimumRadialExpansion + best.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion));
-		foundation.addHeliostatSpiralField(layout);
+		foundation.generateHeliostatField(layout);
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
