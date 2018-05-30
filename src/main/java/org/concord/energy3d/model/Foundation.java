@@ -2293,7 +2293,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by the layout manager
-	public int addHeliostats(final HeliostatCircularFieldLayout layout) {
+	public int addHeliostats(final HeliostatConcentricFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
@@ -2308,7 +2308,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double dp = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
 		final double dr = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
 		final double rows = a / dr;
-		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		if (nrows < 1) {
+			nrows = 1;
+		}
 		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
 		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
@@ -2316,7 +2319,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		case EQUAL_AZIMUTHAL_SPACING:
 			for (int r = nrows; r >= 0; r--) {
 				double b = 0.5 * dr + a * (1.0 - r / rows);
-				b += b * layout.getRadialExpansionRatio();
+				b += (b - 0.5 * dr - a * (1.0 - nrows / rows)) * layout.getRadialExpansionRatio();
 				if (b > a) {
 					break;
 				}
@@ -2375,6 +2378,88 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return countParts(Mirror.class);
 	}
 
+	// used by ga
+	public void generateHeliostatField(final HeliostatConcentricFieldLayout layout) {
+		final Class<?>[] clazz = new Class[] { Mirror.class };
+		Foundation receiver = null;
+		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		if (!removed.isEmpty()) {
+			final Mirror oldMirror = (Mirror) removed.get(0);
+			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
+		}
+		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final Vector3 center = getAbsCenter();
+		final double dp = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
+		final double dr = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
+		final double rows = a / dr;
+		int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		if (nrows < 1) {
+			nrows = 1;
+		}
+		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
+		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
+		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
+		switch (layout.getType()) {
+		case EQUAL_AZIMUTHAL_SPACING:
+			for (int r = nrows; r >= 0; r--) {
+				double b = 0.5 * dr + a * (1.0 - r / rows);
+				b += (b - 0.5 * dr - a * (1.0 - nrows / rows)) * layout.getRadialExpansionRatio();
+				if (b > a) {
+					break;
+				}
+				final int n = (int) (2 * Math.PI * b / dp);
+				final double nsAngle = (Heliodon.getInstance().getLatitude() > 0 ? 1 : 3) * MathUtils.HALF_PI;
+				for (int i = 0; i < n; i++) {
+					final double theta = nsAngle + i * MathUtils.TWO_PI / n; // start from the north axis for the northern hemisphere or the south axis for the southern hemisphere
+					double az = Math.toDegrees(theta);
+					az = az % 360;
+					if (sameSign) {
+						if (az >= startAngle && az < endAngle) {
+							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
+							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						}
+					} else { // not the same sign, so we have to reverse the order
+						if (az < endAngle || az >= startAngle) {
+							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
+							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						}
+					}
+				}
+			}
+			break;
+		case RADIAL_STAGGER: // TODO: http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
+			final double rmin = a * (1.0 - (nrows - 5) / rows);
+			final int n = (int) (rmin / layout.getApertureWidth() * Scene.getInstance().getScale());
+			for (int i = 0; i < n; i++) {
+				double theta = i * 2.0 * Math.PI / n;
+				double az = Math.toDegrees(theta);
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					for (int j = 0; j < nrows; j++) {
+						final double r = a * (1.0 - j / rows);
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					}
+				}
+				theta = (i + 0.5) * 2.0 * Math.PI / n;
+				az = Math.toDegrees(theta);
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					for (int j = 0; j < nrows; j++) {
+						final double r = a * (1.0 - j / rows) - 0.5 * dr;
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					}
+				}
+			}
+			break;
+		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
+	}
+
 	// used by the layout manager
 	public int addHeliostats(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
@@ -2397,7 +2482,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
 				double r = b * Math.sqrt(i);
-				r += r * layout.getRadialExpansionRatio();
+				r += (r - b) * layout.getRadialExpansionRatio();
 				if (r > a) {
 					break;
 				}
@@ -2451,7 +2536,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
 				double r = b * Math.sqrt(i);
-				r += r * layout.getRadialExpansionRatio();
+				r += (r - b) * layout.getRadialExpansionRatio();
 				if (r > a) {
 					break;
 				}
@@ -2844,7 +2929,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by GA
-	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
+	public void generateSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
 		removeChildrenOfClass(clazz);
 		final double az = Math.toRadians(getAzimuth());

@@ -4,7 +4,7 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public class HeliostatCircularFieldLayout extends HeliostatFieldLayout {
+public class HeliostatConcentricFieldLayout extends HeliostatFieldLayout {
 
 	private double radialSpacing = 1;
 	private double radialExpansionRatio = 0;

@@ -38,15 +38,16 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
 import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizer;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatFieldPatternOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
-import org.concord.energy3d.model.HeliostatCircularFieldLayout;
+import org.concord.energy3d.model.HeliostatConcentricFieldLayout;
 import org.concord.energy3d.model.HeliostatRectangularFieldLayout;
 import org.concord.energy3d.model.HeliostatSpiralFieldLayout;
 import org.concord.energy3d.model.HousePart;
@@ -112,7 +113,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static double solarPanelTiltAngle = 0;
 	private static int solarPanelShadeTolerance = SolarPanel.PARTIAL_SHADE_TOLERANCE;
 	private static HeliostatRectangularFieldLayout heliostatRectangularFieldLayout = new HeliostatRectangularFieldLayout();
-	private static HeliostatCircularFieldLayout heliostatCircularFieldLayout = new HeliostatCircularFieldLayout();
+	private static HeliostatConcentricFieldLayout heliostatConcentricFieldLayout = new HeliostatConcentricFieldLayout();
 	private static HeliostatSpiralFieldLayout heliostatSpiralFieldLayout = new HeliostatSpiralFieldLayout();
 
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
@@ -1111,9 +1112,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			layoutMenu.addSeparator();
 
-			final JMenuItem miHeliostatCircularArrays = new JMenuItem("Heliostat Circular Layout...");
-			layoutMenu.add(miHeliostatCircularArrays);
-			miHeliostatCircularArrays.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatConcentricArrays = new JMenuItem("Heliostat Concentric Layout...");
+			layoutMenu.add(miHeliostatConcentricArrays);
+			miHeliostatConcentricArrays.addActionListener(new ActionListener() {
 
 				private Foundation f;
 				private JComboBox<String> typeComboBox;
@@ -1131,47 +1132,47 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Type:"));
 						typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
-						typeComboBox.setSelectedIndex(heliostatCircularFieldLayout.getType());
+						typeComboBox.setSelectedIndex(heliostatConcentricFieldLayout.getType());
 						panel.add(typeComboBox);
 						panel.add(new JLabel());
 
 						panel.add(new JLabel("Aperture Width:"));
-						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getApertureWidth()));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getApertureWidth()));
 						panel.add(widthField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
 						panel.add(new JLabel("Aperture Height:"));
-						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getApertureHeight()));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getApertureHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
+						panel.add(new JLabel("Azimuthal Spacing:"));
+						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getAzimuthalSpacing()));
+						panel.add(azimuthalSpacingField);
+						panel.add(new JLabel("<html><font size=2>Meters"));
+
 						panel.add(new JLabel("Radial Spacing:"));
-						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getRadialSpacing()));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getRadialSpacing()));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
 						panel.add(new JLabel("Radial Expansion Ratio:"));
-						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(heliostatCircularFieldLayout.getRadialExpansionRatio()));
+						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(heliostatConcentricFieldLayout.getRadialExpansionRatio()));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("<html><font size=2>Dimensionless"));
 
-						panel.add(new JLabel("Azimuthal Spacing:"));
-						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getAzimuthalSpacing()));
-						panel.add(azimuthalSpacingField);
-						panel.add(new JLabel("<html><font size=2>Meters"));
-
 						panel.add(new JLabel("Starting Angle:"));
-						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getStartAngle()));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
 
 						panel.add(new JLabel("Ending Angle:"));
-						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getEndAngle()));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
 
 						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getBaseHeight()));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
@@ -1179,7 +1180,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Circular Heliostat Array Options");
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Concentric Heliostat Array Options");
 
 						while (true) {
 							dialog.setVisible(true);
@@ -1189,36 +1190,36 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							} else {
 								boolean ok = true;
 								try {
-									heliostatCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
-									heliostatCircularFieldLayout.setRadialExpansionRatio(Double.parseDouble(radialSpacingIncrementField.getText()));
-									heliostatCircularFieldLayout.setAzimuthalSpacing(Double.parseDouble(azimuthalSpacingField.getText()));
-									heliostatCircularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
-									heliostatCircularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
-									heliostatCircularFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
-									heliostatCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
-									heliostatCircularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatConcentricFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
+									heliostatConcentricFieldLayout.setRadialExpansionRatio(Double.parseDouble(radialSpacingIncrementField.getText()));
+									heliostatConcentricFieldLayout.setAzimuthalSpacing(Double.parseDouble(azimuthalSpacingField.getText()));
+									heliostatConcentricFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
+									heliostatConcentricFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
+									heliostatConcentricFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
+									heliostatConcentricFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
+									heliostatConcentricFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
 								}
 								if (ok) {
-									if (heliostatCircularFieldLayout.getRadialSpacing() < 0) {
+									if (heliostatConcentricFieldLayout.getRadialSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat radial spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getAzimuthalSpacing() < 0) {
+									} else if (heliostatConcentricFieldLayout.getAzimuthalSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat azimuthal spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getRadialExpansionRatio() < 0) {
+									} else if (heliostatConcentricFieldLayout.getRadialExpansionRatio() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial expansion ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getStartAngle() < -360 || heliostatCircularFieldLayout.getStartAngle() > 360) {
+									} else if (heliostatConcentricFieldLayout.getStartAngle() < -360 || heliostatConcentricFieldLayout.getStartAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Starting angle must be between -360 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getEndAngle() < -360 || heliostatCircularFieldLayout.getEndAngle() > 360) {
+									} else if (heliostatConcentricFieldLayout.getEndAngle() < -360 || heliostatConcentricFieldLayout.getEndAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ending angle must be between -360 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getEndAngle() <= heliostatCircularFieldLayout.getStartAngle()) {
+									} else if (heliostatConcentricFieldLayout.getEndAngle() <= heliostatConcentricFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ending angle must be greater than starting angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getApertureWidth() < 1 || heliostatCircularFieldLayout.getApertureWidth() > 50) {
+									} else if (heliostatConcentricFieldLayout.getApertureWidth() < 1 || heliostatConcentricFieldLayout.getApertureWidth() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getApertureHeight() < 1 || heliostatCircularFieldLayout.getApertureHeight() > 50) {
+									} else if (heliostatConcentricFieldLayout.getApertureHeight() < 1 || heliostatConcentricFieldLayout.getApertureHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatCircularFieldLayout.getBaseHeight() < 0) {
+									} else if (heliostatConcentricFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addCircularHeliostatArrays();
@@ -1233,11 +1234,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 
 				private void addCircularHeliostatArrays() {
-					heliostatCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
+					heliostatConcentricFieldLayout.setType(typeComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							final int count = f.addHeliostats(heliostatCircularFieldLayout);
+							final int count = f.addHeliostats(heliostatConcentricFieldLayout);
 							if (count == 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -2137,8 +2138,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			optimizeMenu.add(miHeliostatPositions);
 
-			final JMenuItem miHeliostatFieldPattern = new JMenuItem("Heliostat Field Pattern...");
-			miHeliostatFieldPattern.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatConcentricField = new JMenuItem("Heliostat Concentric Field...");
+			miHeliostatConcentricField.addActionListener(new ActionListener() {
 
 				private int selectedFitnessFunction = 0;
 				private int selectedSelectionMethod = 0;
@@ -2146,16 +2147,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private int maximumGenerations = 5;
 				private double convergenceThreshold = 0.01;
 				private double mutationRate = 0.1;
-				private double divergenceAngle = Math.toDegrees(HeliostatSpiralFieldLayout.GOLDEN_ANGLE);
-				private double minimumDivergenceAngle = 0;
-				private double maximumDivergenceAngle = 180;
-				private double radialExpansion;
-				private double minimumRadialExpansion = 0;
-				private double maximumRadialExpansion = 0.01;
+
 				private double minimumApertureWidth = 1;
 				private double maximumApertureWidth = 10;
 				private double minimumApertureHeight = 1;
 				private double maximumApertureHeight = 2;
+				private double minimumAzimuthalSpacing = 0;
+				private double maximumAzimuthalSpacing = 10;
+				private double minimumRadialSpacing = 0;
+				private double maximumRadialSpacing = 5;
+				private double minimumRadialExpansion = 0;
+				private double maximumRadialExpansion = 1;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2174,72 +2176,105 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Solution:"));
 					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Field Pattern" });
 					panel.add(solutionComboBox);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Fitness function:"));
 					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
-
-					panel.add(new JLabel("Divergence angle:"));
-					final JTextField divergenceAngleField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(divergenceAngle));
-					panel.add(divergenceAngleField);
-					panel.add(new JLabel("Minimum divergence angle:"));
-					final JTextField minimumDivergenceAngleField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumDivergenceAngle));
-					panel.add(minimumDivergenceAngleField);
-					panel.add(new JLabel("Maximum divergence angle:"));
-					final JTextField maximumDivergenceAngleField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumDivergenceAngle));
-					panel.add(maximumDivergenceAngleField);
-
-					panel.add(new JLabel("Radial expansion ratio:"));
-					final JTextField radialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(radialExpansion));
-					panel.add(radialExpansionField);
-					panel.add(new JLabel("Minimum radial expansion:"));
-					final JTextField minimumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(minimumRadialExpansion));
-					panel.add(minimumRadialExpansionField);
-					panel.add(new JLabel("Maximum radial expansion:"));
-					final JTextField maximumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(maximumRadialExpansion));
-					panel.add(maximumRadialExpansionField);
+					panel.add(new JLabel());
 
 					panel.add(new JLabel("Minimum heliostat aperture width:"));
 					final JTextField minimumApertureWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumApertureWidth));
 					panel.add(minimumApertureWidthField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
 					panel.add(new JLabel("Maximum heliostat aperture width:"));
 					final JTextField maximumApertureWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumApertureWidth));
 					panel.add(maximumApertureWidthField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
 
 					panel.add(new JLabel("Minimum heliostat aperture height:"));
 					final JTextField minimumApertureHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumApertureHeight));
 					panel.add(minimumApertureHeightField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
 					panel.add(new JLabel("Maximum heliostat aperture height:"));
 					final JTextField maximumApertureHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumApertureHeight));
 					panel.add(maximumApertureHeightField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Minimum azimuthal spacing:"));
+					final JTextField minimumAzimuthalSpacingField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumAzimuthalSpacing));
+					panel.add(minimumAzimuthalSpacingField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Maximum azimuthal spacing:"));
+					final JTextField maximumAzimuthalSpacingField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumAzimuthalSpacing));
+					panel.add(maximumAzimuthalSpacingField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Minimum radial spacing:"));
+					final JTextField minimumRadialSpacingField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumRadialSpacing));
+					panel.add(minimumRadialSpacingField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Maximum radial spacing:"));
+					final JTextField maximumRadialSpacingField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumRadialSpacing));
+					panel.add(maximumRadialSpacingField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Minimum radial expansion:"));
+					final JTextField minimumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(minimumRadialExpansion));
+					panel.add(minimumRadialExpansionField);
+					panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
+
+					panel.add(new JLabel("Maximum radial expansion:"));
+					final JTextField maximumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(maximumRadialExpansion));
+					panel.add(maximumRadialExpansionField);
+					panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
 
 					panel.add(new JLabel("Type:"));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
 					panel.add(typeComboBox);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Selection:"));
 					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
 					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
 					panel.add(selectionComboBox);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Population size:"));
 					final JTextField populationField = new JTextField(populationSize + "");
 					panel.add(populationField);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Maximum generations:"));
 					final JTextField generationField = new JTextField(maximumGenerations + "");
 					panel.add(generationField);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Mutation rate:"));
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
+					panel.add(new JLabel());
+
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
 					panel.add(convergenceThresholdField);
-					SpringUtilities.makeCompactGrid(panel, 19, 2, 6, 6, 6, 6);
+					panel.add(new JLabel());
+
+					SpringUtilities.makeCompactGrid(panel, 19, 3, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Heliostat Field Pattern");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Concentric Heliostat Field");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -2249,10 +2284,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						} else {
 							boolean ok = true;
 							try {
-								divergenceAngle = Double.parseDouble(divergenceAngleField.getText());
-								minimumDivergenceAngle = Double.parseDouble(minimumDivergenceAngleField.getText());
-								maximumDivergenceAngle = Double.parseDouble(maximumDivergenceAngleField.getText());
-								radialExpansion = Double.parseDouble(radialExpansionField.getText());
+								minimumAzimuthalSpacing = Double.parseDouble(minimumAzimuthalSpacingField.getText());
+								maximumAzimuthalSpacing = Double.parseDouble(maximumAzimuthalSpacingField.getText());
+								minimumRadialSpacing = Double.parseDouble(minimumRadialSpacingField.getText());
+								maximumRadialSpacing = Double.parseDouble(maximumRadialSpacingField.getText());
 								minimumRadialExpansion = Double.parseDouble(minimumRadialExpansionField.getText());
 								maximumRadialExpansion = Double.parseDouble(maximumRadialExpansionField.getText());
 								minimumApertureWidth = Double.parseDouble(minimumApertureWidthField.getText());
@@ -2276,14 +2311,34 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumAzimuthalSpacing < 0 || maximumAzimuthalSpacing < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Azimuthal spacing should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumAzimuthalSpacing >= maximumAzimuthalSpacing) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum azimuthal spacing must be greater than minimum azimuthal spacing.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialSpacing < 0 || maximumRadialSpacing < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialSpacing >= maximumRadialSpacing) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum radial spacing must be greater than minimum radial spacing.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialExpansion < 0 || maximumRadialExpansion < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial expansion ratio should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialExpansion >= maximumRadialExpansion) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum radial expansion ratio must be greater than minimum radial expansion ratio.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureWidth < 0 || maximumApertureWidth < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureWidth >= maximumApertureWidth) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum aperture width must be greater than minimum aperture width.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureHeight < 0 || maximumApertureHeight < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureHeight >= maximumApertureHeight) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum aperture height must be greater than minimum aperture height.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-									final HeliostatFieldPatternOptimizer op = new HeliostatFieldPatternOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold, 0);
-									op.setDivergenceAngle(divergenceAngle);
-									op.setMinimumDivergenceAngle(minimumDivergenceAngle);
-									op.setMaximumDivergeneAngle(maximumDivergenceAngle);
-									op.setRadialExpansion(radialExpansion);
+									final HeliostatConcentricFieldOptimizer op = new HeliostatConcentricFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold, 0);
+									op.setMinimumAzimuthalSpacing(minimumAzimuthalSpacing);
+									op.setMaximumAzimuthalSpacing(maximumAzimuthalSpacing);
+									op.setMinimumRadialSpacing(minimumRadialSpacing);
+									op.setMaximumRadialSpacing(maximumRadialSpacing);
 									op.setMinimumRadialExpansion(minimumRadialExpansion);
 									op.setMaximumRadialExpansion(maximumRadialExpansion);
 									op.setMinimumApertureWidth(minimumApertureWidth);
@@ -2305,7 +2360,211 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			optimizeMenu.add(miHeliostatFieldPattern);
+			optimizeMenu.add(miHeliostatConcentricField);
+
+			final JMenuItem miHeliostatSpiralField = new JMenuItem("Heliostat Spiral Field...");
+			miHeliostatSpiralField.addActionListener(new ActionListener() {
+
+				private int selectedFitnessFunction = 0;
+				private int selectedSelectionMethod = 0;
+				private int populationSize = 20;
+				private int maximumGenerations = 5;
+				private double convergenceThreshold = 0.01;
+				private double mutationRate = 0.1;
+
+				private double minimumApertureWidth = 1;
+				private double maximumApertureWidth = 10;
+				private double minimumApertureHeight = 1;
+				private double maximumApertureHeight = 2;
+				private double minimumDivergenceAngle = 0;
+				private double maximumDivergenceAngle = 180;
+				private double minimumRadialExpansion = 0;
+				private double maximumRadialExpansion = 1;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final List<Mirror> heliostats = foundation.getHeliostats();
+					if (heliostats.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+
+					final JPanel panel = new JPanel(new SpringLayout());
+					panel.add(new JLabel("Solution:"));
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Field Pattern" });
+					panel.add(solutionComboBox);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Fitness function:"));
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
+					panel.add(fitnessComboBox);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Minimum divergence angle:"));
+					final JTextField minimumDivergenceAngleField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumDivergenceAngle));
+					panel.add(minimumDivergenceAngleField);
+					panel.add(new JLabel("<html><font size=2>&deg;</font></html>"));
+
+					panel.add(new JLabel("Maximum divergence angle:"));
+					final JTextField maximumDivergenceAngleField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumDivergenceAngle));
+					panel.add(maximumDivergenceAngleField);
+					panel.add(new JLabel("<html><font size=2>&deg;</font></html>"));
+
+					panel.add(new JLabel("Minimum radial expansion:"));
+					final JTextField minimumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(minimumRadialExpansion));
+					panel.add(minimumRadialExpansionField);
+					panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
+
+					panel.add(new JLabel("Maximum radial expansion:"));
+					final JTextField maximumRadialExpansionField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(maximumRadialExpansion));
+					panel.add(maximumRadialExpansionField);
+					panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
+
+					panel.add(new JLabel("Minimum heliostat aperture width:"));
+					final JTextField minimumApertureWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumApertureWidth));
+					panel.add(minimumApertureWidthField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Maximum heliostat aperture width:"));
+					final JTextField maximumApertureWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumApertureWidth));
+					panel.add(maximumApertureWidthField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Minimum heliostat aperture height:"));
+					final JTextField minimumApertureHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumApertureHeight));
+					panel.add(minimumApertureHeightField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Maximum heliostat aperture height:"));
+					final JTextField maximumApertureHeightField = new JTextField(EnergyPanel.TWO_DECIMALS.format(maximumApertureHeight));
+					panel.add(maximumApertureHeightField);
+					panel.add(new JLabel("<html><font size=2>Meters</font></html>"));
+
+					panel.add(new JLabel("Type:"));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Continuous" });
+					panel.add(typeComboBox);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Selection:"));
+					final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[] { "Roulette Wheel", "Tournament" });
+					selectionComboBox.setSelectedIndex(selectedSelectionMethod);
+					panel.add(selectionComboBox);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Population size:"));
+					final JTextField populationField = new JTextField(populationSize + "");
+					panel.add(populationField);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Maximum generations:"));
+					final JTextField generationField = new JTextField(maximumGenerations + "");
+					panel.add(generationField);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Mutation rate:"));
+					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+					panel.add(mutationRateField);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Convergence criterion:"));
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
+					panel.add(convergenceCriterionComboBox);
+					panel.add(new JLabel());
+
+					panel.add(new JLabel("Convergence threshold:"));
+					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
+					panel.add(convergenceThresholdField);
+					panel.add(new JLabel());
+
+					SpringUtilities.makeCompactGrid(panel, 17, 3, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Spiral Heliostat Field");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								minimumDivergenceAngle = Double.parseDouble(minimumDivergenceAngleField.getText());
+								maximumDivergenceAngle = Double.parseDouble(maximumDivergenceAngleField.getText());
+								minimumRadialExpansion = Double.parseDouble(minimumRadialExpansionField.getText());
+								maximumRadialExpansion = Double.parseDouble(maximumRadialExpansionField.getText());
+								minimumApertureWidth = Double.parseDouble(minimumApertureWidthField.getText());
+								maximumApertureWidth = Double.parseDouble(maximumApertureWidthField.getText());
+								minimumApertureHeight = Double.parseDouble(minimumApertureHeightField.getText());
+								maximumApertureHeight = Double.parseDouble(maximumApertureHeightField.getText());
+								populationSize = Integer.parseInt(populationField.getText());
+								maximumGenerations = Integer.parseInt(generationField.getText());
+								convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
+								mutationRate = Double.parseDouble(mutationRateField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (populationSize <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (maximumGenerations <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum generations must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (mutationRate < 0 || mutationRate > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureWidth < 0 || maximumApertureWidth < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureWidth >= maximumApertureWidth) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum aperture width must be greater than minimum aperture width.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureHeight < 0 || maximumApertureHeight < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumApertureHeight >= maximumApertureHeight) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum aperture height must be greater than minimum aperture height.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialExpansion < 0 || maximumRadialExpansion < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial expansion ratio should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumRadialExpansion >= maximumRadialExpansion) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum radial expansion ratio must be greater than minimum radial expansion ratio.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumDivergenceAngle < 0 || maximumDivergenceAngle < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Divergence angle should not be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (minimumDivergenceAngle >= maximumDivergenceAngle) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum divergence angle must be greater than minimum divergence angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+									selectedSelectionMethod = selectionComboBox.getSelectedIndex();
+									final HeliostatSpiralFieldOptimizer op = new HeliostatSpiralFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, selectedSelectionMethod, convergenceThreshold, 0);
+									op.setMinimumDivergenceAngle(minimumDivergenceAngle);
+									op.setMaximumDivergenceAngle(maximumDivergenceAngle);
+									op.setMinimumRadialExpansion(minimumRadialExpansion);
+									op.setMaximumRadialExpansion(maximumRadialExpansion);
+									op.setMinimumApertureWidth(minimumApertureWidth);
+									op.setMaximumApertureWidth(maximumApertureWidth);
+									op.setMinimumApertureHeight(minimumApertureHeight);
+									op.setMaximumApertureHeight(maximumApertureHeight);
+									op.setMaximumGenerations(maximumGenerations);
+									op.setMutationRate(mutationRate);
+									op.setOjectiveFunction(selectedFitnessFunction);
+									op.setFoundation(foundation);
+									op.setupFoundationConstraint();
+									op.evolve();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+			optimizeMenu.add(miHeliostatSpiralField);
 
 			optimizeMenu.addMenuListener(new MenuListener() {
 
@@ -2321,7 +2580,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					miSolarPanelTiltAngle.setEnabled(foundation.getRacks().size() > 0);
 					miSolarArray.setEnabled(miSolarPanelTiltAngle.isEnabled());
 					miHeliostatPositions.setEnabled(foundation.getHeliostats().size() > 0);
-					miHeliostatFieldPattern.setEnabled(miHeliostatPositions.isEnabled());
+					miHeliostatConcentricField.setEnabled(miHeliostatPositions.isEnabled());
+					miHeliostatSpiralField.setEnabled(miHeliostatPositions.isEnabled());
 				}
 
 				@Override

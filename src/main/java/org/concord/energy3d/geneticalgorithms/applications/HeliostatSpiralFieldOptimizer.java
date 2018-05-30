@@ -22,20 +22,20 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  *
  */
-public class HeliostatFieldPatternOptimizer extends SolarOutputOptimizer {
+public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 
 	private double divergenceAngle = Math.toDegrees(HeliostatSpiralFieldLayout.GOLDEN_ANGLE);
 	private double minimumDivergenceAngle = 0;
 	private double maximumDivergenceAngle = 180;
 	private double radialExpansion;
 	private double minimumRadialExpansion = 0;
-	private double maximumRadialExpansion = 0.01;
+	private double maximumRadialExpansion = 1;
 	private double minimumApertureWidth = 1;
 	private double maximumApertureWidth = 10;
 	private double minimumApertureHeight = 1;
 	private double maximumApertureHeight = 2;
 
-	public HeliostatFieldPatternOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+	public HeliostatSpiralFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
@@ -72,7 +72,7 @@ public class HeliostatFieldPatternOptimizer extends SolarOutputOptimizer {
 		this.minimumDivergenceAngle = minimumDivergenceAngle;
 	}
 
-	public void setMaximumDivergeneAngle(final double maximumDivergenceAngle) {
+	public void setMaximumDivergenceAngle(final double maximumDivergenceAngle) {
 		this.maximumDivergenceAngle = maximumDivergenceAngle;
 	}
 

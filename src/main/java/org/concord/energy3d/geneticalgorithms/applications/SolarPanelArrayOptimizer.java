@@ -115,7 +115,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double rowSpacing = minimumRowSpacing + individual.getGene(0) * (maximumRowSpacing - minimumRowSpacing);
 		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + individual.getGene(2) * (maximumPanelRows - minimumPanelRows));
-		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		foundation.generateSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		final double output = objectiveFunction.compute();
 		final int count = foundation.countSolarPanels();
 		if (netProfit) {
@@ -137,7 +137,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double rowSpacing = minimumRowSpacing + best.getGene(0) * (maximumRowSpacing - minimumRowSpacing);
 		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + best.getGene(2) * (maximumPanelRows - minimumPanelRows));
-		foundation.addSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		foundation.generateSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
