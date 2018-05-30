@@ -1145,16 +1145,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(heightField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
-						panel.add(new JLabel("Starting Angle:"));
-						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getStartAngle()));
-						panel.add(startAngleField);
-						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
-
-						panel.add(new JLabel("Ending Angle:"));
-						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getEndAngle()));
-						panel.add(endAngleField);
-						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
-
 						panel.add(new JLabel("Radial Spacing:"));
 						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getRadialSpacing()));
 						panel.add(rowSpacingField);
@@ -1169,6 +1159,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getAzimuthalSpacing()));
 						panel.add(azimuthalSpacingField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
+
+						panel.add(new JLabel("Starting Angle:"));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getStartAngle()));
+						panel.add(startAngleField);
+						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
+
+						panel.add(new JLabel("Ending Angle:"));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getEndAngle()));
+						panel.add(endAngleField);
+						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
 
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getBaseHeight()));
@@ -1238,104 +1238,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						@Override
 						public Object call() {
 							final int count = f.addHeliostats(heliostatCircularFieldLayout);
-							if (count == 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
-							}
-							return null;
-						}
-					});
-					updateAfterEdit();
-				}
-
-			});
-
-			final JMenuItem miHeliostatRectangularArrays = new JMenuItem("Heliostat Rectangular Layout...");
-			layoutMenu.add(miHeliostatRectangularArrays);
-			miHeliostatRectangularArrays.addActionListener(new ActionListener() {
-
-				private Foundation f;
-				private JComboBox<String> rowAxisComboBox;
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						f = (Foundation) selectedPart;
-						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " heliostats on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-							return;
-						}
-
-						final JPanel panel = new JPanel(new SpringLayout());
-						panel.add(new JLabel("Row Axis:"));
-						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
-						rowAxisComboBox.setSelectedIndex(heliostatRectangularFieldLayout.getRowAxis());
-						panel.add(rowAxisComboBox);
-						panel.add(new JLabel("Aperture Width:"));
-						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureWidth()));
-						panel.add(widthField);
-						panel.add(new JLabel("Aperture Height:"));
-						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureHeight()));
-						panel.add(heightField);
-						panel.add(new JLabel("Row Spacing:"));
-						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getRowSpacing()));
-						panel.add(rowSpacingField);
-						panel.add(new JLabel("Column Spacing:"));
-						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getColumnSpacing()));
-						panel.add(columnSpacingField);
-						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getBaseHeight()));
-						panel.add(baseHeightField);
-						SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
-
-						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rectangular Heliostat Array Options");
-
-						while (true) {
-							dialog.setVisible(true);
-							final Object choice = optionPane.getValue();
-							if (choice == options[1] || choice == null) {
-								break;
-							} else {
-								boolean ok = true;
-								try {
-									heliostatRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
-									heliostatRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
-									heliostatRectangularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
-									heliostatRectangularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
-									heliostatRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-									ok = false;
-								}
-								if (ok) {
-									if (heliostatRectangularFieldLayout.getRowSpacing() < 0 || heliostatRectangularFieldLayout.getColumnSpacing() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatRectangularFieldLayout.getApertureWidth() < 1 || heliostatRectangularFieldLayout.getApertureWidth() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatRectangularFieldLayout.getApertureHeight() < 1 || heliostatRectangularFieldLayout.getApertureHeight() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatRectangularFieldLayout.getBaseHeight() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else {
-										addRectangularHeliostatArrays();
-										if (choice == options[0]) {
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				private void addRectangularHeliostatArrays() {
-					heliostatRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							final int count = f.addHeliostats(heliostatRectangularFieldLayout);
 							if (count == 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -1482,6 +1384,104 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						@Override
 						public Object call() {
 							final int count = f.addHeliostats(heliostatSpiralFieldLayout);
+							if (count == 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
+			});
+
+			final JMenuItem miHeliostatRectangularArrays = new JMenuItem("Heliostat Rectangular Layout...");
+			layoutMenu.add(miHeliostatRectangularArrays);
+			miHeliostatRectangularArrays.addActionListener(new ActionListener() {
+
+				private Foundation f;
+				private JComboBox<String> rowAxisComboBox;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						f = (Foundation) selectedPart;
+						final int n = f.countParts(Mirror.class);
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " heliostats on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
+
+						final JPanel panel = new JPanel(new SpringLayout());
+						panel.add(new JLabel("Row Axis:"));
+						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox.setSelectedIndex(heliostatRectangularFieldLayout.getRowAxis());
+						panel.add(rowAxisComboBox);
+						panel.add(new JLabel("Aperture Width:"));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureWidth()));
+						panel.add(widthField);
+						panel.add(new JLabel("Aperture Height:"));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureHeight()));
+						panel.add(heightField);
+						panel.add(new JLabel("Row Spacing:"));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getRowSpacing()));
+						panel.add(rowSpacingField);
+						panel.add(new JLabel("Column Spacing:"));
+						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getColumnSpacing()));
+						panel.add(columnSpacingField);
+						panel.add(new JLabel("Base Height:"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getBaseHeight()));
+						panel.add(baseHeightField);
+						SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
+
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rectangular Heliostat Array Options");
+
+						while (true) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1] || choice == null) {
+								break;
+							} else {
+								boolean ok = true;
+								try {
+									heliostatRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
+									heliostatRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
+									heliostatRectangularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
+									heliostatRectangularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
+									heliostatRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									if (heliostatRectangularFieldLayout.getRowSpacing() < 0 || heliostatRectangularFieldLayout.getColumnSpacing() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getApertureWidth() < 1 || heliostatRectangularFieldLayout.getApertureWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getApertureHeight() < 1 || heliostatRectangularFieldLayout.getApertureHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getBaseHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										addRectangularHeliostatArrays();
+										if (choice == options[0]) {
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				private void addRectangularHeliostatArrays() {
+					heliostatRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final int count = f.addHeliostats(heliostatRectangularFieldLayout);
 							if (count == 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}

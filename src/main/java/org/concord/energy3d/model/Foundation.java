@@ -2274,10 +2274,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return removed;
 	}
 
-	private static boolean nearAxes(final double x, final double eps) {
-		return Math.abs(x) < eps || Math.abs(x - 90) < eps || Math.abs(x - 180) < eps || Math.abs(x - 270) < eps || Math.abs(x - 360) < eps;
-	}
-
 	private Mirror addMirror(final Vector3 p, final double baseHeight, final double w, final double h, final double az, final Foundation receiver) {
 		final Mirror m = new Mirror();
 		m.setContainer(this);
@@ -2309,25 +2305,27 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		final double w = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
-		final double h = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
-		final double rows = a / h;
+		final double dp = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
+		final double dr = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getScale();
+		final double rows = a / dr;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
 		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
 		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
 		switch (layout.getType()) {
 		case EQUAL_AZIMUTHAL_SPACING:
-			for (int r = nrows - 1; r >= 0; r--) {
-				double b = a * (1.0 - r / rows);
+			for (int r = nrows; r >= 0; r--) {
+				double b = 0.5 * dr + a * (1.0 - r / rows);
 				b += b * layout.getRadialExpansionRatio();
 				if (b > a) {
 					break;
 				}
-				final int n = (int) (2 * Math.PI * b / w);
+				final int n = (int) (2 * Math.PI * b / dp);
+				final double nsAngle = (Heliodon.getInstance().getLatitude() > 0 ? 1 : 3) * MathUtils.HALF_PI;
 				for (int i = 0; i < n; i++) {
-					final double theta = i * MathUtils.TWO_PI / n - Math.PI;
-					final double az = Math.toDegrees(theta);
+					final double theta = nsAngle + i * MathUtils.TWO_PI / n; // start from the north axis for the northern hemisphere or the south axis for the southern hemisphere
+					double az = Math.toDegrees(theta);
+					az = az % 360;
 					if (sameSign) {
 						if (az >= startAngle && az < endAngle) {
 							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
@@ -2359,7 +2357,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				az = Math.toDegrees(theta);
 				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
 					for (int j = 0; j < nrows; j++) {
-						final double r = a * (1.0 - j / rows) - 0.5 * h;
+						final double r = a * (1.0 - j / rows) - 0.5 * dr;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
 						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
