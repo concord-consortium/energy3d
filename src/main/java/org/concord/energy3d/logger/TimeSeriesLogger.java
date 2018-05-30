@@ -452,8 +452,8 @@ public class TimeSeriesLogger {
 					if (c.getPart() instanceof Mirror) {
 						final Mirror m = (Mirror) c.getPart();
 						stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
-						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
-						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
+						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getApertureWidth();
+						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getApertureHeight() + "}";
 					} else if (c.getPart() instanceof ParabolicDish) {
 						final ParabolicDish d = (ParabolicDish) c.getPart();
 						stateValue = "{\"Foundation\": " + d.getTopContainer().getId() + ", \"ID\": " + d.getId();
@@ -818,10 +818,10 @@ public class TimeSeriesLogger {
 				else if (lastEdit instanceof SetSizeForHeliostatsOnFoundationCommand) {
 					final Foundation f = ((SetSizeForHeliostatsOnFoundationCommand) lastEdit).getFoundation();
 					final List<Mirror> mirrors = f.getHeliostats();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getApertureWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getApertureHeight()) + "}";
 				} else if (lastEdit instanceof SetSizeForAllHeliostatsCommand) {
 					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
-					stateValue = "{\"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
+					stateValue = "{\"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getApertureWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getApertureHeight()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeHeliostatTargetCommand) {

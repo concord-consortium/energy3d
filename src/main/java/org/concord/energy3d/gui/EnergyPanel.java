@@ -1328,7 +1328,7 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								partPanelBorder.setTitle("Heliostat (" + m.getId() + ")");
 								partProperty1Label.setText("  Size & Center:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(m.getMirrorWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(m.getMirrorHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
+								partProperty1TextField.setText(TWO_DECIMALS.format(m.getApertureWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(m.getApertureHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
 								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the heliostat");
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");

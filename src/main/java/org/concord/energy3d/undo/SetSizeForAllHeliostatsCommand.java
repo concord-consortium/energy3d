@@ -25,8 +25,8 @@ public class SetSizeForAllHeliostatsCommand extends MyAbstractUndoableEdit {
 		oldHeights = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			oldWidths[i] = m.getMirrorWidth();
-			oldHeights[i] = m.getMirrorHeight();
+			oldWidths[i] = m.getApertureWidth();
+			oldHeights[i] = m.getApertureHeight();
 		}
 	}
 
@@ -38,10 +38,10 @@ public class SetSizeForAllHeliostatsCommand extends MyAbstractUndoableEdit {
 		newHeights = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			newWidths[i] = m.getMirrorWidth();
-			m.setMirrorWidth(oldWidths[i]);
-			newHeights[i] = m.getMirrorHeight();
-			m.setMirrorHeight(oldHeights[i]);
+			newWidths[i] = m.getApertureWidth();
+			m.setApertureWidth(oldWidths[i]);
+			newHeights[i] = m.getApertureHeight();
+			m.seApertureHeight(oldHeights[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -53,8 +53,8 @@ public class SetSizeForAllHeliostatsCommand extends MyAbstractUndoableEdit {
 		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			m.setMirrorWidth(newWidths[i]);
-			m.setMirrorHeight(newHeights[i]);
+			m.setApertureWidth(newWidths[i]);
+			m.seApertureHeight(newHeights[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();

@@ -698,7 +698,7 @@ public class SolarRadiation {
 			mirror.draw();
 		}
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
-		final double a = mirror.getMirrorWidth() * mirror.getMirrorHeight() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+		final double a = mirror.getApertureWidth() * mirror.getApertureHeight() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
 
 		final ReadOnlyVector3 normal = mirror.getNormal();
 		if (normal == null) {

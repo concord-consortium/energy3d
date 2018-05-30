@@ -26,8 +26,8 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 		this.part = part;
 		if (part instanceof Mirror) {
 			final Mirror m = (Mirror) part;
-			oldWidth = m.getMirrorWidth();
-			oldHeight = m.getMirrorHeight();
+			oldWidth = m.getApertureWidth();
+			oldHeight = m.getApertureHeight();
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			oldWidth = t.getApertureWidth();
@@ -77,10 +77,10 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 		super.undo();
 		if (part instanceof Mirror) {
 			final Mirror m = (Mirror) part;
-			newWidth = m.getMirrorWidth();
-			newHeight = m.getMirrorHeight();
-			m.setMirrorWidth(oldWidth);
-			m.setMirrorHeight(oldHeight);
+			newWidth = m.getApertureWidth();
+			newHeight = m.getApertureHeight();
+			m.setApertureWidth(oldWidth);
+			m.seApertureHeight(oldHeight);
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			newWidth = t.getApertureWidth();
@@ -134,8 +134,8 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 		super.redo();
 		if (part instanceof Mirror) {
 			final Mirror m = (Mirror) part;
-			m.setMirrorWidth(newWidth);
-			m.setMirrorHeight(newHeight);
+			m.setApertureWidth(newWidth);
+			m.seApertureHeight(newHeight);
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			t.setApertureWidth(newWidth);

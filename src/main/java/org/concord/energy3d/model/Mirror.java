@@ -542,19 +542,19 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		return 1;
 	}
 
-	public void setMirrorWidth(final double mirrorWidth) {
-		this.mirrorWidth = mirrorWidth;
+	public void setApertureWidth(final double apertureWidth) {
+		mirrorWidth = apertureWidth;
 	}
 
-	public double getMirrorWidth() {
+	public double getApertureWidth() {
 		return mirrorWidth;
 	}
 
-	public void setMirrorHeight(final double mirrorHeight) {
-		this.mirrorHeight = mirrorHeight;
+	public void seApertureHeight(final double apertureHeight) {
+		mirrorHeight = apertureHeight;
 	}
 
-	public double getMirrorHeight() {
+	public double getApertureHeight() {
 		return mirrorHeight;
 	}
 

@@ -3105,8 +3105,8 @@ public class Scene implements Serializable {
 	public void setSizeForAllHeliostats(final double width, final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setMirrorWidth(width);
-				((Mirror) p).setMirrorHeight(height);
+				((Mirror) p).setApertureWidth(width);
+				((Mirror) p).seApertureHeight(height);
 				p.draw();
 			}
 		}

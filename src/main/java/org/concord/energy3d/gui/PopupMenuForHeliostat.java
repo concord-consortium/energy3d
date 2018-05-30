@@ -584,10 +584,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					inputPanel.add(new JLabel("Width: "));
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(m.getMirrorWidth()));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(m.getApertureWidth()));
 					inputPanel.add(widthField);
 					inputPanel.add(new JLabel("Length: "));
-					final JTextField heightField = new JTextField(threeDecimalsFormat.format(m.getMirrorHeight()));
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(m.getApertureHeight()));
 					inputPanel.add(heightField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -641,12 +641,12 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 								} else if (h < 1 || h > 50) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(w - m.getMirrorWidth()) > 0.000001 || Math.abs(h - m.getMirrorHeight()) > 0.000001;
+									boolean changed = Math.abs(w - m.getApertureWidth()) > 0.000001 || Math.abs(h - m.getApertureHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
 											final SetPartSizeCommand c = new SetPartSizeCommand(m);
-											m.setMirrorWidth(w);
-											m.setMirrorHeight(h);
+											m.setApertureWidth(w);
+											m.seApertureHeight(h);
 											m.draw();
 											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -655,7 +655,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final Mirror x : foundation.getHeliostats()) {
-												if (Math.abs(w - x.getMirrorWidth()) > 0.000001 || Math.abs(h - x.getMirrorHeight()) > 0.000001) {
+												if (Math.abs(w - x.getApertureWidth()) > 0.000001 || Math.abs(h - x.getApertureHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
@@ -670,7 +670,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final Mirror x : Scene.getInstance().getAllHeliostats()) {
-												if (Math.abs(w - x.getMirrorWidth()) > 0.000001 || Math.abs(h - x.getMirrorHeight()) > 0.000001) {
+												if (Math.abs(w - x.getApertureWidth()) > 0.000001 || Math.abs(h - x.getApertureHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}

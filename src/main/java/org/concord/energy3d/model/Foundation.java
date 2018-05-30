@@ -78,7 +78,6 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class Foundation extends HousePart implements Thermal, Labelable {
 
 	private static final long serialVersionUID = 1L;
-	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 	public static final int TEXTURE_01 = 1;
 
@@ -2289,8 +2288,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		m.points.get(0).setX(v.getX());
 		m.points.get(0).setY(v.getY());
 		m.points.get(0).setZ(height);
-		m.setMirrorWidth(w);
-		m.setMirrorHeight(h);
+		m.setApertureWidth(w);
+		m.seApertureHeight(h);
 		m.setBaseHeight(baseHeight / Scene.getInstance().getScale());
 		m.setReceiver(receiver);
 		m.draw();
@@ -2372,6 +2371,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return countParts(Mirror.class);
 	}
 
+	// used by the layout manager
 	public int addSpiralHeliostatArrays(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
@@ -2383,7 +2383,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
+		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
 		final double theta0 = layout.getStartTurn() * MathUtils.TWO_PI; // don't normalize it to [-pi, pi] as it is used to calculate the spiral
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getScale();
@@ -2392,13 +2392,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
-			for (int i = 1; i < 10000; i++) {
+			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
 				double r = b * Math.sqrt(i);
-				r += r * r * layout.getRadialSpacingIncrement();
+				r += r * layout.getRadialExpansionRatio();
 				if (r > a) {
 					break;
 				}
-				final double theta = i * GOLDEN_ANGLE;
+				final double theta = i * layout.getDivergence();
 				if (theta < theta0) {
 					continue;
 				}
@@ -2433,6 +2433,58 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		});
 		return countParts(Mirror.class);
+	}
+
+	// used by GA
+	public void addHeliostatSpiralField(final HeliostatSpiralFieldLayout layout) {
+		final Class<?>[] clazz = new Class[] { Mirror.class };
+		Foundation receiver = null;
+		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		if (!removed.isEmpty()) {
+			final Mirror oldMirror = (Mirror) removed.get(0);
+			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
+		}
+		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
+		final Vector3 center = getAbsCenter();
+		final double theta0 = layout.getStartTurn() * MathUtils.TWO_PI; // don't normalize it to [-pi, pi] as it is used to calculate the spiral
+		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
+		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
+		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
+		switch (layout.getType()) {
+		case FERMAT_SPIRAL:
+			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
+				double r = b * Math.sqrt(i);
+				r += r * layout.getRadialExpansionRatio();
+				if (r > a) {
+					break;
+				}
+				final double theta = i * layout.getDivergence();
+				if (theta < theta0) {
+					continue;
+				}
+				double az = Math.toDegrees(theta);
+				az = az % 360;
+				if (sameSign) {
+					if (az >= startAngle && az < endAngle) {
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					}
+				} else { // not the same sign, so we have to reverse the order
+					if (az < endAngle || az >= startAngle) {
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					}
+				}
+			}
+			break;
+		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 	}
 
 	public int addRectangularHeliostatArrays(final HeliostatRectangularFieldLayout layout) {
@@ -3398,8 +3450,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				m.setMirrorWidth(width);
-				m.setMirrorHeight(height);
+				m.setApertureWidth(width);
+				m.seApertureHeight(height);
 				m.draw();
 			}
 		}

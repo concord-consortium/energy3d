@@ -42,7 +42,7 @@ class PropertiesDialogForHeliostat extends PropertiesDialogFactory {
 		int i = 0;
 
 		panel.add(new JLabel("Size: "));
-		final JTextField sizeField = new JTextField(PopupMenuFactory.threeDecimalsFormat.format(mirror.getMirrorWidth()) + "\u00D7" + PopupMenuFactory.threeDecimalsFormat.format(mirror.getMirrorHeight()) + " m");
+		final JTextField sizeField = new JTextField(PopupMenuFactory.threeDecimalsFormat.format(mirror.getApertureWidth()) + "\u00D7" + PopupMenuFactory.threeDecimalsFormat.format(mirror.getApertureHeight()) + " m");
 		sizeField.setEditable(false);
 		panel.add(sizeField);
 		i++;

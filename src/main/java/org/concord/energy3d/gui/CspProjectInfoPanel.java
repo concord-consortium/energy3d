@@ -168,7 +168,7 @@ public class CspProjectInfoPanel extends JPanel {
 					final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 					final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 					for (final Mirror m : mirrors) {
-						mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
+						mirrorArea = m.getApertureWidth() * m.getApertureHeight();
 						cost += price.getHeliostatUnitPrice() * mirrorArea;
 						reflectingArea += mirrorArea;
 						if (m.getReceiver() != null) {

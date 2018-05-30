@@ -26,9 +26,9 @@ import com.ardor3d.math.Vector3;
  * @author Charles Xie
  *
  */
-public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
+public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+	public HeliostatPositionOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
 	}
 
@@ -47,7 +47,7 @@ public class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getScale();
 			final double lx = v0.distance(v2) * Scene.getInstance().getScale();
 			final double ly = v0.distance(v1) * Scene.getInstance().getScale();
-			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getMirrorWidth(), ly + heliostat.getMirrorHeight()));
+			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getApertureWidth(), ly + heliostat.getApertureHeight()));
 		}
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
