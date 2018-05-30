@@ -11,7 +11,7 @@ public class HeliostatSpiralFieldLayout extends HeliostatFieldLayout {
 
 	private int type = Foundation.FERMAT_SPIRAL;
 	private double divergence = GOLDEN_ANGLE;
-	private int startTurn = 3;
+	private int startTurn = 10;
 	private double scalingFactor = 0.5;
 	private double radialExpansionRatio;
 

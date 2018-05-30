@@ -1560,7 +1560,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
@@ -1690,7 +1690,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
@@ -1823,7 +1823,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
@@ -1943,7 +1943,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
@@ -2081,7 +2081,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 					panel.add(mutationRateField);
 					panel.add(new JLabel("Convergence criterion:"));
-					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise" });
+					final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[] { "Bitwise (Nominal)" });
 					panel.add(convergenceCriterionComboBox);
 					panel.add(new JLabel("Convergence threshold:"));
 					final JTextField convergenceThresholdField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(convergenceThreshold));
@@ -2157,7 +2157,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private double minimumRadialSpacing = 0;
 				private double maximumRadialSpacing = 5;
 				private double minimumRadialExpansion = 0;
-				private double maximumRadialExpansion = 1;
+				private double maximumRadialExpansion = 0.01;
+
+				private double pricePerKWh = 0.225;
+				private double dailyCostPerApertureSquareMeter = 0.1;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2179,10 +2182,20 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel());
 
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel());
+
+					panel.add(new JLabel("Electricity price:"));
+					final JTextField priceField = new JTextField(pricePerKWh + "");
+					panel.add(priceField);
+					panel.add(new JLabel("<html><font size=2>$/kWh</font></html>"));
+
+					panel.add(new JLabel("Cost:"));
+					final JTextField dailyCostField = new JTextField(dailyCostPerApertureSquareMeter + "");
+					panel.add(dailyCostField);
+					panel.add(new JLabel("<html><font size=2>$/day/m&sup2;</font></html>"));
 
 					panel.add(new JLabel("Minimum heliostat aperture width:"));
 					final JTextField minimumApertureWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumApertureWidth));
@@ -2270,7 +2283,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(convergenceThresholdField);
 					panel.add(new JLabel());
 
-					SpringUtilities.makeCompactGrid(panel, 19, 3, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 21, 3, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -2284,6 +2297,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						} else {
 							boolean ok = true;
 							try {
+								pricePerKWh = Double.parseDouble(priceField.getText());
+								dailyCostPerApertureSquareMeter = Double.parseDouble(dailyCostField.getText());
 								minimumAzimuthalSpacing = Double.parseDouble(minimumAzimuthalSpacingField.getText());
 								maximumAzimuthalSpacing = Double.parseDouble(maximumAzimuthalSpacingField.getText());
 								minimumRadialSpacing = Double.parseDouble(minimumRadialSpacingField.getText());
@@ -2347,7 +2362,32 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									op.setMaximumApertureHeight(maximumApertureHeight);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
-									op.setOjectiveFunction(selectedFitnessFunction);
+									op.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
+									op.setPricePerKWh(pricePerKWh);
+									switch (selectedFitnessFunction) {
+									case 0:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										break;
+									case 1:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										break;
+									case 2:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setOutputPerApertureSquareMeter(true);
+										break;
+									case 3:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setOutputPerApertureSquareMeter(true);
+										break;
+									case 4:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setNetProfit(true);
+										break;
+									case 5:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setNetProfit(true);
+										break;
+									}
 									op.setFoundation(foundation);
 									op.setupFoundationConstraint();
 									op.evolve();
@@ -2379,7 +2419,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private double minimumDivergenceAngle = 0;
 				private double maximumDivergenceAngle = 180;
 				private double minimumRadialExpansion = 0;
-				private double maximumRadialExpansion = 1;
+				private double maximumRadialExpansion = 0.01;
+
+				private double pricePerKWh = 0.225;
+				private double dailyCostPerApertureSquareMeter = 0.1;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2401,10 +2444,20 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel());
 
 					panel.add(new JLabel("Fitness function:"));
-					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
 					fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 					panel.add(fitnessComboBox);
 					panel.add(new JLabel());
+
+					panel.add(new JLabel("Electricity price:"));
+					final JTextField priceField = new JTextField(pricePerKWh + "");
+					panel.add(priceField);
+					panel.add(new JLabel("<html><font size=2>$/kWh</font></html>"));
+
+					panel.add(new JLabel("Cost:"));
+					final JTextField dailyCostField = new JTextField(dailyCostPerApertureSquareMeter + "");
+					panel.add(dailyCostField);
+					panel.add(new JLabel("<html><font size=2>$/day/m&sup2;</font></html>"));
 
 					panel.add(new JLabel("Minimum divergence angle:"));
 					final JTextField minimumDivergenceAngleField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumDivergenceAngle));
@@ -2482,7 +2535,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(convergenceThresholdField);
 					panel.add(new JLabel());
 
-					SpringUtilities.makeCompactGrid(panel, 17, 3, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 19, 3, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -2496,6 +2549,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						} else {
 							boolean ok = true;
 							try {
+								pricePerKWh = Double.parseDouble(priceField.getText());
+								dailyCostPerApertureSquareMeter = Double.parseDouble(dailyCostField.getText());
 								minimumDivergenceAngle = Double.parseDouble(minimumDivergenceAngleField.getText());
 								maximumDivergenceAngle = Double.parseDouble(maximumDivergenceAngleField.getText());
 								minimumRadialExpansion = Double.parseDouble(minimumRadialExpansionField.getText());
@@ -2551,7 +2606,32 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									op.setMaximumApertureHeight(maximumApertureHeight);
 									op.setMaximumGenerations(maximumGenerations);
 									op.setMutationRate(mutationRate);
-									op.setOjectiveFunction(selectedFitnessFunction);
+									op.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
+									op.setPricePerKWh(pricePerKWh);
+									switch (selectedFitnessFunction) {
+									case 0:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										break;
+									case 1:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										break;
+									case 2:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setOutputPerApertureSquareMeter(true);
+										break;
+									case 3:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setOutputPerApertureSquareMeter(true);
+										break;
+									case 4:
+										op.setOjectiveFunction(ObjectiveFunction.DAILY);
+										op.setNetProfit(true);
+										break;
+									case 5:
+										op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+										op.setNetProfit(true);
+										break;
+									}
 									op.setFoundation(foundation);
 									op.setupFoundationConstraint();
 									op.evolve();

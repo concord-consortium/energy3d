@@ -1639,8 +1639,9 @@ public class MainFrame extends JFrame {
 			addModel(designMethodMenu, "Window Sizing Optimization", "tutorials/optimization-window-sizes.ng3");
 			addModel(designMethodMenu, "Solar Panel Tilt Angle Optimization", "tutorials/optimization-solar-panel-tilt-angle.ng3");
 			addModel(designMethodMenu, "Solar Farm Optimization", "tutorials/optimization-solar-panel-array-rectangular-lot.ng3");
-			// addModel(designMethodMenu, "Solar Farm Optimization: Arbitrary Lot", "tutorials/optimization-solar-panel-array-arbitrary-lot.ng3");
 			addModel(designMethodMenu, "Single Heliostat Optimization", "tutorials/optimization-single-heliostat.ng3");
+			addModel(designMethodMenu, "Concentric Heliostat Field Optimization", "tutorials/optimization-concentric-heliostat-field.ng3");
+			addModel(designMethodMenu, "Spiral Heliostat Field Optimization", "tutorials/optimization-spiral-heliostat-field.ng3");
 
 			tutorialsMenu.addSeparator();
 

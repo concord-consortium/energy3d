@@ -1,18 +1,13 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
-import java.awt.EventQueue;
-import java.util.Calendar;
+import java.util.List;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
-import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HeliostatSpiralFieldLayout;
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.scene.Scene;
 
 /**
  * Chromosome of an individual is encoded as follows:
@@ -22,18 +17,13 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  *
  */
-public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
+public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 
-	private double divergenceAngle = Math.toDegrees(HeliostatSpiralFieldLayout.GOLDEN_ANGLE);
+	private static double divergenceAngle = Math.toDegrees(HeliostatSpiralFieldLayout.GOLDEN_ANGLE); // cache for the next run
 	private double minimumDivergenceAngle = 0;
 	private double maximumDivergenceAngle = 180;
-	private double radialExpansion;
-	private double minimumRadialExpansion = 0;
-	private double maximumRadialExpansion = 1;
-	private double minimumApertureWidth = 1;
-	private double maximumApertureWidth = 10;
-	private double minimumApertureHeight = 1;
-	private double maximumApertureHeight = 2;
+
+	private static double radialExpansion; // cache for the next run
 
 	public HeliostatSpiralFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
@@ -43,7 +33,7 @@ public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
 		final Mirror heliostat = foundation.getHeliostats().get(0);
-		maximumApertureHeight = heliostat.getBaseHeight();
+		maximumApertureHeight = heliostat.getBaseHeight() * Scene.getInstance().getScale();
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		firstBorn.setGene(0, (heliostat.getApertureWidth() - minimumApertureWidth) / (maximumApertureWidth - minimumApertureWidth));
@@ -52,44 +42,12 @@ public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 		firstBorn.setGene(3, (radialExpansion - minimumRadialExpansion) / (maximumRadialExpansion - minimumRadialExpansion));
 	}
 
-	public void setMinimumApertureWidth(final double minimumApertureWidth) {
-		this.minimumApertureWidth = minimumApertureWidth;
-	}
-
-	public void setMaximumApertureWidth(final double maximumApertureWidth) {
-		this.maximumApertureWidth = maximumApertureWidth;
-	}
-
-	public void setMinimumApertureHeight(final double minimumApertureHeight) {
-		this.minimumApertureHeight = minimumApertureHeight;
-	}
-
-	public void setMaximumApertureHeight(final double maximumApertureHeight) {
-		this.maximumApertureHeight = maximumApertureHeight;
-	}
-
 	public void setMinimumDivergenceAngle(final double minimumDivergenceAngle) {
 		this.minimumDivergenceAngle = minimumDivergenceAngle;
 	}
 
 	public void setMaximumDivergenceAngle(final double maximumDivergenceAngle) {
 		this.maximumDivergenceAngle = maximumDivergenceAngle;
-	}
-
-	public void setDivergenceAngle(final double divergenceAngle) {
-		this.divergenceAngle = divergenceAngle;
-	}
-
-	public void setMinimumRadialExpansion(final double minimumRadialExpansion) {
-		this.minimumRadialExpansion = minimumRadialExpansion;
-	}
-
-	public void setMaximumRadialExpansion(final double maximumRadialExpansion) {
-		this.maximumRadialExpansion = maximumRadialExpansion;
-	}
-
-	public void setRadialExpansion(final double radialExpansion) {
-		this.radialExpansion = radialExpansion;
 	}
 
 	@Override
@@ -101,7 +59,20 @@ public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 		layout.setRadialExpansionRatio(minimumRadialExpansion + individual.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion));
 		foundation.generateHeliostatField(layout);
 		final double output = objectiveFunction.compute();
-		individual.setFitness(output);
+		final List<Mirror> heliostats = foundation.getHeliostats();
+		final Mirror heliostat = heliostats.get(0);
+		final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
+		if (netProfit) {
+			double cost = dailyCostPerApertureSquareMeter;
+			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+				cost *= 12;
+			}
+			individual.setFitness(output * pricePerKWh - cost * totalApertureArea);
+		} else if (outputPerApertureSquareMeter) {
+			individual.setFitness(output / totalApertureArea);
+		} else {
+			individual.setFitness(output);
+		}
 	}
 
 	@Override
@@ -110,8 +81,10 @@ public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 		final HeliostatSpiralFieldLayout layout = new HeliostatSpiralFieldLayout();
 		layout.setApertureWidth(minimumApertureWidth + best.getGene(0) * (maximumApertureWidth - minimumApertureWidth));
 		layout.setApertureHeight(minimumApertureHeight + best.getGene(1) * (maximumApertureHeight - minimumApertureHeight));
-		layout.setDivergence(minimumDivergenceAngle + best.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle));
-		layout.setRadialExpansionRatio(minimumRadialExpansion + best.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion));
+		divergenceAngle = minimumDivergenceAngle + best.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle);
+		layout.setDivergence(divergenceAngle);
+		radialExpansion = minimumRadialExpansion + best.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion);
+		layout.setRadialExpansionRatio(radialExpansion);
 		foundation.generateHeliostatField(layout);
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
@@ -125,63 +98,6 @@ public class HeliostatSpiralFieldOptimizer extends SolarOutputOptimizer {
 		s += (minimumDivergenceAngle + individual.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle)) + ", ";
 		s += (minimumRadialExpansion + individual.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion)) + ", ";
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
-	}
-
-	@Override
-	public void displayFittest() {
-		final Individual best = population.getIndividual(0);
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
-		if (receiver != null) {
-			String s = null;
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				s = "Daily Output: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				break;
-			case ObjectiveFunction.ANNUAl:
-				s = "Annual Output: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				break;
-			}
-			receiver.setLabelCustomText(s);
-			receiver.draw();
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	@Override
-	void updateInfo(final Individual individual) {
-		final Individual best = population.getIndividual(0);
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
-		if (receiver != null) {
-			String s = null;
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				s = "Daily Output\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				break;
-			case ObjectiveFunction.ANNUAl:
-				s = "Annual Output\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				break;
-			}
-			receiver.setLabelCustomText(s);
-			receiver.draw();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final Calendar today = Heliodon.getInstance().getCalendar();
-				EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart instanceof Foundation) {
-					final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
-					g.setCalendar(today);
-					EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
-					if (g.hasGraph()) {
-						g.updateGraph();
-					} else {
-						g.addGraph((Foundation) selectedPart);
-					}
-				}
-			}
-		});
 	}
 
 }

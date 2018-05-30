@@ -2319,7 +2319,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		case EQUAL_AZIMUTHAL_SPACING:
 			for (int r = nrows; r >= 0; r--) {
 				double b = 0.5 * dr + a * (1.0 - r / rows);
-				b += (b - 0.5 * dr - a * (1.0 - nrows / rows)) * layout.getRadialExpansionRatio();
+				final double d = b - 0.5 * dr - a * (1.0 - nrows / rows);
+				b += d * d * layout.getRadialExpansionRatio();
 				if (b > a) {
 					break;
 				}
@@ -2403,7 +2404,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		case EQUAL_AZIMUTHAL_SPACING:
 			for (int r = nrows; r >= 0; r--) {
 				double b = 0.5 * dr + a * (1.0 - r / rows);
-				b += (b - 0.5 * dr - a * (1.0 - nrows / rows)) * layout.getRadialExpansionRatio();
+				final double d = b - 0.5 * dr - a * (1.0 - nrows / rows);
+				b += d * d * layout.getRadialExpansionRatio();
 				if (b > a) {
 					break;
 				}
@@ -2478,17 +2480,20 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
 		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
+		int imin = 1;
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
-				double r = b * Math.sqrt(i);
-				r += (r - b) * layout.getRadialExpansionRatio();
-				if (r > a) {
-					break;
-				}
 				final double theta = i * layout.getDivergence();
 				if (theta < theta0) {
+					imin = i;
 					continue;
+				}
+				double r = b * Math.sqrt(i);
+				final double d = r - b * Math.sqrt(imin);
+				r += d * d * layout.getRadialExpansionRatio();
+				if (r > a) {
+					break;
 				}
 				double az = Math.toDegrees(theta);
 				az = az % 360;
@@ -2532,17 +2537,20 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double startAngle = layout.startAngle >= 0 ? layout.startAngle : layout.startAngle + 360;
 		final double endAngle = layout.endAngle > 0 ? layout.endAngle : layout.endAngle + 360;
 		final boolean sameSign = layout.startAngle * layout.endAngle >= 0;
+		int imin = 1;
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < HeliostatSpiralFieldLayout.MAXIMUM_NUMBER_OF_HELIOSTATS; i++) {
-				double r = b * Math.sqrt(i);
-				r += (r - b) * layout.getRadialExpansionRatio();
-				if (r > a) {
-					break;
-				}
 				final double theta = i * layout.getDivergence();
 				if (theta < theta0) {
+					imin = i;
 					continue;
+				}
+				double r = b * Math.sqrt(i);
+				final double d = r - b * Math.sqrt(imin);
+				r += d * d * layout.getRadialExpansionRatio();
+				if (r > a) {
+					break;
 				}
 				double az = Math.toDegrees(theta);
 				az = az % 360;
