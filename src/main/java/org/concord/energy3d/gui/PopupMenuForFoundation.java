@@ -1353,8 +1353,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getRadialExpansionRatio() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial expansion ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatSpiralFieldLayout.getDivergence() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Divergence angle cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getDivergence() < Math.toRadians(5) || heliostatSpiralFieldLayout.getDivergence() > Math.toRadians(175)) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Divergence angle must be between 5 and 175 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getStartAngle() < -360 || heliostatSpiralFieldLayout.getStartAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Starting angle must be between -360 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getEndAngle() < -360 || heliostatSpiralFieldLayout.getEndAngle() > 360) {
@@ -2416,8 +2416,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				private double maximumApertureWidth = 10;
 				private double minimumApertureHeight = 1;
 				private double maximumApertureHeight = 2;
-				private double minimumDivergenceAngle = 0;
-				private double maximumDivergenceAngle = 180;
+				private double minimumDivergenceAngle = 5;
+				private double maximumDivergenceAngle = 175;
 				private double minimumRadialExpansion = 0;
 				private double maximumRadialExpansion = 0.01;
 

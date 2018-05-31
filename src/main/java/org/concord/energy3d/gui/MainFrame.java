@@ -2046,10 +2046,7 @@ public class MainFrame extends JFrame {
 					if (JOptionPane.showConfirmDialog(MainFrame.this, "Sorting IDs may break scripts. Do you want to continue?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
 						return;
 					}
-					long id = 1;
-					for (final HousePart x : Scene.getInstance().getParts()) {
-						x.setId(id++);
-					}
+					Scene.getInstance().sortID();
 					Scene.getInstance().redrawAll();
 				}
 			});

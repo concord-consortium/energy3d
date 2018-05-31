@@ -72,20 +72,24 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		layout.setRadialSpacing(minimumRadialSpacing + individual.getGene(3) * (maximumRadialSpacing - minimumRadialSpacing));
 		layout.setRadialExpansionRatio(minimumRadialExpansion + individual.getGene(4) * (maximumRadialExpansion - minimumRadialExpansion));
 		foundation.generateHeliostatField(layout);
-		final double output = objectiveFunction.compute();
 		final List<Mirror> heliostats = foundation.getHeliostats();
-		final Mirror heliostat = heliostats.get(0);
-		final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
-		if (netProfit) {
-			double cost = dailyCostPerApertureSquareMeter;
-			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
-				cost *= 12;
-			}
-			individual.setFitness(output * pricePerKWh - cost * totalApertureArea);
-		} else if (outputPerApertureSquareMeter) {
-			individual.setFitness(output / totalApertureArea);
+		if (heliostats.isEmpty()) {
+			individual.setFitness(-Double.MAX_VALUE); // unfit
 		} else {
-			individual.setFitness(output);
+			final double output = objectiveFunction.compute();
+			final Mirror heliostat = heliostats.get(0);
+			final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
+			if (netProfit) {
+				double cost = dailyCostPerApertureSquareMeter;
+				if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+					cost *= 12;
+				}
+				individual.setFitness(output * pricePerKWh - cost * totalApertureArea);
+			} else if (outputPerApertureSquareMeter) {
+				individual.setFitness(output / totalApertureArea);
+			} else {
+				individual.setFitness(output);
+			}
 		}
 	}
 

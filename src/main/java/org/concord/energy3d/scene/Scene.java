@@ -3570,6 +3570,14 @@ public class Scene implements Serializable {
 		return ++idCounter;
 	}
 
+	public void sortID() {
+		long id = 1;
+		for (final HousePart x : parts) {
+			x.setId(id++);
+		}
+		idCounter = parts.size();
+	}
+
 	public boolean hasSensor() {
 		for (final HousePart housePart : parts) {
 			if (housePart instanceof Sensor) {

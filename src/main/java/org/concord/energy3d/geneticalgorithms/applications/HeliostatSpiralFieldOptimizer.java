@@ -20,8 +20,8 @@ import org.concord.energy3d.scene.Scene;
 public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 
 	private static double divergenceAngle = Math.toDegrees(HeliostatSpiralFieldLayout.GOLDEN_ANGLE); // cache for the next run
-	private double minimumDivergenceAngle = 0;
-	private double maximumDivergenceAngle = 180;
+	private double minimumDivergenceAngle = 5;
+	private double maximumDivergenceAngle = 175;
 
 	private static double radialExpansion; // cache for the next run
 
@@ -58,20 +58,24 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 		layout.setDivergence(minimumDivergenceAngle + individual.getGene(2) * (maximumDivergenceAngle - minimumDivergenceAngle));
 		layout.setRadialExpansionRatio(minimumRadialExpansion + individual.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion));
 		foundation.generateHeliostatField(layout);
-		final double output = objectiveFunction.compute();
 		final List<Mirror> heliostats = foundation.getHeliostats();
-		final Mirror heliostat = heliostats.get(0);
-		final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
-		if (netProfit) {
-			double cost = dailyCostPerApertureSquareMeter;
-			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
-				cost *= 12;
-			}
-			individual.setFitness(output * pricePerKWh - cost * totalApertureArea);
-		} else if (outputPerApertureSquareMeter) {
-			individual.setFitness(output / totalApertureArea);
+		if (heliostats.isEmpty()) { // sometimes the layout fails, so this individual is absolutely unfit
+			individual.setFitness(-Double.MAX_VALUE);
 		} else {
-			individual.setFitness(output);
+			final double output = objectiveFunction.compute();
+			final Mirror heliostat = heliostats.get(0);
+			final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
+			if (netProfit) {
+				double cost = dailyCostPerApertureSquareMeter;
+				if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+					cost *= 12;
+				}
+				individual.setFitness(output * pricePerKWh - cost * totalApertureArea);
+			} else if (outputPerApertureSquareMeter) {
+				individual.setFitness(output / totalApertureArea);
+			} else {
+				individual.setFitness(output);
+			}
 		}
 	}
 

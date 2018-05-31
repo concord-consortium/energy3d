@@ -2270,7 +2270,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 		for (final HousePart x : removed) {
 			Scene.getInstance().remove(x, false);
+			x.delete();
+			x.getRoot().detachAllChildren(); // detachment cannot be put into delete(), we detach all children here to help garbage collection
 		}
+		Scene.getInstance().sortID();
+		System.gc();
 		return removed;
 	}
 
@@ -2471,8 +2475,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
+			removed.clear();
 		}
-		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
+		// final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
@@ -2511,7 +2516,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 			break;
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(command);
+		// SceneManager.getInstance().getUndoManager().addEdit(command);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
