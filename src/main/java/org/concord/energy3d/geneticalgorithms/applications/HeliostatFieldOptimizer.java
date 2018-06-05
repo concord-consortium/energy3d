@@ -84,7 +84,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
 				if (netProfit) {
-					s = "Net Daily Profit";
+					s = "Daily Profit";
 				} else if (outputPerApertureSquareMeter) {
 					s = "Daily Output per Aperture Square Meter";
 				} else {
@@ -94,7 +94,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 				break;
 			case ObjectiveFunction.ANNUAl:
 				if (netProfit) {
-					s = "Net Annual Profit";
+					s = "Annual Profit";
 				} else if (outputPerApertureSquareMeter) {
 					s = "Annual Output per Aperture Square Meter";
 				} else {
@@ -118,7 +118,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			switch (objectiveFunction.getType()) {
 			case ObjectiveFunction.DAILY:
 				if (netProfit) {
-					s = "Net Daily Profit";
+					s = "Daily Profit";
 				} else if (outputPerApertureSquareMeter) {
 					s = "Daily Output per Aperture Square Meter";
 				} else {
@@ -128,7 +128,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 				break;
 			case ObjectiveFunction.ANNUAl:
 				if (netProfit) {
-					s = "Net Annual Profit";
+					s = "Annual Profit";
 				} else if (outputPerApertureSquareMeter) {
 					s = "Annual Output per Aperture Square Meter";
 				} else {

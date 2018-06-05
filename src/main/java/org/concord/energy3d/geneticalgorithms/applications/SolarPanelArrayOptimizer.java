@@ -157,7 +157,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
 			if (netProfit) {
-				s = "Net Daily Profit";
+				s = "Daily Profit";
 			} else if (outputPerSolarPanel) {
 				s = "Daily Output per Solar Panel";
 			} else {
@@ -167,7 +167,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			break;
 		case ObjectiveFunction.ANNUAl:
 			if (netProfit) {
-				s = "Net Annual Profit";
+				s = "Annual Profit";
 			} else if (outputPerSolarPanel) {
 				s = "Annual Output per Solar Panel";
 			} else {
@@ -188,7 +188,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		switch (objectiveFunction.getType()) {
 		case ObjectiveFunction.DAILY:
 			if (netProfit) {
-				s = "Net Daily Profit";
+				s = "Daily Profit";
 			} else if (outputPerSolarPanel) {
 				s = "Daily Output per Solar Panel";
 			} else {
@@ -198,7 +198,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			break;
 		case ObjectiveFunction.ANNUAl:
 			if (netProfit) {
-				s = "Net Annual Profit";
+				s = "Annual Profit";
 			} else if (outputPerSolarPanel) {
 				s = "Annual Output per Solar Panel";
 			} else {
