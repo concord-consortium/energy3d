@@ -80,6 +80,7 @@ import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddNodeCommand;
+import org.concord.energy3d.undo.ChangeFoundationAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSizeCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
@@ -253,7 +254,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (!(selectedPart instanceof Foundation)) {
 						return;
 					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Foundation foundation = (Foundation) selectedPart;
+					final String partInfo = foundation.toString().substring(0, foundation.toString().indexOf(')') + 1);
 					final String title = "<html>Rotate " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>Rotate a foundation to any angle by degrees.<br>Note: By convention, the angle for counter-wise<br>rotation (e.g., from north to west) is positive.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -280,9 +282,59 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (!Util.isZero(a)) {
-									SceneManager.getInstance().rotate(Math.toRadians(a));
+									SceneManager.getInstance().rotate(-Math.toRadians(a));
 									updateAfterEdit();
 								}
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
+			rotateMenu.add(miAzimuth);
+			miAzimuth.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation foundation = (Foundation) selectedPart;
+					final String partInfo = foundation.toString().substring(0, foundation.toString().indexOf(')') + 1);
+					final String title = "<html>Set azimuth for " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>Set the azimuth (in degrees) of a foundation.<br>The azimuth of a foundation is determined by its reference vector.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(foundation.getAzimuth()));
+					gui.add(inputField, BorderLayout.SOUTH);
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Azimuth (\u00B0)");
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							double a = 0;
+							try {
+								a = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								final ChangeFoundationAzimuthCommand c = new ChangeFoundationAzimuthCommand(foundation);
+								foundation.setAzimuth(a);
+								updateAfterEdit();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 								if (choice == options[0]) {
 									break;
 								}
@@ -1497,7 +1549,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			final JMenu optimizeMenu = new JMenu("Optimize");
 
-			final JMenuItem miBuildingLocation = new JMenuItem("Building Locations...");
+			final JMenuItem miBuildingLocation = new JMenuItem("Building Location...");
 			miBuildingLocation.addActionListener(new ActionListener() {
 
 				private int selectedFitnessFunction = 0;
@@ -1526,7 +1578,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Solution:"));
-					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Locations" });
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Location" });
 					panel.add(solutionComboBox);
 					panel.add(new JLabel("Fitness function:"));
 					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
@@ -1571,7 +1623,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Building Locations");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Building Location");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -1651,7 +1703,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Solution:"));
-					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Locations" });
+					final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Building Orientation" });
 					panel.add(solutionComboBox);
 					panel.add(new JLabel("Fitness function:"));
 					final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
@@ -1684,7 +1736,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Building Locations");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Building Orientation");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -2762,6 +2814,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 					final Foundation foundation = (Foundation) selectedPart;
 					miBuildingLocation.setEnabled(!foundation.getLockEdit() && foundation.getWalls().size() > 0);
+					miBuildingOrientation.setEnabled(miBuildingLocation.isEnabled());
 					miWindows.setEnabled(foundation.getWindows().size() > 0);
 					miSolarPanelTiltAngle.setEnabled(foundation.getRacks().size() > 0);
 					miSolarArray.setEnabled(miSolarPanelTiltAngle.isEnabled());

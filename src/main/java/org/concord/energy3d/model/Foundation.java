@@ -1697,7 +1697,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public void setAzimuth(final double azimuth) {
-		rotate(Math.toRadians(azimuth - getAzimuth()), null, false);
+		rotate(Math.toRadians(getAzimuth() - azimuth), null, false); // not (azimuth-getAzimuth) as we want ccw to be positive
+		drawAzimuthArrow();
 		Scene.getInstance().redrawFoundationNow(this);
 	}
 
