@@ -759,7 +759,7 @@ public class MainFrame extends JFrame {
 					} else {
 						final FileChooser fileChooser = new FileChooser();
 						fileChooser.setCurrentDirectory(SnapshotLogger.getLogFolder());
-						final File file = fileChooser.showDialog(".ng3", FileChooser.ng3Filter, true);
+						final File file = fileChooser.showDialog(".ng3", FileChooser.ng3Filter, false);
 						if (file == null) {
 							return;
 						}

@@ -1696,13 +1696,18 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
+	public void setAzimuth(final double azimuth) {
+		rotate(Math.toRadians(azimuth - getAzimuth()), null, false);
+		Scene.getInstance().redrawFoundationNow(this);
+	}
+
 	/** @return the azimuth of the reference vector of this foundation in degrees */
 	public double getAzimuth() {
-		final Vector3 v = getAbsPoint(0);
+		final Vector3 v0 = getAbsPoint(0);
 		final Vector3 v1 = getAbsPoint(1);
-		final double ly = v.distance(v1);
-		double a = 90 + Math.toDegrees(Math.asin((v.getY() - v1.getY()) / ly));
-		if (v.getX() > v1.getX()) {
+		final double ly = v0.distance(v1);
+		double a = 90 + Math.toDegrees(Math.asin((v0.getY() - v1.getY()) / ly));
+		if (v0.getX() > v1.getX()) {
 			a = 360 - a;
 		}
 		if (Util.isZero(a - 360)) {
