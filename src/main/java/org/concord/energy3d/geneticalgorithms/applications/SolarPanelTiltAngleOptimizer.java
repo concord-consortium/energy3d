@@ -126,4 +126,13 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 		});
 	}
 
+	private static SolarPanelTiltAngleOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new SolarPanelTiltAngleOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

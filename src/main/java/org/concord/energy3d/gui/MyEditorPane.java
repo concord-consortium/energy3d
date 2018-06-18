@@ -41,14 +41,14 @@ import org.concord.energy3d.agents.EventTimeSeries;
 import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.agents.QuestionnaireEvent;
 import org.concord.energy3d.agents.QuestionnaireModel;
-import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.BuildingOrientationOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizerMaker;
+import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.BuildingOrientationOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PartGroup;
@@ -481,7 +481,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new BuildingLocationOptimizerMaker((Foundation) p).make();
+					BuildingLocationOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -494,7 +494,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new BuildingOrientationOptimizerMaker((Foundation) p).make();
+					BuildingOrientationOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -507,7 +507,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new WindowOptimizerMaker((Foundation) p).make();
+					WindowOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -520,7 +520,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new SolarPanelTiltAngleOptimizerMaker((Foundation) p).make();
+					SolarPanelTiltAngleOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -533,7 +533,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new SolarPanelArrayOptimizerMaker((Foundation) p).make();
+					SolarPanelArrayOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -546,7 +546,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new HeliostatPositionOptimizerMaker((Foundation) p).make();
+					HeliostatPositionOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -559,7 +559,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new HeliostatConcentricFieldOptimizerMaker((Foundation) p).make();
+					HeliostatConcentricFieldOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -572,7 +572,7 @@ public class MyEditorPane {
 				final int i = Integer.parseInt(s.trim());
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					new HeliostatSpiralFieldOptimizerMaker((Foundation) p).make();
+					HeliostatSpiralFieldOptimizer.make((Foundation) p);
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}

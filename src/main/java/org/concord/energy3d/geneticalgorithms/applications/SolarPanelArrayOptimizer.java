@@ -229,4 +229,13 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		});
 	}
 
+	private static SolarPanelArrayOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new SolarPanelArrayOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

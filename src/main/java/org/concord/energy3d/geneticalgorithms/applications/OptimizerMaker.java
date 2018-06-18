@@ -15,8 +15,6 @@ public abstract class OptimizerMaker {
 	double convergenceThreshold = 0.01;
 	double mutationRate = 0.1;
 
-	Foundation foundation;
-
-	public abstract void make();
+	public abstract void make(Foundation foundation);
 
 }

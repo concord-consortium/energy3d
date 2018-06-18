@@ -110,4 +110,13 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 		});
 	}
 
+	private static BuildingOrientationOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new BuildingOrientationOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

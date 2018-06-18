@@ -36,14 +36,14 @@ import javax.swing.SpringLayout;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.BuildingOrientationOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizerMaker;
-import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizerMaker;
+import org.concord.energy3d.geneticalgorithms.applications.BuildingLocationOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.BuildingOrientationOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
+import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -1552,7 +1552,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new BuildingLocationOptimizerMaker((Foundation) selectedPart).make();
+						BuildingLocationOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1564,7 +1564,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new BuildingOrientationOptimizerMaker((Foundation) selectedPart).make();
+						BuildingOrientationOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1576,7 +1576,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new WindowOptimizerMaker((Foundation) selectedPart).make();
+						WindowOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1589,7 +1589,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new SolarPanelTiltAngleOptimizerMaker((Foundation) selectedPart).make();
+						SolarPanelTiltAngleOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1601,7 +1601,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new SolarPanelArrayOptimizerMaker((Foundation) selectedPart).make();
+						SolarPanelArrayOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1614,7 +1614,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new HeliostatPositionOptimizerMaker((Foundation) selectedPart).make();
+						HeliostatPositionOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1626,7 +1626,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new HeliostatConcentricFieldOptimizerMaker((Foundation) selectedPart).make();
+						HeliostatConcentricFieldOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});
@@ -1638,7 +1638,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						new HeliostatSpiralFieldOptimizerMaker((Foundation) selectedPart).make();
+						HeliostatSpiralFieldOptimizer.make((Foundation) selectedPart);
 					}
 				}
 			});

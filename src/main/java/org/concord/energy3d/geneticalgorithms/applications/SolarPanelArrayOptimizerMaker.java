@@ -28,12 +28,8 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	private int minimumPanelRows = 1;
 	private int maximumPanelRows = 5;
 
-	public SolarPanelArrayOptimizerMaker(final Foundation foundation) {
-		this.foundation = foundation;
-	}
-
 	@Override
-	public void make() {
+	public void make(final Foundation foundation) {
 
 		final List<Rack> racks = foundation.getRacks();
 		if (racks.isEmpty()) {

@@ -35,12 +35,8 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 	private double pricePerKWh = 0.225;
 	private double dailyCostPerApertureSquareMeter = 0.1;
 
-	public HeliostatSpiralFieldOptimizerMaker(final Foundation foundation) {
-		this.foundation = foundation;
-	}
-
 	@Override
-	public void make() {
+	public void make(final Foundation foundation) {
 
 		final List<Mirror> heliostats = foundation.getHeliostats();
 		if (heliostats.isEmpty()) {

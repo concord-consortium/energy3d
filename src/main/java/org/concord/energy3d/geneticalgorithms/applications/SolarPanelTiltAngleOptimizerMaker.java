@@ -22,12 +22,8 @@ import org.concord.energy3d.util.SpringUtilities;
  */
 public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
-	public SolarPanelTiltAngleOptimizerMaker(final Foundation foundation) {
-		this.foundation = foundation;
-	}
-
 	@Override
-	public void make() {
+	public void make(final Foundation foundation) {
 
 		final List<Rack> racks = foundation.getRacks();
 		if (racks.isEmpty()) {

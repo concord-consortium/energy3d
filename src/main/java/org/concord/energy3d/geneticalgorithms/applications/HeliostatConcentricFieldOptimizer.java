@@ -121,4 +121,13 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
 	}
 
+	private static HeliostatConcentricFieldOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new HeliostatConcentricFieldOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

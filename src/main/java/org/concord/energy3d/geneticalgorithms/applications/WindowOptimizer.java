@@ -330,4 +330,13 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		});
 	}
 
+	private static WindowOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new WindowOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

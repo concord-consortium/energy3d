@@ -166,4 +166,13 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		});
 	}
 
+	private static BuildingLocationOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new BuildingLocationOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

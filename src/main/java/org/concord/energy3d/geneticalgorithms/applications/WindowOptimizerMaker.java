@@ -29,12 +29,8 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 	private double maximumHeightRelative = 0.4;
 	private boolean optimizeIndividualWindows;
 
-	public WindowOptimizerMaker(final Foundation foundation) {
-		this.foundation = foundation;
-	}
-
 	@Override
-	public void make() {
+	public void make(final Foundation foundation) {
 
 		final List<Window> windows = foundation.getWindows();
 		if (windows.isEmpty()) {

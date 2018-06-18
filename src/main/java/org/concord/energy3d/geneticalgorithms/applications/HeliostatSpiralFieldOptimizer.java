@@ -104,4 +104,13 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 		return s.substring(0, s.length() - 2) + ") = " + individual.getFitness();
 	}
 
+	private static HeliostatSpiralFieldOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new HeliostatSpiralFieldOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

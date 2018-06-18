@@ -172,4 +172,13 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 		});
 	}
 
+	private static HeliostatPositionOptimizerMaker maker;
+
+	public static void make(final Foundation foundation) {
+		if (maker == null) {
+			maker = new HeliostatPositionOptimizerMaker();
+		}
+		maker.make(foundation);
+	}
+
 }

@@ -27,12 +27,8 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 	private double minimumY = -30;
 	private double maximumY = 30;
 
-	public BuildingLocationOptimizerMaker(final Foundation foundation) {
-		this.foundation = foundation;
-	}
-
 	@Override
-	public void make() {
+	public void make(final Foundation foundation) {
 
 		final List<Wall> walls = foundation.getWalls();
 		if (walls.isEmpty()) {
