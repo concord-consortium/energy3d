@@ -22,8 +22,8 @@ import org.concord.energy3d.shapes.Heliodon;
  */
 public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 
-	public BuildingOrientationOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public BuildingOrientationOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	@Override

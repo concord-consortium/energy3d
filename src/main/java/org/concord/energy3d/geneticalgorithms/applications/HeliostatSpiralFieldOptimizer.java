@@ -25,8 +25,8 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 
 	private static double radialExpansion; // cache for the next run
 
-	public HeliostatSpiralFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public HeliostatSpiralFieldOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	@Override

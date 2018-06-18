@@ -30,8 +30,8 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 	private double ymin = -30;
 	private double ymax = 30;
 
-	public BuildingLocationOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public BuildingLocationOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	public void setMinimumX(final double xmin) {

@@ -25,9 +25,9 @@ public class Population {
 	private final List<Individual> mutants = new ArrayList<Individual>();
 	private int selectionMethod = ROULETTE_WHEEL;
 	private double convergenceThreshold = 0.01;
-	private final int discretizationSteps;
+	private int discretizationSteps;
 
-	public Population(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
+	public Population(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		individuals = new Individual[populationSize];
 		savedGeneration = new Individual[populationSize];
 		violations = new boolean[populationSize];
@@ -36,9 +36,22 @@ public class Population {
 			savedGeneration[i] = new Individual(chromosomeLength, discretizationSteps);
 			violations[i] = false;
 		}
+	}
+
+	public void setSelectionMethod(final int selectionMethod) {
 		this.selectionMethod = selectionMethod;
+	}
+
+	public int getSelectionMethod() {
+		return selectionMethod;
+	}
+
+	public void setConvergenceThreshold(final double convergenceThreshold) {
 		this.convergenceThreshold = convergenceThreshold;
-		this.discretizationSteps = discretizationSteps;
+	}
+
+	public double getConvergenceThreshold() {
+		return convergenceThreshold;
 	}
 
 	public int size() {

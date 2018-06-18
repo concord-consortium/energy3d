@@ -42,9 +42,17 @@ public abstract class Optimizer {
 	ObjectiveFunction objectiveFunction;
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
-	public Optimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		population = new Population(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		population = new Population(populationSize, chromosomeLength, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
+	}
+
+	public void setSelectionMethod(final int selectionMethod) {
+		population.setSelectionMethod(selectionMethod);
+	}
+
+	public void setConvergenceThreshold(final double convergenceThreshold) {
+		population.setConvergenceThreshold(convergenceThreshold);
 	}
 
 	public void setMaximumGenerations(final int maximumGenerations) {
@@ -56,6 +64,10 @@ public abstract class Optimizer {
 	}
 
 	public abstract void setOjectiveFunction(final int objectiveFunctionType);
+
+	public int getObjectiveFunctionType() {
+		return objectiveFunction.getType();
+	}
 
 	public void setupFoundationConstraint() {
 		final Vector3 v0 = foundation.getAbsPoint(0);

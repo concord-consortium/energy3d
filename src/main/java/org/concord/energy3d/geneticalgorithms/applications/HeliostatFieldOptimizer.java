@@ -31,8 +31,8 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 	double pricePerKWh = 0.225;
 	double dailyCostPerApertureSquareMeter = 0.1;
 
-	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public HeliostatFieldOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	public void setPricePerKWh(final double x) {

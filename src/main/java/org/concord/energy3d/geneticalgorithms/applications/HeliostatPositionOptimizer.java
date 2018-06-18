@@ -28,8 +28,8 @@ import com.ardor3d.math.Vector3;
  */
 public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 
-	public HeliostatPositionOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public HeliostatPositionOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	@Override

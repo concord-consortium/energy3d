@@ -41,8 +41,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 	private double pricePerKWh = 0.225;
 	private double dailyCostPerSolarPanel = 0.15;
 
-	public SolarPanelArrayOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public SolarPanelArrayOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	@Override

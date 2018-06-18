@@ -31,8 +31,8 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 	private double minimumHeightRelative = 0.05;
 	private boolean optimizeIndividualWindows;
 
-	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int selectionMethod, final double convergenceThreshold, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, selectionMethod, convergenceThreshold, discretizationSteps);
+	public WindowOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
 	public void setOptimizeIndividualWindows(final boolean optimizeIndividualWindows) {
