@@ -43,7 +43,7 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 		final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Window Sizes" });
 		panel.add(solutionComboBox);
 		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use", "Random" });
+		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
 		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 		panel.add(fitnessComboBox);
 		panel.add(new JLabel("Minimum width (relative to wall width):"));

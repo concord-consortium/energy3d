@@ -36,7 +36,7 @@ public class HeliostatPositionOptimizerMaker extends OptimizerMaker {
 		final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Positions" });
 		panel.add(solutionComboBox);
 		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output", "Random" });
+		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
 		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
 		panel.add(fitnessComboBox);
 		panel.add(new JLabel("Type:"));
