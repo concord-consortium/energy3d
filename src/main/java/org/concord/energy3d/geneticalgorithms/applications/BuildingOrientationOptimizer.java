@@ -42,7 +42,16 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 	void computeIndividualFitness(final Individual individual) {
 		final double gene = individual.getGene(0);
 		foundation.setAzimuth(gene * 360);
-		individual.setFitness(objectiveFunction.compute());
+		final double rawObjective = objectiveFunction.compute();
+		sharing = true;
+		sigmaShare = 0.125;
+		if (sharing) {
+			final double nc = population.getNicheCount(individual, sigmaShare);
+			System.out.println("****" + nc);
+			individual.setFitness(rawObjective / nc);
+		} else {
+			individual.setFitness(rawObjective);
+		}
 	}
 
 	@Override

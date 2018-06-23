@@ -27,6 +27,8 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
+	private final static int MICRO_GA_MAX_POPULATION = 9;
+
 	double mutationRate = 0.1;
 	double crossoverRate = 0.5;
 	double selectionRate = 0.5;
@@ -40,11 +42,28 @@ public abstract class Optimizer {
 	List<Constraint> constraints;
 	volatile boolean converged;
 	ObjectiveFunction objectiveFunction;
-	private final static int MICRO_GA_MAX_POPULATION = 9;
+	boolean sharing; // fitness sharing?
+	double sigmaShare;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
+	}
+
+	public void setSharing(final boolean sharing) {
+		this.sharing = sharing;
+	}
+
+	public boolean isSharing() {
+		return sharing;
+	}
+
+	public void setSigmaShare(final double sigmaShare) {
+		this.sigmaShare = sigmaShare;
+	}
+
+	public double getSigmaShare() {
+		return sigmaShare;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {

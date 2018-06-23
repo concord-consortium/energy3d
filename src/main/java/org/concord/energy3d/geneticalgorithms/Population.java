@@ -7,7 +7,7 @@ import java.util.List;
 import org.concord.energy3d.util.Util;
 
 /**
- * This class implements standard genetic algorithm (SGA) and micro genetic algorithm (MGA).
+ * This class implements simple genetic algorithm (SGA) and micro genetic algorithm (MGA).
  * 
  * @author Charles Xie
  *
@@ -36,6 +36,19 @@ public class Population {
 			savedGeneration[i] = new Individual(chromosomeLength, discretizationSteps);
 			violations[i] = false;
 		}
+	}
+
+	public double getNicheCount(final Individual selected, final double sigma) {
+		double nicheCount = 0;
+		for (final Individual i : individuals) {
+			final double d = selected.distance(i);
+			double share = 0;
+			if (d < sigma) {
+				share = 1.0 - d / sigma;
+			}
+			nicheCount += share;
+		}
+		return nicheCount;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {
@@ -175,7 +188,7 @@ public class Population {
 		return true;
 	}
 
-	/* Implement standard genetic algorithm (SGA) */
+	/* Implement simple genetic algorithm (SGA) */
 
 	public void runSGA(final double selectionRate, final double crossoverRate) {
 		selectSurvivors(selectionRate);

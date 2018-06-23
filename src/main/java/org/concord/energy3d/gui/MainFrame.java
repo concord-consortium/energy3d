@@ -4587,6 +4587,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getEnableAllEditPointsMenuItem() {
 		if (enableAllEditPointsMenuItem == null) {
 			enableAllEditPointsMenuItem = new JMenuItem("Enable All Base Edit Points");
+			enableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			enableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -4610,6 +4611,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getDisableAllEditPointsMenuItem() {
 		if (disableAllEditPointsMenuItem == null) {
 			disableAllEditPointsMenuItem = new JMenuItem("Disable All Base Edit Points");
+			disableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.SHIFT_MASK));
 			disableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

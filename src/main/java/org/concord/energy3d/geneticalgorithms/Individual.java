@@ -37,6 +37,19 @@ public class Individual implements Comparable<Individual> {
 		}
 	}
 
+	/** @return the Euclidean distance between the chromosomes */
+	public double distance(final Individual individual) {
+		if (chromosome.length == 1) {
+			return Math.abs(chromosome[0] - individual.chromosome[0]);
+		}
+		double sum = 0;
+		for (int i = 0; i < chromosome.length; i++) {
+			final double d = chromosome[i] - individual.chromosome[i];
+			sum += d * d;
+		}
+		return Math.sqrt(sum);
+	}
+
 	public void copyGenes(final Individual original) {
 		System.arraycopy(original.chromosome, 0, chromosome, 0, chromosome.length);
 	}
