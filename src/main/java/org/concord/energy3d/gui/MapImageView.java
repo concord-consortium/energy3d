@@ -77,11 +77,15 @@ class MapImageView extends JComponent {
 			g2.drawImage(image, 0, 0, this);
 		}
 		if (text != null) {
+			g2.setFont(new Font(null, Font.BOLD, 14));
 			final FontMetrics fm = g2.getFontMetrics();
 			final int textWidth = fm.stringWidth(text);
-			g2.setFont(new Font(null, Font.BOLD, 14));
+			final int x = (getWidth() - textWidth) / 2;
+			final int y = getHeight() / 2;
+			g2.setColor(Color.BLACK);
+			g2.fillRect(x - 8, y - 14, textWidth + 16, 20);
 			g2.setColor(textColor);
-			g2.drawString(text, (getWidth() - textWidth) / 2, getHeight() / 2);
+			g2.drawString(text, x, y);
 		}
 	}
 

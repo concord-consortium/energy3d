@@ -8,7 +8,6 @@ public abstract class ObjectiveFunction {
 
 	public final static int DAILY = 0;
 	public final static int ANNUAl = 1;
-	public final static int RANDOM = 2;
 
 	protected int type = DAILY;
 

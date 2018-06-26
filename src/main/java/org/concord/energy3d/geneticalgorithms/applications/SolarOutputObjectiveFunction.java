@@ -32,10 +32,6 @@ public class SolarOutputObjectiveFunction extends ObjectiveFunction {
 				result += Util.sum(Scene.getInstance().getSolarResults()[m]);
 			}
 			break;
-		case RANDOM:
-			Scene.getInstance().updateTrackables();
-			result = Math.random();
-			break;
 		default:
 			Scene.getInstance().updateTrackables();
 			EnergyPanel.getInstance().computeNow();

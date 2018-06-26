@@ -151,7 +151,7 @@ public abstract class Optimizer {
 
 				final int populationSize = population.size();
 
-				if (populationSize > MICRO_GA_MAX_POPULATION) { // implement standard GA
+				if (populationSize > MICRO_GA_MAX_POPULATION) { // implement simple GA
 
 					if (!converged) {
 						final Individual individual = population.getIndividual(indexOfIndividual);

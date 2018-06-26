@@ -82,7 +82,7 @@ public class Population {
 		return individuals[i];
 	}
 
-	private void sort() {
+	public void sort() {
 		Arrays.sort(individuals);
 	}
 
@@ -199,13 +199,16 @@ public class Population {
 	private void selectSurvivors(final double selectionRate) {
 		survivors.clear();
 		sort();
-		for (int i = 0; i < individuals.length; i++) {
-			if (i < selectionRate * individuals.length) {
-				survivors.add(individuals[i]);
-			} else {
-				break;
-			}
+		final int imax = (int) (selectionRate * individuals.length);
+		for (int i = 0; i < imax; i++) {
+			survivors.add(individuals[i]);
 		}
+	}
+
+	private Parents selectParentsByRemainder() {
+		final Individual dad = null;
+		final Individual mom = null;
+		return new Parents(dad, mom);
 	}
 
 	// select a parent by the roulette wheel rule (fitness proportionate selection)

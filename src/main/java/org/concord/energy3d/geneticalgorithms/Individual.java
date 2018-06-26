@@ -37,7 +37,7 @@ public class Individual implements Comparable<Individual> {
 		}
 	}
 
-	/** @return the Euclidean distance between the chromosomes */
+	/** @return the Euclidean distance between the chromosomes (phenotypic only as we don't use genotypic (bit) coding) */
 	public double distance(final Individual individual) {
 		if (chromosome.length == 1) {
 			return Math.abs(chromosome[0] - individual.chromosome[0]);

@@ -33,15 +33,12 @@ public class NetEnergyObjectiveFunction extends ObjectiveFunction {
 				result += foundation.getTotalEnergyToday();
 			}
 			break;
-		case RANDOM:
-			result = Math.random();
-			break;
 		default:
 			EnergyPanel.getInstance().computeNow();
 			result = foundation.getTotalEnergyToday();
 			break;
 		}
-		return -result;
+		return -result; // energy use is positive but we want to minimize it, so we flip the sign here
 	}
 
 }
