@@ -2,6 +2,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.Calendar;
+import java.util.Random;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -36,6 +37,17 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 			throw new RuntimeException("Foundation azimuth out of range");
 		}
 		firstBorn.setGene(0, normalizedValue);
+		if (nicheConfinement) {
+			final Random random = new Random();
+			for (int i = 1; i < population.size(); i++) {
+				final Individual x = population.getIndividual(i);
+				double v = random.nextGaussian() * nicheConfinementRadius + normalizedValue;
+				while (v < 0 || v > 1) {
+					v = random.nextGaussian() * nicheConfinementRadius + normalizedValue;
+				}
+				x.setGene(0, v);
+			}
+		}
 	}
 
 	@Override
@@ -43,12 +55,13 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 		final double gene = individual.getGene(0);
 		foundation.setAzimuth(gene * 360);
 		final double rawObjective = objectiveFunction.compute();
-		sharing = true;
-		sigmaShare = 0.125;
-		if (sharing) {
-			final double nc = population.getNicheCount(individual, sigmaShare);
-			System.out.println("****" + nc);
-			individual.setFitness(rawObjective / nc);
+		// final double rawObjective = Math.abs(Math.sin(gene * MathUtils.TWO_PI)); // test function
+		// sharing = true;
+		if (fitnessSharing) {
+			fitnessSharingRadius = 2;
+			final double nc = population.getNicheCount(individual, fitnessSharingRadius);
+			System.out.println("****" + nc + ", " + rawObjective);
+			individual.setFitness((rawObjective - 50) / nc);
 		} else {
 			individual.setFitness(rawObjective);
 		}

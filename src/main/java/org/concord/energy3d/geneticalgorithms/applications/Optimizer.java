@@ -42,8 +42,10 @@ public abstract class Optimizer {
 	List<Constraint> constraints;
 	volatile boolean converged;
 	ObjectiveFunction objectiveFunction;
-	boolean sharing; // fitness sharing?
-	double sigmaShare;
+	boolean fitnessSharing;
+	double fitnessSharingRadius = 0.1;
+	boolean nicheConfinement;
+	double nicheConfinementRadius = 0.1;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
@@ -51,19 +53,35 @@ public abstract class Optimizer {
 	}
 
 	public void setSharing(final boolean sharing) {
-		this.sharing = sharing;
+		this.fitnessSharing = sharing;
 	}
 
 	public boolean isSharing() {
-		return sharing;
+		return fitnessSharing;
 	}
 
-	public void setSigmaShare(final double sigmaShare) {
-		this.sigmaShare = sigmaShare;
+	public void setShareRadius(final double shareRadius) {
+		this.fitnessSharingRadius = shareRadius;
 	}
 
-	public double getSigmaShare() {
-		return sigmaShare;
+	public double getShareRadius() {
+		return fitnessSharingRadius;
+	}
+
+	public void setNicheConfinement(final boolean nicheConfinement) {
+		this.nicheConfinement = nicheConfinement;
+	}
+
+	public boolean isNicheConfinement() {
+		return nicheConfinement;
+	}
+
+	public void setNicheConfinementRadius(final double nicheConfinementRadius) {
+		this.nicheConfinementRadius = nicheConfinementRadius;
+	}
+
+	public double getNicheConfinementRadius() {
+		return nicheConfinementRadius;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {

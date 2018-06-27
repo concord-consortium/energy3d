@@ -205,12 +205,6 @@ public class Population {
 		}
 	}
 
-	private Parents selectParentsByRemainder() {
-		final Individual dad = null;
-		final Individual mom = null;
-		return new Parents(dad, mom);
-	}
-
 	// select a parent by the roulette wheel rule (fitness proportionate selection)
 	private Parents selectParentsByRouletteWheel(final double lowestFitness, final double sumOfFitness) {
 		// spin the wheel to find dad

@@ -8,6 +8,8 @@ import org.concord.energy3d.model.Foundation;
  */
 public abstract class OptimizerMaker {
 
+	int selectedScope = 0;
+	double nicheConfinementRadius = 0.1;
 	int selectedFitnessFunction = 0;
 	int selectedSelectionMethod = 0;
 	int populationSize = 20;
