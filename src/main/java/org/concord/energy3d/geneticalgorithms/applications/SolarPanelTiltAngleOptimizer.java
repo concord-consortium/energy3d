@@ -3,6 +3,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -32,11 +33,24 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
 		// initialize the population with the first-born being the current design
+		final Random random = new Random();
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
 		final List<Rack> racks = foundation.getRacks();
 		for (final Rack r : racks) {
-			firstBorn.setGene(i++, 0.5 * (1.0 + r.getTiltAngle() / 90.0));
+			final double normalizedValue = 0.5 * (1.0 + r.getTiltAngle() / 90.0);
+			firstBorn.setGene(i, normalizedValue);
+			if (neighborhoodSearch) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+					}
+					individual.setGene(i, v);
+				}
+			}
+			i++;
 		}
 	}
 

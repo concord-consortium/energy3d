@@ -1,5 +1,7 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -26,6 +28,8 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 	private double maximumX = 30;
 	private double minimumY = -30;
 	private double maximumY = 30;
+
+	private BuildingLocationOptimizer op;
 
 	@Override
 	public void make(final Foundation foundation) {
@@ -105,16 +109,33 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 		panel.add(convergenceThresholdField);
 		panel.add(new JLabel("<html><font size=2>Not %</font></html>"));
 
+		final JLabel neighborhoodSearchRadiusLabel = new JLabel("Neighborhood search radius:");
+		final JTextField neighborhoodSearchRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(neighborhoodSearchRadius));
+		final JLabel neighborhoodSearchRadiusLabel2 = new JLabel("<html><font size=2>(0, 1]</font></html>");
+		neighborhoodSearchRadiusLabel.setEnabled(selectedScope == 1);
+		neighborhoodSearchRadiusField.setEnabled(selectedScope == 1);
+		neighborhoodSearchRadiusLabel2.setEnabled(selectedScope == 1);
+
 		panel.add(new JLabel("Initial scope:"));
-		final JComboBox<String> scopeComboBox = new JComboBox<String>(new String[] { "Entire Range", "Nearest Niche" });
+		final JComboBox<String> scopeComboBox = new JComboBox<String>(new String[] { "Entire Range", "Current Neighborhood" });
 		scopeComboBox.setSelectedIndex(selectedScope);
+		scopeComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final boolean enabled = scopeComboBox.getSelectedIndex() == 1;
+					neighborhoodSearchRadiusLabel.setEnabled(enabled);
+					neighborhoodSearchRadiusField.setEnabled(enabled);
+					neighborhoodSearchRadiusLabel2.setEnabled(enabled);
+				}
+			}
+		});
 		panel.add(scopeComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Niche confinement radius:"));
-		final JTextField nicheConfinmentRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(nicheConfinementRadius));
-		panel.add(nicheConfinmentRadiusField);
-		panel.add(new JLabel("<html><font size=2>(0, 1]</font></html>"));
+		panel.add(neighborhoodSearchRadiusLabel);
+		panel.add(neighborhoodSearchRadiusField);
+		panel.add(neighborhoodSearchRadiusLabel2);
 
 		SpringUtilities.makeCompactGrid(panel, 15, 3, 6, 6, 6, 6);
 
@@ -134,7 +155,7 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 					maximumGenerations = Integer.parseInt(generationField.getText());
 					convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 					mutationRate = Double.parseDouble(mutationRateField.getText());
-					nicheConfinementRadius = Double.parseDouble(nicheConfinmentRadiusField.getText());
+					neighborhoodSearchRadius = Double.parseDouble(neighborhoodSearchRadiusField.getText());
 					minimumX = Double.parseDouble(minimumXField.getText());
 					maximumX = Double.parseDouble(maximumXField.getText());
 					minimumY = Double.parseDouble(minimumYField.getText());
@@ -152,13 +173,13 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					} else if (nicheConfinementRadius < 0 || nicheConfinementRadius > 1) {
+					} else if (neighborhoodSearchRadius < 0 || neighborhoodSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Niche confinement radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						selectedScope = scopeComboBox.getSelectedIndex();
-						final BuildingLocationOptimizer op = new BuildingLocationOptimizer(populationSize, 2, 30);
+						op = new BuildingLocationOptimizer(populationSize, 2, 30);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMinimumX(minimumX);
@@ -167,10 +188,10 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 						op.setMaximumY(maximumY);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
+						op.setNeighborhoodSearch(selectedScope == 1);
+						op.setNeighborhoodSearchRadius(neighborhoodSearchRadius);
 						op.setFoundation(foundation);
 						op.setOjectiveFunction(selectedFitnessFunction);
-						op.setNicheConfinement(selectedScope == 1);
-						op.setNicheConfinementRadius(nicheConfinementRadius);
 						op.evolve();
 						if (choice == options[0]) {
 							break;

@@ -2,6 +2,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.Calendar;
+import java.util.Random;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -34,44 +35,14 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
-	public void setMinimumX(final double xmin) {
-		this.xmin = xmin;
-	}
-
-	public double getMinimumX() {
-		return xmin;
-	}
-
-	public void setMaximumX(final double xmax) {
-		this.xmax = xmax;
-	}
-
-	public double getMaximumX() {
-		return xmax;
-	}
-
-	public void setMinimumY(final double ymin) {
-		this.ymin = ymin;
-	}
-
-	public double getMinimumY() {
-		return ymin;
-	}
-
-	public void setMaximumY(final double ymax) {
-		this.ymax = ymax;
-	}
-
-	public double getMaximumY() {
-		return ymax;
-	}
-
 	@Override
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
+
 		// initialize the population with the first-born being the current design
 		final Vector3 center = foundation.getAbsCenter();
 		final Individual firstBorn = population.getIndividual(0);
+
 		double normalizedValue = (center.getX() * Scene.getInstance().getScale() - xmin) / (xmax - xmin);
 		if (normalizedValue < 0) {
 			normalizedValue = 0;
@@ -79,6 +50,18 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			normalizedValue = 1;
 		}
 		firstBorn.setGene(0, normalizedValue);
+		if (neighborhoodSearch) {
+			final Random random = new Random();
+			for (int i = 1; i < population.size(); i++) {
+				final Individual individual = population.getIndividual(i);
+				double v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+				while (v < 0 || v > 1) {
+					v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+				}
+				individual.setGene(0, v);
+			}
+		}
+
 		normalizedValue = (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin);
 		if (normalizedValue < 0) {
 			normalizedValue = 0;
@@ -86,6 +69,18 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			normalizedValue = 1;
 		}
 		firstBorn.setGene(1, normalizedValue);
+		if (neighborhoodSearch) {
+			final Random random = new Random();
+			for (int i = 1; i < population.size(); i++) {
+				final Individual individual = population.getIndividual(i);
+				double v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+				while (v < 0 || v > 1) {
+					v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+				}
+				individual.setGene(1, v);
+			}
+		}
+
 	}
 
 	@Override
@@ -173,6 +168,38 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			maker = new BuildingLocationOptimizerMaker();
 		}
 		maker.make(foundation);
+	}
+
+	public void setMinimumX(final double xmin) {
+		this.xmin = xmin;
+	}
+
+	public double getMinimumX() {
+		return xmin;
+	}
+
+	public void setMaximumX(final double xmax) {
+		this.xmax = xmax;
+	}
+
+	public double getMaximumX() {
+		return xmax;
+	}
+
+	public void setMinimumY(final double ymin) {
+		this.ymin = ymin;
+	}
+
+	public double getMinimumY() {
+		return ymin;
+	}
+
+	public void setMaximumY(final double ymax) {
+		this.ymax = ymax;
+	}
+
+	public double getMaximumY() {
+		return ymax;
 	}
 
 }

@@ -35,30 +35,6 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		super(populationSize, chromosomeLength, discretizationSteps);
 	}
 
-	public void setOptimizeIndividualWindows(final boolean optimizeIndividualWindows) {
-		this.optimizeIndividualWindows = optimizeIndividualWindows;
-	}
-
-	public boolean getOptimizeIndividualWindows() {
-		return optimizeIndividualWindows;
-	}
-
-	public void setMinimumWidthRelative(final double minimumWidthRelative) {
-		this.minimumWidthRelative = minimumWidthRelative;
-	}
-
-	public void setMaximumWidthRelative(final double maximumWidthRelative) {
-		this.maximumWidthRelative = maximumWidthRelative;
-	}
-
-	public void setMinimumHeightRelative(final double minimumHeightRelative) {
-		this.minimumHeightRelative = minimumHeightRelative;
-	}
-
-	public void setMaximumHeightRelative(final double maximumHeightRelative) {
-		this.maximumHeightRelative = maximumHeightRelative;
-	}
-
 	@Override
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
@@ -337,6 +313,30 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 			maker = new WindowOptimizerMaker();
 		}
 		maker.make(foundation);
+	}
+
+	public void setOptimizeIndividualWindows(final boolean optimizeIndividualWindows) {
+		this.optimizeIndividualWindows = optimizeIndividualWindows;
+	}
+
+	public boolean getOptimizeIndividualWindows() {
+		return optimizeIndividualWindows;
+	}
+
+	public void setMinimumWidthRelative(final double minimumWidthRelative) {
+		this.minimumWidthRelative = minimumWidthRelative;
+	}
+
+	public void setMaximumWidthRelative(final double maximumWidthRelative) {
+		this.maximumWidthRelative = maximumWidthRelative;
+	}
+
+	public void setMinimumHeightRelative(final double minimumHeightRelative) {
+		this.minimumHeightRelative = minimumHeightRelative;
+	}
+
+	public void setMaximumHeightRelative(final double maximumHeightRelative) {
+		this.maximumHeightRelative = maximumHeightRelative;
 	}
 
 }

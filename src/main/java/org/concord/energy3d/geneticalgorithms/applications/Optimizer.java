@@ -44,8 +44,8 @@ public abstract class Optimizer {
 	ObjectiveFunction objectiveFunction;
 	boolean fitnessSharing;
 	double fitnessSharingRadius = 0.1;
-	boolean nicheConfinement;
-	double nicheConfinementRadius = 0.1;
+	boolean neighborhoodSearch;
+	double neighborhoodSearchRadius = 0.1;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
@@ -68,20 +68,20 @@ public abstract class Optimizer {
 		return fitnessSharingRadius;
 	}
 
-	public void setNicheConfinement(final boolean nicheConfinement) {
-		this.nicheConfinement = nicheConfinement;
+	public void setNeighborhoodSearch(final boolean neighborhoodSearch) {
+		this.neighborhoodSearch = neighborhoodSearch;
 	}
 
-	public boolean isNicheConfinement() {
-		return nicheConfinement;
+	public boolean isNeighborhoodSearch() {
+		return neighborhoodSearch;
 	}
 
-	public void setNicheConfinementRadius(final double nicheConfinementRadius) {
-		this.nicheConfinementRadius = nicheConfinementRadius;
+	public void setNeighborhoodSearchRadius(final double neighborhoodSearchRadius) {
+		this.neighborhoodSearchRadius = neighborhoodSearchRadius;
 	}
 
-	public double getNicheConfinementRadius() {
-		return nicheConfinementRadius;
+	public double getNeighborhoodSearchRadius() {
+		return neighborhoodSearchRadius;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {
