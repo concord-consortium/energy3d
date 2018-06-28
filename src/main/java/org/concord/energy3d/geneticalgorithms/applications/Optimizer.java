@@ -27,6 +27,8 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
+	public final static int GLOBAL_SEARCH = 0;
+	public final static int LOCAL_SEARCH = 1;
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
 	double mutationRate = 0.1;
@@ -44,8 +46,8 @@ public abstract class Optimizer {
 	ObjectiveFunction objectiveFunction;
 	boolean fitnessSharing;
 	double fitnessSharingRadius = 0.1;
-	boolean neighborhoodSearch;
-	double neighborhoodSearchRadius = 0.1;
+	int searchMethod = GLOBAL_SEARCH;
+	double localSearchRadius = 0.1;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
@@ -68,20 +70,20 @@ public abstract class Optimizer {
 		return fitnessSharingRadius;
 	}
 
-	public void setNeighborhoodSearch(final boolean neighborhoodSearch) {
-		this.neighborhoodSearch = neighborhoodSearch;
+	public void setSearchMethod(final int searchMethod) {
+		this.searchMethod = searchMethod;
 	}
 
-	public boolean isNeighborhoodSearch() {
-		return neighborhoodSearch;
+	public int getSearchMethod() {
+		return searchMethod;
 	}
 
-	public void setNeighborhoodSearchRadius(final double neighborhoodSearchRadius) {
-		this.neighborhoodSearchRadius = neighborhoodSearchRadius;
+	public void setLocalSearchRadius(final double localSearchRadius) {
+		this.localSearchRadius = localSearchRadius;
 	}
 
-	public double getNeighborhoodSearchRadius() {
-		return neighborhoodSearchRadius;
+	public double getLocalSearchRadius() {
+		return localSearchRadius;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {

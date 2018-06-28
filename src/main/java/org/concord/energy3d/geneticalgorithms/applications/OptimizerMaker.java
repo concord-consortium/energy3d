@@ -8,8 +8,8 @@ import org.concord.energy3d.model.Foundation;
  */
 public abstract class OptimizerMaker {
 
-	int selectedScope = 0;
-	double neighborhoodSearchRadius = 0.1;
+	int selectedSearchMethod = Optimizer.GLOBAL_SEARCH;
+	double localSearchRadius = 0.1;
 	int selectedFitnessFunction = 0;
 	int selectedSelectionMethod = 0;
 	int populationSize = 20;

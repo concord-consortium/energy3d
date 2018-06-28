@@ -84,33 +84,33 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 		panel.add(convergenceThresholdField);
 		panel.add(new JLabel("<html><font size=2>Not %</font></html>"));
 
-		final JLabel neighborhoodSearchRadiusLabel = new JLabel("Neighborhood search radius:");
-		final JTextField neighborhoodSearchRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(neighborhoodSearchRadius));
-		final JLabel neighborhoodSearchRadiusLabel2 = new JLabel("<html><font size=2>(0, 1]</font></html>");
-		neighborhoodSearchRadiusLabel.setEnabled(selectedScope == 1);
-		neighborhoodSearchRadiusField.setEnabled(selectedScope == 1);
-		neighborhoodSearchRadiusLabel2.setEnabled(selectedScope == 1);
+		final JLabel localSearchRadiusLabel = new JLabel("Local search radius:");
+		final JTextField localSearchRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(localSearchRadius));
+		final JLabel localSearchRadiusLabel2 = new JLabel("<html><font size=2>(0, 1]</font></html>");
+		localSearchRadiusLabel.setEnabled(selectedSearchMethod > 0);
+		localSearchRadiusField.setEnabled(selectedSearchMethod > 0);
+		localSearchRadiusLabel2.setEnabled(selectedSearchMethod > 0);
 
-		panel.add(new JLabel("Initial scope:"));
-		final JComboBox<String> scopeComboBox = new JComboBox<String>(new String[] { "Entire Range", "Current Neighborhood" });
-		scopeComboBox.setSelectedIndex(selectedScope);
-		scopeComboBox.addItemListener(new ItemListener() {
+		panel.add(new JLabel("Search method:"));
+		final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[] { "Global Search", "Local Search" });
+		searchMethodComboBox.setSelectedIndex(selectedSearchMethod);
+		searchMethodComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final boolean enabled = scopeComboBox.getSelectedIndex() == 1;
-					neighborhoodSearchRadiusLabel.setEnabled(enabled);
-					neighborhoodSearchRadiusField.setEnabled(enabled);
-					neighborhoodSearchRadiusLabel2.setEnabled(enabled);
+					final boolean enabled = searchMethodComboBox.getSelectedIndex() > 0;
+					localSearchRadiusLabel.setEnabled(enabled);
+					localSearchRadiusField.setEnabled(enabled);
+					localSearchRadiusLabel2.setEnabled(enabled);
 				}
 			}
 		});
-		panel.add(scopeComboBox);
+		panel.add(searchMethodComboBox);
 		panel.add(new JLabel());
 
-		panel.add(neighborhoodSearchRadiusLabel);
-		panel.add(neighborhoodSearchRadiusField);
-		panel.add(neighborhoodSearchRadiusLabel2);
+		panel.add(localSearchRadiusLabel);
+		panel.add(localSearchRadiusField);
+		panel.add(localSearchRadiusLabel2);
 
 		SpringUtilities.makeCompactGrid(panel, 11, 3, 6, 6, 6, 6);
 
@@ -137,7 +137,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					maximumGenerations = Integer.parseInt(generationField.getText());
 					convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 					mutationRate = Double.parseDouble(mutationRateField.getText());
-					neighborhoodSearchRadius = Double.parseDouble(neighborhoodSearchRadiusField.getText());
+					localSearchRadius = Double.parseDouble(localSearchRadiusField.getText());
 				} catch (final NumberFormatException exception) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					ok = false;
@@ -151,19 +151,19 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					} else if (neighborhoodSearchRadius < 0 || neighborhoodSearchRadius > 1) {
+					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Niche confinement radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						selectedScope = scopeComboBox.getSelectedIndex();
+						selectedSearchMethod = searchMethodComboBox.getSelectedIndex();
 						op = new BuildingOrientationOptimizer(populationSize, 2, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
-						op.setNeighborhoodSearch(selectedScope == 1);
-						op.setNeighborhoodSearchRadius(neighborhoodSearchRadius);
+						op.setSearchMethod(selectedSearchMethod);
+						op.setLocalSearchRadius(localSearchRadius);
 						op.setFoundation(foundation);
 						op.setOjectiveFunction(selectedFitnessFunction);
 						op.evolve();

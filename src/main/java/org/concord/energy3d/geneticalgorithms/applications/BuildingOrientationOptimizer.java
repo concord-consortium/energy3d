@@ -37,13 +37,13 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 			throw new RuntimeException("Foundation azimuth out of range");
 		}
 		firstBorn.setGene(0, normalizedValue);
-		if (neighborhoodSearch) {
+		if (searchMethod == LOCAL_SEARCH) {
 			final Random random = new Random();
 			for (int i = 1; i < population.size(); i++) {
 				final Individual individual = population.getIndividual(i);
-				double v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+				double v = random.nextGaussian() * localSearchRadius + normalizedValue;
 				while (v < 0 || v > 1) {
-					v = random.nextGaussian() * neighborhoodSearchRadius + normalizedValue;
+					v = random.nextGaussian() * localSearchRadius + normalizedValue;
 				}
 				individual.setGene(0, v);
 			}
