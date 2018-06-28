@@ -8,7 +8,7 @@ import org.concord.energy3d.model.Foundation;
  */
 public abstract class OptimizerMaker {
 
-	int selectedSearchMethod = Optimizer.GLOBAL_SEARCH;
+	int selectedSearchMethod = Optimizer.GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
 	int selectedFitnessFunction = 0;
 	int selectedSelectionMethod = 0;

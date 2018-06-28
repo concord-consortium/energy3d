@@ -3,6 +3,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -52,9 +53,34 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		int i = 0;
+		final Random random = new Random();
 		for (final Mirror m : heliostats) {
-			firstBorn.setGene(i++, m.getPoints().get(0).getX());
-			firstBorn.setGene(i++, m.getPoints().get(0).getY());
+			double normalizedValue = m.getPoints().get(0).getX();
+			firstBorn.setGene(i, normalizedValue);
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					}
+					individual.setGene(i, v);
+				}
+			}
+			i++;
+			normalizedValue = m.getPoints().get(0).getY();
+			firstBorn.setGene(i, normalizedValue);
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					}
+					individual.setGene(i, v);
+				}
+			}
+			i++;
 		}
 	}
 

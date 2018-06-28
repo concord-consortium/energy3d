@@ -40,7 +40,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 		for (final Rack r : racks) {
 			final double normalizedValue = 0.5 * (1.0 + r.getTiltAngle() / 90.0);
 			firstBorn.setGene(i, normalizedValue);
-			if (searchMethod == LOCAL_SEARCH) {
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
 				for (int k = 1; k < population.size(); k++) {
 					final Individual individual = population.getIndividual(k);
 					double v = random.nextGaussian() * localSearchRadius + normalizedValue;

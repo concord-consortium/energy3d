@@ -220,26 +220,19 @@ public class Population {
 		}
 		// spin the wheel to find mom
 		Individual mom = null;
-		roulettWheelPosition = Math.random() * sumOfFitness;
-		spinWheel = 0;
-		for (final Individual s : survivors) {
-			spinWheel += s.getFitness() - lowestFitness;
-			if (spinWheel >= roulettWheelPosition) {
-				if (s != dad) {
-					mom = s;
-				} else { // just select dad's neighbor in the survivors if the wheel hits dad again
-					final int index = survivors.indexOf(s);
-					if (index == 0) {
-						mom = survivors.get(1);
-					} else if (index == survivors.size() - 1) {
-						mom = survivors.get(survivors.size() - 2);
-					} else {
-						mom = survivors.get(Math.random() < 0.5 ? index - 1 : index + 1);
+		do {
+			roulettWheelPosition = Math.random() * sumOfFitness;
+			spinWheel = 0;
+			for (final Individual s : survivors) {
+				spinWheel += s.getFitness() - lowestFitness;
+				if (spinWheel >= roulettWheelPosition) {
+					if (s != dad) {
+						mom = s;
 					}
+					break;
 				}
-				break;
 			}
-		}
+		} while (mom == null);
 		return new Parents(dad, mom);
 	}
 
@@ -249,27 +242,34 @@ public class Population {
 		if (numberOfSurvivers <= 1) {
 			throw new RuntimeException("Must have at least two survivors to be used as parents");
 		}
-		int i = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+		final int n1 = numberOfSurvivers - 1;
+
+		// find dad first
+		int i = (int) Math.round(Math.random() * n1);
 		int j;
 		do {
-			j = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+			j = (int) Math.round(Math.random() * n1);
 		} while (j == i);
 		final int d = survivors.get(i).getFitness() > survivors.get(j).getFitness() ? i : j;
-		i = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+
+		// now find mom
+		i = (int) Math.round(Math.random() * n1);
 		do {
-			j = (int) Math.round(Math.random() * (numberOfSurvivers - 1));
+			j = (int) Math.round(Math.random() * n1);
 		} while (j == i);
 		int m = survivors.get(i).getFitness() > survivors.get(j).getFitness() ? i : j;
-		if (m == d) {// just select dad's neighbor in the survivors
-			if (d == 0) {
-				m = 1;
-			} else if (d == numberOfSurvivers - 1) {
-				m = numberOfSurvivers - 2;
-			} else {
-				m = Math.random() < 0.5 ? d - 1 : d + 1;
-			}
+
+		// if mom is the same with dad, try again until otherwise
+		while (m == d) {
+			i = (int) Math.round(Math.random() * n1);
+			do {
+				j = (int) Math.round(Math.random() * n1);
+			} while (j == i);
+			m = survivors.get(i).getFitness() > survivors.get(j).getFitness() ? i : j;
 		}
+
 		return new Parents(survivors.get(d), survivors.get(m));
+
 	}
 
 	// uniform crossover

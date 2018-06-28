@@ -50,7 +50,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			normalizedValue = 1;
 		}
 		firstBorn.setGene(0, normalizedValue);
-		if (searchMethod == LOCAL_SEARCH) {
+		if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
 			final Random random = new Random();
 			for (int i = 1; i < population.size(); i++) {
 				final Individual individual = population.getIndividual(i);
@@ -69,7 +69,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			normalizedValue = 1;
 		}
 		firstBorn.setGene(1, normalizedValue);
-		if (searchMethod == LOCAL_SEARCH) {
+		if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
 			final Random random = new Random();
 			for (int i = 1; i < population.size(); i++) {
 				final Individual individual = population.getIndividual(i);

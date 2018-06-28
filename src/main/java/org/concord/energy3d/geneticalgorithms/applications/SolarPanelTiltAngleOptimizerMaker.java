@@ -91,7 +91,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 		localSearchRadiusLabel2.setEnabled(selectedSearchMethod > 0);
 
 		panel.add(new JLabel("Search method:"));
-		final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[] { "Global Search", "Local Search" });
+		final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[] { "Global Search (Uniform Selection)", "Local Search (Random Optimization)" });
 		searchMethodComboBox.setSelectedIndex(selectedSearchMethod);
 		searchMethodComboBox.addItemListener(new ItemListener() {
 			@Override
@@ -151,7 +151,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Niche confinement radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();

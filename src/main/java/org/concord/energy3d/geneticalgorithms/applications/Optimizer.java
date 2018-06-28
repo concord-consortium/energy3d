@@ -27,8 +27,8 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
-	public final static int GLOBAL_SEARCH = 0;
-	public final static int LOCAL_SEARCH = 1;
+	public final static int GLOBAL_SEARCH_UNIFORM_SELECTION = 0;
+	public final static int LOCAL_SEARCH_RANDOM_OPTIMIZATION = 1; // https://en.wikipedia.org/wiki/Random_optimization
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
 	double mutationRate = 0.1;
@@ -46,7 +46,7 @@ public abstract class Optimizer {
 	ObjectiveFunction objectiveFunction;
 	boolean fitnessSharing;
 	double fitnessSharingRadius = 0.1;
-	int searchMethod = GLOBAL_SEARCH;
+	int searchMethod = GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
