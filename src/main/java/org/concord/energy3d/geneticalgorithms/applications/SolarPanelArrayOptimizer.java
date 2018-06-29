@@ -3,6 +3,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
@@ -52,6 +53,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final List<Rack> racks = foundation.getRacks();
 		final int n = racks.size();
 		if (n > 0) {
+			final Random random = new Random();
 			final Rack rack = racks.get(0);
 			solarPanel = rack.getSolarPanel();
 			baseHeight = rack.getBaseHeight() * Scene.getInstance().getScale();
@@ -69,11 +71,34 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				} else if (normalizedValue > 1) {
 					normalizedValue = 1;
 				}
-				firstBorn.setGene(0, normalizedValue);
 			} else {
-				firstBorn.setGene(0, 1);
+				normalizedValue = 1;
 			}
-			firstBorn.setGene(1, 0.5 * (1.0 + rack.getTiltAngle() / 90.0));
+			firstBorn.setGene(0, normalizedValue);
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					}
+					individual.setGene(0, v);
+				}
+			}
+
+			normalizedValue = 0.5 * (1.0 + rack.getTiltAngle() / 90.0);
+			firstBorn.setGene(1, normalizedValue);
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					}
+					individual.setGene(1, v);
+				}
+			}
+
 			normalizedValue = (double) (panelRowsPerRack - minimumPanelRows) / (double) (maximumPanelRows - minimumPanelRows);
 			if (normalizedValue < 0) {
 				normalizedValue = 0;
@@ -81,6 +106,17 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				normalizedValue = 1;
 			}
 			firstBorn.setGene(2, normalizedValue);
+			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+				for (int k = 1; k < population.size(); k++) {
+					final Individual individual = population.getIndividual(k);
+					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					while (v < 0 || v > 1) {
+						v = random.nextGaussian() * localSearchRadius + normalizedValue;
+					}
+					individual.setGene(2, v);
+				}
+			}
+
 		} else {
 			throw new RuntimeException("Must have at least one solar panel rack on this foundation");
 		}

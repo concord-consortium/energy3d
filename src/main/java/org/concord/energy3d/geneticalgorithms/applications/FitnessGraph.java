@@ -9,13 +9,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,6 +26,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.util.ClipImage;
 
@@ -34,7 +34,7 @@ import org.concord.energy3d.util.ClipImage;
  * @author Charles Xie
  *
  */
-class FitnessEvolutionGraph extends JComponent {
+class FitnessGraph extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private final static int LEFT_MARGIN = 60;
@@ -42,21 +42,22 @@ class FitnessEvolutionGraph extends JComponent {
 	private final static int TOP_MARGIN = 20;
 	private final static int BOTTOM_MARGIN = 40;
 
-	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
+	private final BasicStroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 4f }, 0.0f);
 	private final BasicStroke thin = new BasicStroke(1);
-	private final Individual[] records;
+	private final Individual[] individuals;
 	private double maxFitness = -Double.MAX_VALUE;
 	private double minFitness = Double.MAX_VALUE;
+	private int length;
 
-	public FitnessEvolutionGraph(final Individual[] records) {
+	public FitnessGraph(final Individual[] individuals) {
 
 		super();
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.DARK_GRAY);
 
-		this.records = records;
-		for (final Individual i : records) {
-			if (i != null) {
+		this.individuals = individuals;
+		for (final Individual i : individuals) {
+			if (i != null && !Double.isNaN(i.getFitness())) {
 				final double f = i.getFitness();
 				if (f > maxFitness) {
 					maxFitness = f;
@@ -64,6 +65,7 @@ class FitnessEvolutionGraph extends JComponent {
 				if (f < minFitness) {
 					minFitness = f;
 				}
+				length++;
 			}
 		}
 
@@ -104,16 +106,18 @@ class FitnessEvolutionGraph extends JComponent {
 
 		// draw y axis
 
-		String tickmark;
+		String tickmarkLabel;
 		final int x0 = LEFT_MARGIN + 1;
 		final int ny = 10;
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		double yTick;
-		for (int i = 0; i < ny; i++) {
+		for (int i = 0; i <= ny; i++) {
 			yTick = height - BOTTOM_MARGIN - (double) (i * graphWindowHeight) / (double) ny;
 			g2.drawLine(x0, (int) yTick, x0 - 5, (int) yTick);
-			tickmark = "" + i;
-			g2.drawString(tickmark, x0 - 10 - g2.getFontMetrics().stringWidth(tickmark), (int) (yTick + 4));
+			if (i == 0 || i == ny) {
+				tickmarkLabel = EnergyPanel.FIVE_DECIMALS.format(minFitness + i * (maxFitness - minFitness) / ny);
+				g2.drawString(tickmarkLabel, x0 - 10 - g2.getFontMetrics().stringWidth(tickmarkLabel), (int) (yTick + 4));
+			}
 		}
 		final String yLabel = "Fitness";
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
@@ -124,44 +128,44 @@ class FitnessEvolutionGraph extends JComponent {
 		g2.rotate(Math.PI * 0.5, yLabelX, yLabelY);
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
-		final double dx = graphWindowWidth / records.length;
+		final double dx = graphWindowWidth / (length - 1);
 		double xTick;
 		int tickmarkLength;
 		Path2D.Double path = null;
-		for (int i = 0; i < records.length; i++) {
-			if (records[i] == null) {
-				break;
+		for (int i = 0; i < individuals.length; i++) {
+			if (individuals[i] == null || Double.isNaN(individuals[i].getFitness())) {
+				continue;
 			}
 			xTick = x0 + i * dx;
-			final double f = (records[i].getFitness() - minFitness) / (maxFitness - minFitness);
-			final Shape s = new Rectangle2D.Double(xTick, xAxisY - f * graphWindowHeight, 8, 8);
+			yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
+			final Ellipse2D circle = new Ellipse2D.Double(xTick - 4, yTick - 4, 8, 8);
 			if (path == null) {
 				path = new Path2D.Double();
-				path.moveTo(xTick, xAxisY - f * graphWindowHeight);
+				path.moveTo(xTick, yTick);
 			} else {
-				path.lineTo(xTick, xAxisY - f * graphWindowHeight);
+				path.lineTo(xTick, yTick);
 			}
 
 			g2.setColor(Color.GRAY);
-			g2.fill(s);
+			g2.fill(circle);
 			g2.setColor(Color.LIGHT_GRAY);
-			g2.draw(s);
+			g2.draw(circle);
 			g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
-			if (i == records.length - 1) {
-				tickmark = (i + 1) + "";
-				tickmarkLength = g2.getFontMetrics().stringWidth(tickmark);
-				g2.drawString(tickmark, (int) (xTick + dx - tickmarkLength * 0.5), xAxisY + 16);
-			}
+			tickmarkLabel = i + "";
+			tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
+			g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLength * 0.5), xAxisY + 16);
 		}
 		if (path != null) {
+			g2.setColor(Color.WHITE);
+			g2.setStroke(dashed);
 			g2.draw(path);
 		}
 
 	}
 
-	public void showGui() {
+	public void display(final String title) {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Fitness Evolution", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -177,7 +181,7 @@ class FitnessEvolutionGraph extends JComponent {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(FitnessEvolutionGraph.this);
+				new ClipImage().copyImageToClipboard(FitnessGraph.this);
 			}
 		});
 		menu.add(mi);

@@ -137,7 +137,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 								System.out.println("Generation #" + (i++) + ": " + x);
 							}
 						}
-						new FitnessEvolutionGraph(op.getFittestOfGenerations()).showGui();
+						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
 					}
 				}
 			} else {

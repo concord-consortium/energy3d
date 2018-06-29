@@ -31,7 +31,7 @@ import org.concord.energy3d.util.Util;
 class SimulationSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	private final static DecimalFormat FORMAT2 = new DecimalFormat("##");
+	private final static DecimalFormat FORMAT2 = new DecimalFormat("##.##");
 
 	public SimulationSettingsDialog() {
 
