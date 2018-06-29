@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
@@ -128,6 +129,15 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					op.population.sort();
 					for (int i = 0; i < op.population.size() / 2; i++) {
 						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
+					}
+					if (op.getFittestOfGenerations() != null) {
+						int i = 0;
+						for (final Individual x : op.getFittestOfGenerations()) {
+							if (x != null) {
+								System.out.println("Generation #" + (i++) + ": " + x);
+							}
+						}
+						new FitnessEvolutionGraph(op.getFittestOfGenerations()).showGui();
 					}
 				}
 			} else {

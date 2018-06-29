@@ -2,6 +2,7 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -35,6 +36,7 @@ public abstract class Optimizer {
 	double crossoverRate = 0.5;
 	double selectionRate = 0.5;
 	int maximumGenerations = 5;
+	Individual[] fittestOfGenerations;
 	Population population;
 	int outsideGenerationCounter;
 	int computeCounter;
@@ -96,6 +98,11 @@ public abstract class Optimizer {
 
 	public void setMaximumGenerations(final int maximumGenerations) {
 		this.maximumGenerations = maximumGenerations;
+		fittestOfGenerations = new Individual[maximumGenerations];
+	}
+
+	public Individual[] getFittestOfGenerations() {
+		return fittestOfGenerations;
 	}
 
 	public void setFoundation(final Foundation foundation) {
@@ -135,6 +142,7 @@ public abstract class Optimizer {
 		onStart();
 		outsideGenerationCounter = 0;
 		computeCounter = 0;
+		Arrays.fill(fittestOfGenerations, null);
 
 		while (!shouldTerminate()) { // the number of individuals to evaluate is maximumGeneration * population.size(), subject to the convergence criterion
 			for (int i = 0; i < population.size(); i++) {
@@ -182,6 +190,7 @@ public abstract class Optimizer {
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
 							population.runSGA(selectionRate, crossoverRate);
+							fittestOfGenerations[generation] = new Individual(population.getFittest());
 							if (detectViolations()) {
 								population.restoreGenes();
 							} else {
@@ -212,6 +221,7 @@ public abstract class Optimizer {
 					if (isAtTheEndOfGeneration) {
 						population.saveGenes();
 						population.runMGA();
+						fittestOfGenerations[generation] = new Individual(population.getFittest());
 						if (detectViolations()) {
 							population.restoreGenes();
 						} else {

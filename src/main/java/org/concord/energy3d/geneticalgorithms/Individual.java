@@ -18,6 +18,7 @@ public class Individual implements Comparable<Individual> {
 	public Individual(final Individual original) {
 		this(original.chromosome.length, false, 0);
 		System.arraycopy(original.chromosome, 0, chromosome, 0, chromosome.length);
+		fitness = original.fitness;
 	}
 
 	private Individual(final int length, final boolean randomize, final int discretizationSteps) {
