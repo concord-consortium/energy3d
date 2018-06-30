@@ -113,7 +113,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
 		SpringUtilities.makeCompactGrid(panel, 11, 3, 6, 6, 6, 6);
 
-		final Object[] options = new Object[] { "OK", "Cancel", "Previous" };
+		final Object[] options = new Object[] { "OK", "Cancel", "Fitness", "Gene" };
 		final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Finding Optimal Solar Panel Tilt Angle");
 
@@ -124,15 +124,21 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 				break;
 			} else if (choice == options[2]) {
 				if (op != null) {
-					op.population.sort();
-					for (int i = 0; i < op.population.size() / 2; i++) {
-						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
-					}
 					if (op.getFittestOfGenerations() != null) {
-						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
+						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend of Previous Run");
 					}
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				}
+			} else if (choice == options[3]) {
+				if (op != null) {
+					op.population.sort();
+					for (int i = 0; i < op.population.size(); i++) {
+						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
+					}
+					new GeneGraph(op.getPopulation().getIndividuals()).display();
+				} else {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No data is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}
 			} else {
 				boolean ok = true;
@@ -149,8 +155,8 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 				if (ok) {
 					if (populationSize <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Population size must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					} else if (maximumGenerations <= 1) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum generations must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					} else if (maximumGenerations < 0) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum generations cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (mutationRate < 0 || mutationRate > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {

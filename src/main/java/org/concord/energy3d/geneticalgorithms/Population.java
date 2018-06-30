@@ -82,6 +82,10 @@ public class Population {
 		return individuals[i];
 	}
 
+	public Individual[] getIndividuals() {
+		return individuals;
+	}
+
 	public void sort() {
 		Arrays.sort(individuals);
 	}

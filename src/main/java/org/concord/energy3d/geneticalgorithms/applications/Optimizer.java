@@ -30,6 +30,7 @@ public abstract class Optimizer {
 
 	public final static int GLOBAL_SEARCH_UNIFORM_SELECTION = 0;
 	public final static int LOCAL_SEARCH_RANDOM_OPTIMIZATION = 1; // https://en.wikipedia.org/wiki/Random_optimization
+	public final static int GLOBAL_SEARCH_FITNESS_SHARING = 2; // https://stackoverflow.com/questions/13775810/what-is-niching-scheme
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
 	double mutationRate = 0.1;
@@ -144,17 +145,21 @@ public abstract class Optimizer {
 		computeCounter = 0;
 		Arrays.fill(fittestOfGenerations, null);
 
-		while (!shouldTerminate()) { // the number of individuals to evaluate is maximumGeneration * population.size(), subject to the convergence criterion
-			for (int i = 0; i < population.size(); i++) {
-				computeIndividual(i);
+		if (maximumGenerations > 1) {
+			while (!shouldTerminate()) { // the number of individuals to evaluate is maximumGeneration * population.size(), subject to the convergence criterion
+				for (int i = 0; i < population.size(); i++) {
+					computeIndividual(i);
+				}
+				outsideGenerationCounter++;
 			}
-			outsideGenerationCounter++;
 		}
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				applyFittest(); // show the fittest
+				if (maximumGenerations > 1) {
+					applyFittest(); // show the fittest
+				}
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
