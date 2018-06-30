@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
@@ -114,7 +113,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
 		SpringUtilities.makeCompactGrid(panel, 11, 3, 6, 6, 6, 6);
 
-		final Object[] options = new Object[] { "OK", "Cancel", "View" };
+		final Object[] options = new Object[] { "OK", "Cancel", "Previous" };
 		final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Finding Optimal Solar Panel Tilt Angle");
 
@@ -130,16 +129,10 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
 					}
 					if (op.getFittestOfGenerations() != null) {
-						int i = 0;
-						for (final Individual x : op.getFittestOfGenerations()) {
-							if (x != null) {
-								System.out.println("Generation #" + (i++) + ": " + x);
-							}
-						}
 						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
 					}
 				} else {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}
 			} else {
 				boolean ok = true;

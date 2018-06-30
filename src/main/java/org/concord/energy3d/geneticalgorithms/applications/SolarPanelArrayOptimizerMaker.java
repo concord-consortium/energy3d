@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
@@ -140,7 +139,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 
 		SpringUtilities.makeCompactGrid(panel, 15, 3, 6, 6, 6, 6);
 
-		final Object[] options = new Object[] { "OK", "Cancel", "View" };
+		final Object[] options = new Object[] { "OK", "Cancel", "Previous" };
 		final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Solar Panel Arrays");
 
@@ -156,16 +155,10 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
 					}
 					if (op.getFittestOfGenerations() != null) {
-						int i = 0;
-						for (final Individual x : op.getFittestOfGenerations()) {
-							if (x != null) {
-								System.out.println("Generation #" + (i++) + ": " + x);
-							}
-						}
 						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
 					}
 				} else {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}
 			} else {
 				boolean ok = true;
@@ -192,7 +185,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					} else if (minimumPanelRows < 1 || maximumPanelRows < 1 || maximumPanelRows < minimumPanelRows || maximumPanelRows > 8 || minimumPanelRows > 4) {
+					} else if (minimumPanelRows < 1 || maximumPanelRows < 1 || maximumPanelRows <= minimumPanelRows || maximumPanelRows > 8 || minimumPanelRows > 4) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problems in minimum or maximum rows of solar panels on a rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);

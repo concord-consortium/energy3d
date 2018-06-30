@@ -115,7 +115,7 @@ class FitnessGraph extends JComponent {
 			yTick = height - BOTTOM_MARGIN - (double) (i * graphWindowHeight) / (double) ny;
 			g2.drawLine(x0, (int) yTick, x0 - 5, (int) yTick);
 			if (i == 0 || i == ny) {
-				tickmarkLabel = EnergyPanel.FIVE_DECIMALS.format(minFitness + i * (maxFitness - minFitness) / ny);
+				tickmarkLabel = EnergyPanel.TWO_DECIMALS.format(minFitness + i * (maxFitness - minFitness) / ny);
 				g2.drawString(tickmarkLabel, x0 - 10 - g2.getFontMetrics().stringWidth(tickmarkLabel), (int) (yTick + 4));
 			}
 		}
