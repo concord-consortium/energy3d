@@ -87,9 +87,16 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 		final JLabel localSearchRadiusLabel = new JLabel("Local search radius:");
 		final JTextField localSearchRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(localSearchRadius));
 		final JLabel localSearchRadiusLabel2 = new JLabel("<html><font size=2>(0, 1]</font></html>");
-		localSearchRadiusLabel.setEnabled(selectedSearchMethod > 0);
-		localSearchRadiusField.setEnabled(selectedSearchMethod > 0);
-		localSearchRadiusLabel2.setEnabled(selectedSearchMethod > 0);
+		localSearchRadiusLabel.setEnabled(selectedSearchMethod == 1);
+		localSearchRadiusField.setEnabled(selectedSearchMethod == 1);
+		localSearchRadiusLabel2.setEnabled(selectedSearchMethod == 1);
+
+		final JLabel sharingRadiusLabel = new JLabel("Sharing radius:");
+		final JTextField sharingRadiusField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(sharingRadius));
+		final JLabel sharingRadiusLabel2 = new JLabel();
+		sharingRadiusLabel.setEnabled(selectedSearchMethod == 2);
+		sharingRadiusField.setEnabled(selectedSearchMethod == 2);
+		sharingRadiusLabel2.setEnabled(selectedSearchMethod == 2);
 
 		panel.add(new JLabel("Search method:"));
 		final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[] { "Global Search (Uniform Selection)", "Local Search (Random Optimization)", "Global Search (Fitness Sharing)" });
@@ -98,10 +105,12 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final boolean enabled = searchMethodComboBox.getSelectedIndex() > 0;
-					localSearchRadiusLabel.setEnabled(enabled);
-					localSearchRadiusField.setEnabled(enabled);
-					localSearchRadiusLabel2.setEnabled(enabled);
+					localSearchRadiusLabel.setEnabled(searchMethodComboBox.getSelectedIndex() == 1);
+					localSearchRadiusField.setEnabled(searchMethodComboBox.getSelectedIndex() == 1);
+					localSearchRadiusLabel2.setEnabled(searchMethodComboBox.getSelectedIndex() == 1);
+					sharingRadiusLabel.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
+					sharingRadiusField.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
+					sharingRadiusLabel2.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
 				}
 			}
 		});
@@ -112,7 +121,11 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 		panel.add(localSearchRadiusField);
 		panel.add(localSearchRadiusLabel2);
 
-		SpringUtilities.makeCompactGrid(panel, 11, 3, 6, 6, 6, 6);
+		panel.add(sharingRadiusLabel);
+		panel.add(sharingRadiusField);
+		panel.add(sharingRadiusLabel2);
+
+		SpringUtilities.makeCompactGrid(panel, 12, 3, 6, 6, 6, 6);
 
 		final Object[] options = new Object[] { "OK", "Cancel", "Fitness", "Gene" };
 		final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
@@ -149,6 +162,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
 					mutationRate = Double.parseDouble(mutationRateField.getText());
 					localSearchRadius = Double.parseDouble(localSearchRadiusField.getText());
+					sharingRadius = Double.parseDouble(sharingRadiusField.getText());
 				} catch (final NumberFormatException exception) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					ok = false;
@@ -164,6 +178,8 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					} else if (sharingRadius < 0) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sharing radius cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
@@ -175,6 +191,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 						op.setMutationRate(mutationRate);
 						op.setSearchMethod(selectedSearchMethod);
 						op.setLocalSearchRadius(localSearchRadius);
+						op.setSharingRadius(sharingRadius);
 						op.setFoundation(foundation);
 						op.setOjectiveFunction(selectedFitnessFunction);
 						op.evolve();

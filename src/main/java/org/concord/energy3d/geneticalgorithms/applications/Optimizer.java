@@ -47,7 +47,6 @@ public abstract class Optimizer {
 	List<Constraint> constraints;
 	volatile boolean converged;
 	ObjectiveFunction objectiveFunction;
-	boolean fitnessSharing;
 	double fitnessSharingRadius = 0.1;
 	int searchMethod = GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
@@ -55,22 +54,6 @@ public abstract class Optimizer {
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
-	}
-
-	public void setSharing(final boolean sharing) {
-		this.fitnessSharing = sharing;
-	}
-
-	public boolean isSharing() {
-		return fitnessSharing;
-	}
-
-	public void setShareRadius(final double shareRadius) {
-		this.fitnessSharingRadius = shareRadius;
-	}
-
-	public double getShareRadius() {
-		return fitnessSharingRadius;
 	}
 
 	public void setSearchMethod(final int searchMethod) {
@@ -87,6 +70,14 @@ public abstract class Optimizer {
 
 	public double getLocalSearchRadius() {
 		return localSearchRadius;
+	}
+
+	public void setSharingRadius(final double sharingRadius) {
+		this.fitnessSharingRadius = sharingRadius;
+	}
+
+	public double getSharingRadius() {
+		return fitnessSharingRadius;
 	}
 
 	public void setSelectionMethod(final int selectionMethod) {
