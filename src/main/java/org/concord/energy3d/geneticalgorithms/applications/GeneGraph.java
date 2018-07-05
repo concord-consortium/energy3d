@@ -1,40 +1,25 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
-import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.util.ClipImage;
 
 /**
  * @author Charles Xie
  *
  */
-public class GeneGraph extends JComponent {
+class GeneGraph extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private final static int LEFT_MARGIN = 60;
@@ -49,17 +34,16 @@ public class GeneGraph extends JComponent {
 	private int ymax = 0; // maximum count per bin
 	private final int[] count;
 
-	public GeneGraph(final Individual[] individuals) {
+	GeneGraph(final Individual[] individuals, final int geneIndex) {
 
 		super();
-		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.DARK_GRAY);
 
 		final double delta = 1.0 / nbin;
 		count = new int[nbin];
 		for (final Individual i : individuals) {
 			if (i != null) {
-				count[(int) (i.getGene(0) / delta)]++;
+				count[(int) (i.getGene(geneIndex) / delta)]++;
 			}
 		}
 		for (int i = 0; i < count.length; i++) {
@@ -150,7 +134,7 @@ public class GeneGraph extends JComponent {
 				g2.setColor(Color.LIGHT_GRAY);
 				g2.draw(area);
 				g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
-				if (i % 10 == 0) {
+				if (i % 20 == 0) {
 					tickmarkLabel = "" + format1.format((double) i / (double) count.length);
 					tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 					g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLength * 0.5), xAxisY + 16);
@@ -160,60 +144,6 @@ public class GeneGraph extends JComponent {
 			tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 			g2.drawString(tickmarkLabel, (int) (x0 + graphWindowWidth - tickmarkLength * 0.5), xAxisY + 16);
 		}
-
-	}
-
-	public void display() {
-
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Gene Graph", true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-		final JPanel contentPane = new JPanel(new BorderLayout());
-		dialog.setContentPane(contentPane);
-
-		final JMenuBar menuBar = new JMenuBar();
-		dialog.setJMenuBar(menuBar);
-
-		final JMenu menu = new JMenu("Export");
-		menuBar.add(menu);
-
-		final JMenuItem mi = new JMenuItem("Copy Image");
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(GeneGraph.this);
-			}
-		});
-		menu.add(mi);
-
-		final JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		contentPane.add(panel, BorderLayout.CENTER);
-
-		panel.add(this, BorderLayout.CENTER);
-
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
-
-		final JButton button = new JButton("Close");
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				dialog.dispose();
-			}
-		});
-		buttonPanel.add(button);
-
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(final WindowEvent e) {
-				dialog.dispose();
-			}
-		});
-
-		dialog.pack();
-		dialog.setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
 
 	}
 
