@@ -70,7 +70,8 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Mutation rate:"));
-		final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+		final JTextField mutationRateField = new JTextField(selectedSearchMethod == 1 ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+		mutationRateField.setEnabled(selectedSearchMethod != 1);
 		panel.add(mutationRateField);
 		panel.add(new JLabel("<html><font size=2>Not %</font></html>"));
 
@@ -111,6 +112,8 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					sharingRadiusLabel.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
 					sharingRadiusField.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
 					sharingRadiusLabel2.setEnabled(searchMethodComboBox.getSelectedIndex() == 2);
+					mutationRateField.setEnabled(!localSearchRadiusField.isEnabled());
+					mutationRateField.setText(!mutationRateField.isEnabled() ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 				}
 			}
 		});
@@ -156,11 +159,14 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 				}
 			} else {
 				boolean ok = true;
+				selectedSearchMethod = searchMethodComboBox.getSelectedIndex();
 				try {
 					populationSize = Integer.parseInt(populationField.getText());
 					maximumGenerations = Integer.parseInt(generationField.getText());
 					convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
-					mutationRate = Double.parseDouble(mutationRateField.getText());
+					if (selectedSearchMethod != 1) { // no mutation for local research
+						mutationRate = Double.parseDouble(mutationRateField.getText());
+					}
 					localSearchRadius = Double.parseDouble(localSearchRadiusField.getText());
 					sharingRadius = Double.parseDouble(sharingRadiusField.getText());
 				} catch (final NumberFormatException exception) {
@@ -183,7 +189,6 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						selectedSearchMethod = searchMethodComboBox.getSelectedIndex();
 						op = new BuildingOrientationOptimizer(populationSize, 2, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);

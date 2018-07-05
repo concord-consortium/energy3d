@@ -95,7 +95,8 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Mutation rate:"));
-		final JTextField mutationRateField = new JTextField(EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+		final JTextField mutationRateField = new JTextField(selectedSearchMethod == 1 ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
+		mutationRateField.setEnabled(selectedSearchMethod != 1);
 		panel.add(mutationRateField);
 		panel.add(new JLabel("<html><font size=2>Not %</font></html>"));
 
@@ -127,6 +128,8 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 					localSearchRadiusLabel.setEnabled(enabled);
 					localSearchRadiusField.setEnabled(enabled);
 					localSearchRadiusLabel2.setEnabled(enabled);
+					mutationRateField.setEnabled(!enabled);
+					mutationRateField.setText(enabled ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 				}
 			}
 		});
@@ -168,11 +171,14 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 				}
 			} else {
 				boolean ok = true;
+				selectedSearchMethod = searchMethodComboBox.getSelectedIndex();
 				try {
 					populationSize = Integer.parseInt(populationField.getText());
 					maximumGenerations = Integer.parseInt(generationField.getText());
 					convergenceThreshold = Double.parseDouble(convergenceThresholdField.getText());
-					mutationRate = Double.parseDouble(mutationRateField.getText());
+					if (selectedSearchMethod != 1) { // no mutation for local research
+						mutationRate = Double.parseDouble(mutationRateField.getText());
+					}
 					localSearchRadius = Double.parseDouble(localSearchRadiusField.getText());
 					minimumX = Double.parseDouble(minimumXField.getText());
 					maximumX = Double.parseDouble(maximumXField.getText());
@@ -196,7 +202,6 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						selectedSearchMethod = searchMethodComboBox.getSelectedIndex();
 						op = new BuildingLocationOptimizer(populationSize, 2, 30);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);

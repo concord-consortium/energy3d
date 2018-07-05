@@ -191,7 +191,7 @@ public abstract class Optimizer {
 								population.restoreGenes();
 							} else {
 								converged = population.isSGAConverged();
-								if (!converged) {
+								if (!converged && searchMethod == GLOBAL_SEARCH_UNIFORM_SELECTION) {
 									population.mutate(mutationRate);
 								}
 							}
