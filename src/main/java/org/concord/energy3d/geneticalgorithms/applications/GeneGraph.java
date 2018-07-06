@@ -31,12 +31,16 @@ class GeneGraph extends JComponent {
 	private final String geneName;
 	private int ymax = 0; // maximum count per bin
 	private final int[] count;
+	private double lowerBound = 0;
+	private double upperBound = 1;
 
-	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin) {
+	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin, final double lowerBound, final double upperBound) {
 
 		super();
 		setBackground(Color.DARK_GRAY);
 		this.geneName = geneName;
+		this.lowerBound = lowerBound;
+		this.upperBound = upperBound;
 
 		final double delta = 1.0 / nbin;
 		count = new int[nbin];
@@ -83,7 +87,7 @@ class GeneGraph extends JComponent {
 
 		g2.setColor(Color.WHITE);
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
-		final String xLabel = geneName + " (normalized)";
+		final String xLabel = geneName;
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
 
 		// draw y axis
@@ -135,19 +139,19 @@ class GeneGraph extends JComponent {
 					if (i % 2 == 0) {
 						g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
 						if (i % 20 == 0) {
-							tickmarkLabel = EnergyPanel.ONE_DECIMAL.format((double) i / (double) count.length);
+							tickmarkLabel = EnergyPanel.ONE_DECIMAL.format((double) i / (double) count.length * (upperBound - lowerBound) + lowerBound);
 							tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 							g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
 						}
 					}
 				} else {
 					g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
-					tickmarkLabel = EnergyPanel.TWO_DECIMALS.format((double) i / (double) count.length);
+					tickmarkLabel = EnergyPanel.TWO_DECIMALS.format((double) i / (double) count.length * (upperBound - lowerBound) + lowerBound);
 					tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 					g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
 				}
 			}
-			tickmarkLabel = "1.0";
+			tickmarkLabel = count.length > 10 ? EnergyPanel.ONE_DECIMAL.format(upperBound) : EnergyPanel.TWO_DECIMALS.format(upperBound);
 			tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 			g2.drawString(tickmarkLabel, (int) (x0 + count.length * dx - tickmarkLabelLength * 0.5), xAxisY + 16);
 		}

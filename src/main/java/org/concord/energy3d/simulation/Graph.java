@@ -351,9 +351,6 @@ public abstract class Graph extends JPanel {
 		if (this instanceof DailyGraph) {
 			return DailyGraph.records;
 		}
-		if (this instanceof AngularGraph) {
-			return AngularGraph.records;
-		}
 		return AnnualGraph.records;
 	}
 
@@ -763,11 +760,10 @@ public abstract class Graph extends JPanel {
 		legendY = y0;
 		legendText = "<html><h4>Energy (kWh):</h4><hr><ul>";
 
-		final boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
-			final String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
+			final String t = s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("* " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -776,7 +772,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			final String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
+			final String t = s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u2212 " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -785,7 +781,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleUp(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			final String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
+			final String t = s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -794,7 +790,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleDown(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			final String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
+			final String t = s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -804,7 +800,7 @@ public abstract class Graph extends JPanel {
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
-			final String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
+			final String t = s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u003d " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -1002,16 +998,15 @@ public abstract class Graph extends JPanel {
 			}
 			break;
 		default:
-			final boolean isAngularGraph = this instanceof AngularGraph;
 			boolean found = false;
 			s = "Solar";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				final double sum = getSum(s);
+				s += " (" + TWO_DECIMALS.format(sum) + ")";
 				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
-				s = "Solar";
-				s = isAngularGraph ? s : s + " (" + FIVE_DECIMALS.format(getSum(s)) + ")";
+				s = "Solar (" + FIVE_DECIMALS.format(sum) + ")";
 				legendText += "<li>" + s;
 			}
 			s = "Heat Gain";
@@ -1019,9 +1014,11 @@ public abstract class Graph extends JPanel {
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				final double sum = getSum(s);
+				s += " (" + TWO_DECIMALS.format(sum) + ")";
 				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
+				s = "Heat Gain (" + FIVE_DECIMALS.format(sum) + ")";
 				legendText += "<li>" + s;
 			}
 			s = "Utility";
@@ -1029,7 +1026,7 @@ public abstract class Graph extends JPanel {
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawCircle(g2, x0, y0, 8, colors.get(s));
-				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				s += " (" + TWO_DECIMALS.format(getSum(s)) + ")";
 				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
 				legendText += "<li>" + s;
@@ -1053,7 +1050,7 @@ public abstract class Graph extends JPanel {
 					if (i2 != -1) {
 						k2 = k2.substring(i2 + 1);
 					}
-					s = isAngularGraph ? k2 : k2 + " (" + TWO_DECIMALS.format(getSum(k)) + ")";
+					s = k2 + " (" + TWO_DECIMALS.format(getSum(k)) + ")";
 					g2.drawString(s, x0 + 14, y0 + 8);
 					y0 += 12;
 					legendText += "<li>" + s;

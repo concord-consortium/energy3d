@@ -63,6 +63,8 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 				individual.setGene(0, v);
 			}
 		}
+		setGeneMinimum(0, xmin);
+		setGeneMaximum(0, xmax);
 
 		normalizedValue = (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin);
 		if (normalizedValue < 0) {
@@ -82,6 +84,8 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 				individual.setGene(1, v);
 			}
 		}
+		setGeneMinimum(1, ymin);
+		setGeneMaximum(1, ymax);
 
 	}
 

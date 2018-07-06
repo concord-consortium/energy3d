@@ -1377,7 +1377,6 @@ public class MainFrame extends JFrame {
 					annualEnergyAnalysisForSelectionMenuItem.setEnabled(b);
 					dailyEnergyAnalysisMenuItem.setEnabled(b);
 					dailyEnergyAnalysisForSelectionMenuItem.setEnabled(b);
-					// orientationalEnergyAnalysisMenuItem.setEnabled(b);
 				}
 
 				@Override
@@ -1463,7 +1462,6 @@ public class MainFrame extends JFrame {
 			analysisMenu.addSeparator();
 
 			analysisMenu.add(getCostAnalysisMenuItem());
-			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 
 		}
 		return analysisMenu;
@@ -2775,41 +2773,6 @@ public class MainFrame extends JFrame {
 		}
 		return showHeatFluxVectorsMenuItem;
 	}
-
-	// private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
-	// if (orientationalEnergyAnalysisMenuItem == null) {
-	// orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
-	// orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	// final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-	// if ("".equals(city)) {
-	// JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-	// return;
-	// }
-	// final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-	// if (selectedPart == null) {
-	// int count = 0;
-	// HousePart hp = null;
-	// for (final HousePart x : Scene.getInstance().getParts()) {
-	// if (x instanceof Foundation) {
-	// count++;
-	// hp = x;
-	// }
-	// }
-	// if (count == 1) {
-	// SceneManager.getInstance().setSelectedPart(hp);
-	// } else {
-	// JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-	// return;
-	// }
-	// }
-	// new EnergyAngularAnalysis().show("Orientation");
-	// }
-	// });
-	// }
-	// return orientationalEnergyAnalysisMenuItem;
-	// }
 
 	private JMenuItem getCostAnalysisMenuItem() {
 		if (costAnalysisMenuItem == null) {

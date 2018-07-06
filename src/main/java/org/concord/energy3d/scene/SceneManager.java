@@ -884,7 +884,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		((Component) canvas).addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(final MouseEvent e) {
-				EnergyPanel.getInstance().update();
+				// EnergyPanel.getInstance().update(); // sometimes drag initiates incomplete objects whose properties are problematic
 				cameraChanged = true;
 			}
 		});

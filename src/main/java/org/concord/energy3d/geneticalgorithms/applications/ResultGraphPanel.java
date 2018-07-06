@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -44,14 +45,19 @@ public class ResultGraphPanel extends JPanel {
 
 		final Individual[] individuals = op.getPopulation().getIndividuals();
 		final int n = individuals[0].getChromosomeLength();
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int mx = (int) Math.round((double) screenSize.width / (double) n);
+		if (mx > 400) {
+			mx = 400;
+		}
 
 		for (int i = 0; i < n; i++) {
 			int nbin = 100;
 			if (op.isGeneInteger(i)) {
 				nbin = (int) Math.round(op.getGeneMaximum(i) - op.getGeneMinimum(i));
 			}
-			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i), nbin);
-			g.setPreferredSize(new Dimension(400, 400));
+			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i), nbin, op.getGeneMinimum(i), op.getGeneMaximum(i));
+			g.setPreferredSize(new Dimension(mx, 400));
 			add(g);
 		}
 
@@ -86,7 +92,7 @@ public class ResultGraphPanel extends JPanel {
 
 		panel.add(this, BorderLayout.CENTER);
 
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
 		JButton button = new JButton("Fitness");

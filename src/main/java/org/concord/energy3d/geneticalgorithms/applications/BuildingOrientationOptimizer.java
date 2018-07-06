@@ -49,6 +49,8 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 				individual.setGene(0, v);
 			}
 		}
+		setGeneMinimum(0, 0);
+		setGeneMaximum(0, 360);
 	}
 
 	@Override

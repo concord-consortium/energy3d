@@ -27,7 +27,6 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 
 	public SolarPanelTiltAngleOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, discretizationSteps);
-		setGeneName(0, "Tilt Angle");
 	}
 
 	@Override
@@ -51,6 +50,9 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 					individual.setGene(i, v);
 				}
 			}
+			setGeneName(i, "Tilt Angle (" + r.getId() + ")");
+			setGeneMinimum(i, -90);
+			setGeneMaximum(i, 90);
 			i++;
 		}
 	}

@@ -139,17 +139,6 @@ class DataViewer {
 					}
 				}
 			}
-		} else if (graph instanceof BuildingEnergyAngularGraph) {
-			header = new String[] { "Degree", "Windows", "Solar Panels", "Heater", "AC", "Net" };
-		} else if (graph instanceof PartEnergyAngularGraph) {
-			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Mirror || selectedPart instanceof Foundation) {
-				header = new String[] { "Degree", "Solar" };
-			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
-				header = new String[] { "Degree", "Heat Gain" };
-			} else if (selectedPart instanceof Window) {
-				header = new String[] { "Degree", "Solar", "Heat Gain" };
-			}
 		}
 		if (header == null) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);

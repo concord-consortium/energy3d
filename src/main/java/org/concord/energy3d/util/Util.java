@@ -483,6 +483,10 @@ public class Util {
 		return a.distance(b) < MathUtils.ZERO_TOLERANCE;
 	}
 
+	public static boolean isEqual(final ReadOnlyVector2 a, final ReadOnlyVector2 b, final double tolerance) {
+		return a.distance(b) < tolerance;
+	}
+
 	public static boolean isEqual(final double a, final double b) {
 		return isZero(a - b);
 	}

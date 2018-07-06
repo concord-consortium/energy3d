@@ -39,7 +39,6 @@ import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
-import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
@@ -1008,8 +1007,6 @@ public class TimeSeriesLogger {
 						}
 					} else if (analysisRequester instanceof EnergyAnnualAnalysis) {
 						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
-					} else if (analysisRequester instanceof EnergyAngularAnalysis) {
-						line += ((EnergyAngularAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof ProjectCost) {
 						line += ((ProjectCost) analysisRequester).toJson();
 					}
