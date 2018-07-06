@@ -9,11 +9,11 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.text.DecimalFormat;
 
 import javax.swing.JComponent;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
+import org.concord.energy3d.gui.EnergyPanel;
 
 /**
  * @author Charles Xie
@@ -29,15 +29,16 @@ class GeneGraph extends JComponent {
 
 	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
 	private final BasicStroke thin = new BasicStroke(1);
-	private final DecimalFormat format1 = new DecimalFormat("#.#");
+	private final String geneName;
 	private final int nbin = 100; // number of bins
 	private int ymax = 0; // maximum count per bin
 	private final int[] count;
 
-	GeneGraph(final Individual[] individuals, final int geneIndex) {
+	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName) {
 
 		super();
 		setBackground(Color.DARK_GRAY);
+		this.geneName = geneName;
 
 		final double delta = 1.0 / nbin;
 		count = new int[nbin];
@@ -84,7 +85,7 @@ class GeneGraph extends JComponent {
 
 		g2.setColor(Color.WHITE);
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
-		final String xLabel = "Gene (normalized)";
+		final String xLabel = geneName + " (normalized)";
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
 
 		// draw y axis
@@ -92,7 +93,7 @@ class GeneGraph extends JComponent {
 		String tickmarkLabel;
 		final int x0 = LEFT_MARGIN + 1;
 		final int ny = ymax + 1;
-		final double dy = graphWindowHeight / ny;
+		final double dy = (double) graphWindowHeight / (double) ny;
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		double yTick;
 		if (ny < 20) {
@@ -123,26 +124,28 @@ class GeneGraph extends JComponent {
 		if (count != null) { // draw Manhattan plot
 			final Area area = new Area();
 			g2.setFont(new Font("Arial", Font.PLAIN, 10));
-			final double dx = graphWindowWidth / count.length;
+			final double dx = (double) graphWindowWidth / (double) count.length;
 			double xTick;
-			int tickmarkLength;
+			int tickmarkLabelLength;
 			for (int i = 0; i < count.length; i++) {
 				xTick = x0 + i * dx;
-				area.add(new Area(new Rectangle2D.Double(xTick, xAxisY - count[i] * dy, dx, count[i] * dy)));
-				g2.setColor(Color.GRAY);
-				g2.fill(area);
-				g2.setColor(Color.LIGHT_GRAY);
-				g2.draw(area);
-				g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
-				if (i % 20 == 0) {
-					tickmarkLabel = "" + format1.format((double) i / (double) count.length);
-					tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
-					g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLength * 0.5), xAxisY + 16);
+				area.add(new Area(new Rectangle2D.Double(xTick - dx / 2, xAxisY - count[i] * dy, dx, count[i] * dy)));
+				if (i % 2 == 0) {
+					g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
+					if (i % 20 == 0) {
+						tickmarkLabel = EnergyPanel.ONE_DECIMAL.format((double) i / (double) count.length);
+						tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
+						g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
+					}
 				}
 			}
 			tickmarkLabel = "1.0";
-			tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
-			g2.drawString(tickmarkLabel, (int) (x0 + graphWindowWidth - tickmarkLength * 0.5), xAxisY + 16);
+			tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
+			g2.drawString(tickmarkLabel, (int) (x0 + count.length * dx - tickmarkLabelLength * 0.5), xAxisY + 16);
+			g2.setColor(Color.GRAY);
+			g2.fill(area);
+			g2.setColor(Color.LIGHT_GRAY);
+			g2.draw(area);
 		}
 
 	}

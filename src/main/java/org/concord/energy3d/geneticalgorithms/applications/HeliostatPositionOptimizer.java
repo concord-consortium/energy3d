@@ -67,6 +67,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 					individual.setGene(i, v);
 				}
 			}
+			setGeneName(i, "X (" + m.getId() + ")");
 			i++;
 			normalizedValue = m.getPoints().get(0).getY();
 			firstBorn.setGene(i, normalizedValue);
@@ -80,6 +81,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 					individual.setGene(i, v);
 				}
 			}
+			setGeneName(i, "Y (" + m.getId() + ")");
 			i++;
 		}
 	}

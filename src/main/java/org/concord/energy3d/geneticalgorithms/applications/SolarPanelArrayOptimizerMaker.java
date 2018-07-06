@@ -142,7 +142,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 
 		SpringUtilities.makeCompactGrid(panel, 15, 3, 6, 6, 6, 6);
 
-		final Object[] options = new Object[] { "OK", "Cancel", "Fitness", "Gene" };
+		final Object[] options = new Object[] { "OK", "Cancel", "Previous Results" };
 		final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Genetic Algorithm Options for Optimizing Solar Panel Arrays");
 
@@ -153,19 +153,11 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 				break;
 			} else if (choice == options[2]) {
 				if (op != null) {
-					if (op.getFittestOfGenerations() != null) {
-						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend of Previous Run");
-					}
-				} else {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
-				}
-			} else if (choice == options[3]) {
-				if (op != null) {
 					op.population.sort();
 					for (int i = 0; i < op.population.size(); i++) {
 						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
 					}
-					new GeneGraphPanel(op.getPopulation().getIndividuals()).display();
+					op.displayResults();
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No data is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}

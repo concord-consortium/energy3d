@@ -33,6 +33,8 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 
 	public BuildingLocationOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, discretizationSteps);
+		setGeneName(0, "X");
+		setGeneName(1, "Y");
 	}
 
 	@Override

@@ -50,10 +50,20 @@ public abstract class Optimizer {
 	double fitnessSharingRadius = 0.1;
 	int searchMethod = GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
+	String[] geneNames;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
+		geneNames = new String[chromosomeLength];
+	}
+
+	public void setGeneName(final int i, final String name) {
+		geneNames[i] = name;
+	}
+
+	public String getGeneName(final int i) {
+		return geneNames[i];
 	}
 
 	public void setSearchMethod(final int searchMethod) {
@@ -332,6 +342,10 @@ public abstract class Optimizer {
 
 	public double getSelectionRate() {
 		return selectionRate;
+	}
+
+	public void displayResults() {
+		new ResultGraphPanel(this).display();
 	}
 
 }

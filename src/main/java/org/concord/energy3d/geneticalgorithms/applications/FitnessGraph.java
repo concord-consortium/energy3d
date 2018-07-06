@@ -52,7 +52,7 @@ class FitnessGraph extends JComponent {
 	public FitnessGraph(final Individual[] individuals) {
 
 		super();
-		setPreferredSize(new Dimension(800, 500));
+		setPreferredSize(new Dimension(600, 400));
 		setBackground(Color.DARK_GRAY);
 
 		this.individuals = individuals;
@@ -128,7 +128,7 @@ class FitnessGraph extends JComponent {
 		g2.rotate(Math.PI * 0.5, yLabelX, yLabelY);
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
-		final double dx = graphWindowWidth / (length - 1);
+		final double dx = graphWindowWidth / (length - 1.0);
 		double xTick;
 		int tickmarkLength;
 		Path2D.Double path = null;

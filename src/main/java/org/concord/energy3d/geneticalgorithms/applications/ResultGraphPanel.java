@@ -2,10 +2,13 @@ package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -15,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
@@ -25,20 +29,24 @@ import org.concord.energy3d.util.ClipImage;
  * @author Charles Xie
  *
  */
-public class GeneGraphPanel extends JPanel {
+public class ResultGraphPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	private final Optimizer op;
 
-	public GeneGraphPanel(final Individual[] individuals) {
+	public ResultGraphPanel(final Optimizer op) {
 
 		super();
 		setBackground(Color.DARK_GRAY);
-		setLayout(new FlowLayout());
+		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
+		this.op = op;
+
+		final Individual[] individuals = op.getPopulation().getIndividuals();
 		final int n = individuals[0].getChromosomeLength();
 
 		for (int i = 0; i < n; i++) {
-			final GeneGraph g = new GeneGraph(individuals, i);
+			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i));
 			g.setPreferredSize(new Dimension(400, 400));
 			add(g);
 		}
@@ -47,7 +55,7 @@ public class GeneGraphPanel extends JPanel {
 
 	public void display() {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Gene Graph", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Previous Results", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -63,7 +71,7 @@ public class GeneGraphPanel extends JPanel {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(GeneGraphPanel.this);
+				new ClipImage().copyImageToClipboard(ResultGraphPanel.this);
 			}
 		});
 		menu.add(mi);
@@ -77,7 +85,22 @@ public class GeneGraphPanel extends JPanel {
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-		final JButton button = new JButton("Close");
+		JButton button = new JButton("Fitness");
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				if (op != null) {
+					if (op.getFittestOfGenerations() != null) {
+						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend of Previous Run");
+					}
+				} else {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+		});
+		buttonPanel.add(button);
+
+		button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -90,6 +113,18 @@ public class GeneGraphPanel extends JPanel {
 			@Override
 			public void windowClosing(final WindowEvent e) {
 				dialog.dispose();
+			}
+		});
+
+		dialog.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(final ComponentEvent e) {
+				final int n = getComponentCount();
+				for (int i = 0; i < n; i++) {
+					final Component c = getComponent(i);
+					c.setPreferredSize(new Dimension(getWidth() / n, getHeight()));
+				}
+				repaint();
 			}
 		});
 

@@ -13,6 +13,8 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 
+import com.ardor3d.math.MathUtils;
+
 /**
  * Chromosome of an individual is encoded as follows:
  * 
@@ -25,6 +27,7 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 
 	public BuildingOrientationOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, discretizationSteps);
+		setGeneName(0, "Azimuth");
 	}
 
 	@Override
@@ -54,8 +57,8 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 	void computeIndividualFitness(final Individual individual) {
 		final double gene = individual.getGene(0);
 		foundation.setAzimuth(gene * 360);
-		final double rawObjective = objectiveFunction.compute();
-		// final double rawObjective = Math.abs(Math.sin(2 * gene * MathUtils.TWO_PI)); // test function
+		// final double rawObjective = objectiveFunction.compute();
+		final double rawObjective = Math.abs(Math.sin(2 * gene * MathUtils.TWO_PI)); // test function
 		if (searchMethod == GLOBAL_SEARCH_FITNESS_SHARING) {
 			final double nc = population.getNicheCount(individual, fitnessSharingRadius);
 			System.out.println("****" + nc + ", " + rawObjective);

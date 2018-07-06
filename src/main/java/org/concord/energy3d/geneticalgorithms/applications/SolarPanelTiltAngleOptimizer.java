@@ -27,6 +27,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 
 	public SolarPanelTiltAngleOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		super(populationSize, chromosomeLength, discretizationSteps);
+		setGeneName(0, "Tilt Angle");
 	}
 
 	@Override
