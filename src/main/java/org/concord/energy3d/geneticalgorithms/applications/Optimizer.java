@@ -51,11 +51,26 @@ public abstract class Optimizer {
 	int searchMethod = GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
 	String[] geneNames;
+	double[] geneMinima;
+	double[] geneMaxima;
+	boolean[] isGeneInteger;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
 		constraints = new ArrayList<Constraint>();
 		geneNames = new String[chromosomeLength];
+		geneMinima = new double[chromosomeLength];
+		geneMaxima = new double[chromosomeLength];
+		isGeneInteger = new boolean[chromosomeLength];
+		Arrays.fill(isGeneInteger, false);
+	}
+
+	public void setGeneInteger(final int i, final boolean b) {
+		isGeneInteger[i] = b;
+	}
+
+	public boolean isGeneInteger(final int i) {
+		return isGeneInteger[i];
 	}
 
 	public void setGeneName(final int i, final String name) {
@@ -64,6 +79,22 @@ public abstract class Optimizer {
 
 	public String getGeneName(final int i) {
 		return geneNames[i];
+	}
+
+	public void setGeneMinimum(final int i, final double min) {
+		geneMinima[i] = min;
+	}
+
+	public double getGeneMinimum(final int i) {
+		return geneMinima[i];
+	}
+
+	public void setGeneMaximum(final int i, final double max) {
+		geneMaxima[i] = max;
+	}
+
+	public double getGeneMaximum(final int i) {
+		return geneMaxima[i];
 	}
 
 	public void setSearchMethod(final int searchMethod) {

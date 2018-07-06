@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
@@ -30,11 +29,10 @@ class GeneGraph extends JComponent {
 	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
 	private final BasicStroke thin = new BasicStroke(1);
 	private final String geneName;
-	private final int nbin = 100; // number of bins
 	private int ymax = 0; // maximum count per bin
 	private final int[] count;
 
-	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName) {
+	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin) {
 
 		super();
 		setBackground(Color.DARK_GRAY);
@@ -121,31 +119,37 @@ class GeneGraph extends JComponent {
 		g2.drawString(yLabel, yLabelX, yLabelY);
 		g2.rotate(Math.PI * 0.5, yLabelX, yLabelY);
 
-		if (count != null) { // draw Manhattan plot
-			final Area area = new Area();
+		if (count != null) { // draw bar graph
 			g2.setFont(new Font("Arial", Font.PLAIN, 10));
 			final double dx = (double) graphWindowWidth / (double) count.length;
 			double xTick;
 			int tickmarkLabelLength;
 			for (int i = 0; i < count.length; i++) {
 				xTick = x0 + i * dx;
-				area.add(new Area(new Rectangle2D.Double(xTick - dx / 2, xAxisY - count[i] * dy, dx, count[i] * dy)));
-				if (i % 2 == 0) {
-					g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
-					if (i % 20 == 0) {
-						tickmarkLabel = EnergyPanel.ONE_DECIMAL.format((double) i / (double) count.length);
-						tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
-						g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
+				final Rectangle2D.Double rect = new Rectangle2D.Double(xTick, xAxisY - count[i] * dy, dx, count[i] * dy);
+				g2.setColor(Color.GRAY);
+				g2.fill(rect);
+				g2.setColor(Color.LIGHT_GRAY);
+				g2.draw(rect);
+				if (count.length > 10) {
+					if (i % 2 == 0) {
+						g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
+						if (i % 20 == 0) {
+							tickmarkLabel = EnergyPanel.ONE_DECIMAL.format((double) i / (double) count.length);
+							tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
+							g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
+						}
 					}
+				} else {
+					g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
+					tickmarkLabel = EnergyPanel.TWO_DECIMALS.format((double) i / (double) count.length);
+					tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
+					g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLabelLength * 0.5), xAxisY + 16);
 				}
 			}
 			tickmarkLabel = "1.0";
 			tickmarkLabelLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 			g2.drawString(tickmarkLabel, (int) (x0 + count.length * dx - tickmarkLabelLength * 0.5), xAxisY + 16);
-			g2.setColor(Color.GRAY);
-			g2.fill(area);
-			g2.setColor(Color.LIGHT_GRAY);
-			g2.draw(area);
 		}
 
 	}

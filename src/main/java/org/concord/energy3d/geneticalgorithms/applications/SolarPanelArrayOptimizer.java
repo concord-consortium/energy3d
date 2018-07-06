@@ -63,6 +63,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			final int panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
 			minimumRowSpacing = rack.getRackHeight(); // two racks that border each other
+			setGeneMinimum(0, minimumRowSpacing);
+			setGeneMaximum(0, maximumRowSpacing);
 			double normalizedValue;
 			final Individual firstBorn = population.getIndividual(0); // initialize the population with the first-born being the current design
 			if (n > 1) {
@@ -89,6 +91,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				}
 			}
 
+			setGeneMinimum(1, -90);
+			setGeneMaximum(1, 90);
 			normalizedValue = 0.5 * (1.0 + rack.getTiltAngle() / 90.0);
 			firstBorn.setGene(1, normalizedValue);
 			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
@@ -102,6 +106,9 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				}
 			}
 
+			setGeneMinimum(2, minimumPanelRows);
+			setGeneMaximum(2, maximumPanelRows);
+			setGeneInteger(2, true);
 			normalizedValue = (double) (panelRowsPerRack - minimumPanelRows) / (double) (maximumPanelRows - minimumPanelRows);
 			if (normalizedValue < 0) {
 				normalizedValue = 0;

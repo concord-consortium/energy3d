@@ -46,7 +46,11 @@ public class ResultGraphPanel extends JPanel {
 		final int n = individuals[0].getChromosomeLength();
 
 		for (int i = 0; i < n; i++) {
-			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i));
+			int nbin = 100;
+			if (op.isGeneInteger(i)) {
+				nbin = (int) Math.round(op.getGeneMaximum(i) - op.getGeneMinimum(i));
+			}
+			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i), nbin);
 			g.setPreferredSize(new Dimension(400, 400));
 			add(g);
 		}
