@@ -1,10 +1,17 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import org.concord.energy3d.geneticalgorithms.Constraint;
 import org.concord.energy3d.geneticalgorithms.Individual;
@@ -12,6 +19,7 @@ import org.concord.energy3d.geneticalgorithms.ObjectiveFunction;
 import org.concord.energy3d.geneticalgorithms.Population;
 import org.concord.energy3d.geneticalgorithms.RectangularBound;
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
@@ -54,6 +62,8 @@ public abstract class Optimizer {
 	double[] geneMinima;
 	double[] geneMaxima;
 	boolean[] isGeneInteger;
+	double[] initialGene, finalGene;
+	double initialFitness, finalFitness;
 
 	public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
 		population = new Population(populationSize, chromosomeLength, discretizationSteps);
@@ -62,7 +72,41 @@ public abstract class Optimizer {
 		geneMinima = new double[chromosomeLength];
 		geneMaxima = new double[chromosomeLength];
 		isGeneInteger = new boolean[chromosomeLength];
+		initialGene = new double[chromosomeLength];
+		finalGene = new double[chromosomeLength];
 		Arrays.fill(isGeneInteger, false);
+	}
+
+	public void setInitialGene(final int i, final double g) {
+		initialGene[i] = g;
+	}
+
+	public double getInitialGene(final int i) {
+		return initialGene[i];
+	}
+
+	public void setInitialFitness(final double f) {
+		initialFitness = f;
+	}
+
+	public double getInitialFitness() {
+		return initialFitness;
+	}
+
+	public void setFinalGene(final int i, final double g) {
+		finalGene[i] = g;
+	}
+
+	public double getFinalGene(final int i) {
+		return finalGene[i];
+	}
+
+	public void setFinalFitness(final double f) {
+		finalFitness = f;
+	}
+
+	public double getFinalFitness() {
+		return finalFitness;
 	}
 
 	public void setGeneInteger(final int i, final boolean b) {
@@ -168,7 +212,29 @@ public abstract class Optimizer {
 
 	public abstract void applyFittest();
 
-	public abstract void displayFittest();
+	public void displayFittest() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				final int n = population.getChromosomeLength();
+				final String[] header = new String[] { "", "Initial", "Final" };
+				final Object[][] data = new Object[n + 1][3];
+				for (int i = 0; i < n; i++) {
+					data[i][0] = geneNames[i];
+					data[i][1] = EnergyPanel.FIVE_DECIMALS.format(initialGene[i]);
+					data[i][2] = EnergyPanel.FIVE_DECIMALS.format(finalGene[i]);
+				}
+				data[n][0] = "Fitness";
+				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
+				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
+				final JTable table = new JTable(data, header);
+				final JPanel ui = new JPanel(new BorderLayout());
+				ui.setPreferredSize(new Dimension(300, (n + 1) * 60));
+				ui.add(new JScrollPane(table), BorderLayout.CENTER);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ui, "Results", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+	}
 
 	public void evolve() {
 
@@ -272,6 +338,9 @@ public abstract class Optimizer {
 
 				computeCounter++;
 				updateInfo(population.getIndividual(indexOfIndividual));
+				if (computeCounter == 1 && indexOfIndividual == 0) {
+					initialFitness = population.getIndividual(0).getFitness();
+				}
 				return null;
 
 			}

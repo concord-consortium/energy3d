@@ -106,6 +106,7 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		radialExpansion = minimumRadialExpansion + best.getGene(4) * (maximumRadialExpansion - minimumRadialExpansion);
 		layout.setRadialExpansionRatio(radialExpansion);
 		foundation.generateHeliostatField(layout);
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}

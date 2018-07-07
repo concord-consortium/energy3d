@@ -119,6 +119,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 			}
 			m.draw();
 		}
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
@@ -165,6 +166,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 			receiver.draw();
 		}
 		SceneManager.getInstance().refresh();
+		super.displayFittest();
 	}
 
 	@Override

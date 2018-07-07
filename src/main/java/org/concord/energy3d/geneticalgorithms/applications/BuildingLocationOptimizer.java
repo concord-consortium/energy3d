@@ -109,6 +109,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		foundation.move(displacement);
 		displayFittest();
 		foundation.draw();
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		SceneManager.getInstance().refresh();
 	}
@@ -131,6 +132,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 			break;
 		}
 		foundation.setLabelCustomText(s);
+		super.displayFittest();
 	}
 
 	@Override

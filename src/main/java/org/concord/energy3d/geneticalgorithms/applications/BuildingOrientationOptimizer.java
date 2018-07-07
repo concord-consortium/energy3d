@@ -75,6 +75,7 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 		foundation.setAzimuth(gene * 360);
 		displayFittest();
 		foundation.draw();
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		SceneManager.getInstance().refresh();
 	}
@@ -97,6 +98,7 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 			break;
 		}
 		foundation.setLabelCustomText(s);
+		super.displayFittest();
 	}
 
 	@Override

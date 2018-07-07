@@ -76,8 +76,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				} else if (normalizedValue > 1) {
 					normalizedValue = 1;
 				}
+				setInitialGene(0, rowSpacing);
 			} else {
 				normalizedValue = 1;
+				setInitialGene(0, maximumRowSpacing);
 			}
 			firstBorn.setGene(0, normalizedValue);
 			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
@@ -95,6 +97,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			setGeneMaximum(1, 90);
 			normalizedValue = 0.5 * (1.0 + rack.getTiltAngle() / 90.0);
 			firstBorn.setGene(1, normalizedValue);
+			setInitialGene(1, rack.getTiltAngle());
 			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
 				for (int k = 1; k < population.size(); k++) {
 					final Individual individual = population.getIndividual(k);
@@ -116,6 +119,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 				normalizedValue = 1;
 			}
 			firstBorn.setGene(2, normalizedValue);
+			setInitialGene(2, panelRowsPerRack);
 			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
 				for (int k = 1; k < population.size(); k++) {
 					final Individual individual = population.getIndividual(k);
@@ -184,6 +188,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + best.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.generateSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		setFinalGene(0, rowSpacing);
+		setFinalGene(1, tiltAngle);
+		setFinalGene(2, panelRowsPerRack);
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
@@ -225,6 +233,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		foundation.setLabelCustomText(s);
 		foundation.draw();
 		SceneManager.getInstance().refresh();
+		super.displayFittest();
 	}
 
 	@Override

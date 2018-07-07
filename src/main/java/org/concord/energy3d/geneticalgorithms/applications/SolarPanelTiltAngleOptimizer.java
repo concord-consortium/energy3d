@@ -53,6 +53,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 			setGeneName(i, "Tilt Angle (" + r.getId() + ")");
 			setGeneMinimum(i, -90);
 			setGeneMaximum(i, 90);
+			setInitialGene(i, r.getTiltAngle());
 			i++;
 		}
 	}
@@ -77,7 +78,9 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 			final Rack rack = racks.get(i);
 			rack.setTiltAngle((2 * gene - 1) * 90);
 			rack.draw();
+			setFinalGene(i, rack.getTiltAngle());
 		}
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
@@ -107,6 +110,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 		foundation.setLabelCustomText(s);
 		foundation.draw();
 		SceneManager.getInstance().refresh();
+		super.displayFittest();
 	}
 
 	@Override

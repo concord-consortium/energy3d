@@ -204,6 +204,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 				}
 			}
 		}
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
@@ -270,6 +271,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		foundation.setLabelCustomText(s);
 		foundation.draw();
 		SceneManager.getInstance().refresh();
+		super.displayFittest();
 	}
 
 	@Override

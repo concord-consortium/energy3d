@@ -2031,9 +2031,9 @@ public class SolarRadiation {
 	}
 
 	private void applyTexture(final Mesh mesh) {
+		mesh.clearRenderState(StateType.Texture);
 		if (onMesh.get(mesh) == null) {
 			mesh.setDefaultColor(ColorRGBA.BLACK);
-			mesh.clearRenderState(StateType.Texture);
 			return;
 		}
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;

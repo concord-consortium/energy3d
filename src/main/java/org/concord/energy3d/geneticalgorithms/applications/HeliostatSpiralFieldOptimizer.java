@@ -90,6 +90,7 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 		radialExpansion = minimumRadialExpansion + best.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion);
 		layout.setRadialExpansionRatio(radialExpansion);
 		foundation.generateHeliostatField(layout);
+		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
 	}
