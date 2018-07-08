@@ -220,7 +220,7 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						final HeliostatConcentricFieldOptimizer op = new HeliostatConcentricFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, 0);
+						final HeliostatConcentricFieldOptimizer op = new HeliostatConcentricFieldOptimizer(populationSize, 5, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMinimumAzimuthalSpacing(minimumAzimuthalSpacing);
@@ -262,7 +262,6 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 							break;
 						}
 						op.setFoundation(foundation);
-						op.setupFoundationConstraint();
 						op.evolve();
 						if (choice == options[0]) {
 							break;

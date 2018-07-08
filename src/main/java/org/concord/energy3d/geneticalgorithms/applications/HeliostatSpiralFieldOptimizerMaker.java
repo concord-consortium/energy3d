@@ -202,7 +202,7 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						final HeliostatSpiralFieldOptimizer op = new HeliostatSpiralFieldOptimizer(populationSize, foundation.getHeliostats().size() * 2, 0);
+						final HeliostatSpiralFieldOptimizer op = new HeliostatSpiralFieldOptimizer(populationSize, 4, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMinimumDivergenceAngle(minimumDivergenceAngle);
@@ -242,7 +242,6 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 							break;
 						}
 						op.setFoundation(foundation);
-						op.setupFoundationConstraint();
 						op.evolve();
 						if (choice == options[0]) {
 							break;

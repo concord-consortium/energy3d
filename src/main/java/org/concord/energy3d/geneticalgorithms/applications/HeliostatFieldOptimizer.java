@@ -107,6 +107,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 			receiver.draw();
 		}
 		SceneManager.getInstance().refresh();
+		super.displayFittest();
 	}
 
 	@Override

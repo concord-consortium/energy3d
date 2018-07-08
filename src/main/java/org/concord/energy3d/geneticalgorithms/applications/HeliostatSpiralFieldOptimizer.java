@@ -40,6 +40,27 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 		firstBorn.setGene(1, (heliostat.getApertureHeight() - minimumApertureHeight) / (maximumApertureHeight - minimumApertureHeight));
 		firstBorn.setGene(2, (divergenceAngle - minimumDivergenceAngle) / (maximumDivergenceAngle - minimumDivergenceAngle));
 		firstBorn.setGene(3, (radialExpansion - minimumRadialExpansion) / (maximumRadialExpansion - minimumRadialExpansion));
+
+		setGeneName(0, "Aperture Width");
+		setInitialGene(0, heliostat.getApertureWidth());
+		setGeneMinimum(0, minimumApertureWidth);
+		setGeneMaximum(0, maximumApertureWidth);
+
+		setGeneName(1, "Aperture Height");
+		setInitialGene(1, heliostat.getApertureHeight());
+		setGeneMinimum(1, minimumApertureHeight);
+		setGeneMaximum(1, maximumApertureHeight);
+
+		setGeneName(2, "Divergence Angle");
+		setInitialGene(2, divergenceAngle);
+		setGeneMinimum(2, minimumDivergenceAngle);
+		setGeneMaximum(2, maximumDivergenceAngle);
+
+		setGeneName(3, "Radial Expansion");
+		setInitialGene(3, radialExpansion);
+		setGeneMinimum(3, minimumRadialExpansion);
+		setGeneMaximum(3, maximumRadialExpansion);
+
 	}
 
 	public void setMinimumDivergenceAngle(final double minimumDivergenceAngle) {
@@ -90,6 +111,10 @@ public class HeliostatSpiralFieldOptimizer extends HeliostatFieldOptimizer {
 		radialExpansion = minimumRadialExpansion + best.getGene(3) * (maximumRadialExpansion - minimumRadialExpansion);
 		layout.setRadialExpansionRatio(radialExpansion);
 		foundation.generateHeliostatField(layout);
+		setFinalGene(0, layout.getApertureWidth());
+		setFinalGene(1, layout.getApertureHeight());
+		setFinalGene(2, layout.getDivergence());
+		setFinalGene(3, layout.getRadialExpansionRatio());
 		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();

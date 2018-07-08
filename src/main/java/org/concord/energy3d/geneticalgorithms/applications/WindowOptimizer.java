@@ -58,14 +58,24 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 					} else if (normalizedValue > 1) {
 						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, normalizedValue);
+					firstBorn.setGene(i, normalizedValue);
+					setGeneName(i, "Window Width (" + w.getId() + ")");
+					setGeneMinimum(i, minWidth);
+					setGeneMaximum(i, maxWidth);
+					setInitialGene(i, w.getWindowWidth());
+					i++;
 					normalizedValue = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
 					if (normalizedValue < 0) {
 						normalizedValue = 0;
 					} else if (normalizedValue > 1) {
 						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, normalizedValue);
+					firstBorn.setGene(i, normalizedValue);
+					setGeneName(i, "Window Height (" + w.getId() + ")");
+					setGeneMinimum(i, minHeight);
+					setGeneMaximum(i, maxHeight);
+					setInitialGene(i, w.getWindowHeight());
+					i++;
 				} else {
 					throw new RuntimeException("Windows must be on walls!");
 				}
@@ -89,14 +99,24 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 					} else if (normalizedValue > 1) {
 						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, normalizedValue);
+					firstBorn.setGene(i, normalizedValue);
+					setGeneName(i, "Window Width (" + w.getId() + ")");
+					setGeneMinimum(i, minWidth);
+					setGeneMaximum(i, maxWidth);
+					setInitialGene(i, w.getWindowWidth());
+					i++;
 					normalizedValue = (w.getWindowHeight() - minHeight) / (maxHeight - minHeight);
 					if (normalizedValue < 0) {
 						normalizedValue = 0;
 					} else if (normalizedValue > 1) {
 						normalizedValue = 1;
 					}
-					firstBorn.setGene(i++, normalizedValue);
+					firstBorn.setGene(i, normalizedValue);
+					setGeneName(i, "Window Height (" + w.getId() + ")");
+					setGeneMinimum(i, minHeight);
+					setGeneMaximum(i, maxHeight);
+					setInitialGene(i, w.getWindowHeight());
+					i++;
 				}
 			}
 		}
@@ -172,9 +192,11 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 				switch (i % 2) {
 				case 0:
 					w.setWindowWidth(minWidth + gene * (maxWidth - minWidth));
+					setFinalGene(i, w.getWindowWidth());
 					break;
 				case 1:
 					w.setWindowHeight(minHeight + gene * (maxHeight - minHeight));
+					setFinalGene(i, w.getWindowHeight());
 					break;
 				}
 				w.draw();
@@ -194,9 +216,11 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 					final double maxWidth = maximumWidthRelative * wallWidth;
 					final double minHeight = minimumHeightRelative * wallHeight;
 					final double maxHeight = maximumHeightRelative * wallHeight;
+					setFinalGene(2 * i, minWidth + geneWidth * (maxWidth - minWidth));
+					setFinalGene(2 * i + 1, minHeight + geneHeight * (maxHeight - minHeight));
 					for (final Window w : windows) {
-						w.setWindowWidth(minWidth + geneWidth * (maxWidth - minWidth));
-						w.setWindowHeight(minHeight + geneHeight * (maxHeight - minHeight));
+						w.setWindowWidth(getFinalGene(2 * i));
+						w.setWindowHeight(getFinalGene(2 * i + 1));
 						w.draw();
 					}
 					wall.draw();

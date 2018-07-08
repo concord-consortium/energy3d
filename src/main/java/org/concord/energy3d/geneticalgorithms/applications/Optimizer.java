@@ -229,7 +229,7 @@ public abstract class Optimizer {
 				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
 				final JTable table = new JTable(data, header);
 				final JPanel ui = new JPanel(new BorderLayout());
-				ui.setPreferredSize(new Dimension(300, (n + 1) * 60));
+				table.setPreferredSize(new Dimension(240, (n + 1) * 30));
 				ui.add(new JScrollPane(table), BorderLayout.CENTER);
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), ui, "Results", JOptionPane.INFORMATION_MESSAGE);
 			}

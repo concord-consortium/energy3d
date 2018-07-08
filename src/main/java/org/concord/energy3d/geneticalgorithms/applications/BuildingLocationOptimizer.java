@@ -65,6 +65,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		}
 		setGeneMinimum(0, xmin);
 		setGeneMaximum(0, xmax);
+		setInitialGene(0, center.getX() * Scene.getInstance().getScale());
 
 		normalizedValue = (center.getY() * Scene.getInstance().getScale() - ymin) / (ymax - ymin);
 		if (normalizedValue < 0) {
@@ -86,6 +87,7 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		}
 		setGeneMinimum(1, ymin);
 		setGeneMaximum(1, ymax);
+		setInitialGene(1, center.getY() * Scene.getInstance().getScale());
 
 	}
 
@@ -105,13 +107,17 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		final double geneX = best.getGene(0);
 		final double geneY = best.getGene(1);
 		final Vector3 displacement = foundation.getAbsCenter();
-		displacement.subtractLocal((xmin + geneX * (xmax - xmin)) / Scene.getInstance().getScale(), (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getScale(), 0).negateLocal();
+		final double newX = (xmin + geneX * (xmax - xmin)) / Scene.getInstance().getScale();
+		final double newY = (ymin + geneY * (ymax - ymin)) / Scene.getInstance().getScale();
+		displacement.subtractLocal(newX, newY, 0).negateLocal();
 		foundation.move(displacement);
-		displayFittest();
 		foundation.draw();
+		setFinalGene(0, newX);
+		setFinalGene(1, newY);
 		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		SceneManager.getInstance().refresh();
+		displayFittest();
 	}
 
 	@Override

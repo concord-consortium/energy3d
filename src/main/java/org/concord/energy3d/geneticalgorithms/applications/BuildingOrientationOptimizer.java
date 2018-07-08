@@ -51,6 +51,7 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 		}
 		setGeneMinimum(0, 0);
 		setGeneMaximum(0, 360);
+		setInitialGene(0, foundation.getAzimuth());
 	}
 
 	@Override
@@ -73,11 +74,12 @@ public class BuildingOrientationOptimizer extends NetEnergyOptimizer {
 		final Individual best = population.getFittest();
 		final double gene = best.getGene(0);
 		foundation.setAzimuth(gene * 360);
-		displayFittest();
 		foundation.draw();
+		setFinalGene(0, foundation.getAzimuth());
 		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		SceneManager.getInstance().refresh();
+		displayFittest();
 	}
 
 	@Override

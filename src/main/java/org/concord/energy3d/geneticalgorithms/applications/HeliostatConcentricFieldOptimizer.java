@@ -45,6 +45,32 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		firstBorn.setGene(2, (azimuthalSpacing - minimumAzimuthalSpacing) / (maximumAzimuthalSpacing - minimumAzimuthalSpacing));
 		firstBorn.setGene(3, (radialSpacing - minimumRadialSpacing) / (maximumRadialSpacing - minimumRadialSpacing));
 		firstBorn.setGene(4, (radialExpansion - minimumRadialExpansion) / (maximumRadialExpansion - minimumRadialExpansion));
+
+		setGeneName(0, "Aperture Width");
+		setInitialGene(0, heliostat.getApertureWidth());
+		setGeneMinimum(0, minimumApertureWidth);
+		setGeneMaximum(0, maximumApertureWidth);
+
+		setGeneName(1, "Aperture Height");
+		setInitialGene(1, heliostat.getApertureHeight());
+		setGeneMinimum(1, minimumApertureHeight);
+		setGeneMaximum(1, maximumApertureHeight);
+
+		setGeneName(2, "Azimuthal Spacing");
+		setInitialGene(2, azimuthalSpacing);
+		setGeneMinimum(2, minimumAzimuthalSpacing);
+		setGeneMaximum(2, maximumAzimuthalSpacing);
+
+		setGeneName(3, "Radial Spacing");
+		setInitialGene(3, radialSpacing);
+		setGeneMinimum(3, minimumRadialSpacing);
+		setGeneMaximum(3, maximumRadialSpacing);
+
+		setGeneName(4, "Radial Expansion");
+		setInitialGene(4, radialExpansion);
+		setGeneMinimum(4, minimumRadialExpansion);
+		setGeneMaximum(4, maximumRadialExpansion);
+
 	}
 
 	public void setMinimumAzimuthalSpacing(final double minimumAzimuthalSpacing) {
@@ -106,6 +132,11 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		radialExpansion = minimumRadialExpansion + best.getGene(4) * (maximumRadialExpansion - minimumRadialExpansion);
 		layout.setRadialExpansionRatio(radialExpansion);
 		foundation.generateHeliostatField(layout);
+		setFinalGene(0, layout.getApertureWidth());
+		setFinalGene(1, layout.getApertureHeight());
+		setFinalGene(2, layout.getAzimuthalSpacing());
+		setFinalGene(3, layout.getRadialSpacing());
+		setFinalGene(4, layout.getRadialExpansionRatio());
 		setFinalFitness(best.getFitness());
 		System.out.println("Fittest: " + individualToString(best));
 		displayFittest();
