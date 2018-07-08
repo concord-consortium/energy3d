@@ -1,6 +1,7 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.ArrayList;
@@ -8,11 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.border.TitledBorder;
 
 import org.concord.energy3d.geneticalgorithms.Constraint;
 import org.concord.energy3d.geneticalgorithms.Individual;
@@ -230,16 +234,29 @@ public abstract class Optimizer {
 				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
 				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
 				final JTable table = new JTable(data, header);
-				// FIXME: table.getTableHeader().setBackground(Color.GRAY);
-				final JPanel ui = new JPanel(new BorderLayout());
-				table.setPreferredSize(new Dimension(360, (n + 1) * 30));
+				// table.getTableHeader().setBackground(Color.GRAY); // Why doesn't it work?
+				final JPanel ui = new JPanel(new BorderLayout(5, 5));
 				final JScrollPane scrollPane = new JScrollPane(table);
-				scrollPane.setPreferredSize(table.getPreferredSize());
+				final Dimension size = new Dimension(360, 200);
+				scrollPane.setPreferredSize(size);
 				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 				ui.add(scrollPane, BorderLayout.CENTER);
-				final FitnessGraph fitnessGraph = new FitnessGraph(getFittestOfGenerations());
-				fitnessGraph.setPreferredSize(new Dimension(table.getPreferredSize().width, 200));
-				ui.add(fitnessGraph, BorderLayout.SOUTH);
+
+				final JTabbedPane tabbedPane = new JTabbedPane();
+				tabbedPane.setBorder(BorderFactory.createTitledBorder(null, "Intermediates", TitledBorder.CENTER, TitledBorder.TOP));
+				ui.add(tabbedPane, BorderLayout.SOUTH);
+
+				for (int i = 0; i < n; i++) {
+					final GeneTemporalGraph geneGraph = new GeneTemporalGraph(fittestOfGenerations, i, geneMinima[i], geneMaxima[i]);
+					geneGraph.setBackground(Color.WHITE);
+					geneGraph.setPreferredSize(size);
+					tabbedPane.addTab(geneNames[i], geneGraph);
+				}
+
+				final FitnessTemporalGraph fitnessGraph = new FitnessTemporalGraph(getFittestOfGenerations());
+				fitnessGraph.setBackground(Color.WHITE);
+				fitnessGraph.setPreferredSize(size);
+				tabbedPane.addTab("Fitness", fitnessGraph);
 
 				final Object[] options = new Object[] { "Close", "More" };
 				final JOptionPane optionPane = new JOptionPane(ui, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);

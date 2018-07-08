@@ -1,65 +1,33 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
  *
  */
-class FitnessGraph extends JComponent {
+class FitnessTemporalGraph extends AbstractGraph {
 
 	private static final long serialVersionUID = 1L;
-	private final static int LEFT_MARGIN = 60;
-	private final static int RIGHT_MARGIN = 20;
-	private final static int TOP_MARGIN = 20;
-	private final static int BOTTOM_MARGIN = 40;
-
-	private final BasicStroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 4f }, 0.0f);
-	private final BasicStroke thin = new BasicStroke(1);
 	private final Individual[] individuals;
 	private double maxFitness = -Double.MAX_VALUE;
 	private double minFitness = Double.MAX_VALUE;
 	private int length;
 
-	private final JPopupMenu popupMenu;
-
-	public FitnessGraph(final Individual[] individuals) {
+	public FitnessTemporalGraph(final Individual[] individuals) {
 
 		super();
-		setPreferredSize(new Dimension(600, 400));
-		setBackground(Color.DARK_GRAY);
 
 		this.individuals = individuals;
 		for (final Individual i : individuals) {
@@ -75,33 +43,6 @@ class FitnessGraph extends JComponent {
 			}
 		}
 
-		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
-		popupMenu = new JPopupMenu();
-		popupMenu.setInvoker(this);
-
-		miCopyImage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(FitnessGraph.this);
-			}
-		});
-		popupMenu.add(miCopyImage);
-
-		addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(final MouseEvent e) {
-				if (Util.isRightClick(e)) {
-					popupMenu.show(FitnessGraph.this, e.getX(), e.getY());
-				}
-			}
-		});
-
-	}
-
-	@Override
-	public void paintComponent(final Graphics g) {
-		super.paintComponent(g);
-		update(g);
 	}
 
 	@Override
@@ -117,7 +58,9 @@ class FitnessGraph extends JComponent {
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
 
-		g2.setColor(Color.LIGHT_GRAY);
+		final boolean dark = getBackground().equals(Color.DARK_GRAY);
+
+		g2.setColor(dark ? Color.LIGHT_GRAY : Color.DARK_GRAY);
 		final int xAxisY = height - BOTTOM_MARGIN;
 		final int graphWindowHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
 		final int graphWindowWidth = width - LEFT_MARGIN - RIGHT_MARGIN;
@@ -126,7 +69,7 @@ class FitnessGraph extends JComponent {
 
 		// draw x axis
 
-		g2.setColor(Color.WHITE);
+		g2.setColor(dark ? Color.WHITE : Color.BLACK);
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
 		final String xLabel = "Generation";
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
@@ -169,82 +112,39 @@ class FitnessGraph extends JComponent {
 			} else {
 				yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
 			}
-			final Ellipse2D circle = new Ellipse2D.Double(xTick - 4, yTick - 4, 8, 8);
 			if (path == null) {
 				path = new Path2D.Double();
 				path.moveTo(xTick, yTick);
 			} else {
 				path.lineTo(xTick, yTick);
 			}
-
-			g2.setColor(Color.GRAY);
-			g2.fill(circle);
-			g2.setColor(Color.LIGHT_GRAY);
-			g2.draw(circle);
 			g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
 			tickmarkLabel = i + "";
 			tickmarkLength = g2.getFontMetrics().stringWidth(tickmarkLabel);
 			g2.drawString(tickmarkLabel, (int) (xTick - tickmarkLength * 0.5), xAxisY + 16);
 		}
 		if (path != null) {
-			g2.setColor(Color.WHITE);
+			g2.setColor(dark ? Color.WHITE : Color.BLACK);
 			g2.setStroke(dashed);
 			g2.draw(path);
 		}
-
-	}
-
-	public void display(final String title) {
-
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), title, true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-		final JPanel contentPane = new JPanel(new BorderLayout());
-		dialog.setContentPane(contentPane);
-
-		final JMenuBar menuBar = new JMenuBar();
-		dialog.setJMenuBar(menuBar);
-
-		final JMenu menu = new JMenu("Export");
-		menuBar.add(menu);
-
-		final JMenuItem mi = new JMenuItem("Copy Image");
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(FitnessGraph.this);
+		g2.setStroke(thin);
+		for (int i = 0; i < individuals.length; i++) {
+			if (individuals[i] == null || Double.isNaN(individuals[i].getFitness())) {
+				continue;
 			}
-		});
-		menu.add(mi);
-
-		final JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		contentPane.add(panel, BorderLayout.CENTER);
-
-		panel.add(this, BorderLayout.CENTER);
-
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
-
-		final JButton button = new JButton("Close");
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				dialog.dispose();
+			xTick = x0 + i * dx;
+			if (Util.isEqual(minFitness, maxFitness, 0.000001)) {
+				yTick = xAxisY - graphWindowHeight * 0.5;
+			} else {
+				yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
 			}
-		});
-		buttonPanel.add(button);
-
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(final WindowEvent e) {
-				dialog.dispose();
-			}
-		});
-
-		dialog.pack();
-		dialog.setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
+			final Ellipse2D circle = new Ellipse2D.Double(xTick - 4, yTick - 4, 8, 8);
+			g2.setColor(dark ? Color.GRAY : Color.WHITE);
+			g2.fill(circle);
+			g2.setColor(dark ? Color.LIGHT_GRAY : Color.GRAY);
+			g2.draw(circle);
+		}
 
 	}
 

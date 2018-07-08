@@ -1,53 +1,33 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.util.ClipImage;
-import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
  *
  */
-class GeneGraph extends JComponent {
+class GeneSpatialGraph extends AbstractGraph {
 
 	private static final long serialVersionUID = 1L;
-	private final static int LEFT_MARGIN = 60;
-	private final static int RIGHT_MARGIN = 20;
-	private final static int TOP_MARGIN = 20;
-	private final static int BOTTOM_MARGIN = 40;
 
-	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
-	private final BasicStroke thin = new BasicStroke(1);
 	private final String geneName;
 	private int ymax = 0; // maximum count per bin
 	private final int[] count;
 	private double lowerBound = 0;
 	private double upperBound = 1;
 
-	private final JPopupMenu popupMenu;
-
-	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin, final double lowerBound, final double upperBound) {
+	GeneSpatialGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin, final double lowerBound, final double upperBound) {
 
 		super();
-		setBackground(Color.DARK_GRAY);
 		this.geneName = geneName;
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
@@ -65,33 +45,6 @@ class GeneGraph extends JComponent {
 			}
 		}
 
-		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
-		popupMenu = new JPopupMenu();
-		popupMenu.setInvoker(this);
-
-		miCopyImage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(GeneGraph.this);
-			}
-		});
-		popupMenu.add(miCopyImage);
-
-		addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(final MouseEvent e) {
-				if (Util.isRightClick(e)) {
-					popupMenu.show(GeneGraph.this, e.getX(), e.getY());
-				}
-			}
-		});
-
-	}
-
-	@Override
-	public void paintComponent(final Graphics g) {
-		super.paintComponent(g);
-		update(g);
 	}
 
 	@Override

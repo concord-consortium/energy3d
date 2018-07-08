@@ -56,7 +56,7 @@ public class ResultGraphPanel extends JPanel {
 			if (op.isGeneInteger(i)) {
 				nbin = (int) Math.round(op.getGeneMaximum(i) - op.getGeneMinimum(i));
 			}
-			final GeneGraph g = new GeneGraph(individuals, i, op.getGeneName(i), nbin, op.getGeneMinimum(i), op.getGeneMaximum(i));
+			final GeneSpatialGraph g = new GeneSpatialGraph(individuals, i, op.getGeneName(i), nbin, op.getGeneMinimum(i), op.getGeneMaximum(i));
 			g.setPreferredSize(new Dimension(mx, 400));
 			add(g);
 		}
@@ -101,7 +101,7 @@ public class ResultGraphPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				if (op != null) {
 					if (op.getFittestOfGenerations() != null) {
-						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
+						new FitnessTemporalGraph(op.getFittestOfGenerations()).display("Fitness Trend");
 					}
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
