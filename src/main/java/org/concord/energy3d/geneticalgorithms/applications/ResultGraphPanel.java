@@ -63,9 +63,9 @@ public class ResultGraphPanel extends JPanel {
 
 	}
 
-	public void display() {
+	public void display(final String title) {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Previous Results", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -101,10 +101,10 @@ public class ResultGraphPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				if (op != null) {
 					if (op.getFittestOfGenerations() != null) {
-						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend of Previous Run");
+						new FitnessGraph(op.getFittestOfGenerations()).display("Fitness Trend");
 					}
 				} else {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No previous result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});

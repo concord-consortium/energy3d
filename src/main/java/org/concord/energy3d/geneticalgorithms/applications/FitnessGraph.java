@@ -11,6 +11,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
@@ -24,11 +26,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.util.ClipImage;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -49,6 +53,8 @@ class FitnessGraph extends JComponent {
 	private double minFitness = Double.MAX_VALUE;
 	private int length;
 
+	private final JPopupMenu popupMenu;
+
 	public FitnessGraph(final Individual[] individuals) {
 
 		super();
@@ -68,6 +74,27 @@ class FitnessGraph extends JComponent {
 				length++;
 			}
 		}
+
+		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
+		popupMenu = new JPopupMenu();
+		popupMenu.setInvoker(this);
+
+		miCopyImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				new ClipImage().copyImageToClipboard(FitnessGraph.this);
+			}
+		});
+		popupMenu.add(miCopyImage);
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					popupMenu.show(FitnessGraph.this, e.getX(), e.getY());
+				}
+			}
+		});
 
 	}
 
@@ -137,7 +164,11 @@ class FitnessGraph extends JComponent {
 				continue;
 			}
 			xTick = x0 + i * dx;
-			yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
+			if (Util.isEqual(minFitness, maxFitness, 0.000001)) {
+				yTick = xAxisY - graphWindowHeight * 0.5;
+			} else {
+				yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
+			}
 			final Ellipse2D circle = new Ellipse2D.Double(xTick - 4, yTick - 4, 8, 8);
 			if (path == null) {
 				path = new Path2D.Double();

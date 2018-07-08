@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -175,7 +176,7 @@ public abstract class Optimizer {
 
 	public void setMaximumGenerations(final int maximumGenerations) {
 		this.maximumGenerations = maximumGenerations;
-		fittestOfGenerations = new Individual[maximumGenerations];
+		fittestOfGenerations = new Individual[maximumGenerations + 1];
 	}
 
 	public Individual[] getFittestOfGenerations() {
@@ -216,6 +217,7 @@ public abstract class Optimizer {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+
 				final int n = population.getChromosomeLength();
 				final String[] header = new String[] { "", "Initial", "Final" };
 				final Object[][] data = new Object[n + 1][3];
@@ -228,12 +230,38 @@ public abstract class Optimizer {
 				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
 				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
 				final JTable table = new JTable(data, header);
+				// FIXME: table.getTableHeader().setBackground(Color.GRAY);
 				final JPanel ui = new JPanel(new BorderLayout());
-				table.setPreferredSize(new Dimension(240, (n + 1) * 30));
-				ui.add(new JScrollPane(table), BorderLayout.CENTER);
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ui, "Results", JOptionPane.INFORMATION_MESSAGE);
+				table.setPreferredSize(new Dimension(360, (n + 1) * 30));
+				final JScrollPane scrollPane = new JScrollPane(table);
+				scrollPane.setPreferredSize(table.getPreferredSize());
+				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				ui.add(scrollPane, BorderLayout.CENTER);
+				final FitnessGraph fitnessGraph = new FitnessGraph(getFittestOfGenerations());
+				fitnessGraph.setPreferredSize(new Dimension(table.getPreferredSize().width, 200));
+				ui.add(fitnessGraph, BorderLayout.SOUTH);
+
+				final Object[] options = new Object[] { "Close", "More" };
+				final JOptionPane optionPane = new JOptionPane(ui, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+				final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Results");
+
+				while (true) {
+					dialog.setVisible(true);
+					final Object choice = optionPane.getValue();
+					if (choice == options[1]) {
+						population.sort();
+						for (int i = 0; i < population.size(); i++) {
+							System.out.println(i + " = " + individualToString(population.getIndividual(i)));
+						}
+						displayResults("Population Distribution");
+					} else {
+						break;
+					}
+				}
+
 			}
 		});
+
 	}
 
 	public void evolve() {
@@ -293,7 +321,7 @@ public abstract class Optimizer {
 						if (isAtTheEndOfGeneration) {
 							population.saveGenes();
 							population.runSGA(selectionRate, crossoverRate);
-							fittestOfGenerations[generation] = new Individual(population.getFittest());
+							fittestOfGenerations[generation + 1] = new Individual(population.getFittest());
 							if (detectViolations()) {
 								population.restoreGenes();
 							} else {
@@ -324,7 +352,7 @@ public abstract class Optimizer {
 					if (isAtTheEndOfGeneration) {
 						population.saveGenes();
 						population.runMGA();
-						fittestOfGenerations[generation] = new Individual(population.getFittest());
+						fittestOfGenerations[generation + 1] = new Individual(population.getFittest());
 						if (detectViolations()) {
 							population.restoreGenes();
 						} else {
@@ -339,6 +367,7 @@ public abstract class Optimizer {
 				computeCounter++;
 				updateInfo(population.getIndividual(indexOfIndividual));
 				if (computeCounter == 1 && indexOfIndividual == 0) {
+					fittestOfGenerations[0] = population.getIndividual(0);
 					initialFitness = population.getIndividual(0).getFitness();
 				}
 				return null;
@@ -444,8 +473,8 @@ public abstract class Optimizer {
 		return selectionRate;
 	}
 
-	public void displayResults() {
-		new ResultGraphPanel(this).display();
+	public void displayResults(final String title) {
+		new ResultGraphPanel(this).display(title);
 	}
 
 }

@@ -491,6 +491,10 @@ public class Util {
 		return isZero(a - b);
 	}
 
+	public static boolean isEqual(final double a, final double b, final double tolerance) {
+		return Math.abs(a - b) < tolerance;
+	}
+
 	public static boolean isZero(final double x) {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}

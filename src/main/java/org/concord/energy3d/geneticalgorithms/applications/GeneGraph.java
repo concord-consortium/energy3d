@@ -7,12 +7,20 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.geneticalgorithms.Individual;
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.util.ClipImage;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -34,6 +42,8 @@ class GeneGraph extends JComponent {
 	private double lowerBound = 0;
 	private double upperBound = 1;
 
+	private final JPopupMenu popupMenu;
+
 	GeneGraph(final Individual[] individuals, final int geneIndex, final String geneName, final int nbin, final double lowerBound, final double upperBound) {
 
 		super();
@@ -54,6 +64,27 @@ class GeneGraph extends JComponent {
 				ymax = count[i];
 			}
 		}
+
+		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
+		popupMenu = new JPopupMenu();
+		popupMenu.setInvoker(this);
+
+		miCopyImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				new ClipImage().copyImageToClipboard(GeneGraph.this);
+			}
+		});
+		popupMenu.add(miCopyImage);
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					popupMenu.show(GeneGraph.this, e.getX(), e.getY());
+				}
+			}
+		});
 
 	}
 

@@ -131,7 +131,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 					for (int i = 0; i < op.population.size(); i++) {
 						System.out.println(i + " = " + op.individualToString(op.population.getIndividual(i)));
 					}
-					op.displayResults();
+					op.displayResults(choice.toString());
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No data is available.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				}
