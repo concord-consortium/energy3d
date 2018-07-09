@@ -30,8 +30,6 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	private int minimumPanelRows = 1;
 	private int maximumPanelRows = 5;
 
-	private SolarPanelArrayOptimizer op;
-
 	@Override
 	public void make(final Foundation foundation) {
 
@@ -197,14 +195,15 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new SolarPanelArrayOptimizer(populationSize, 3, 0);
+						final SolarPanelArrayOptimizer op1 = (SolarPanelArrayOptimizer) op;
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
-						op.setPricePerKWh(pricePerKWh);
-						op.setDailyCostPerSolarPanel(dailyCostPerPanel);
-						op.setMinimumPanelRows(minimumPanelRows);
-						op.setMaximumPanelRows(maximumPanelRows);
+						op1.setPricePerKWh(pricePerKWh);
+						op1.setDailyCostPerSolarPanel(dailyCostPerPanel);
+						op1.setMinimumPanelRows(minimumPanelRows);
+						op1.setMaximumPanelRows(maximumPanelRows);
 						switch (selectedFitnessFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
@@ -214,19 +213,19 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 							break;
 						case 2:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setOutputPerSolarPanel(true);
+							op1.setOutputPerSolarPanel(true);
 							break;
 						case 3:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setOutputPerSolarPanel(true);
+							op1.setOutputPerSolarPanel(true);
 							break;
 						case 4:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						case 5:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						}
 						op.setSearchMethod(selectedSearchMethod);

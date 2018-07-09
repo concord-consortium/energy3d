@@ -184,6 +184,12 @@ public class BuildingLocationOptimizer extends NetEnergyOptimizer {
 		maker.make(foundation);
 	}
 
+	public static void stopIt() {
+		if (maker != null) {
+			maker.stop();
+		}
+	}
+
 	public void setMinimumX(final double xmin) {
 		this.xmin = xmin;
 	}

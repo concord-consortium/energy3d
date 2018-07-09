@@ -137,14 +137,14 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 							}
 							chromesomeLength = numberOfWallsWithWindows * 2;
 						}
-						final WindowOptimizer op = new WindowOptimizer(populationSize, chromesomeLength, 20);
+						op = new WindowOptimizer(populationSize, chromesomeLength, 20);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
-						op.setOptimizeIndividualWindows(optimizeIndividualWindows);
-						op.setMinimumWidthRelative(minimumWidthRelative);
-						op.setMaximumWidthRelative(maximumWidthRelative);
-						op.setMinimumHeightRelative(minimumHeightRelative);
-						op.setMaximumHeightRelative(maximumHeightRelative);
+						((WindowOptimizer) op).setOptimizeIndividualWindows(optimizeIndividualWindows);
+						((WindowOptimizer) op).setMinimumWidthRelative(minimumWidthRelative);
+						((WindowOptimizer) op).setMaximumWidthRelative(maximumWidthRelative);
+						((WindowOptimizer) op).setMinimumHeightRelative(minimumHeightRelative);
+						((WindowOptimizer) op).setMaximumHeightRelative(maximumHeightRelative);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
 						op.setFoundation(foundation);

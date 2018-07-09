@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,7 @@ public abstract class Optimizer {
 	public final static int GLOBAL_SEARCH_FITNESS_SHARING = 2; // https://stackoverflow.com/questions/13775810/what-is-niching-scheme
 	private final static int MICRO_GA_MAX_POPULATION = 9;
 
+	volatile boolean stop;
 	double mutationRate = 0.1;
 	double crossoverRate = 0.5;
 	double selectionRate = 0.5;
@@ -217,70 +219,6 @@ public abstract class Optimizer {
 
 	public abstract void applyFittest();
 
-	public void displayFittest() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-
-				final int n = population.getChromosomeLength();
-				final String[] header = new String[] { "", "Initial", "Final" };
-				final Object[][] data = new Object[n + 1][3];
-				for (int i = 0; i < n; i++) {
-					data[i][0] = geneNames[i];
-					data[i][1] = EnergyPanel.FIVE_DECIMALS.format(initialGene[i]);
-					data[i][2] = EnergyPanel.FIVE_DECIMALS.format(finalGene[i]);
-				}
-				data[n][0] = "Fitness";
-				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
-				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
-				final JTable table = new JTable(data, header);
-				// table.getTableHeader().setBackground(Color.GRAY); // Why doesn't it work?
-				final JPanel ui = new JPanel(new BorderLayout(5, 5));
-				final JScrollPane scrollPane = new JScrollPane(table);
-				final Dimension size = new Dimension(360, 200);
-				scrollPane.setPreferredSize(size);
-				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-				ui.add(scrollPane, BorderLayout.CENTER);
-
-				final JTabbedPane tabbedPane = new JTabbedPane();
-				tabbedPane.setBorder(BorderFactory.createTitledBorder(null, "Intermediates", TitledBorder.CENTER, TitledBorder.TOP));
-				ui.add(tabbedPane, BorderLayout.SOUTH);
-
-				for (int i = 0; i < n; i++) {
-					final GeneTemporalGraph geneGraph = new GeneTemporalGraph(fittestOfGenerations, i, geneMinima[i], geneMaxima[i]);
-					geneGraph.setBackground(Color.WHITE);
-					geneGraph.setPreferredSize(size);
-					tabbedPane.addTab(geneNames[i], geneGraph);
-				}
-
-				final FitnessTemporalGraph fitnessGraph = new FitnessTemporalGraph(getFittestOfGenerations());
-				fitnessGraph.setBackground(Color.WHITE);
-				fitnessGraph.setPreferredSize(size);
-				tabbedPane.addTab("Fitness", fitnessGraph);
-
-				final Object[] options = new Object[] { "Close", "More" };
-				final JOptionPane optionPane = new JOptionPane(ui, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
-				final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Results");
-
-				while (true) {
-					dialog.setVisible(true);
-					final Object choice = optionPane.getValue();
-					if (choice == options[1]) {
-						population.sort();
-						for (int i = 0; i < population.size(); i++) {
-							System.out.println(i + " = " + individualToString(population.getIndividual(i)));
-						}
-						displayResults("Population Distribution");
-					} else {
-						break;
-					}
-				}
-
-			}
-		});
-
-	}
-
 	public void evolve() {
 
 		onStart();
@@ -324,6 +262,17 @@ public abstract class Optimizer {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
+
+				if (stop) {
+					SceneManager.getTaskManager().clearTasks();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							onCompletion();
+						}
+					});
+					return null;
+				}
 
 				final int populationSize = population.size();
 
@@ -433,6 +382,10 @@ public abstract class Optimizer {
 		constraints.add(c);
 	}
 
+	public void stop() {
+		stop = true;
+	}
+
 	boolean shouldTerminate() {
 		return outsideGenerationCounter >= maximumGenerations;
 	}
@@ -492,6 +445,72 @@ public abstract class Optimizer {
 
 	public void displayResults(final String title) {
 		new ResultGraphPanel(this).display(title);
+	}
+
+	public void displayFittest() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+
+				final JTabbedPane tabbedPane = new JTabbedPane();
+
+				final int n = population.getChromosomeLength();
+				final String[] header = new String[] { "", "Initial", "Final" };
+				final Object[][] data = new Object[n + 1][3];
+				for (int i = 0; i < n; i++) {
+					data[i][0] = geneNames[i];
+					data[i][1] = EnergyPanel.FIVE_DECIMALS.format(initialGene[i]);
+					data[i][2] = EnergyPanel.FIVE_DECIMALS.format(finalGene[i]);
+				}
+				data[n][0] = "Fitness";
+				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
+				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
+				final JTable table = new JTable(data, header);
+				// table.getTableHeader().setBackground(Color.GRAY); // Why doesn't it work?
+				final JPanel ui = new JPanel(new BorderLayout(5, 5));
+				final JScrollPane scrollPane = new JScrollPane(table);
+				final Dimension size = new Dimension(360, 200);
+				scrollPane.setPreferredSize(size);
+				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				ui.add(scrollPane, BorderLayout.CENTER);
+
+				tabbedPane.setFont(new Font(null, Font.PLAIN, 8));
+				tabbedPane.setBorder(BorderFactory.createTitledBorder(null, "Intermediates", TitledBorder.CENTER, TitledBorder.TOP));
+				ui.add(tabbedPane, BorderLayout.SOUTH);
+
+				for (int i = 0; i < n; i++) {
+					final GeneTemporalGraph geneGraph = new GeneTemporalGraph(fittestOfGenerations, i, geneMinima[i], geneMaxima[i]);
+					geneGraph.setBackground(Color.WHITE);
+					geneGraph.setPreferredSize(size);
+					tabbedPane.addTab(geneNames[i], geneGraph);
+				}
+
+				final FitnessTemporalGraph fitnessGraph = new FitnessTemporalGraph(getFittestOfGenerations());
+				fitnessGraph.setBackground(Color.WHITE);
+				fitnessGraph.setPreferredSize(size);
+				tabbedPane.addTab("Fitness", fitnessGraph);
+
+				final Object[] options = new Object[] { "Close", "More" };
+				final JOptionPane optionPane = new JOptionPane(ui, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+				final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Results");
+
+				while (true) {
+					dialog.setVisible(true);
+					final Object choice = optionPane.getValue();
+					if (choice == options[1]) {
+						population.sort();
+						for (int i = 0; i < population.size(); i++) {
+							System.out.println(i + " = " + individualToString(population.getIndividual(i)));
+						}
+						displayResults("Population Distribution");
+					} else {
+						break;
+					}
+				}
+
+			}
+		});
+
 	}
 
 }

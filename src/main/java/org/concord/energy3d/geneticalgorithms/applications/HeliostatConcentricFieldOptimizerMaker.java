@@ -220,23 +220,24 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						final HeliostatConcentricFieldOptimizer op = new HeliostatConcentricFieldOptimizer(populationSize, 5, 0);
+						op = new HeliostatConcentricFieldOptimizer(populationSize, 5, 0);
+						final HeliostatConcentricFieldOptimizer op1 = (HeliostatConcentricFieldOptimizer) op;
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
-						op.setMinimumAzimuthalSpacing(minimumAzimuthalSpacing);
-						op.setMaximumAzimuthalSpacing(maximumAzimuthalSpacing);
-						op.setMinimumRadialSpacing(minimumRadialSpacing);
-						op.setMaximumRadialSpacing(maximumRadialSpacing);
-						op.setMinimumRadialExpansion(minimumRadialExpansion);
-						op.setMaximumRadialExpansion(maximumRadialExpansion);
-						op.setMinimumApertureWidth(minimumApertureWidth);
-						op.setMaximumApertureWidth(maximumApertureWidth);
-						op.setMinimumApertureHeight(minimumApertureHeight);
-						op.setMaximumApertureHeight(maximumApertureHeight);
+						op1.setMinimumAzimuthalSpacing(minimumAzimuthalSpacing);
+						op1.setMaximumAzimuthalSpacing(maximumAzimuthalSpacing);
+						op1.setMinimumRadialSpacing(minimumRadialSpacing);
+						op1.setMaximumRadialSpacing(maximumRadialSpacing);
+						op1.setMinimumRadialExpansion(minimumRadialExpansion);
+						op1.setMaximumRadialExpansion(maximumRadialExpansion);
+						op1.setMinimumApertureWidth(minimumApertureWidth);
+						op1.setMaximumApertureWidth(maximumApertureWidth);
+						op1.setMinimumApertureHeight(minimumApertureHeight);
+						op1.setMaximumApertureHeight(maximumApertureHeight);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
-						op.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
-						op.setPricePerKWh(pricePerKWh);
+						op1.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
+						op1.setPricePerKWh(pricePerKWh);
 						switch (selectedFitnessFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
@@ -246,19 +247,19 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 							break;
 						case 2:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setOutputPerApertureSquareMeter(true);
+							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 3:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setOutputPerApertureSquareMeter(true);
+							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 4:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						case 5:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						}
 						op.setFoundation(foundation);

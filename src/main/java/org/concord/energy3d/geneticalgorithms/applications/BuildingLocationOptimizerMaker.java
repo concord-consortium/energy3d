@@ -29,8 +29,6 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 	private double minimumY = -30;
 	private double maximumY = 30;
 
-	private BuildingLocationOptimizer op;
-
 	@Override
 	public void make(final Foundation foundation) {
 
@@ -197,10 +195,10 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 						op = new BuildingLocationOptimizer(populationSize, 2, 30);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
-						op.setMinimumX(minimumX);
-						op.setMaximumX(maximumX);
-						op.setMinimumY(minimumY);
-						op.setMaximumY(maximumY);
+						((BuildingLocationOptimizer) op).setMinimumX(minimumX);
+						((BuildingLocationOptimizer) op).setMaximumX(maximumX);
+						((BuildingLocationOptimizer) op).setMinimumY(minimumY);
+						((BuildingLocationOptimizer) op).setMaximumY(maximumY);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
 						op.setSearchMethod(selectedSearchMethod);

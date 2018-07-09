@@ -24,8 +24,6 @@ import org.concord.energy3d.util.SpringUtilities;
  */
 public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
-	private SolarPanelTiltAngleOptimizer op;
-
 	@Override
 	public void make(final Foundation foundation) {
 

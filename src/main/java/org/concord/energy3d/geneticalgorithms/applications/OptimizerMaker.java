@@ -17,7 +17,14 @@ public abstract class OptimizerMaker {
 	int maximumGenerations = 5;
 	double convergenceThreshold = 0.01;
 	double mutationRate = 0.1;
+	Optimizer op;
 
 	public abstract void make(Foundation foundation);
+
+	public void stop() {
+		if (op != null) {
+			op.stop();
+		}
+	}
 
 }

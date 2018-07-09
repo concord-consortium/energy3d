@@ -162,4 +162,10 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 		maker.make(foundation);
 	}
 
+	public static void stopIt() {
+		if (maker != null) {
+			maker.stop();
+		}
+	}
+
 }

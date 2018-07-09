@@ -476,108 +476,140 @@ public class MyEditorPane {
 
 		// generative design functions
 		else if (act.startsWith("Building Location Optimizer")) {
-			final String s = act.substring("Building Location Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					BuildingLocationOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Building Location Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				BuildingLocationOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						BuildingLocationOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Building Orientation Optimizer")) {
-			final String s = act.substring("Building Orientation Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					BuildingOrientationOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Building Orientation Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				BuildingOrientationOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						BuildingOrientationOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Window Optimizer")) {
-			final String s = act.substring("Window Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					WindowOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Window Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				WindowOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						WindowOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Solar Panel Tilt Angle Optimizer")) {
-			final String s = act.substring("Solar Panel Tilt Angle Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					SolarPanelTiltAngleOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Solar Panel Tilt Angle Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				SolarPanelTiltAngleOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						SolarPanelTiltAngleOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Solar Panel Array Optimizer")) {
-			final String s = act.substring("Solar Panel Array Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					SolarPanelArrayOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Solar Panel Array Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				SolarPanelArrayOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						SolarPanelArrayOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Heliostat Position Optimizer")) {
-			final String s = act.substring("Heliostat Position Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					HeliostatPositionOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Heliostat Position Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				HeliostatPositionOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						HeliostatPositionOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Heliostat Concentric Field Optimizer")) {
-			final String s = act.substring("Heliostat Concentric Field Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					HeliostatConcentricFieldOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Heliostat Concentric Field Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				HeliostatConcentricFieldOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						HeliostatConcentricFieldOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (act.startsWith("Heliostat Spiral Field Optimizer")) {
-			final String s = act.substring("Heliostat Spiral Field Optimizer".length());
-			try {
-				final int i = Integer.parseInt(s.trim());
-				final HousePart p = Scene.getInstance().getPart(i);
-				if (p instanceof Foundation) {
-					HeliostatSpiralFieldOptimizer.make((Foundation) p);
-				} else {
+			final String s = act.substring("Heliostat Spiral Field Optimizer".length()).trim();
+			if ("Stop".equalsIgnoreCase(s)) {
+				HeliostatSpiralFieldOptimizer.stopIt();
+			} else {
+				try {
+					final int i = Integer.parseInt(s);
+					final HousePart p = Scene.getInstance().getPart(i);
+					if (p instanceof Foundation) {
+						HeliostatSpiralFieldOptimizer.make((Foundation) p);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (final Exception e) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 

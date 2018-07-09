@@ -24,8 +24,6 @@ import org.concord.energy3d.util.SpringUtilities;
  */
 public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 
-	private BuildingOrientationOptimizer op;
-
 	@Override
 	public void make(final Foundation foundation) {
 

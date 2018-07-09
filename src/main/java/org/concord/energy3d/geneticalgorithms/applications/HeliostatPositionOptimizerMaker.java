@@ -24,8 +24,6 @@ import org.concord.energy3d.util.SpringUtilities;
  */
 public class HeliostatPositionOptimizerMaker extends OptimizerMaker {
 
-	private HeliostatPositionOptimizer op;
-
 	@Override
 	public void make(final Foundation foundation) {
 

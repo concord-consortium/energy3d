@@ -202,21 +202,22 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 					} else {
 						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
-						final HeliostatSpiralFieldOptimizer op = new HeliostatSpiralFieldOptimizer(populationSize, 4, 0);
+						op = new HeliostatSpiralFieldOptimizer(populationSize, 4, 0);
+						final HeliostatSpiralFieldOptimizer op1 = (HeliostatSpiralFieldOptimizer) op;
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
-						op.setMinimumDivergenceAngle(minimumDivergenceAngle);
-						op.setMaximumDivergenceAngle(maximumDivergenceAngle);
-						op.setMinimumRadialExpansion(minimumRadialExpansion);
-						op.setMaximumRadialExpansion(maximumRadialExpansion);
-						op.setMinimumApertureWidth(minimumApertureWidth);
-						op.setMaximumApertureWidth(maximumApertureWidth);
-						op.setMinimumApertureHeight(minimumApertureHeight);
-						op.setMaximumApertureHeight(maximumApertureHeight);
+						op1.setMinimumDivergenceAngle(minimumDivergenceAngle);
+						op1.setMaximumDivergenceAngle(maximumDivergenceAngle);
+						op1.setMinimumRadialExpansion(minimumRadialExpansion);
+						op1.setMaximumRadialExpansion(maximumRadialExpansion);
+						op1.setMinimumApertureWidth(minimumApertureWidth);
+						op1.setMaximumApertureWidth(maximumApertureWidth);
+						op1.setMinimumApertureHeight(minimumApertureHeight);
+						op1.setMaximumApertureHeight(maximumApertureHeight);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
-						op.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
-						op.setPricePerKWh(pricePerKWh);
+						op1.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
+						op1.setPricePerKWh(pricePerKWh);
 						switch (selectedFitnessFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
@@ -226,19 +227,19 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 							break;
 						case 2:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setOutputPerApertureSquareMeter(true);
+							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 3:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setOutputPerApertureSquareMeter(true);
+							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 4:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						case 5:
 							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
-							op.setNetProfit(true);
+							op1.setNetProfit(true);
 							break;
 						}
 						op.setFoundation(foundation);
