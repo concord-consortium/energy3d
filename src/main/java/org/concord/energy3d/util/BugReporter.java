@@ -51,6 +51,15 @@ public class BugReporter {
 					System.gc();
 				}
 			});
+		} else if (msg.indexOf("Error in opengl: invalid enumerant") != -1) { // Intel driver bug reminder
+			if (Config.isWindows()) {
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Open the Device Manager from the Control Panel and update your Intel graphics driver.<br>Then restart the computer and Energy3D.</html>", "Graphics Driver Problem", JOptionPane.ERROR_MESSAGE);
+					}
+				});
+			}
 		} else {
 			final String text = header + "\n" + msg;
 			File file;
