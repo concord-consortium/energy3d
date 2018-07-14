@@ -327,8 +327,8 @@ public class TimeSeriesLogger {
 					stateValue += ", \"New Time\": \"" + (newCal.get(Calendar.HOUR_OF_DAY)) + ":" + newCal.get(Calendar.MINUTE) + "\"";
 					stateValue += ", \"Old Date\": \"" + (oldCal.get(Calendar.MONTH) + 1) + "/" + oldCal.get(Calendar.DAY_OF_MONTH) + "\"";
 					stateValue += ", \"New Date\": \"" + (newCal.get(Calendar.MONTH) + 1) + "/" + newCal.get(Calendar.DAY_OF_MONTH) + "\"}";
-				} else if (lastEdit instanceof ChangeThemeCommand) {
-					stateValue = "{\"Old Value\": " + ((ChangeThemeCommand) lastEdit).getOldValue() + ", \"New Value\": " + Scene.getInstance().getTheme() + "}";
+				} else if (lastEdit instanceof ChangeEnvironmentCommand) {
+					stateValue = "{\"Old Value\": " + ((ChangeEnvironmentCommand) lastEdit).getOldValue() + ", \"New Value\": " + Scene.getInstance().getEnvironment() + "}";
 				}
 
 				/* building properties */

@@ -752,7 +752,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (sky != null) {
 			final boolean isNightTime = Heliodon.getInstance().isNightTime();
 			String textureFile;
-			switch (Scene.getInstance().getTheme()) {
+			switch (Scene.getInstance().getEnvironment()) {
 			case Scene.DESERT_THEME:
 				textureFile = isNightTime ? "desert-night.jpg" : "desert.jpg";
 				break;

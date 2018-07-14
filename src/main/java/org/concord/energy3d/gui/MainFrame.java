@@ -122,7 +122,7 @@ import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.ChangeEnvironmentCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -241,8 +241,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
 	private JMenuItem zoomInMenuItem;
 	private JMenuItem zoomOutMenuItem;
-	private JMenu themeMenu;
-	private JRadioButtonMenuItem blueSkyMenuItem;
+	private JMenu environmentMenu;
+	private JRadioButtonMenuItem defaultMenuItem;
 	private JRadioButtonMenuItem desertMenuItem;
 	private JRadioButtonMenuItem grasslandMenuItem;
 	private JRadioButtonMenuItem forestMenuItem;
@@ -1293,9 +1293,9 @@ public class MainFrame extends JFrame {
 			String acknowledge = "<h4>Acknowledgement</h4>";
 			acknowledge += "<font size=2>This program is dedicated to Dr. Robert Tinker (1941-2017), the founder of<br>the Concord Consortium. ";
 			acknowledge += "The help from the following people to improve<br>this program is much appreciated: Katie Armstrong, Siobhan Bailey, Jie Chao,<br>";
-			acknowledge += "Guanhua Chen, Maya Haigis, Xudong Huang, Shiyan Jiang, Shasha Liu,<br>";
-			acknowledge += "Jeff Lockwood, Joy Massicotte, Ethan McElroy, Scott Ogle, Cormac Paterson,<br>";
-			acknowledge += "Corey Schimpf, Zhenghui Sha";
+			acknowledge += "Guanhua Chen, Amos Decker, Maya Haigis, Xudong Huang, Shiyan Jiang,<br>";
+			acknowledge += "Mark Liao, Shasha Liu, Jeff Lockwood, Joy Massicotte, Ethan McElroy, Scott Ogle,<br>";
+			acknowledge += "Cormac Paterson, Allison Pearson, Corey Schimpf, Zhenghui Sha";
 			p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
@@ -1744,7 +1744,6 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getGroundImageMenu());
-			viewMenu.add(getThemeMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -1763,11 +1762,11 @@ public class MainFrame extends JFrame {
 		return viewMenu;
 	}
 
-	private JMenu getThemeMenu() {
+	private JMenu getEnvironmentMenu() {
 
-		if (themeMenu == null) {
-			themeMenu = new JMenu("Theme");
-			themeMenu.addMenuListener(new MenuListener() {
+		if (environmentMenu == null) {
+			environmentMenu = new JMenu("Set Environment");
+			environmentMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -1779,20 +1778,20 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(blueSkyMenuItem, Scene.getInstance().getTheme() == Scene.BLUE_SKY_THEME);
-					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
-					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
-					Util.selectSilently(forestMenuItem, Scene.getInstance().getTheme() == Scene.FOREST_THEME);
+					Util.selectSilently(defaultMenuItem, Scene.getInstance().getEnvironment() == Scene.DEFAULT_THEME);
+					Util.selectSilently(desertMenuItem, Scene.getInstance().getEnvironment() == Scene.DESERT_THEME);
+					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getEnvironment() == Scene.GRASSLAND_THEME);
+					Util.selectSilently(forestMenuItem, Scene.getInstance().getEnvironment() == Scene.FOREST_THEME);
 				}
 			});
 
-			themeMenu.add(getBlueSkyMenuItem());
-			themeMenu.add(getDesertMenuItem());
-			themeMenu.add(getGrasslandMenuItem());
-			themeMenu.add(getForestMenuItem());
+			environmentMenu.add(getDefaultMenuItem());
+			environmentMenu.add(getDesertMenuItem());
+			environmentMenu.add(getGrasslandMenuItem());
+			environmentMenu.add(getForestMenuItem());
 
 		}
-		return themeMenu;
+		return environmentMenu;
 
 	}
 
@@ -2980,10 +2979,11 @@ public class MainFrame extends JFrame {
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.addSeparator();
-			editMenu.add(getSetRegionMenuItem());
 			editMenu.add(getCustomPricesMenuItem());
 			editMenu.add(getSpecificationsMenuItem());
 			editMenu.add(getOverallUtilityBillMenuItem());
+			editMenu.add(getSetRegionMenuItem());
+			editMenu.add(getEnvironmentMenu());
 			editMenu.addSeparator();
 			editMenu.add(getPropertiesMenuItem());
 		}
@@ -3383,23 +3383,23 @@ public class MainFrame extends JFrame {
 		return zoomOutMenuItem;
 	}
 
-	private JRadioButtonMenuItem getBlueSkyMenuItem() {
-		if (blueSkyMenuItem == null) {
-			blueSkyMenuItem = new JRadioButtonMenuItem("Blue Sky");
-			blueSkyMenuItem.addItemListener(new ItemListener() {
+	private JRadioButtonMenuItem getDefaultMenuItem() {
+		if (defaultMenuItem == null) {
+			defaultMenuItem = new JRadioButtonMenuItem("Default");
+			defaultMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			themeButtonGroup.add(blueSkyMenuItem);
+			themeButtonGroup.add(defaultMenuItem);
 		}
-		return blueSkyMenuItem;
+		return defaultMenuItem;
 	}
 
 	private JRadioButtonMenuItem getDesertMenuItem() {
@@ -3409,8 +3409,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.DESERT_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3428,8 +3428,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3447,8 +3447,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.FOREST_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}

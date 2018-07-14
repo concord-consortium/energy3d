@@ -96,10 +96,11 @@ import com.ardor3d.util.TextureKey;
 
 public class Scene implements Serializable {
 
-	public static final int BLUE_SKY_THEME = 0;
+	public static final int DEFAULT_THEME = 0;
 	public static final int DESERT_THEME = 1;
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
+	public static final int OCEAN_THEME = 4;
 
 	public static final int INSTRUCTION_SHEET_NUMBER = 5;
 
@@ -149,7 +150,7 @@ public class Scene implements Serializable {
 	private long idCounter;
 	private int latitude; // Legacy: Do NOT use this in the calculation -- use geoLocation.getLatitude() instead
 	private int solarContrast;
-	private int theme;
+	private int theme; // this variable should have been named as 'environment'
 	private double annotationScale = 0.2; // TODO: this is a mistake, but it is not easy to fix
 	private double heatVectorLength = 2000;
 	private double heatFluxGridSize = 2;
@@ -404,7 +405,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().setAxesVisible(!hideAxes);
 		SceneManager.getInstance().getSolarLand().setVisible(solarMapForLand);
 
-		setTheme(theme);
+		setEnvironment(theme);
 		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
 		PvModulesData.getInstance();
 
@@ -3933,27 +3934,35 @@ public class Scene implements Serializable {
 		return utilityBill;
 	}
 
-	public void setTheme(final int theme) {
-		this.theme = theme;
+	public void setEnvironment(final int environment) {
+		theme = environment;
 		ReadOnlyColorRGBA c;
-		switch (theme) {
+		switch (environment) {
 		case DESERT_THEME:
 			c = new ColorRGBA(1, 1, 1, 0.5f);
+			// ground.setAlbedo(0.4);
 			break;
 		case GRASSLAND_THEME:
 			c = new ColorRGBA(0, 0.9f, 0.5f, 0.5f);
+			// ground.setAlbedo(0.25);
 			break;
 		case FOREST_THEME:
 			c = new ColorRGBA(0, 0.9f, 0.6f, 0.5f);
+			// ground.setAlbedo(0.15);
+			break;
+		case OCEAN_THEME:
+			c = landColor == null ? new ColorRGBA(0, 1, 0.75f, 0.5f) : landColor;
+			// ground.setAlbedo(0.06);
 			break;
 		default:
 			c = landColor == null ? new ColorRGBA(0, 1, 0.75f, 0.5f) : landColor;
+			// ground.setAlbedo(0.25);
 		}
 		setLandColor(c);
 		SceneManager.getInstance().changeSkyTexture();
 	}
 
-	public int getTheme() {
+	public int getEnvironment() {
 		return theme;
 	}
 

@@ -31,7 +31,7 @@ import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
-import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.ChangeEnvironmentCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
@@ -92,70 +92,70 @@ class PopupMenuForSky extends PopupMenuFactory {
 			});
 			weatherMenu.add(mi);
 
-			final JMenu themeMenu = new JMenu("Theme");
-			final ButtonGroup themeButtonGroup = new ButtonGroup();
+			final JMenu environmentMenu = new JMenu("Environment");
+			final ButtonGroup environmentButtonGroup = new ButtonGroup();
 
-			final JRadioButtonMenuItem miBlueSky = new JRadioButtonMenuItem("Blue Sky");
-			miBlueSky.addItemListener(new ItemListener() {
+			final JRadioButtonMenuItem miDefault = new JRadioButtonMenuItem("Default");
+			miDefault.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			themeButtonGroup.add(miBlueSky);
-			themeMenu.add(miBlueSky);
+			environmentButtonGroup.add(miDefault);
+			environmentMenu.add(miDefault);
 
 			final JRadioButtonMenuItem miDesert = new JRadioButtonMenuItem("Desert");
 			miDesert.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.DESERT_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			themeButtonGroup.add(miDesert);
-			themeMenu.add(miDesert);
+			environmentButtonGroup.add(miDesert);
+			environmentMenu.add(miDesert);
 
 			final JRadioButtonMenuItem miGrassland = new JRadioButtonMenuItem("Grassland");
 			miGrassland.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			themeButtonGroup.add(miGrassland);
-			themeMenu.add(miGrassland);
+			environmentButtonGroup.add(miGrassland);
+			environmentMenu.add(miGrassland);
 
 			final JRadioButtonMenuItem miForest = new JRadioButtonMenuItem("Forest");
 			miForest.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeThemeCommand c = new ChangeThemeCommand();
-						Scene.getInstance().setTheme(Scene.FOREST_THEME);
+						final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
+						Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			themeButtonGroup.add(miForest);
-			themeMenu.add(miForest);
+			environmentButtonGroup.add(miForest);
+			environmentMenu.add(miForest);
 
-			themeMenu.addMenuListener(new MenuListener() {
+			environmentMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -167,10 +167,10 @@ class PopupMenuForSky extends PopupMenuFactory {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(miBlueSky, Scene.getInstance().getTheme() == Scene.BLUE_SKY_THEME);
-					Util.selectSilently(miDesert, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
-					Util.selectSilently(miGrassland, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
-					Util.selectSilently(miForest, Scene.getInstance().getTheme() == Scene.FOREST_THEME);
+					Util.selectSilently(miDefault, Scene.getInstance().getEnvironment() == Scene.DEFAULT_THEME);
+					Util.selectSilently(miDesert, Scene.getInstance().getEnvironment() == Scene.DESERT_THEME);
+					Util.selectSilently(miGrassland, Scene.getInstance().getEnvironment() == Scene.GRASSLAND_THEME);
+					Util.selectSilently(miForest, Scene.getInstance().getEnvironment() == Scene.FOREST_THEME);
 				}
 			});
 
@@ -257,7 +257,7 @@ class PopupMenuForSky extends PopupMenuFactory {
 			popupMenuForSky.add(miHeliodon);
 			popupMenuForSky.addSeparator();
 			popupMenuForSky.add(weatherMenu);
-			popupMenuForSky.add(themeMenu);
+			popupMenuForSky.add(environmentMenu);
 
 		}
 
