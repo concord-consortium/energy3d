@@ -243,9 +243,25 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 
 	}
 
+	// TODO: This method currently assumes local research with a set of fixed parameters
 	@Override
 	public void run(final Foundation foundation) {
-
+		op = new SolarPanelArrayOptimizer(populationSize, 3, 0);
+		final SolarPanelArrayOptimizer op1 = (SolarPanelArrayOptimizer) op;
+		op.setSelectionMethod(selectedSelectionMethod);
+		op.setConvergenceThreshold(convergenceThreshold);
+		op.setMaximumGenerations(maximumGenerations);
+		op.setMutationRate(0);
+		op1.setPricePerKWh(pricePerKWh);
+		op1.setDailyCostPerSolarPanel(dailyCostPerPanel);
+		op1.setMinimumPanelRows(minimumPanelRows);
+		op1.setMaximumPanelRows(maximumPanelRows);
+		op.setOjectiveFunction(ObjectiveFunction.DAILY);
+		op1.setNetProfit(true);
+		op.setSearchMethod(Optimizer.LOCAL_SEARCH_RANDOM_OPTIMIZATION);
+		op.setLocalSearchRadius(0.05);
+		op.setFoundation(foundation);
+		op.evolve();
 	}
 
 }

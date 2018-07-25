@@ -193,15 +193,24 @@ public final class TaskFactory {
 	}
 
 	public static void solarPanelTiltAngleOptimizer(final String taskName) {
-		final String s = taskName.substring("Solar Panel Tilt Angle Optimizer".length()).trim();
+		String s = taskName.substring("Solar Panel Tilt Angle Optimizer".length()).trim();
 		if ("Stop".equalsIgnoreCase(s)) {
 			SolarPanelTiltAngleOptimizer.stopIt();
 		} else {
+			boolean silent = false;
+			if (s.startsWith("silent")) {
+				silent = true;
+				s = s.substring("silent".length()).trim();
+			}
 			try {
 				final int i = Integer.parseInt(s);
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					SolarPanelTiltAngleOptimizer.make((Foundation) p);
+					if (silent) {
+						SolarPanelTiltAngleOptimizer.runIt((Foundation) p);
+					} else {
+						SolarPanelTiltAngleOptimizer.make((Foundation) p);
+					}
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + taskName + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -212,15 +221,24 @@ public final class TaskFactory {
 	}
 
 	public static void solarPanelArrayOptimizer(final String taskName) {
-		final String s = taskName.substring("Solar Panel Array Optimizer".length()).trim();
+		String s = taskName.substring("Solar Panel Array Optimizer".length()).trim();
 		if ("Stop".equalsIgnoreCase(s)) {
 			SolarPanelArrayOptimizer.stopIt();
 		} else {
+			boolean silent = false;
+			if (s.startsWith("silent")) {
+				silent = true;
+				s = s.substring("silent".length()).trim();
+			}
 			try {
 				final int i = Integer.parseInt(s);
 				final HousePart p = Scene.getInstance().getPart(i);
 				if (p instanceof Foundation) {
-					SolarPanelArrayOptimizer.make((Foundation) p);
+					if (silent) {
+						SolarPanelArrayOptimizer.runIt((Foundation) p);
+					} else {
+						SolarPanelArrayOptimizer.make((Foundation) p);
+					}
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + taskName + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 				}

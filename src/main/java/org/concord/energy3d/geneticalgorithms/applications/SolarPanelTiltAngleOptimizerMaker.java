@@ -183,16 +183,17 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
 	}
 
+	// TODO: This method currently assumes local research with a set of fixed parameters
 	@Override
 	public void run(final Foundation foundation) {
 		op = new SolarPanelTiltAngleOptimizer(populationSize, foundation.getRacks().size(), 0);
 		op.setSelectionMethod(selectedSelectionMethod);
 		op.setConvergenceThreshold(convergenceThreshold);
 		op.setMaximumGenerations(maximumGenerations);
-		op.setMutationRate(mutationRate);
+		op.setMutationRate(0);
 		op.setOjectiveFunction(selectedFitnessFunction);
-		op.setSearchMethod(selectedSearchMethod);
-		op.setLocalSearchRadius(localSearchRadius);
+		op.setSearchMethod(Optimizer.LOCAL_SEARCH_RANDOM_OPTIMIZATION);
+		op.setLocalSearchRadius(0.05);
 		op.setFoundation(foundation);
 		op.evolve();
 	}
