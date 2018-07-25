@@ -243,4 +243,9 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 
 	}
 
+	@Override
+	public void run(final Foundation foundation) {
+
+	}
+
 }

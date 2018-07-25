@@ -27,4 +27,6 @@ public abstract class OptimizerMaker {
 		}
 	}
 
+	public abstract void run(Foundation foundation);
+
 }

@@ -274,4 +274,9 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 
 	}
 
+	@Override
+	public void run(final Foundation foundation) {
+
+	}
+
 }

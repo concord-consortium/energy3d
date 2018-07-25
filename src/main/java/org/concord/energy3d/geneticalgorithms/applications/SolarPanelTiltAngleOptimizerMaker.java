@@ -183,4 +183,18 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
 	}
 
+	@Override
+	public void run(final Foundation foundation) {
+		op = new SolarPanelTiltAngleOptimizer(populationSize, foundation.getRacks().size(), 0);
+		op.setSelectionMethod(selectedSelectionMethod);
+		op.setConvergenceThreshold(convergenceThreshold);
+		op.setMaximumGenerations(maximumGenerations);
+		op.setMutationRate(mutationRate);
+		op.setOjectiveFunction(selectedFitnessFunction);
+		op.setSearchMethod(selectedSearchMethod);
+		op.setLocalSearchRadius(localSearchRadius);
+		op.setFoundation(foundation);
+		op.evolve();
+	}
+
 }

@@ -113,16 +113,14 @@ import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
-import org.concord.energy3d.simulation.PvAnnualAnalysis;
-import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
+import org.concord.energy3d.undo.ChangeEnvironmentCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangeEnvironmentCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -802,19 +800,36 @@ public class MainFrame extends JFrame {
 		final JPanel inputPanel = new JPanel(new SpringLayout());
 		inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		gui.add(inputPanel, BorderLayout.CENTER);
+
 		JLabel label = new JLabel("Maximum memory: ");
 		inputPanel.add(label);
 		final JTextField maxMemoryField = new JTextField(Math.round(runtime.maxMemory() / (1024.0 * 1024.0)) + " MB");
 		maxMemoryField.setEditable(false);
 		label.setLabelFor(maxMemoryField);
 		inputPanel.add(maxMemoryField);
+
 		label = new JLabel("Total memory: ");
 		inputPanel.add(label);
 		final JTextField totalMemoryField = new JTextField(Math.round(runtime.totalMemory() / (1024.0 * 1024.0)) + " MB");
 		totalMemoryField.setEditable(false);
 		label.setLabelFor(totalMemoryField);
 		inputPanel.add(totalMemoryField);
-		SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
+
+		label = new JLabel("Java vendor: ");
+		inputPanel.add(label);
+		final JTextField javaVendorField = new JTextField(System.getProperty("java.vendor"));
+		javaVendorField.setEditable(false);
+		label.setLabelFor(javaVendorField);
+		inputPanel.add(javaVendorField);
+
+		label = new JLabel("Java version: ");
+		inputPanel.add(label);
+		final JTextField javaVersionField = new JTextField(System.getProperty("java.version"));
+		javaVersionField.setEditable(false);
+		label.setLabelFor(javaVersionField);
+		inputPanel.add(javaVersionField);
+
+		SpringUtilities.makeCompactGrid(inputPanel, 4, 2, 6, 6, 6, 6);
 		final Object[] options = new Object[] { "OK", "Cancel" };
 		final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
 		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
@@ -2176,37 +2191,7 @@ public class MainFrame extends JFrame {
 			annualPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (EnergyPanel.getInstance().checkCity()) {
-						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
-						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
-							return;
-						}
-						if (EnergyPanel.getInstance().adjustCellSize()) {
-							return;
-						}
-						final PvAnnualAnalysis a = new PvAnnualAnalysis();
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart != null) {
-							Foundation foundation;
-							if (selectedPart instanceof Foundation) {
-								foundation = (Foundation) selectedPart;
-							} else {
-								foundation = selectedPart.getTopContainer();
-							}
-							if (foundation != null) {
-								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
-								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this foundation to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
-									return;
-								}
-								a.setUtilityBill(foundation.getUtilityBill());
-							}
-						} else {
-							a.setUtilityBill(Scene.getInstance().getUtilityBill());
-						}
-						a.show();
-					}
+					TaskFactory.annualYieldAnalysisOfSolarPanels();
 				}
 			});
 		}
@@ -2219,37 +2204,7 @@ public class MainFrame extends JFrame {
 			dailyPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (EnergyPanel.getInstance().checkCity()) {
-						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
-						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
-							return;
-						}
-						if (EnergyPanel.getInstance().adjustCellSize()) {
-							return;
-						}
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart != null) {
-							Foundation foundation;
-							if (selectedPart instanceof Foundation) {
-								foundation = (Foundation) selectedPart;
-							} else {
-								foundation = selectedPart.getTopContainer();
-							}
-							if (foundation != null) {
-								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
-								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this foundation to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
-									return;
-								}
-							}
-						}
-						final PvDailyAnalysis a = new PvDailyAnalysis();
-						if (SceneManager.getInstance().getSolarHeatMap()) {
-							a.updateGraph();
-						}
-						a.show();
-					}
+					TaskFactory.dailyYieldAnalysisOfSolarPanels();
 				}
 			});
 		}

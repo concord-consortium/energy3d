@@ -1,6 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -46,18 +45,12 @@ import org.concord.energy3d.geneticalgorithms.applications.BuildingOrientationOp
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatConcentricFieldOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatPositionOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.HeliostatSpiralFieldOptimizer;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
-import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
-import org.concord.energy3d.simulation.GroupAnnualAnalysis;
-import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.util.Util;
 
@@ -115,6 +108,9 @@ public class MyEditorPane {
 									} else if (s.startsWith("href=menu://")) {
 										s = s.substring(12).trim();
 										MainFrame.getInstance().openModel(MainApplication.class.getResource(s));
+									} else if (s.startsWith("href=run://")) {
+										s = s.substring(11).trim();
+										TaskFactory.run(s);
 									}
 								} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 									editorPane.setToolTipText(s);
@@ -392,86 +388,19 @@ public class MyEditorPane {
 			MainPanel.getInstance().getShadowButton().setSelected(false);
 		}
 
+		// solar analysis tools
+		else if (act.startsWith("Daily Yield Analysis of Solar Panels")) {
+			TaskFactory.dailyYieldAnalysisOfSolarPanels();
+		} else if (act.startsWith("Annual Yield Analysis of Solar Panels")) {
+			TaskFactory.annualYieldAnalysisOfSolarPanels();
+		}
+
 		// group analysis tools
 
 		else if (act.startsWith("Daily Analysis for Group")) {
-			if (EnergyPanel.getInstance().checkCity()) {
-				PartGroup g = null;
-				final GroupSelector selector = new GroupSelector();
-				for (final String s : GroupSelector.types) {
-					final int index = act.indexOf(s);
-					if (index > 0) {
-						selector.setCurrentGroupType(s);
-						try {
-							final String t = act.substring(index + s.length()).trim();
-							if (!t.equals("")) {
-								g = new PartGroup(s);
-								final String[] a = t.split(",");
-								for (final String x : a) {
-									g.addId(Integer.parseInt(x.trim()));
-								}
-							}
-						} catch (final Exception e) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-							g = null;
-						}
-						break;
-					}
-				}
-				if (g == null) {
-					g = selector.select();
-				}
-				if (g != null) {
-					final PartGroup g2 = g;
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
-							final GroupDailyAnalysis a = new GroupDailyAnalysis(g2);
-							a.show(g2.getType() + ": " + g2.getIds());
-						}
-					});
-				}
-				SceneManager.getInstance().hideAllEditPoints();
-			}
+			TaskFactory.dailyAnalysisForGroup(act);
 		} else if (act.startsWith("Annual Analysis for Group")) {
-			if (EnergyPanel.getInstance().checkCity()) {
-				PartGroup g = null;
-				final GroupSelector selector = new GroupSelector();
-				for (final String s : GroupSelector.types) {
-					final int index = act.indexOf(s);
-					if (index > 0) {
-						selector.setCurrentGroupType(s);
-						try {
-							final String t = act.substring(index + s.length()).trim();
-							if (!t.equals("")) {
-								g = new PartGroup(s);
-								final String[] a = t.split(",");
-								for (final String x : a) {
-									g.addId(Integer.parseInt(x.trim()));
-								}
-							}
-						} catch (final Exception e) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-							g = null;
-						}
-						break;
-					}
-				}
-				if (g == null) {
-					g = selector.select();
-				}
-				if (g != null) {
-					final PartGroup g2 = g;
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
-							final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g2);
-							a.show(g2.getType() + ": " + g2.getIds());
-						}
-					});
-				}
-				SceneManager.getInstance().hideAllEditPoints();
-			}
+			TaskFactory.annualAnalysisForGroup(act);
 		}
 
 		// generative design functions
@@ -527,39 +456,9 @@ public class MyEditorPane {
 				}
 			}
 		} else if (act.startsWith("Solar Panel Tilt Angle Optimizer")) {
-			final String s = act.substring("Solar Panel Tilt Angle Optimizer".length()).trim();
-			if ("Stop".equalsIgnoreCase(s)) {
-				SolarPanelTiltAngleOptimizer.stopIt();
-			} else {
-				try {
-					final int i = Integer.parseInt(s);
-					final HousePart p = Scene.getInstance().getPart(i);
-					if (p instanceof Foundation) {
-						SolarPanelTiltAngleOptimizer.make((Foundation) p);
-					} else {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (final Exception e) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
+			TaskFactory.solarPanelTiltAngleOptimizer(act);
 		} else if (act.startsWith("Solar Panel Array Optimizer")) {
-			final String s = act.substring("Solar Panel Array Optimizer".length()).trim();
-			if ("Stop".equalsIgnoreCase(s)) {
-				SolarPanelArrayOptimizer.stopIt();
-			} else {
-				try {
-					final int i = Integer.parseInt(s);
-					final HousePart p = Scene.getInstance().getPart(i);
-					if (p instanceof Foundation) {
-						SolarPanelArrayOptimizer.make((Foundation) p);
-					} else {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (final Exception e) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
+			TaskFactory.solarPanelArrayOptimizer(act);
 		} else if (act.startsWith("Heliostat Position Optimizer")) {
 			final String s = act.substring("Heliostat Position Optimizer".length()).trim();
 			if ("Stop".equalsIgnoreCase(s)) {
