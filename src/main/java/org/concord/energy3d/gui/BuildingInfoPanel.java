@@ -167,6 +167,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateAreaBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		final double r = 3.28084 * 3.28084;
 		String t = "Area (";
 		switch (Scene.getInstance().getUnit()) {
@@ -194,6 +197,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateHeightBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		final double r = 3.28084;
 		String t = "Height (";
 		switch (Scene.getInstance().getUnit()) {
@@ -221,6 +227,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateWindowToFloorRatioBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Window/floor area ratio";
 		if (specs.isWindowToFloorRatioEnabled()) {
 			t += " (" + twoDecimals.format(specs.getMinimumWindowToFloorRatio()) + " - " + twoDecimals.format(specs.getMaximumWindowToFloorRatio()) + ")";
@@ -234,6 +243,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateSolarPanelNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Number of solar panels";
 		if (specs.isNumberOfSolarPanelsEnabled()) {
 			t += " (" + specs.getMinimumNumberOfSolarPanels() + " - " + specs.getMaximumNumberOfSolarPanels() + ")";
@@ -247,6 +259,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateWindowNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Number of windows";
 		if (specs.isNumberOfWindowsEnabled()) {
 			if (specs.getMinimumNumberOfWindows() == 0) {
@@ -264,6 +279,9 @@ public class BuildingInfoPanel extends JPanel {
 
 	public void updateWallNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Number of walls";
 		if (specs.isNumberOfWallsEnabled()) {
 			t += " (" + specs.getMinimumNumberOfWalls() + " - " + specs.getMaximumNumberOfWalls() + ")";

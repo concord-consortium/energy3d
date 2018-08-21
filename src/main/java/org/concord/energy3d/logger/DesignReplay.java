@@ -73,11 +73,12 @@ public class DesignReplay extends PlayControl {
 				final int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
 				final String fileName = files[i].toString().substring(slash + 1).trim();
 				System.out.println("Play back " + (i + 1) + " of " + n + ": " + fileName);
+				final int i2 = i;
 				try {
-					Scene.openNow(files[i].toURI().toURL());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
+							Scene.openNow(files[i2].toURI().toURL());
 							if (SceneManager.getInstance().getSolarHeatMap()) {
 								EnergyPanel.getInstance().updateRadiationHeatMap();
 							}

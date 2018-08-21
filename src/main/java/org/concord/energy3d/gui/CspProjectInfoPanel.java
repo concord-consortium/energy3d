@@ -231,7 +231,13 @@ public class CspProjectInfoPanel extends JPanel {
 
 	public void updateBudgetMaximum() {
 		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+		if (price == null) {
+			return;
+		}
 		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Total cost over " + price.getLifespan() + " years";
 		if (specs.isBudgetEnabled()) {
 			t += " (" + "<$" + specs.getMaximumBudget() + ")";
@@ -245,6 +251,9 @@ public class CspProjectInfoPanel extends JPanel {
 	public void updateHeliostatNumberMaximum() {
 		if (Scene.getInstance().countParts(Mirror.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			if (specs == null) {
+				return;
+			}
 			String t = "Number of heliostats";
 			if (specs.isNumberOfMirrorsEnabled()) {
 				t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
@@ -259,6 +268,9 @@ public class CspProjectInfoPanel extends JPanel {
 	public void updateParabolicTroughNumberMaximum() {
 		if (Scene.getInstance().countParts(ParabolicTrough.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			if (specs == null) {
+				return;
+			}
 			String t = "Number of parabolic troughs";
 			if (specs.isNumberOfParabolicTroughsEnabled()) {
 				t += " (" + "<" + specs.getMaximumNumberOfParabolicTroughs() + ")";

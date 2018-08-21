@@ -62,7 +62,8 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			baseHeight = rack.getBaseHeight() * Scene.getInstance().getScale();
 			final int panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
-			minimumRowSpacing = rack.getRackHeight(); // two racks that border each other
+			// minimumRowSpacing = rack.getRackHeight(); // WARNING: Can't do this as the rack height can change during a run
+			minimumRowSpacing = (maximumPanelRows - 1) * (solarPanel.isRotated() ? solarPanel.getPanelWidth() : solarPanel.getPanelHeight()); // allow possible overlap of a panel's height
 			setGeneMinimum(0, minimumRowSpacing);
 			setGeneMaximum(0, maximumRowSpacing);
 			double normalizedValue;
@@ -166,6 +167,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double tiltAngle = (2 * individual.getGene(1) - 1) * 90;
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + individual.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.generateSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		for (final Rack r : foundation.getRacks()) {
+			r.setPoleDistanceX(10);
+			r.setPoleDistanceY(10);
+		}
 		final double output = objectiveFunction.compute();
 		final int count = foundation.countSolarPanels();
 		if (netProfit) {
@@ -188,6 +193,10 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final double tiltAngle = (2 * best.getGene(1) - 1) * 90;
 		final int panelRowsPerRack = (int) Math.round(minimumPanelRows + best.getGene(2) * (maximumPanelRows - minimumPanelRows));
 		foundation.generateSolarRackArrays(solarPanel, tiltAngle, baseHeight, panelRowsPerRack, rowSpacing, 1);
+		for (final Rack r : foundation.getRacks()) {
+			r.setPoleDistanceX(10);
+			r.setPoleDistanceY(10);
+		}
 		setFinalGene(0, rowSpacing);
 		setFinalGene(1, tiltAngle);
 		setFinalGene(2, panelRowsPerRack);

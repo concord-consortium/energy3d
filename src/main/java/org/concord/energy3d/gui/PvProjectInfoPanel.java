@@ -103,7 +103,13 @@ public class PvProjectInfoPanel extends JPanel {
 
 	void update(final Foundation foundation) {
 		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+		if (price == null) {
+			return;
+		}
 		int countSolarPanels = 0;
 		double cost = 0;
 		double panelArea = 0;
@@ -150,7 +156,13 @@ public class PvProjectInfoPanel extends JPanel {
 
 	public void updateBudgetMaximum() {
 		final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+		if (price == null) {
+			return;
+		}
 		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Total cost over " + price.getLifespan() + " years";
 		if (specs.isBudgetEnabled()) {
 			t += " (" + "<$" + specs.getMaximumBudget() + ")";
@@ -163,6 +175,9 @@ public class PvProjectInfoPanel extends JPanel {
 
 	public void updateSolarPanelNumberMaximum() {
 		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+		if (specs == null) {
+			return;
+		}
 		String t = "Number of solar panels";
 		if (specs.isNumberOfSolarPanelsEnabled()) {
 			t += " (" + "<" + specs.getMaximumNumberOfSolarPanels() + ")";
