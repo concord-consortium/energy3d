@@ -459,6 +459,8 @@ public class MyEditorPane {
 			TaskFactory.solarPanelTiltAngleOptimizer(act);
 		} else if (act.startsWith("Solar Panel Array Optimizer")) {
 			TaskFactory.solarPanelArrayOptimizer(act);
+		} else if (act.startsWith("Solar Panel Array Layout Manager")) {
+			TaskFactory.solarPanelArrayLayoutManager(act);
 		} else if (act.startsWith("Heliostat Position Optimizer")) {
 			final String s = act.substring("Heliostat Position Optimizer".length()).trim();
 			if ("Stop".equalsIgnoreCase(s)) {

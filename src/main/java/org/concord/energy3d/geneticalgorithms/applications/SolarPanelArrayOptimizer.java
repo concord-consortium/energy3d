@@ -63,7 +63,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			final int panelRowsPerRack = rack.getSolarPanelRowAndColumnNumbers()[1];
 			maximumRowSpacing = p.length() * Scene.getInstance().getScale() - rack.getRackHeight(); // two racks at the opposite edges of the rectangular area
 			// minimumRowSpacing = rack.getRackHeight(); // WARNING: Can't do this as the rack height can change during a run
-			minimumRowSpacing = (maximumPanelRows - 1) * (solarPanel.isRotated() ? solarPanel.getPanelWidth() : solarPanel.getPanelHeight()); // allow possible overlap of a panel's height
+			minimumRowSpacing = 0.5 * (minimumPanelRows + maximumPanelRows) * (solarPanel.isRotated() ? solarPanel.getPanelWidth() : solarPanel.getPanelHeight());
 			setGeneMinimum(0, minimumRowSpacing);
 			setGeneMaximum(0, maximumRowSpacing);
 			double normalizedValue;
