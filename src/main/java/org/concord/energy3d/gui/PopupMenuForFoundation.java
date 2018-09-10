@@ -792,7 +792,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(orientationComboBox);
 
 						panel.add(new JLabel("Row Axis:"));
-						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
@@ -1036,7 +1036,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(orientationComboBox);
 
 						panel.add(new JLabel("Row Axis:"));
-						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
@@ -1114,7 +1114,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (solarPanelRackArrayInterRowSpacing < rackHeight) {
+									} else if (solarPanelRackArrayInterRowSpacing < solarPanelRowsPerRack * (solarPanelOrientation == 1 ? solarPanelWidth : solarPanelHeight)) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row center-to-center distance cannot be smaller than " + EnergyPanel.TWO_DECIMALS.format(rackHeight) + "m (" + solarPanelRowsPerRack + "\u00d7" + EnergyPanel.TWO_DECIMALS.format((solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth)) + "m)", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSolarRackArrays();

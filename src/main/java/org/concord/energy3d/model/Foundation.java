@@ -2751,7 +2751,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			path.closePath();
 		}
 		switch (rowAxis) {
-		case 0:
+		case 1:
 			int rows = (int) Math.floor(b / w);
 			int cols = (int) Math.floor(a / h);
 			double marginx = (a - cols * h) * 0.5;
@@ -2776,7 +2776,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 			break;
-		case 1:
+		case 0:
 			rows = (int) Math.floor(a / w);
 			cols = (int) Math.floor(b / h);
 			marginx = (a - rows * w) * 0.5;
@@ -2846,7 +2846,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
 		double[] bounds = null;
 		switch (rowAxis) {
-		case 1:
+		case 0:
 			center.setX((x0 + x1) * 0.5);
 			rackWidth = a * Scene.getInstance().getScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
@@ -2879,7 +2879,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 			break;
-		case 0:
+		case 1:
 			center.setY((y0 + y1) * 0.5);
 			rackWidth = b * Scene.getInstance().getScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
