@@ -56,7 +56,7 @@ public class BugReporter {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Open the Device Manager from the Control Panel and update your Intel graphics driver.<br>Then restart the computer and Energy3D.</html>", "Graphics Driver Problem", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Oops, Energy3D will not work with the current graphics card driver.</html>", "Graphics Driver Problem", JOptionPane.ERROR_MESSAGE);
 					}
 				});
 			}
