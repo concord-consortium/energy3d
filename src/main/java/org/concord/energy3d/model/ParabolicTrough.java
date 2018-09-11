@@ -35,7 +35,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -53,9 +52,9 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 	private transient ReadOnlyVector3 normal;
 	private transient ParabolicCylinder reflector;
 	private transient Mesh reflectorBack;
-	private transient Cylinder absorber, absorberCore;
-	private transient Cylinder absorberEnd1, absorberEnd1Core;
-	private transient Cylinder absorberEnd2, absorberEnd2Core;
+	private transient MyCylinder absorber, absorberCore;
+	private transient MyCylinder absorberEnd1, absorberEnd1Core;
+	private transient MyCylinder absorberEnd2, absorberEnd2Core;
 	private transient Line outlines;
 	private transient Line steelFrame;
 	private transient Node modulesRoot;
@@ -146,7 +145,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		root.attachChild(reflectorBack);
 
 		final ColorRGBA tubeColor = new ColorRGBA(0.8f, 0.8f, 0.8f, 0.8f);
-		absorber = new Cylinder("Absorber Tube", 2, detailed ? 10 : 4, 0.5, 0, true);
+		absorber = new MyCylinder("Absorber Tube", 2, detailed ? 10 : 4, 0.5, 0, true);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);
 		absorber.setRenderState(blend);
@@ -155,14 +154,14 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		absorber.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorber);
 
-		absorberEnd1 = new Cylinder("Absorber End Tube 1", 2, detailed ? 10 : 4, 0.5, 0, true);
+		absorberEnd1 = new MyCylinder("Absorber End Tube 1", 2, detailed ? 10 : 4, 0.5, 0, true);
 		absorberEnd1.setRenderState(blend);
 		absorberEnd1.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		absorberEnd1.setDefaultColor(tubeColor);
 		absorberEnd1.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd1);
 
-		absorberEnd2 = new Cylinder("Absorber End Tube 2", 2, detailed ? 10 : 4, 0.5, 0, true);
+		absorberEnd2 = new MyCylinder("Absorber End Tube 2", 2, detailed ? 10 : 4, 0.5, 0, true);
 		absorberEnd2.setRenderState(blend);
 		absorberEnd2.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		absorberEnd2.setDefaultColor(tubeColor);
@@ -170,15 +169,15 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		root.attachChild(absorberEnd2);
 
 		if (detailed) {
-			absorberCore = new Cylinder("Absorber Tube Core", 2, 4, 0.4, 0, true);
+			absorberCore = new MyCylinder("Absorber Tube Core", 2, 4, 0.4, 0, true);
 			absorberCore.setDefaultColor(ColorRGBA.BROWN);
 			absorberCore.setModelBound(new OrientedBoundingBox());
 			root.attachChild(absorberCore);
-			absorberEnd1Core = new Cylinder("Absorber End Tube 1 Core", 2, 4, 0.4, 0, true);
+			absorberEnd1Core = new MyCylinder("Absorber End Tube 1 Core", 2, 4, 0.4, 0, true);
 			absorberEnd1Core.setDefaultColor(ColorRGBA.BROWN);
 			absorberEnd1Core.setModelBound(new OrientedBoundingBox());
 			root.attachChild(absorberEnd1Core);
-			absorberEnd2Core = new Cylinder("Absorber End Tube 2 Core", 2, 4, 0.4, 0, true);
+			absorberEnd2Core = new MyCylinder("Absorber End Tube 2 Core", 2, 4, 0.4, 0, true);
 			absorberEnd2Core.setDefaultColor(ColorRGBA.BROWN);
 			absorberEnd2Core.setModelBound(new OrientedBoundingBox());
 			root.attachChild(absorberEnd2Core);
@@ -564,7 +563,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 	}
 
 	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
-		final Cylinder pole = new Cylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
+		final MyCylinder pole = new MyCylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
 		pole.setRadius(0.6);
 		pole.setRenderState(offsetState);
 		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the trough

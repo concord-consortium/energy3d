@@ -32,8 +32,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Box;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -51,7 +49,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
-	private transient Box reflector;
+	private transient MyBox reflector;
 	private transient Line outlines;
 	private transient Node modulesRoot;
 	private transient Line lightBeams;
@@ -124,7 +122,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		reflector = new Box("Fresnel Reflector Box");
+		reflector = new MyBox("Fresnel Reflector Box");
 		reflector.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
@@ -477,7 +475,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	}
 
 	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
-		final Cylinder pole = new Cylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
+		final MyCylinder pole = new MyCylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
 		pole.setRadius(0.6);
 		pole.setRenderState(offsetState);
 		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the reflector

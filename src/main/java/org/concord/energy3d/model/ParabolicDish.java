@@ -29,7 +29,6 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -51,10 +50,10 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	private transient Paraboloid dish;
 	private transient Mesh dishBack;
 	private transient Line outlines;
-	private transient Cylinder[] tripod;
-	private transient Cylinder post;
-	private transient Cylinder duct;
-	private transient Cylinder receiver;
+	private transient MyCylinder[] tripod;
+	private transient MyCylinder post;
+	private transient MyCylinder duct;
+	private transient MyCylinder receiver;
 	private transient Line lightBeams;
 	private transient BMText label;
 	private transient double copyLayoutGap = 0.2;
@@ -139,7 +138,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		dishBack.setRenderState(cullState);
 		root.attachChild(dishBack);
 
-		post = new Cylinder("Post Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many dishes, reduce the solution of post
+		post = new MyCylinder("Post Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many dishes, reduce the solution of post
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRadius(0.6);
 		post.setRenderState(offsetState);
@@ -147,7 +146,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		post.updateModelBound();
 		root.attachChild(post);
 
-		duct = new Cylinder("Duct Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		duct = new MyCylinder("Duct Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
 		duct.setDefaultColor(ColorRGBA.WHITE);
 		duct.setRadius(0.6);
 		duct.setRenderState(offsetState);
@@ -156,7 +155,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		root.attachChild(duct);
 
 		final ColorRGBA receiverColor = new ColorRGBA(0.9f, 0.9f, 0.95f, 1);
-		receiver = new Cylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
+		receiver = new MyCylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
 		receiver.setDefaultColor(receiverColor);
 		receiver.setRadius(2);
 		receiver.setHeight(3);
@@ -174,10 +173,10 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
 
-		tripod = new Cylinder[3];
+		tripod = new MyCylinder[3];
 
 		for (int i = 0; i < 3; i++) {
-			tripod[i] = new Cylinder("Tripod Cylinder " + i, 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+			tripod[i] = new MyCylinder("Tripod Cylinder " + i, 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
 			tripod[i].setDefaultColor(receiverColor);
 			tripod[i].setRadius(0.2);
 			tripod[i].setRenderState(offsetState);
@@ -860,7 +859,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		addPrintMesh(list, post);
 		addPrintMesh(list, duct);
 		addPrintMesh(list, receiver);
-		for (final Cylinder mesh : tripod) {
+		for (final MyCylinder mesh : tripod) {
 			addPrintMesh(list, mesh);
 		}
 	}

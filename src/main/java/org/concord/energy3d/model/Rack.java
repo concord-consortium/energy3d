@@ -39,8 +39,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Box;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -52,7 +50,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
-	private transient Box surround;
+	private transient MyBox surround;
 	private transient Node polesRoot;
 	private transient Node angles;
 	private transient AngleAnnotation sunAngle;
@@ -121,7 +119,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("Rack (Surround)");
+		surround = new MyBox("Rack (Surround)");
 		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
@@ -651,7 +649,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
-		final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+		final MyCylinder pole = new MyCylinder("Pole Cylinder", 10, 10, 10, 0);
 		pole.setRadius(0.6);
 		pole.setRenderState(offsetState);
 		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the rack

@@ -20,7 +20,6 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -34,7 +33,7 @@ public class Sensor extends HousePart implements SolarCollector {
 	public static final double HEIGHT = 0.1;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
-	private transient Box surround;
+	private transient MyBox surround;
 	private transient BMText label;
 	private boolean lightOff;
 	private boolean heatFluxOff;
@@ -54,7 +53,7 @@ public class Sensor extends HousePart implements SolarCollector {
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("Sensor (Surround)");
+		surround = new MyBox("Sensor (Surround)");
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);

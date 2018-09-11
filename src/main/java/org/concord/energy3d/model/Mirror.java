@@ -25,8 +25,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.shape.Box;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -49,9 +47,9 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
-	private transient Box surround;
+	private transient MyBox surround;
 	private transient Line lightBeams;
-	private transient Cylinder post;
+	private transient MyCylinder post;
 	private transient BMText label;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double opticalEfficiency = 1.0; // the percentage of the effective reflection area on the heliostat surface (since it is modeled as a whole plate, this factor deducts the areas of gaps, frames, etc.)
@@ -108,7 +106,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("Mirror (Surround)");
+		surround = new MyBox("Mirror (Surround)");
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
@@ -122,7 +120,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = new Cylinder("Post Cylinder", 2, Scene.getInstance().getAllHeliostats().size() < 200 ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post = new MyCylinder("Post Cylinder", 2, Scene.getInstance().getAllHeliostats().size() < 200 ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
 		post.setRadius(0.6);
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);

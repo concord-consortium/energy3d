@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.MySphere;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ChangeTimeAndDateWithHeliodonCommand;
@@ -58,7 +59,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TransparencyType;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.AutoFade;
@@ -77,7 +77,7 @@ public class Heliodon {
 	private static final double TILT_ANGLE = 23.45 / 180.0 * Math.PI;
 	private static Heliodon instance;
 	private final Node root = new Node("Heliodon Root");
-	private final Mesh sun = new Sphere("Sun", 20, 20, 0.3);
+	private final Mesh sun = new MySphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
 	private final Line sunPath;
 	private final Line sunTriangle;

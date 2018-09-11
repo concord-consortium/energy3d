@@ -106,7 +106,7 @@ public class ParabolicCylinder extends Mesh {
 			_meshData.setIndices(BufferUtils.createIndexBufferData(3 * count, verts - 1));
 		}
 		setGeometryData();
-		setIndexData();
+		// setIndexData();
 	}
 
 	// generate geometry

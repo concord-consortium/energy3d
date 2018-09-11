@@ -36,7 +36,6 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -62,7 +61,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
-	private transient Box surround;
+	private transient MyBox surround;
 	private transient Mesh supportFrame;
 	private transient Line sunBeam;
 	private transient Line normalVector;
@@ -169,7 +168,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("SolarPanel (Surround)");
+		surround = new MyBox("SolarPanel (Surround)");
 		surround.setModelBound(new OrientedBoundingBox());
 
 		final OffsetState offset = new OffsetState();
