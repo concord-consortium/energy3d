@@ -132,7 +132,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		CullState cullState = new CullState();
-		cullState.setCullFace(Face.Back);
+		cullState.setCullFace(Face.Front);
 		mesh.setRenderState(cullState);
 		root.attachChild(mesh);
 		reflector = (ParabolicCylinder) mesh;

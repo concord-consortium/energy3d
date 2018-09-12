@@ -2,7 +2,6 @@ package org.concord.energy3d.model;
 
 import java.io.IOException;
 
-import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -97,78 +96,61 @@ public class ParabolicCylinder extends Mesh {
 	}
 
 	private void allocateVertices() {
-		final int verts = 2 * (numberOfSamples + 1);
+		final int verts = 6 * numberOfSamples;
 		_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
 		_meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts)); // allocate normals if requested
 		_meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0); // allocate texture coordinates
-		final int count = 2 * numberOfSamples;
-		if (_meshData.getIndices() == null || _meshData.getIndices().getBufferLimit() != 3 * count) {
-			_meshData.setIndices(BufferUtils.createIndexBufferData(3 * count, verts - 1));
-		}
-		setGeometryData();
-		// setIndexData();
-	}
 
-	// generate geometry
-	private void setGeometryData() {
-		final double halfWidth = 0.5 * width;
-		final double halfHeight = 0.5 * height;
+		final float halfWidth = (float) (0.5 * width);
+		final float halfHeight = (float) (0.5 * height);
 		final double tmin = -halfWidth / semilatusRectum;
 		final double delta = width / (numberOfSamples * semilatusRectum);
 
 		// Generate points of the parabola under the limit to be used in computing the mesh points on a cylinder end.
-		final double[] x = new double[numberOfSamples + 1];
-		final double[] y = new double[numberOfSamples + 1];
+		final float[] x = new float[numberOfSamples + 1];
+		final float[] z = new float[numberOfSamples + 1];
 
-		for (int i = 0; i < numberOfSamples + 1; i++) { // use the parametric equation to compute the points (no need to use Lissajous Curve)
+		for (int i = 0; i <= numberOfSamples; i++) { // use the parametric equation to compute the points (no need to use Lissajous Curve)
 			final double t = i * delta + tmin;
-			x[i] = semilatusRectum * t;
-			y[i] = semilatusRectum * t * t * 0.5;
+			x[i] = (float) (semilatusRectum * t);
+			z[i] = (float) (semilatusRectum * t * t * 0.5);
 		}
 
 		// generate the cylinder itself
-		final Vector3 point = new Vector3();
-		final Vector3 pointNormal = new Vector3();
-		final Vector3 faceCenter = new Vector3(0, -halfHeight, 0); // compute the center of the lower end
+		double xn, zn, rn;
 
 		// compute lower end vertices with duplication at end point
+		int j;
 		final float inverseNumberOfSamples = 1.0f / numberOfSamples;
-		for (int i = 0; i < numberOfSamples + 1; i++) {
-			point.set(x[i], 0, y[i]);
-			point.normalize(pointNormal);
-			_meshData.getNormalBuffer().put(pointNormal.getXf()).put(pointNormal.getYf()).put(pointNormal.getZf());
-			point.addLocal(faceCenter);
-			_meshData.getVertexBuffer().put(point.getXf()).put(point.getYf()).put(point.getZf());
-			_meshData.getTextureCoords(0).getBuffer().put(i * inverseNumberOfSamples).put(0);
-		}
-
-		// compute upper end vertices with duplication at end point
-		faceCenter.setY(halfHeight);
-		for (int i = 0; i < numberOfSamples + 1; i++) {
-			point.set(x[i], 0, y[i]);
-			point.normalize(pointNormal);
-			_meshData.getNormalBuffer().put(pointNormal.getXf()).put(pointNormal.getYf()).put(pointNormal.getZf());
-			point.addLocal(faceCenter);
-			_meshData.getVertexBuffer().put(point.getXf()).put(point.getYf()).put(point.getZf());
-			_meshData.getTextureCoords(0).getBuffer().put(i * inverseNumberOfSamples).put(1);
-		}
-
-	}
-
-	private void setIndexData() {
-		_meshData.getIndices().rewind();
-		int i0 = 0;
-		int i1 = 1;
-		int i2 = numberOfSamples + 1;
-		int i3 = i2 + 1;
 		for (int i = 0; i < numberOfSamples; i++) {
-			_meshData.getIndices().put(i0++);
-			_meshData.getIndices().put(i1);
-			_meshData.getIndices().put(i2);
-			_meshData.getIndices().put(i1++);
-			_meshData.getIndices().put(i3++);
-			_meshData.getIndices().put(i2++);
+			xn = x[i];
+			zn = z[i];
+			rn = 1.0 / Math.hypot(xn, zn);
+			xn *= rn;
+			zn *= rn;
+			j = i + 1;
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[i]).put(-halfHeight).put(z[i]);
+			_meshData.getTextureCoords(0).getBuffer().put(i * inverseNumberOfSamples).put(0);
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[i]).put(halfHeight).put(z[i]);
+			_meshData.getTextureCoords(0).getBuffer().put(i * inverseNumberOfSamples).put(1);
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[j]).put(halfHeight).put(z[j]);
+			_meshData.getTextureCoords(0).getBuffer().put(j * inverseNumberOfSamples).put(1);
+
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[j]).put(halfHeight).put(z[j]);
+			_meshData.getTextureCoords(0).getBuffer().put(j * inverseNumberOfSamples).put(1);
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[j]).put(-halfHeight).put(z[j]);
+			_meshData.getTextureCoords(0).getBuffer().put(j * inverseNumberOfSamples).put(0);
+			_meshData.getNormalBuffer().put((float) xn).put(0).put((float) zn);
+			_meshData.getVertexBuffer().put(x[i]).put(-halfHeight).put(z[i]);
+			_meshData.getTextureCoords(0).getBuffer().put(i * inverseNumberOfSamples).put(0);
+
 		}
+
 	}
 
 	@Override

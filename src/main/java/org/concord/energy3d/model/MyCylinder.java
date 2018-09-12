@@ -117,7 +117,7 @@ class MyCylinder extends Mesh {
 
 	private void allocateVertices() {
 		// allocate vertices
-		final int verts = 6 * _axisSamples * (_radialSamples + 1) + (_closed ? 2 : 0);
+		final int verts = 6 * _axisSamples * _radialSamples + (_closed ? 2 : 0);
 		_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
 
 		// allocate normals if requested
@@ -135,20 +135,22 @@ class MyCylinder extends Mesh {
 		// generate the cylinder itself
 		double x1 = _radius, y1 = 0, x2, y2;
 		for (int i = 0; i < _radialSamples; i++) {
-			// texture coord
-			final float tx = (float) i / (float) _radialSamples;
-			// normal
-			final double nf = 1.0 / Math.sqrt(x1 * x1 + y1 * y1);
-			final double xn = x1 * nf;
-			final double yn = y1 * nf;
+			x2 = cos * x1 - sin * y1;
+			y2 = sin * x1 + cos * y1;
+			// normal vector
+			double xn = (x1 + x2) * 0.5;
+			double yn = (y1 + y2) * 0.5;
+			final double nf = 1.0 / Math.sqrt(xn * xn + yn * yn);
+			xn = xn * nf;
+			yn = yn * nf;
+			// texture coordinates
+			final float tx = (float) (i + 0.5) / _radialSamples;
 			_meshData.getNormalBuffer().put((float) xn).put((float) yn).put(0);
 			_meshData.getTextureCoords(0).getBuffer().put(tx).put(0);
 			_meshData.getVertexBuffer().put((float) x1).put((float) y1).put(-halfHeight);
 			_meshData.getNormalBuffer().put((float) xn).put((float) yn).put(0);
 			_meshData.getTextureCoords(0).getBuffer().put(tx).put(1);
 			_meshData.getVertexBuffer().put((float) x1).put((float) y1).put(halfHeight);
-			x2 = cos * x1 - sin * y1;
-			y2 = sin * x1 + cos * y1;
 			_meshData.getNormalBuffer().put((float) xn).put((float) yn).put(0);
 			_meshData.getTextureCoords(0).getBuffer().put(tx).put(1);
 			_meshData.getVertexBuffer().put((float) x2).put((float) y2).put(halfHeight);
@@ -162,7 +164,7 @@ class MyCylinder extends Mesh {
 			_meshData.getNormalBuffer().put((float) xn).put((float) yn).put(0);
 			_meshData.getTextureCoords(0).getBuffer().put(tx).put(0);
 			_meshData.getVertexBuffer().put((float) x1).put((float) y1).put(-halfHeight);
-			// next position
+			// next strip
 			x1 = x2;
 			y1 = y2;
 		}
