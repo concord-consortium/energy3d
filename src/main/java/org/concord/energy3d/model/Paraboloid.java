@@ -90,12 +90,12 @@ public class Paraboloid extends Mesh {
 		final double cz = center.getZ();
 		final double[] dz = new double[zSamples - 1];
 		final double[] dr = new double[zSamples - 1];
-		for (int i = 1; i < zSamples - 1; i++) {
+		for (int i = 0; i < zSamples - 1; i++) {
 			dz[i] = zSteplength * i;
 			dr[i] = Math.sqrt(dz[i]) * a;
 		}
 
-		for (int i = 1; i < zSamples - 2; i++) {
+		for (int i = 0; i < zSamples - 2; i++) {
 
 			final float zFraction = (float) i / (float) (zSamples - 1);
 			dx1 = dr[i];
@@ -154,11 +154,11 @@ public class Paraboloid extends Mesh {
 
 			}
 
-			// close the circle by looping back to the beginning point
-			// final float r = (float) ((MathUtils.HALF_PI - Math.abs(zFraction)) / MathUtils.PI);
-			// _meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
-
 		}
+
+		// TODO: Handle the bottom
+		// final float r = (float) ((MathUtils.HALF_PI - Math.abs(zFraction)) / MathUtils.PI);
+		// _meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
 
 	}
 

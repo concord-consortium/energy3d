@@ -42,7 +42,7 @@ public class MySphere extends Mesh {
 		radius = rad;
 
 		// allocate vertices
-		final int verts = 6 * (zSamples - 2) * (radialSamples + 1) + 2;
+		final int verts = 6 * (zSamples - 1) * (radialSamples + 1) + 2;
 		final FloatBufferData vertsData = _meshData.getVertexCoords();
 		if (vertsData == null) {
 			_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
@@ -82,13 +82,13 @@ public class MySphere extends Mesh {
 		final double[] sinz = new double[zSamples - 1];
 		final double[] dz = new double[zSamples - 1];
 		final double[] dr = new double[zSamples - 1];
-		for (int i = 1; i < zSamples - 1; i++) {
+		for (int i = 0; i < zSamples - 1; i++) {
 			sinz[i] = Math.sin(MathUtils.HALF_PI * (-1.0 + zFactor * i)); // angle in -pi/2 and pi/2
 			dz[i] = radius * sinz[i];
 			dr[i] = Math.sqrt(Math.abs(radius * radius - dz[i] * dz[i]));
 		}
 
-		for (int i = 1; i < zSamples - 2; i++) {
+		for (int i = 0; i < zSamples - 2; i++) {
 
 			dx1 = dr[i];
 			dy1 = 0;
@@ -149,6 +149,8 @@ public class MySphere extends Mesh {
 			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (sinz[i] + 1.0)));
 
 		}
+
+		// TODO: Handle the poles
 
 		final int i = verts - 2;
 		// south pole
