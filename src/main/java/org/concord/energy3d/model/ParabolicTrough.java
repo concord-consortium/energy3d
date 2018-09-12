@@ -348,10 +348,11 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 		FloatBuffer steelFrameBuffer = steelFrame.getMeshData().getVertexBuffer();
 
-		final int vertexCount = vertexBuffer.limit() / 6;
-		final int j = vertexCount * 3; // number of vertex coordinates on each end
-		final int j1 = (j - 3) / 2; // start index of middle point on end 1
-		final int j2 = j + j1; // start index of middle point on end 2
+		final int halfVertexCount = vertexBuffer.limit() / 6;
+		final int vertexCount = halfVertexCount * 2;
+		final int j = halfVertexCount * 3; // number of vertex coordinates on each end
+		final int j1 = j; // the middle point on end 1
+		final int j2 = j + 3; // the middle point on end 2
 		final Vector3 p1 = new Vector3(vertexBuffer.get(j1), vertexBuffer.get(j1 + 1), vertexBuffer.get(j1 + 2)); // middle point on end 1
 		final Vector3 p2 = new Vector3(vertexBuffer.get(j2), vertexBuffer.get(j2 + 1), vertexBuffer.get(j2 + 2)); // middle point on end 2
 		final Vector3 pd = p2.subtract(p1, null).normalizeLocal(); // normal in the direction of cylinder axis
@@ -359,7 +360,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		final Vector3 center = getAbsPoint(0);
 
 		final int nModules = Math.max(1, getNumberOfModules());
-		final int outlineBufferSize = 6 * (vertexCount - 1) * (nModules + 2) + 12; // 12 is for the two lateral lines
+		final int outlineBufferSize = 6 * (halfVertexCount - 1) * (nModules + 2) + 12; // 12 (3 x 4) is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -368,27 +369,28 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 			outlineBuffer.limit(outlineBufferSize);
 		}
 		// draw parabolic lines of the two end faces
-		int i3;
-		for (int i = 0; i < vertexCount - 1; i++) {
-			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
-			outlineBuffer.put(vertexBuffer.get(j + i3)).put(vertexBuffer.get(j + i3 + 1)).put(vertexBuffer.get(j + i3 + 2));
-			outlineBuffer.put(vertexBuffer.get(j + i3 + 3)).put(vertexBuffer.get(j + i3 + 4)).put(vertexBuffer.get(j + i3 + 5));
+		int k;
+		for (int i = 0; i < vertexCount; i += 6) {
+			k = i * 3;
+			outlineBuffer.put(vertexBuffer.get(k)).put(vertexBuffer.get(k + 1)).put(vertexBuffer.get(k + 2));
+			outlineBuffer.put(vertexBuffer.get(k + 12)).put(vertexBuffer.get(k + 13)).put(vertexBuffer.get(k + 14));
+			outlineBuffer.put(vertexBuffer.get(k + 3)).put(vertexBuffer.get(k + 4)).put(vertexBuffer.get(k + 5));
+			outlineBuffer.put(vertexBuffer.get(k + 6)).put(vertexBuffer.get(k + 7)).put(vertexBuffer.get(k + 8));
 		}
 		// draw lateral lines connecting the two end faces
 		outlineBuffer.put(vertexBuffer.get(0)).put(vertexBuffer.get(1)).put(vertexBuffer.get(2));
-		outlineBuffer.put(vertexBuffer.get(j)).put(vertexBuffer.get(j + 1)).put(vertexBuffer.get(j + 2));
-		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
-		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
+		outlineBuffer.put(vertexBuffer.get(3)).put(vertexBuffer.get(4)).put(vertexBuffer.get(5));
+		k = 2 * j - 9;
+		outlineBuffer.put(vertexBuffer.get(k)).put(vertexBuffer.get(k + 1)).put(vertexBuffer.get(k + 2));
+		outlineBuffer.put(vertexBuffer.get(k + 3)).put(vertexBuffer.get(k + 4)).put(vertexBuffer.get(k + 5));
 		// draw seam lines between units
 		if (nModules > 1) { // if there is only one module, don't draw
-			for (int k = 1; k < nModules; k++) {
-				final double ua = k * moduleLength / sceneScale;
-				for (int i = 0; i < vertexCount - 1; i++) {
-					i3 = i * 3;
-					final Vector3 v1 = new Vector3(vertexBuffer.get(i3), vertexBuffer.get(i3 + 1), vertexBuffer.get(i3 + 2));
-					final Vector3 v2 = new Vector3(vertexBuffer.get(i3 + 3), vertexBuffer.get(i3 + 4), vertexBuffer.get(i3 + 5));
+			for (int n = 1; n < nModules; n++) {
+				final double ua = n * moduleLength / sceneScale;
+				for (int i = 0; i < vertexCount; i += 6) {
+					k = i * 3;
+					final Vector3 v1 = new Vector3(vertexBuffer.get(k), vertexBuffer.get(k + 1), vertexBuffer.get(k + 2));
+					final Vector3 v2 = new Vector3(vertexBuffer.get(k + 12), vertexBuffer.get(k + 13), vertexBuffer.get(k + 14));
 					v1.addLocal(0, ua, 0);
 					v2.addLocal(0, ua, 0);
 					outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
@@ -396,7 +398,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 				}
 			}
 		}
-		outlineBuffer.limit(vertexCount * 12 + (vertexCount - 1) * 6 * (nModules - 1));
+		outlineBuffer.limit(vertexCount * 6 + (halfVertexCount - 1) * 6 * (nModules - 1));
 
 		// draw steel frame lines
 		final int steelBufferSize = nModules * 6;
