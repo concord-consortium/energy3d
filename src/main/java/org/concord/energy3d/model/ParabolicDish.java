@@ -126,7 +126,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		CullState cullState = new CullState();
-		cullState.setCullFace(Face.Front);
+		cullState.setCullFace(Face.Back);
 		mesh.setRenderState(cullState);
 		root.attachChild(mesh);
 		dish = (Paraboloid) mesh;
