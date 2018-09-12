@@ -11,87 +11,38 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
-/**
- * Sphere represents a 3D object with all points equi-distance from a center point.
- */
-
 public class MySphere extends Mesh {
 
-	private int _zSamples;
-	private int _radialSamples;
-	private double _radius;
-	private final Vector3 _center = new Vector3();
+	private int zSamples;
+	private int radialSamples;
+	private double radius;
+	private final Vector3 center = new Vector3();
 
 	public MySphere() {
 	}
 
-	/**
-	 * Constructs a sphere. By default the Sphere has not geometry data or center.
-	 * 
-	 * @param name
-	 *            The name of the sphere.
-	 */
 	public MySphere(final String name) {
 		super(name);
 	}
 
-	/**
-	 * Constructs a sphere with center at the origin. For details, see the other constructor.
-	 * 
-	 * @param name
-	 *            Name of sphere.
-	 * @param zSamples
-	 *            The samples along the Z.
-	 * @param radialSamples
-	 *            The samples along the radial.
-	 * @param radius
-	 *            Radius of the sphere.
-	 * @see #Sphere(java.lang.String, com.ardor3d.math.Vector3, int, int, double)
-	 */
 	public MySphere(final String name, final int zSamples, final int radialSamples, final double radius) {
 		this(name, new Vector3(), zSamples, radialSamples, radius);
 	}
 
-	/**
-	 * Constructs a sphere. All geometry data buffers are updated automatically. Both zSamples and radialSamples increase the quality of the generated sphere.
-	 * 
-	 * @param name
-	 *            Name of the sphere.
-	 * @param center
-	 *            Center of the sphere.
-	 * @param zSamples
-	 *            The number of samples along the Z.
-	 * @param radialSamples
-	 *            The number of samples along the radial.
-	 * @param radius
-	 *            The radius of the sphere.
-	 */
 	public MySphere(final String name, final ReadOnlyVector3 center, final int zSamples, final int radialSamples, final double radius) {
 		super(name);
 		setData(center, zSamples, radialSamples, radius);
 	}
 
-	/**
-	 * Changes the information of the sphere into the given values.
-	 * 
-	 * @param center
-	 *            The new center of the sphere.
-	 * @param zSamples
-	 *            The new number of zSamples of the sphere.
-	 * @param radialSamples
-	 *            The new number of radial samples of the sphere.
-	 * @param radius
-	 *            The new radius of the sphere.
-	 */
-	public void setData(final ReadOnlyVector3 center, final int zSamples, final int radialSamples, final double radius) {
+	public void setData(final ReadOnlyVector3 centerPoint, final int zSteps, final int rSteps, final double rad) {
 
-		_center.set(center);
-		_zSamples = zSamples;
-		_radialSamples = radialSamples;
-		_radius = radius;
+		center.set(centerPoint);
+		zSamples = zSteps;
+		radialSamples = rSteps;
+		radius = rad;
 
 		// allocate vertices
-		final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
+		final int verts = 6 * (zSamples - 2) * (radialSamples + 1) + 2;
 		final FloatBufferData vertsData = _meshData.getVertexCoords();
 		if (vertsData == null) {
 			_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
@@ -115,84 +66,104 @@ public class MySphere extends Mesh {
 			texData.setBuffer(BufferUtils.createVector2Buffer(texData.getBuffer(), verts));
 		}
 
-		// generate geometry
-		final double fInvRS = 1.0 / _radialSamples;
-		final double fZFactor = 2.0 / (_zSamples - 1);
-
-		// Generate points on the unit circle to be used in computing the mesh points on a sphere slice.
-		final double[] afSin = new double[(_radialSamples + 1)];
-		final double[] afCos = new double[(_radialSamples + 1)];
-		for (int i = 0; i < _radialSamples; i++) {
-			final double fAngle = MathUtils.TWO_PI * fInvRS * i;
-			afCos[i] = MathUtils.cos(fAngle);
-			afSin[i] = MathUtils.sin(fAngle);
+		final double inverseRadialSamples = 1.0 / radialSamples;
+		final double zFactor = 2.0 / (zSamples - 1);
+		final double theta = MathUtils.TWO_PI * inverseRadialSamples;
+		final double cosr = Math.cos(theta);
+		final double sinr = Math.sin(theta);
+		double dx1, dy1, dz1;
+		double dx2, dy2, dz2;
+		double dx3, dy3, dz3;
+		double dx4, dy4, dz4;
+		double xn, yn, zn, nf;
+		final double cx = center.getX();
+		final double cy = center.getY();
+		final double cz = center.getZ();
+		final double[] sinz = new double[zSamples - 1];
+		final double[] dz = new double[zSamples - 1];
+		final double[] dr = new double[zSamples - 1];
+		for (int i = 1; i < zSamples - 1; i++) {
+			sinz[i] = Math.sin(MathUtils.HALF_PI * (-1.0 + zFactor * i)); // angle in -pi/2 and pi/2
+			dz[i] = radius * sinz[i];
+			dr[i] = Math.sqrt(Math.abs(radius * radius - dz[i] * dz[i]));
 		}
-		afSin[_radialSamples] = afSin[0];
-		afCos[_radialSamples] = afCos[0];
 
-		// generate the sphere itself
-		int i = 0;
-		final Vector3 tempVa = Vector3.fetchTempInstance();
-		final Vector3 tempVb = Vector3.fetchTempInstance();
-		final Vector3 tempVc = Vector3.fetchTempInstance();
-		for (int iZ = 1; iZ < _zSamples - 1; iZ++) {
-			final double fAFraction = MathUtils.HALF_PI * (-1.0f + fZFactor * iZ); // in (-pi/2, pi/2)
-			final double fZFraction = MathUtils.sin(fAFraction); // in (-1,1)
-			final double fZ = _radius * fZFraction;
+		for (int i = 1; i < zSamples - 2; i++) {
 
-			// compute center of slice
-			final Vector3 kSliceCenter = tempVb.set(_center);
-			kSliceCenter.setZ(kSliceCenter.getZ() + fZ);
+			dx1 = dr[i];
+			dy1 = 0;
+			dz1 = dz[i];
+			dx2 = dr[i + 1];
+			dy2 = 0;
+			dz2 = dz[i + 1];
+			dz3 = dz2;
+			dz4 = dz1;
 
-			// compute radius of slice
-			final double fSliceRadius = Math.sqrt(Math.abs(_radius * _radius - fZ * fZ));
+			for (int j = 0; j <= radialSamples; j++) {
 
-			// compute slice vertices with duplication at end point
-			Vector3 kNormal;
-			final int iSave = i;
-			for (int iR = 0; iR < _radialSamples; iR++) {
-				final double fRadialFraction = iR * fInvRS; // in [0,1)
-				final Vector3 kRadial = tempVc.set(afCos[iR], afSin[iR], 0);
-				kRadial.multiply(fSliceRadius, tempVa);
-				_meshData.getVertexBuffer().put((float) (kSliceCenter.getX() + tempVa.getX())).put((float) (kSliceCenter.getY() + tempVa.getY())).put((float) (kSliceCenter.getZ() + tempVa.getZ()));
+				dx3 = cosr * dx2 - sinr * dy2;
+				dy3 = sinr * dx2 + cosr * dy2;
+				dx4 = cosr * dx1 - sinr * dy1;
+				dy4 = sinr * dx1 + cosr * dy1;
+				// normal vector
+				xn = (dx1 + dx2) * 0.5;
+				yn = (dy1 + dy2) * 0.5;
+				zn = (dz1 + dz2) * 0.5;
+				nf = 1.0 / Math.sqrt(xn * xn + yn * yn + zn * zn);
+				xn = xn * nf;
+				yn = yn * nf;
+				zn = zn * nf;
 
-				BufferUtils.populateFromBuffer(tempVa, _meshData.getVertexBuffer(), i);
-				kNormal = tempVa.subtractLocal(_center);
-				kNormal.normalizeLocal();
-				_meshData.getNormalBuffer().put(kNormal.getXf()).put(kNormal.getYf()).put(kNormal.getZf());
-				_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) (0.5 * (fZFraction + 1.0)));
+				_meshData.getVertexBuffer().put((float) (cx + dx1)).put((float) (cy + dy1)).put((float) (cz + dz1));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i] + 1.0)));
 
-				i++;
+				_meshData.getVertexBuffer().put((float) (cx + dx2)).put((float) (cy + dy2)).put((float) (cz + dz2));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i + 1] + 1.0)));
+
+				_meshData.getVertexBuffer().put((float) (cx + dx3)).put((float) (cy + dy3)).put((float) (cz + dz3));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i + 1] + 1.0)));
+
+				_meshData.getVertexBuffer().put((float) (cx + dx3)).put((float) (cy + dy3)).put((float) (cz + dz3));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i + 1] + 1.0)));
+
+				_meshData.getVertexBuffer().put((float) (cx + dx4)).put((float) (cy + dy4)).put((float) (cz + dz4));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i] + 1.0)));
+
+				_meshData.getVertexBuffer().put((float) (cx + dx1)).put((float) (cy + dy1)).put((float) (cz + dz1));
+				_meshData.getNormalBuffer().put((float) xn).put((float) yn).put((float) zn);
+				_meshData.getTextureCoords(0).getBuffer().put((float) (j * inverseRadialSamples)).put((float) (0.5 * (sinz[i] + 1.0)));
+
+				// next strip
+				dx1 = dx4;
+				dy1 = dy4;
+				dx2 = dx3;
+				dy2 = dy3;
+
 			}
 
-			BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
-			BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
+			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (sinz[i] + 1.0)));
 
-			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
-
-			i++;
 		}
 
+		final int i = verts - 2;
 		// south pole
 		_meshData.getVertexBuffer().position(i * 3);
-		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() - _radius));
-
+		_meshData.getVertexBuffer().put(center.getXf()).put(center.getYf()).put((float) (center.getZ() - radius));
 		_meshData.getNormalBuffer().position(i * 3);
 		_meshData.getNormalBuffer().put(0).put(0).put(-1);
-
 		_meshData.getTextureCoords(0).getBuffer().position(i * 2);
 		_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.0f);
 
-		i++;
-
 		// north pole
-		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() + _radius));
+		_meshData.getVertexBuffer().put(center.getXf()).put(center.getYf()).put((float) (center.getZ() + radius));
 		_meshData.getNormalBuffer().put(0).put(0).put(1);
 		_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(1.0f);
 
-		Vector3.releaseTempInstance(tempVa);
-		Vector3.releaseTempInstance(tempVb);
-		Vector3.releaseTempInstance(tempVc);
 	}
 
 	/**
@@ -201,29 +172,29 @@ public class MySphere extends Mesh {
 	 * @return The sphere's center.
 	 */
 	public Vector3 getCenter() {
-		return _center;
+		return center;
 	}
 
 	public double getRadius() {
-		return _radius;
+		return radius;
 	}
 
 	@Override
 	public void write(final OutputCapsule capsule) throws IOException {
 		super.write(capsule);
-		capsule.write(_zSamples, "zSamples", 0);
-		capsule.write(_radialSamples, "radialSamples", 0);
-		capsule.write(_radius, "radius", 0);
-		capsule.write(_center, "center", new Vector3());
+		capsule.write(zSamples, "zSamples", 0);
+		capsule.write(radialSamples, "radialSamples", 0);
+		capsule.write(radius, "radius", 0);
+		capsule.write(center, "center", new Vector3());
 	}
 
 	@Override
 	public void read(final InputCapsule capsule) throws IOException {
 		super.read(capsule);
-		_zSamples = capsule.readInt("zSamples", 0);
-		_radialSamples = capsule.readInt("radialSamples", 0);
-		_radius = capsule.readDouble("radius", 0);
-		_center.set((Vector3) capsule.readSavable("center", new Vector3()));
+		zSamples = capsule.readInt("zSamples", 0);
+		radialSamples = capsule.readInt("radialSamples", 0);
+		radius = capsule.readDouble("radius", 0);
+		center.set((Vector3) capsule.readSavable("center", new Vector3()));
 	}
 
 }
