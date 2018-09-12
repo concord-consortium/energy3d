@@ -915,21 +915,36 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		final double halfWidth = 0.5 * apertureWidth / Scene.getInstance().getScale();
 		final double dy = halfWidth * halfWidth / (2 * (semilatusRectum / Scene.getInstance().getScale()));
 		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
-		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
-		BufferUtils.populateFromBuffer(v1, buf, 0);
-		BufferUtils.populateFromBuffer(v2, buf, j);
+
+		// horizontal edge 1
+		int j1 = buf.limit() / 3 - 2;
+		int j2 = j1 - 1;
+		BufferUtils.populateFromBuffer(v1, buf, j1);
+		BufferUtils.populateFromBuffer(v2, buf, j2);
 		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
-		BufferUtils.populateFromBuffer(v1, buf, 0);
-		BufferUtils.populateFromBuffer(v2, buf, j - 1);
+
+		// vertical edge 1
+		j2 = 0;
+		BufferUtils.populateFromBuffer(v1, buf, j1);
+		BufferUtils.populateFromBuffer(v2, buf, j2);
 		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
-		BufferUtils.populateFromBuffer(v1, buf, j - 1);
-		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
+
+		// horizontal edge 2
+		j1 = 0;
+		j2 = 1;
+		BufferUtils.populateFromBuffer(v1, buf, j1);
+		BufferUtils.populateFromBuffer(v2, buf, j2);
 		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
-		BufferUtils.populateFromBuffer(v1, buf, j);
-		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
+
+		// vertical edge 2
+		j1 = 1;
+		j2 = buf.limit() / 3 - 3;
+		BufferUtils.populateFromBuffer(v1, buf, j1);
+		BufferUtils.populateFromBuffer(v2, buf, j2);
 		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
+
 		int i = 1;
 		getEditPointShape(i++).setTranslation(p1);
 		getEditPointShape(i++).setTranslation(p2);

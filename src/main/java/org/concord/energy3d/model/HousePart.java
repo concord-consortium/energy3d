@@ -248,7 +248,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	private void addNewEditPointShape(final int i) {
-		final MySphere pointShape = new MySphere("Point", Vector3.ZERO, 8, 8, this instanceof SolarCollector ? 0.05 : 0.1);
+		final MySphere pointShape = this instanceof SolarCollector ? new MySphere("Point", new Vector3(0, 0, 0.025), 8, 8, 0.05) : new MySphere("Point", Vector3.ZERO, 8, 8, 0.1);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
 		pointShape.setVisible(false);
