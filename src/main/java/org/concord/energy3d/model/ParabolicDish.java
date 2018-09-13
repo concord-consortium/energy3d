@@ -29,6 +29,7 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -53,7 +54,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	private transient MyCylinder[] tripod;
 	private transient MyCylinder post;
 	private transient MyCylinder duct;
-	private transient MyCylinder receiver;
+	private transient Cylinder receiver;
 	private transient Line lightBeams;
 	private transient BMText label;
 	private transient double copyLayoutGap = 0.2;
@@ -126,7 +127,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		CullState cullState = new CullState();
-		cullState.setCullFace(Face.Back);
+		cullState.setCullFace(Face.Front);
 		mesh.setRenderState(cullState);
 		root.attachChild(mesh);
 		dish = (Paraboloid) mesh;
@@ -155,7 +156,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		root.attachChild(duct);
 
 		final ColorRGBA receiverColor = new ColorRGBA(0.9f, 0.9f, 0.95f, 1);
-		receiver = new MyCylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
+		receiver = new Cylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
 		receiver.setDefaultColor(receiverColor);
 		receiver.setRadius(2);
 		receiver.setHeight(3);
@@ -166,7 +167,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 		outlines = new Line("Parabolic Dish (Outline)");
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
-		outlines.setDefaultColor(ColorRGBA.GRAY);
+		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(1f);
 		outlines.setStipplePattern((short) 0xffff);
@@ -270,13 +271,15 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 
+		final int vertexCount = vertexBuffer.limit() / 3;
 		final Vector3 center = getAbsPoint(0);
 
 		final int rSamples = dish.getRSamples() + 1;
 		final int zSamples = dish.getZSamples() - 1;
-		final int outlineBufferSize = 6 * ((rSamples + 1) * 3 + zSamples * nrib);
+		final int outlineBufferSize = 6 * (rSamples * 3 + zSamples * nrib);
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -284,21 +287,18 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
-
-		// final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		// final int vertexCount = vertexBuffer.limit() / 3;
 		// draw the rim line
-		// int i3;
-		// for (int i = vertexCount - (rSamples + 1) * 6; i < vertexCount; i += 6) {
-		// i3 = i * 3;
-		// outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
-		// }
-		// for (int i = (vertexCount - rSamples * 3) / 4; i < (vertexCount + rSamples) / 4; i++) {
-		// i3 = i * 3;
-		// outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + zOffset);
-		// outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
-		// }
-
+		int i3;
+		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
+			i3 = i * 3;
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+		}
+		for (int i = (vertexCount - rSamples * 3) / 4; i < (vertexCount + rSamples) / 4; i++) {
+			i3 = i * 3;
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + zOffset);
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
+		}
 		// draw the rib lines
 		double xi, yi, zi, angle;
 		final double delta = dish.getRimRadius() * 2.0 / (zSamples + 1);

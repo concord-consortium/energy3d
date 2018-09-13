@@ -54,6 +54,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -248,7 +249,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	private void addNewEditPointShape(final int i) {
-		final MySphere pointShape = this instanceof SolarCollector ? new MySphere("Point", new Vector3(0, 0, 0.025), 8, 8, 0.05) : new MySphere("Point", Vector3.ZERO, 8, 8, 0.1);
+		final Sphere pointShape = this instanceof SolarCollector ? new Sphere("Point", new Vector3(0, 0, 0.025), 8, 8, 0.05) : new Sphere("Point", Vector3.ZERO, 8, 8, 0.1);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
 		pointShape.setVisible(false);

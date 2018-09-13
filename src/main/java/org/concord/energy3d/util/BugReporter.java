@@ -51,15 +51,6 @@ public class BugReporter {
 					System.gc();
 				}
 			});
-		} else if (msg.indexOf("Error in opengl: invalid enumerant") != -1) { // Intel driver bug reminder
-			if (Config.isWindows()) {
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Oops, Energy3D will not work with the current graphics card driver.</html>", "Graphics Driver Problem", JOptionPane.ERROR_MESSAGE);
-					}
-				});
-			}
 		} else {
 			final String text = header + "\n" + msg;
 			File file;

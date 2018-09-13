@@ -68,6 +68,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -96,7 +97,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private transient Mesh[] sideMesh;
 	transient Mesh linePatternMesh;
 	private transient BMText label;
-	private transient MyCylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
+	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient Line azimuthArrow;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
@@ -259,7 +260,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		azimuthArrow.setDefaultColor(ColorRGBA.WHITE);
 		root.attachChild(azimuthArrow);
 
-		solarReceiver = new MyCylinder("Solar Receiver", 10, 10, 10, 0, true);
+		solarReceiver = new Cylinder("Solar Receiver", 10, 10, 10, 0, true);
 		solarReceiver.setDefaultColor(ColorRGBA.WHITE);
 		solarReceiver.setRenderState(offsetState);
 		solarReceiver.setModelBound(new BoundingBox());
@@ -269,9 +270,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		selectedMeshOutline = new Line("Outline of Selected Mesh");
 		selectedMeshOutline.setLineWidth(2f);
 		selectedMeshOutline.setStipplePattern((short) 0xf0f0);
-		selectedMeshOutline.setModelBound(null);
+		selectedMeshOutline.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(selectedMeshOutline);
-		selectedMeshOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
+		selectedMeshOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
 		selectedMeshOutline.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(selectedMeshOutline);
 
