@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "8.3.9";
+	public static final String VERSION = "8.4.0";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -53,6 +53,23 @@ public class MainApplication {
 		// System.out.println(org.concord.energy3d.util.Util.countMatch(java.util.regex.Pattern.compile("A+?.*?W+?").matcher("*DA***DW")));
 		System.out.println(org.concord.energy3d.util.Util.countMatch(java.util.regex.Pattern.compile(regex).matcher(s)));
 		System.exit(0);
+	}
+
+	static void testSocket() {
+		final Thread socketThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final MyServerSocket s = new MyServerSocket(null);
+					System.out.println("\r\nRunning Server: " + "Host=" + s.getSocketAddress().getHostAddress() + " Port=" + s.getPort());
+					s.listen();
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		socketThread.setPriority(Thread.MIN_PRIORITY);
+		socketThread.start();
 	}
 
 	public static void main(final String[] args) {

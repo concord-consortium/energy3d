@@ -167,7 +167,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 		outlines = new Line("Parabolic Dish (Outline)");
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
-		outlines.setDefaultColor(ColorRGBA.BLACK);
+		outlines.setDefaultColor(ColorRGBA.DARK_GRAY);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(1f);
 		outlines.setStipplePattern((short) 0xffff);

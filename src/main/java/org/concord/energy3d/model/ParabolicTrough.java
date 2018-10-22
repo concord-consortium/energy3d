@@ -186,7 +186,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		final int nModules = getNumberOfModules();
 		outlines = new Line("Parabolic Trough (Outline)");
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 + 2 * (reflector.getNumberOfSamples() + 1) * (nModules + 1)));
-		outlines.setDefaultColor(ColorRGBA.BLACK);
+		outlines.setDefaultColor(ColorRGBA.DARK_GRAY);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(1f);
 		outlines.setStipplePattern((short) 0xffff);

@@ -28,7 +28,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	private double pricePerKWh = 0.225;
 	private double dailyCostPerPanel = 0.15;
 	private int minimumPanelRows = 1;
-	private int maximumPanelRows = 5;
+	private int maximumPanelRows = 8;
 
 	@Override
 	public void make(final Foundation foundation) {

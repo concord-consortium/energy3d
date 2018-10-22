@@ -362,8 +362,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							numberOfCellsInY = solarPanelNominalSize.getCellNy()[i];
 							solarPanelOrientation = orientationComboBox.getSelectedIndex();
 							final int minimumSolarPanelRowsPerRack = 1;
-							final int maximumSolarPanelRowsPerRack = 5;
-							final double minimumInterRowSpacing = 0.5 * (maximumSolarPanelRowsPerRack + minimumSolarPanelRowsPerRack) * (solarPanelOrientation == 0 ? solarPanelWidth : solarPanelHeight);
+							final int maximumSolarPanelRowsPerRack = 8;
+							final double minimumInterRowSpacing = 0.5 * (maximumSolarPanelRowsPerRack + minimumSolarPanelRowsPerRack) * (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth);
 							final double rackHeight = (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth) * solarPanelRowsPerRack;
 							if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -386,7 +386,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else if (solarPanelRackArrayInterRowSpacing < minimumInterRowSpacing) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row center-to-center distance cannot be smaller than " + EnergyPanel.TWO_DECIMALS.format(minimumInterRowSpacing) + "m (" + solarPanelRowsPerRack + "\u00d7" + EnergyPanel.TWO_DECIMALS.format((solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth)) + "m)", "Range Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row center-to-center distance cannot be smaller than " + EnergyPanel.TWO_DECIMALS.format(minimumInterRowSpacing) + "m (" + EnergyPanel.ONE_DECIMAL.format(0.5 * (maximumSolarPanelRowsPerRack + minimumSolarPanelRowsPerRack)) + "\u00d7" + EnergyPanel.TWO_DECIMALS.format((solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth)) + "m)", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
 								addSolarRackArrays();
 								if (choice == options[0]) {
