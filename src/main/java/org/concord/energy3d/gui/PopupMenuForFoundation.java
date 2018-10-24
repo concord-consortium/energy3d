@@ -294,7 +294,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
 				panel.add(tiltAngleField);
 
-				panel.add(new JLabel("Solar Panel Sub-Rows Per Rack:"));
+				panel.add(new JLabel("Solar Panel Rows Per Rack:"));
 				final JTextField rowsPerRackField = new JTextField(threeDecimalsFormat.format(solarPanelRowsPerRack));
 				panel.add(rowsPerRackField);
 
@@ -308,7 +308,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 				panel.add(rowAxisComboBox);
 
-				panel.add(new JLabel("Inter-Row Center-to-Center Distance (m):"));
+				panel.add(new JLabel("Inter-Row Spacing (Center-to-Center, m):"));
 				final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
 				panel.add(interrowSpacingField);
 
@@ -362,7 +362,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							numberOfCellsInY = solarPanelNominalSize.getCellNy()[i];
 							solarPanelOrientation = orientationComboBox.getSelectedIndex();
 							final int minimumSolarPanelRowsPerRack = 1;
-							final int maximumSolarPanelRowsPerRack = 8;
+							final int maximumSolarPanelRowsPerRack = Rack.MAXIMUM_SOLAR_PANEL_ROWS;
 							final double minimumInterRowSpacing = 0.5 * (maximumSolarPanelRowsPerRack + minimumSolarPanelRowsPerRack) * (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth);
 							final double rackHeight = (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth) * solarPanelRowsPerRack;
 							if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {

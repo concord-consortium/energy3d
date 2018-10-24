@@ -52,10 +52,10 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Electricity price:"));
@@ -218,7 +218,7 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 					} else if (minimumApertureHeight >= maximumApertureHeight) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum aperture height must be greater than minimum aperture height.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new HeliostatConcentricFieldOptimizer(populationSize, 5, 0);
 						final HeliostatConcentricFieldOptimizer op1 = (HeliostatConcentricFieldOptimizer) op;
@@ -238,7 +238,7 @@ public class HeliostatConcentricFieldOptimizerMaker extends OptimizerMaker {
 						op.setMutationRate(mutationRate);
 						op1.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
 						op1.setPricePerKWh(pricePerKWh);
-						switch (selectedFitnessFunction) {
+						switch (selectedObjectiveFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							break;

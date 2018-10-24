@@ -40,10 +40,10 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Chromosome type:"));
@@ -177,7 +177,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 					} else if (sharingRadius < 0) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sharing radius cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new BuildingOrientationOptimizer(populationSize, 1, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
@@ -188,7 +188,7 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 						op.setLocalSearchRadius(localSearchRadius);
 						op.setSharingRadius(sharingRadius);
 						op.setFoundation(foundation);
-						op.setOjectiveFunction(selectedFitnessFunction);
+						op.setOjectiveFunction(selectedObjectiveFunction);
 						op.evolve();
 						if (choice == options[0]) {
 							break;

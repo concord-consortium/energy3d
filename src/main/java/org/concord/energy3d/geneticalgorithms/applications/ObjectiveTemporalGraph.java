@@ -17,15 +17,15 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-class FitnessTemporalGraph extends AbstractGraph {
+class ObjectiveTemporalGraph extends AbstractGraph {
 
 	private static final long serialVersionUID = 1L;
 	private final Individual[] individuals;
-	private double maxFitness = -Double.MAX_VALUE;
-	private double minFitness = Double.MAX_VALUE;
+	private double maxObjective = -Double.MAX_VALUE;
+	private double minObjective = Double.MAX_VALUE;
 	private int length;
 
-	public FitnessTemporalGraph(final Individual[] individuals) {
+	public ObjectiveTemporalGraph(final Individual[] individuals) {
 
 		super();
 
@@ -33,11 +33,11 @@ class FitnessTemporalGraph extends AbstractGraph {
 		for (final Individual i : individuals) {
 			if (i != null && !Double.isNaN(i.getFitness())) {
 				final double f = i.getFitness();
-				if (f > maxFitness) {
-					maxFitness = f;
+				if (f > maxObjective) {
+					maxObjective = f;
 				}
-				if (f < minFitness) {
-					minFitness = f;
+				if (f < minObjective) {
+					minObjective = f;
 				}
 				length++;
 			}
@@ -85,11 +85,11 @@ class FitnessTemporalGraph extends AbstractGraph {
 			yTick = height - BOTTOM_MARGIN - (double) (i * graphWindowHeight) / (double) ny;
 			g2.drawLine(x0, (int) yTick, x0 - 5, (int) yTick);
 			if (i == 0 || i == ny) {
-				tickmarkLabel = EnergyPanel.TWO_DECIMALS.format(minFitness + i * (maxFitness - minFitness) / ny);
+				tickmarkLabel = EnergyPanel.TWO_DECIMALS.format(minObjective + i * (maxObjective - minObjective) / ny);
 				g2.drawString(tickmarkLabel, x0 - 10 - g2.getFontMetrics().stringWidth(tickmarkLabel), (int) (yTick + 4));
 			}
 		}
-		final String yLabel = "Fitness";
+		final String yLabel = "Objective";
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
 		final int yLabelX = x0 - 30;
 		final int yLabelY = height / 2 + g2.getFontMetrics().stringWidth(yLabel) / 2 - 8;
@@ -107,10 +107,10 @@ class FitnessTemporalGraph extends AbstractGraph {
 				continue;
 			}
 			xTick = x0 + i * dx;
-			if (Util.isEqual(minFitness, maxFitness, 0.000001)) {
+			if (Util.isEqual(minObjective, maxObjective, 0.000001)) {
 				yTick = xAxisY - graphWindowHeight * 0.5;
 			} else {
-				yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
+				yTick = xAxisY - (individuals[i].getFitness() - minObjective) / (maxObjective - minObjective) * graphWindowHeight;
 			}
 			if (path == null) {
 				path = new Path2D.Double();
@@ -134,10 +134,10 @@ class FitnessTemporalGraph extends AbstractGraph {
 				continue;
 			}
 			xTick = x0 + i * dx;
-			if (Util.isEqual(minFitness, maxFitness, 0.000001)) {
+			if (Util.isEqual(minObjective, maxObjective, 0.000001)) {
 				yTick = xAxisY - graphWindowHeight * 0.5;
 			} else {
-				yTick = xAxisY - (individuals[i].getFitness() - minFitness) / (maxFitness - minFitness) * graphWindowHeight;
+				yTick = xAxisY - (individuals[i].getFitness() - minObjective) / (maxObjective - minObjective) * graphWindowHeight;
 			}
 			final Ellipse2D circle = new Ellipse2D.Double(xTick - 4, yTick - 4, 8, 8);
 			g2.setColor(dark ? Color.GRAY : Color.WHITE);

@@ -462,7 +462,7 @@ public abstract class Optimizer {
 					data[i][1] = EnergyPanel.FIVE_DECIMALS.format(initialGene[i]);
 					data[i][2] = EnergyPanel.FIVE_DECIMALS.format(finalGene[i]);
 				}
-				data[n][0] = "Fitness";
+				data[n][0] = "Objective";
 				data[n][1] = EnergyPanel.FIVE_DECIMALS.format(initialFitness);
 				data[n][2] = EnergyPanel.FIVE_DECIMALS.format(finalFitness);
 				final JTable table = new JTable(data, header);
@@ -472,6 +472,7 @@ public abstract class Optimizer {
 				final Dimension size = new Dimension(360, 200);
 				scrollPane.setPreferredSize(size);
 				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				table.getColumnModel().getColumn(0).setPreferredWidth(180);
 				ui.add(scrollPane, BorderLayout.CENTER);
 
 				tabbedPane.setFont(new Font(null, Font.PLAIN, 8));
@@ -485,10 +486,10 @@ public abstract class Optimizer {
 					tabbedPane.addTab(geneNames[i], geneGraph);
 				}
 
-				final FitnessTemporalGraph fitnessGraph = new FitnessTemporalGraph(getFittestOfGenerations());
-				fitnessGraph.setBackground(Color.WHITE);
-				fitnessGraph.setPreferredSize(size);
-				tabbedPane.addTab("Fitness", fitnessGraph);
+				final ObjectiveTemporalGraph objectiveGraph = new ObjectiveTemporalGraph(getFittestOfGenerations());
+				objectiveGraph.setBackground(Color.WHITE);
+				objectiveGraph.setPreferredSize(size);
+				tabbedPane.addTab("Objective", objectiveGraph);
 
 				final Object[] options = new Object[] { "Close", "More" };
 				final JOptionPane optionPane = new JOptionPane(ui, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);

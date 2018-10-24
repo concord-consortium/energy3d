@@ -11,7 +11,7 @@ public abstract class OptimizerMaker {
 	int selectedSearchMethod = Optimizer.GLOBAL_SEARCH_UNIFORM_SELECTION;
 	double localSearchRadius = 0.1;
 	double sharingRadius = 0.1;
-	int selectedFitnessFunction = 0;
+	int selectedObjectiveFunction = 0;
 	int selectedSelectionMethod = 0;
 	int populationSize = 20;
 	int maximumGenerations = 5;

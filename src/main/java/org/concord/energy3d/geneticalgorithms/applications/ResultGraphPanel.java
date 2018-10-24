@@ -95,13 +95,13 @@ public class ResultGraphPanel extends JPanel {
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton button = new JButton("Fitness");
+		JButton button = new JButton("Objective");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				if (op != null) {
 					if (op.getFittestOfGenerations() != null) {
-						new FitnessTemporalGraph(op.getFittestOfGenerations()).display("Fitness Trend");
+						new ObjectiveTemporalGraph(op.getFittestOfGenerations()).display("Objective Trend");
 					}
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No result is available.", "Information", JOptionPane.INFORMATION_MESSAGE);

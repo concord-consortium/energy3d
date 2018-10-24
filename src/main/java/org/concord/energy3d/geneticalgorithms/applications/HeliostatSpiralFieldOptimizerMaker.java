@@ -50,10 +50,10 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Total Output", "Annual Total Output", "Daily Average Output", "Annual Average Output", "Daily Profit", "Annual Profit" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Electricity price:"));
@@ -200,7 +200,7 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 					} else if (minimumDivergenceAngle >= maximumDivergenceAngle) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Maximum divergence angle must be greater than minimum divergence angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new HeliostatSpiralFieldOptimizer(populationSize, 4, 0);
 						final HeliostatSpiralFieldOptimizer op1 = (HeliostatSpiralFieldOptimizer) op;
@@ -218,7 +218,7 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 						op.setMutationRate(mutationRate);
 						op1.setDailyCostPerApertureSquareMeter(dailyCostPerApertureSquareMeter);
 						op1.setPricePerKWh(pricePerKWh);
-						switch (selectedFitnessFunction) {
+						switch (selectedObjectiveFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							break;

@@ -45,10 +45,10 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Minimum X:"));
@@ -190,7 +190,7 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new BuildingLocationOptimizer(populationSize, 2, 30);
 						op.setSelectionMethod(selectedSelectionMethod);
@@ -204,7 +204,7 @@ public class BuildingLocationOptimizerMaker extends OptimizerMaker {
 						op.setSearchMethod(selectedSearchMethod);
 						op.setLocalSearchRadius(localSearchRadius);
 						op.setFoundation(foundation);
-						op.setOjectiveFunction(selectedFitnessFunction);
+						op.setOjectiveFunction(selectedObjectiveFunction);
 						op.evolve();
 						if (choice == options[0]) {
 							break;

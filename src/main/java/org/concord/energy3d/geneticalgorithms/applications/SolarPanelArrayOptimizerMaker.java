@@ -28,7 +28,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	private double pricePerKWh = 0.225;
 	private double dailyCostPerPanel = 0.15;
 	private int minimumPanelRows = 1;
-	private int maximumPanelRows = 8;
+	private int maximumPanelRows = 6;
 
 	@Override
 	public void make(final Foundation foundation) {
@@ -45,10 +45,10 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Daily Output per Solar Panel", "Annual Output per Solar Panel", "Daily Profit", "Annual Profit" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Total Daily Output", "Total Annual Output", "Daily Output per Solar Panel", "Annual Output per Solar Panel", "Daily Profit", "Annual Profit" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Electricity price:"));
@@ -61,12 +61,12 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 		panel.add(dailyCostField);
 		panel.add(new JLabel("<html><font size=2>$ per day</font></html>"));
 
-		panel.add(new JLabel("Minimum rows of solar panels on a rack:"));
+		panel.add(new JLabel("Minimum solar panel rows per rack:"));
 		final JTextField minimumPanelRowsField = new JTextField(minimumPanelRows + "");
 		panel.add(minimumPanelRowsField);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Maximum rows of solar panels on a rack:"));
+		panel.add(new JLabel("Maximum solar panel rows per rack:"));
 		final JTextField maximumPanelRowsField = new JTextField(maximumPanelRows + "");
 		panel.add(maximumPanelRowsField);
 		panel.add(new JLabel());
@@ -187,12 +187,12 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mutation rate must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					} else if (minimumPanelRows < 1 || maximumPanelRows < 1 || maximumPanelRows <= minimumPanelRows || maximumPanelRows > 8 || minimumPanelRows > 4) {
+					} else if (minimumPanelRows < 1 || maximumPanelRows < 1 || maximumPanelRows <= minimumPanelRows || maximumPanelRows > Rack.MAXIMUM_SOLAR_PANEL_ROWS || minimumPanelRows > 4) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problems in minimum or maximum rows of solar panels on a rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new SolarPanelArrayOptimizer(populationSize, 3, 0);
 						final SolarPanelArrayOptimizer op1 = (SolarPanelArrayOptimizer) op;
@@ -204,7 +204,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 						op1.setDailyCostPerSolarPanel(dailyCostPerPanel);
 						op1.setMinimumPanelRows(minimumPanelRows);
 						op1.setMaximumPanelRows(maximumPanelRows);
-						switch (selectedFitnessFunction) {
+						switch (selectedObjectiveFunction) {
 						case 0:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							break;

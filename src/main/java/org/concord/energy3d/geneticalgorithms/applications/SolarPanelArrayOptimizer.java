@@ -46,7 +46,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		super(populationSize, chromosomeLength, discretizationSteps);
 		setGeneName(0, "Inter-Row Spacing");
 		setGeneName(1, "Tilt Angle");
-		setGeneName(2, "Panel Rows per Rack");
+		setGeneName(2, "Solar Panel Rows per Rack");
 	}
 
 	@Override

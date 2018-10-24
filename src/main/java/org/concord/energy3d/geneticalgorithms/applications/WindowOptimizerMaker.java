@@ -42,10 +42,10 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 		panel.add(new JLabel("Solution:"));
 		final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[] { "Window Sizes" });
 		panel.add(solutionComboBox);
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Energy Use", "Annual Energy Use" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel("Minimum width (relative to wall width):"));
 		final JTextField minimumWidthField = new JTextField(EnergyPanel.TWO_DECIMALS.format(minimumWidthRelative));
 		panel.add(minimumWidthField);
@@ -121,7 +121,7 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 					} else if (convergenceThreshold < 0 || convergenceThreshold > 0.1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Convergence threshold must be between 0 and 0.1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						optimizeIndividualWindows = optimizeIndividualWindowsComboBox.getSelectedIndex() == 1;
 						int chromesomeLength;
@@ -148,7 +148,7 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
 						op.setFoundation(foundation);
-						op.setOjectiveFunction(selectedFitnessFunction);
+						op.setOjectiveFunction(selectedObjectiveFunction);
 						op.evolve();
 						if (choice == options[0]) {
 							break;

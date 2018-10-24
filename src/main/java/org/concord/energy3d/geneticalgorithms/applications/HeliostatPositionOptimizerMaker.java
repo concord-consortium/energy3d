@@ -39,10 +39,10 @@ public class HeliostatPositionOptimizerMaker extends OptimizerMaker {
 		panel.add(solutionComboBox);
 		panel.add(new JLabel());
 
-		panel.add(new JLabel("Fitness function:"));
-		final JComboBox<String> fitnessComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
-		fitnessComboBox.setSelectedIndex(selectedFitnessFunction);
-		panel.add(fitnessComboBox);
+		panel.add(new JLabel("Objective:"));
+		final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[] { "Daily Output", "Annual Output" });
+		objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
+		panel.add(objectiveComboBox);
 		panel.add(new JLabel());
 
 		panel.add(new JLabel("Chromosome type:"));
@@ -160,14 +160,14 @@ public class HeliostatPositionOptimizerMaker extends OptimizerMaker {
 					} else if (localSearchRadius < 0 || localSearchRadius > 1) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Local search radius must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						selectedFitnessFunction = fitnessComboBox.getSelectedIndex();
+						selectedObjectiveFunction = objectiveComboBox.getSelectedIndex();
 						selectedSelectionMethod = selectionComboBox.getSelectedIndex();
 						op = new HeliostatPositionOptimizer(populationSize, foundation.getHeliostats().size() * 2, 0);
 						op.setSelectionMethod(selectedSelectionMethod);
 						op.setConvergenceThreshold(convergenceThreshold);
 						op.setMaximumGenerations(maximumGenerations);
 						op.setMutationRate(mutationRate);
-						op.setOjectiveFunction(selectedFitnessFunction);
+						op.setOjectiveFunction(selectedObjectiveFunction);
 						op.setSearchMethod(selectedSearchMethod);
 						op.setLocalSearchRadius(localSearchRadius);
 						op.setFoundation(foundation);
