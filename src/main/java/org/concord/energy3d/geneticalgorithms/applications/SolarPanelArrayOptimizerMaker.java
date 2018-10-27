@@ -244,7 +244,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	}
 
 	@Override
-	public void run(final Foundation foundation, final boolean local, final int population, final int generations, final float mutation) {
+	public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation) {
 		op = new SolarPanelArrayOptimizer(population > 0 ? population : populationSize, 3, 0);
 		final SolarPanelArrayOptimizer op1 = (SolarPanelArrayOptimizer) op;
 		op.setSelectionMethod(selectedSelectionMethod);
@@ -255,8 +255,8 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 		op1.setDailyCostPerSolarPanel(dailyCostPerPanel);
 		op1.setMinimumPanelRows(minimumPanelRows);
 		op1.setMaximumPanelRows(maximumPanelRows);
-		op.setOjectiveFunction(ObjectiveFunction.DAILY);
-		op1.setNetProfit(true);
+		op.setOjectiveFunction(daily ? ObjectiveFunction.DAILY : ObjectiveFunction.ANNUAl);
+		op1.setNetProfit(profit);
 		op.setSearchMethod(local ? Optimizer.LOCAL_SEARCH_RANDOM_OPTIMIZATION : Optimizer.GLOBAL_SEARCH_UNIFORM_SELECTION);
 		op.setLocalSearchRadius(0.05);
 		op.setFoundation(foundation);

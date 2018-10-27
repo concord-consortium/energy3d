@@ -209,6 +209,16 @@ public final class TaskFactory {
 				local = true;
 				s = s.substring("local".length()).trim();
 			}
+			boolean daily = false;
+			if (s.startsWith("daily")) {
+				daily = true;
+				s = s.substring("daily".length()).trim();
+			}
+			boolean profit = false;
+			if (s.startsWith("profit")) {
+				profit = true;
+				s = s.substring("profit".length()).trim();
+			}
 			try {
 				final String[] t = s.split("\\s+");
 				final int foundationID = Integer.parseInt(t[0]);
@@ -227,7 +237,7 @@ public final class TaskFactory {
 				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelTiltAngleOptimizer.runIt((Foundation) p, local, population, generations, mutation);
+						SolarPanelTiltAngleOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation);
 					} else {
 						SolarPanelTiltAngleOptimizer.make((Foundation) p);
 					}
@@ -255,6 +265,16 @@ public final class TaskFactory {
 				local = true;
 				s = s.substring("local".length()).trim();
 			}
+			boolean daily = false;
+			if (s.startsWith("daily")) {
+				daily = true;
+				s = s.substring("daily".length()).trim();
+			}
+			boolean profit = false;
+			if (s.startsWith("profit")) {
+				profit = true;
+				s = s.substring("profit".length()).trim();
+			}
 			try {
 				final String[] t = s.split("\\s+");
 				final int foundationID = Integer.parseInt(t[0]);
@@ -273,7 +293,7 @@ public final class TaskFactory {
 				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelArrayOptimizer.runIt((Foundation) p, local, population, generations, mutation);
+						SolarPanelArrayOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation);
 					} else {
 						SolarPanelArrayOptimizer.make((Foundation) p);
 					}

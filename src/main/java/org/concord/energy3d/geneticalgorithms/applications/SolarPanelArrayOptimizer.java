@@ -308,11 +308,11 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 	}
 
-	public static void runIt(final Foundation foundation, final boolean local, final int population, final int generations, final float mutation) {
+	public static void runIt(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation) {
 		if (maker == null) {
 			maker = new SolarPanelArrayOptimizerMaker();
 		}
-		maker.run(foundation, local, population, generations, mutation);
+		maker.run(foundation, local, daily, profit, population, generations, mutation);
 	}
 
 }

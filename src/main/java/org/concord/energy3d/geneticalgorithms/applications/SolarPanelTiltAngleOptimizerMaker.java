@@ -184,7 +184,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 	}
 
 	@Override
-	public void run(final Foundation foundation, final boolean local, final int population, final int generations, final float mutation) {
+	public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation) {
 		op = new SolarPanelTiltAngleOptimizer(population > 0 ? population : populationSize, foundation.getRacks().size(), 0);
 		op.setSelectionMethod(selectedSelectionMethod);
 		op.setConvergenceThreshold(convergenceThreshold);
