@@ -255,9 +255,4 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 
 	}
 
-	@Override
-	public void run(final Foundation foundation) {
-
-	}
-
 }

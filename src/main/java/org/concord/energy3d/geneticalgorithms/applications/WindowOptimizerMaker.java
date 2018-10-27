@@ -160,9 +160,4 @@ public class WindowOptimizerMaker extends OptimizerMaker {
 
 	}
 
-	@Override
-	public void run(final Foundation foundation) {
-
-	}
-
 }

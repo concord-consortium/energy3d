@@ -3089,7 +3089,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void saveFile(final boolean outsideTaskManager) {
+	public void saveFile(final boolean outsideTaskManager) {
 		final File file = FileChooser.getInstance().showDialog(".ng3", FileChooser.ng3Filter, true);
 		if (file == null) {
 			return;

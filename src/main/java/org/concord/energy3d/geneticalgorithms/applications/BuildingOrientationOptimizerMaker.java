@@ -200,9 +200,4 @@ public class BuildingOrientationOptimizerMaker extends OptimizerMaker {
 
 	}
 
-	@Override
-	public void run(final Foundation foundation) {
-
-	}
-
 }

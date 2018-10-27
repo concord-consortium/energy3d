@@ -342,6 +342,10 @@ public class MyEditorPane {
 			}
 		}
 
+		else if ("Save".equals(act)) {
+			MainFrame.getInstance().saveFile(false);
+		}
+
 		else if (act.startsWith("Event Miner") || act.startsWith("Conformance Checker")) {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {

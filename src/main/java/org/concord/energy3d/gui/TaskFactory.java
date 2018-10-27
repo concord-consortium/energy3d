@@ -204,12 +204,30 @@ public final class TaskFactory {
 				silent = true;
 				s = s.substring("silent".length()).trim();
 			}
+			boolean local = false;
+			if (s.startsWith("local")) {
+				local = true;
+				s = s.substring("local".length()).trim();
+			}
 			try {
-				final int i = Integer.parseInt(s);
-				final HousePart p = Scene.getInstance().getPart(i);
+				final String[] t = s.split("\\s+");
+				final int foundationID = Integer.parseInt(t[0]);
+				int population = -1;
+				int generations = -1;
+				float mutation = -1;
+				if (t.length > 1) {
+					population = Integer.parseInt(t[1]);
+				}
+				if (t.length > 2) {
+					generations = Integer.parseInt(t[2]);
+				}
+				if (t.length > 3) {
+					mutation = Float.parseFloat(t[3]);
+				}
+				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelTiltAngleOptimizer.runIt((Foundation) p);
+						SolarPanelTiltAngleOptimizer.runIt((Foundation) p, local, population, generations, mutation);
 					} else {
 						SolarPanelTiltAngleOptimizer.make((Foundation) p);
 					}
@@ -232,12 +250,30 @@ public final class TaskFactory {
 				silent = true;
 				s = s.substring("silent".length()).trim();
 			}
+			boolean local = false;
+			if (s.startsWith("local")) {
+				local = true;
+				s = s.substring("local".length()).trim();
+			}
 			try {
-				final int i = Integer.parseInt(s);
-				final HousePart p = Scene.getInstance().getPart(i);
+				final String[] t = s.split("\\s+");
+				final int foundationID = Integer.parseInt(t[0]);
+				int population = -1;
+				int generations = -1;
+				float mutation = -1;
+				if (t.length > 1) {
+					population = Integer.parseInt(t[1]);
+				}
+				if (t.length > 2) {
+					generations = Integer.parseInt(t[2]);
+				}
+				if (t.length > 3) {
+					mutation = Float.parseFloat(t[3]);
+				}
+				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelArrayOptimizer.runIt((Foundation) p);
+						SolarPanelArrayOptimizer.runIt((Foundation) p, local, population, generations, mutation);
 					} else {
 						SolarPanelArrayOptimizer.make((Foundation) p);
 					}

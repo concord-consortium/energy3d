@@ -184,9 +184,4 @@ public class HeliostatPositionOptimizerMaker extends OptimizerMaker {
 
 	}
 
-	@Override
-	public void run(final Foundation foundation) {
-
-	}
-
 }

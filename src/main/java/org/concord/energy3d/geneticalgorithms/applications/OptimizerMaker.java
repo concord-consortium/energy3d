@@ -27,6 +27,8 @@ public abstract class OptimizerMaker {
 		}
 	}
 
-	public abstract void run(Foundation foundation);
+	public void run(final Foundation foundation, final boolean local, final int population, final int generations, final float mutation) {
+		// stub
+	}
 
 }
