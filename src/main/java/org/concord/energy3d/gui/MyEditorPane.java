@@ -342,6 +342,10 @@ public class MyEditorPane {
 			}
 		}
 
+		else if ("Reopen".equals(act)) {
+			MainFrame.getInstance().reopen();
+		}
+
 		else if ("Save".equals(act)) {
 			MainFrame.getInstance().saveFile(false);
 		}

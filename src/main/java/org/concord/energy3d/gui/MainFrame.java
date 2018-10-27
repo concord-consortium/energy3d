@@ -708,6 +708,39 @@ public class MainFrame extends JFrame {
 		topViewCheckBoxMenuItem.setSelected(false);
 	}
 
+	public void reopen() {
+		if (Scene.getInstance().isEdited()) {
+			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save as", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if (save == JOptionPane.YES_OPTION) {
+				saveFile(false);
+				if (!Scene.getInstance().isEdited()) {
+					reload();
+				}
+			} else if (save != JOptionPane.CANCEL_OPTION) {
+				reload();
+			}
+		} else {
+			reload();
+		}
+	}
+
+	private void reload() {
+		final URL url = Scene.getURL();
+		if (url != null) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
+					try {
+						Scene.open(url);
+					} catch (final Exception e) {
+						BugReporter.report(e, "Error in reopening " + url);
+					}
+					return null;
+				}
+			});
+		}
+	}
+
 	private JMenuItem getRecoveryMenuItem() {
 		if (recoveryMenuItem == null) {
 			recoveryMenuItem = new JMenuItem("Recover from Latest Snapshot...");
