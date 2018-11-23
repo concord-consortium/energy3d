@@ -160,6 +160,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem openMenuItem;
 	private JMenuItem recoveryMenuItem;
 	private JMenuItem listLoggedSnapshotsMenuItem;
+	private JMenuItem clearLogMenuItem;
 	private JMenuItem replayFolderMenuItem;
 	private JMenuItem replayLastFolderMenuItem;
 	private JMenu replayControlsMenu;
@@ -814,6 +815,43 @@ public class MainFrame extends JFrame {
 		return listLoggedSnapshotsMenuItem;
 	}
 
+	private JMenuItem getClearLogMenuItem() {
+		if (clearLogMenuItem == null) {
+			clearLogMenuItem = new JMenuItem("Clear Log...");
+			clearLogMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final File logFolder = SnapshotLogger.getLogFolder();
+					if (!logFolder.exists()) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Nothing has been logged.", "No log", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to clear the log?", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+						return;
+					}
+					final File[] files = logFolder.listFiles();
+					new SwingWorker<Object, Void>() {
+
+						@Override
+						protected Object doInBackground() {
+							for (final File f : files) {
+								f.delete();
+							}
+							return null;
+						}
+
+						@Override
+						protected void done() {
+							JOptionPane.showMessageDialog(MainFrame.this, files.length + " files were deleted.", "Deletion completed", JOptionPane.INFORMATION_MESSAGE);
+						}
+
+					}.execute();
+				}
+			});
+		}
+		return clearLogMenuItem;
+	}
+
 	private JMenuItem getPreferencesMenuItem() {
 		if (preferencesMenuItem == null) {
 			preferencesMenuItem = new JMenuItem("System Information & Preferences...");
@@ -1203,6 +1241,7 @@ public class MainFrame extends JFrame {
 			helpMenu.add(getSortIdMenuItem());
 			helpMenu.add(getRecoveryMenuItem());
 			helpMenu.add(getListLoggedSnapshotsMenuItem());
+			helpMenu.add(getClearLogMenuItem());
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
 			helpMenu.add(miUpdate);
