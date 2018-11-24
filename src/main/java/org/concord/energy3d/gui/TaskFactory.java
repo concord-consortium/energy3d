@@ -309,16 +309,26 @@ public final class TaskFactory {
 	public static void solarPanelArrayLayoutManager(final String options) {
 		final String s = options.substring("Solar Panel Array Layout Manager".length()).trim();
 		try {
-			final int i = Integer.parseInt(s);
-			final HousePart p = Scene.getInstance().getPart(i);
-			if (p instanceof Foundation) {
-				SceneManager.getInstance().setSelectedPart(p);
-				new PopupMenuForFoundation.SolarPanelArrayLayoutManager().open();
-			} else {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + options + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+			final String[] t = s.split("\\s+");
+			int foundationIndex = -1;
+			int operationType = 0;
+			if (t.length > 0) {
+				foundationIndex = Integer.parseInt(t[0]);
+			}
+			if (t.length > 1) {
+				operationType = Integer.parseInt(t[1]);
+			}
+			if (foundationIndex >= 0) {
+				final HousePart p = Scene.getInstance().getPart(foundationIndex);
+				if (p instanceof Foundation) {
+					SceneManager.getInstance().setSelectedPart(p);
+					new PopupMenuForFoundation.SolarPanelArrayLayoutManager().open(operationType);
+				} else {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + options + "</i>.<br>Please select the ID of the solar array foundation manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		} catch (final Exception e) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + options + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + options + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

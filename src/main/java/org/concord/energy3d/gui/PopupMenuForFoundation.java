@@ -174,7 +174,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			updateAfterEdit();
 		}
 
-		void open() {
+		void open(final int operationType) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Foundation) {
 				foundation = (Foundation) selectedPart;
@@ -217,6 +217,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				final JPanel panel = new JPanel(new SpringLayout());
 
+				int rowCount = 0;
+
 				final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
 				final String[] models = new String[modules.size() + 1];
 				int j = 0;
@@ -224,107 +226,127 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				for (final String key : modules.keySet()) {
 					models[++j] = key;
 				}
-				panel.add(new JLabel("Solar Panel Model:"));
 				modelComboBox = new JComboBox<String>(models);
-				modelComboBox.setSelectedItem(solarPanelModel);
-				modelComboBox.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(final ItemEvent e) {
-						if (e.getStateChange() == ItemEvent.SELECTED) {
-							final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
-							enableSettings(isCustom);
-							if (!isCustom) {
-								final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
-								cellTypeComboBox.setSelectedItem(specs.getCellType());
-								shadeToleranceComboBox.setSelectedItem(specs.getShadeTolerance());
-								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
-								noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
-								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
-								sizeComboBox.setSelectedItem(s);
-								colorOptionComboBox.setSelectedItem(specs.getColor());
+				cellTypeComboBox = new JComboBox<String>(new String[] { "Polycrystalline", "Monocrystalline", "Thin Film" });
+				colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
+				sizeComboBox = new JComboBox<String>(solarPanelNominalSize.getStrings());
+				cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarCellEfficiencyPercentage));
+				noctField = new JTextField(threeDecimalsFormat.format(solarPanelNominalOperatingCellTemperature));
+				pmaxTcField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
+				shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
+				final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(inverterEfficiencyPercentage));
+
+				if (operationType != 1) {
+
+					panel.add(new JLabel("Solar Panel Model:"));
+					modelComboBox.setSelectedItem(solarPanelModel);
+					modelComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							if (e.getStateChange() == ItemEvent.SELECTED) {
+								final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
+								enableSettings(isCustom);
+								if (!isCustom) {
+									final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
+									cellTypeComboBox.setSelectedItem(specs.getCellType());
+									shadeToleranceComboBox.setSelectedItem(specs.getShadeTolerance());
+									cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
+									noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
+									pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
+									final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
+									sizeComboBox.setSelectedItem(s);
+									colorOptionComboBox.setSelectedItem(specs.getColor());
+								}
 							}
 						}
+					});
+					panel.add(modelComboBox);
+					rowCount++;
+
+					panel.add(new JLabel("Solar Panel Cell Type:"));
+					cellTypeComboBox.setSelectedIndex(solarPanelCellType);
+					panel.add(cellTypeComboBox);
+					rowCount++;
+
+					panel.add(new JLabel("Solar Panel Color:"));
+					colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
+					panel.add(colorOptionComboBox);
+					rowCount++;
+
+					panel.add(new JLabel("Solar Panel Size:"));
+					final int nItems = sizeComboBox.getItemCount();
+					for (int i = 0; i < nItems; i++) {
+						if (Util.isZero(solarPanelHeight - solarPanelNominalSize.getNominalHeights()[i]) && Util.isZero(solarPanelWidth - solarPanelNominalSize.getNominalWidths()[i])) {
+							sizeComboBox.setSelectedIndex(i);
+						}
 					}
-				});
-				panel.add(modelComboBox);
+					panel.add(sizeComboBox);
+					rowCount++;
 
-				panel.add(new JLabel("Solar Panel Cell Type:"));
-				cellTypeComboBox = new JComboBox<String>(new String[] { "Polycrystalline", "Monocrystalline", "Thin Film" });
-				cellTypeComboBox.setSelectedIndex(solarPanelCellType);
-				panel.add(cellTypeComboBox);
+					panel.add(new JLabel("Solar Cell Efficiency (%):"));
+					panel.add(cellEfficiencyField);
+					rowCount++;
 
-				panel.add(new JLabel("Solar Panel Color:"));
-				colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
-				colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
-				panel.add(colorOptionComboBox);
+					panel.add(new JLabel("<html>Nominal Operating Cell Temperature (&deg;C):"));
+					panel.add(noctField);
+					rowCount++;
 
-				panel.add(new JLabel("Solar Panel Size:"));
-				sizeComboBox = new JComboBox<String>(solarPanelNominalSize.getStrings());
-				final int nItems = sizeComboBox.getItemCount();
-				for (int i = 0; i < nItems; i++) {
-					if (Util.isZero(solarPanelHeight - solarPanelNominalSize.getNominalHeights()[i]) && Util.isZero(solarPanelWidth - solarPanelNominalSize.getNominalWidths()[i])) {
-						sizeComboBox.setSelectedIndex(i);
-					}
+					panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
+					panel.add(pmaxTcField);
+					rowCount++;
+
+					panel.add(new JLabel("Shade Tolerance:"));
+					shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
+					panel.add(shadeToleranceComboBox);
+					rowCount++;
+
+					panel.add(new JLabel("Inverter Efficiency (%):"));
+					panel.add(inverterEfficiencyField);
+					rowCount++;
+
 				}
-				panel.add(sizeComboBox);
-
-				panel.add(new JLabel("Solar Cell Efficiency (%):"));
-				cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarCellEfficiencyPercentage));
-				panel.add(cellEfficiencyField);
-
-				panel.add(new JLabel("<html>Nominal Operating Cell Temperature (&deg;C):"));
-				noctField = new JTextField(threeDecimalsFormat.format(solarPanelNominalOperatingCellTemperature));
-				panel.add(noctField);
-
-				panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
-				pmaxTcField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
-				panel.add(pmaxTcField);
-
-				panel.add(new JLabel("Shade Tolerance:"));
-				shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
-				shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
-				panel.add(shadeToleranceComboBox);
-
-				panel.add(new JLabel("Inverter Efficiency (%):"));
-				final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(inverterEfficiencyPercentage));
-				panel.add(inverterEfficiencyField);
 
 				panel.add(new JLabel("Tile Angle (\u00B0):"));
-				final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
+				final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle), 10);
 				panel.add(tiltAngleField);
+				rowCount++;
 
 				panel.add(new JLabel("Solar Panel Rows Per Rack:"));
 				final JTextField rowsPerRackField = new JTextField(threeDecimalsFormat.format(solarPanelRowsPerRack));
 				panel.add(rowsPerRackField);
-
-				panel.add(new JLabel("Solar Panel Orientation:"));
-				orientationComboBox = new JComboBox<String>(new String[] { "Landscape", "Portrait" });
-				orientationComboBox.setSelectedIndex(solarPanelOrientation);
-				panel.add(orientationComboBox);
-
-				panel.add(new JLabel("Row Axis:"));
-				rowAxisComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
-				rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
-				panel.add(rowAxisComboBox);
+				rowCount++;
 
 				panel.add(new JLabel("Inter-Row Spacing (Center-to-Center, m):"));
 				final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
 				panel.add(interrowSpacingField);
+				rowCount++;
 
-				panel.add(new JLabel("Pole Spacing X (m):"));
+				orientationComboBox = new JComboBox<String>(new String[] { "Landscape", "Portrait" });
+				rowAxisComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
 				final JTextField poleSpacingXField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingX));
-				panel.add(poleSpacingXField);
-
-				panel.add(new JLabel("Pole Spacing Y (m):"));
 				final JTextField poleSpacingYField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingY));
-				panel.add(poleSpacingYField);
-
-				panel.add(new JLabel("Base Height (m):"));
 				final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackBaseHeight));
-				panel.add(baseHeightField);
+				if (operationType != 1) {
+					panel.add(new JLabel("Solar Panel Orientation:"));
+					orientationComboBox.setSelectedIndex(solarPanelOrientation);
+					panel.add(orientationComboBox);
+					rowCount++;
+					panel.add(new JLabel("Row Axis:"));
+					rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
+					panel.add(rowAxisComboBox);
+					rowCount++;
+					panel.add(new JLabel("Pole Spacing X (m):"));
+					panel.add(poleSpacingXField);
+					rowCount++;
+					panel.add(new JLabel("Pole Spacing Y (m):"));
+					panel.add(poleSpacingYField);
+					rowCount++;
+					panel.add(new JLabel("Base Height (m):"));
+					panel.add(baseHeightField);
+					rowCount++;
+				}
 
-				SpringUtilities.makeCompactGrid(panel, 17, 2, 6, 6, 6, 6);
+				SpringUtilities.makeCompactGrid(panel, rowCount, 2, 6, 6, 6, 6);
 
 				enableSettings(modelComboBox.getSelectedIndex() == 0);
 
@@ -1197,7 +1219,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			miSolarRackArrays.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new SolarPanelArrayLayoutManager().open();
+					new SolarPanelArrayLayoutManager().open(0);
 				}
 			});
 
