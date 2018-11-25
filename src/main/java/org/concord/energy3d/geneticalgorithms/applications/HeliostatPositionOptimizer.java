@@ -161,7 +161,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 			case ObjectiveFunction.DAILY:
 				s = "Daily Output: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 				break;
-			case ObjectiveFunction.ANNUAl:
+			case ObjectiveFunction.ANNUAL:
 				s = "Annual Output: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
 				break;
 			}
@@ -182,7 +182,7 @@ public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 			case ObjectiveFunction.DAILY:
 				s = "Daily Output\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 				break;
-			case ObjectiveFunction.ANNUAl:
+			case ObjectiveFunction.ANNUAL:
 				s = "Annual Output\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
 				break;
 			}

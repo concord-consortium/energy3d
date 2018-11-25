@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.agents.EventUtil;
+import org.concord.energy3d.geneticalgorithms.applications.Optimizer;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
@@ -66,6 +67,7 @@ public class TimeSeriesLogger {
 	private final static int MINIMUM_INTERVAL = 200; // in milliseconds
 	private File file;
 	private Object analysisRequester;
+	private Object optimizationRequester;
 	private String action;
 	private String cameraPosition, cameraMode;
 	private PrintWriter writer;
@@ -1034,6 +1036,15 @@ public class TimeSeriesLogger {
 			}
 		}
 
+		// optimization requesters
+
+		if (optimizationRequester != null) {
+			line += ", \"" + optimizationRequester.getClass().getSimpleName() + "\": ";
+			if (optimizationRequester instanceof Optimizer) {
+				line += ((Optimizer) optimizationRequester).toJson();
+			}
+		}
+
 		if (firstRecord) {
 			firstRecord = false;
 		} else {
@@ -1077,6 +1088,17 @@ public class TimeSeriesLogger {
 			BugReporter.report(t);
 		} finally {
 			analysisRequester = null;
+		}
+	}
+
+	public void logOptimization(final Object x) {
+		optimizationRequester = x;
+		try {
+			record();
+		} catch (final Throwable t) {
+			BugReporter.report(t);
+		} finally {
+			optimizationRequester = null;
 		}
 	}
 

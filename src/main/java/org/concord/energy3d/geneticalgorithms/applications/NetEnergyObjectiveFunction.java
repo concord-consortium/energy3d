@@ -25,7 +25,7 @@ public class NetEnergyObjectiveFunction extends ObjectiveFunction {
 	public double compute() {
 		double result = 0;
 		switch (type) {
-		case ANNUAl:
+		case ANNUAL:
 			for (final int m : Analysis.MONTHS) {
 				final Calendar c = Heliodon.getInstance().getCalendar();
 				c.set(Calendar.MONTH, m);

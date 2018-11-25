@@ -288,7 +288,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		case ObjectiveFunction.DAILY:
 			s = "Daily Energy Use: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
 			break;
-		case ObjectiveFunction.ANNUAl:
+		case ObjectiveFunction.ANNUAL:
 			s = "Annual Energy Use: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
 			break;
 		}
@@ -306,7 +306,7 @@ public class WindowOptimizer extends NetEnergyOptimizer {
 		case ObjectiveFunction.DAILY:
 			s = "Daily Energy Use\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(-individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(-best.getFitness());
 			break;
-		case ObjectiveFunction.ANNUAl:
+		case ObjectiveFunction.ANNUAL:
 			s = "Annual Energy Use\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(-individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(-best.getFitness() * 365.0 / 12.0);
 			break;
 		}

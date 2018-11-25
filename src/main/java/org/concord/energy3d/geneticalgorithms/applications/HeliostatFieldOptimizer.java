@@ -92,7 +92,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 				}
 				s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 				break;
-			case ObjectiveFunction.ANNUAl:
+			case ObjectiveFunction.ANNUAL:
 				if (netProfit) {
 					s = "Annual Profit";
 				} else if (outputPerApertureSquareMeter) {
@@ -127,7 +127,7 @@ public abstract class HeliostatFieldOptimizer extends SolarOutputOptimizer {
 				}
 				s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 				break;
-			case ObjectiveFunction.ANNUAl:
+			case ObjectiveFunction.ANNUAL:
 				if (netProfit) {
 					s = "Annual Profit";
 				} else if (outputPerApertureSquareMeter) {

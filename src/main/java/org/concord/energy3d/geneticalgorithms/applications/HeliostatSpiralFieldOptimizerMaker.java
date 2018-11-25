@@ -223,14 +223,14 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							break;
 						case 1:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							break;
 						case 2:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 3:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							op1.setOutputPerApertureSquareMeter(true);
 							break;
 						case 4:
@@ -238,7 +238,7 @@ public class HeliostatSpiralFieldOptimizerMaker extends OptimizerMaker {
 							op1.setNetProfit(true);
 							break;
 						case 5:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							op1.setNetProfit(true);
 							break;
 						}

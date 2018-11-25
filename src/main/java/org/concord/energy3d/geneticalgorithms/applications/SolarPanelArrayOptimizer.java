@@ -175,7 +175,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		final int count = foundation.countSolarPanels();
 		if (netProfit) {
 			double cost = dailyCostPerSolarPanel;
-			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+			if (objectiveFunction.getType() == ObjectiveFunction.ANNUAL) {
 				cost *= 12;
 			}
 			individual.setFitness(output * pricePerKWh - cost * count);
@@ -228,7 +228,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			}
 			s += ": " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 			break;
-		case ObjectiveFunction.ANNUAl:
+		case ObjectiveFunction.ANNUAL:
 			if (netProfit) {
 				s = "Annual Profit";
 			} else if (outputPerSolarPanel) {
@@ -260,7 +260,7 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 			}
 			s += "\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
 			break;
-		case ObjectiveFunction.ANNUAl:
+		case ObjectiveFunction.ANNUAL:
 			if (netProfit) {
 				s = "Annual Profit";
 			} else if (outputPerSolarPanel) {
@@ -315,4 +315,15 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		maker.run(foundation, local, daily, profit, population, generations, mutation);
 	}
 
+	@Override
+	public String toJson() {
+		String json = super.toJson();
+		json = json.substring(0, json.length() - 1);
+		json += ", \"Profit\": " + netProfit;
+		json += ", \"Solar Panel Average\": " + outputPerSolarPanel;
+		json += ", \"Price per KWh\": " + pricePerKWh;
+		json += ", \"Daily Cost per Solar Panel\": " + dailyCostPerSolarPanel;
+		json += "}";
+		return json;
+	}
 }

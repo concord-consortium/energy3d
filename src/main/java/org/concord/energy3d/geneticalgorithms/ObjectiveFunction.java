@@ -7,7 +7,7 @@ package org.concord.energy3d.geneticalgorithms;
 public abstract class ObjectiveFunction {
 
 	public final static int DAILY = 0;
-	public final static int ANNUAl = 1;
+	public final static int ANNUAL = 1;
 
 	protected int type = DAILY;
 

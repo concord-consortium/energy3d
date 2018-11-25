@@ -27,6 +27,7 @@ import org.concord.energy3d.geneticalgorithms.RectangularBound;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -404,6 +405,7 @@ public abstract class Optimizer {
 		EnergyPanel.getInstance().disableDateSpinner(false);
 		SceneManager.setExecuteAllTask(true);
 		EnergyPanel.getInstance().cancel();
+		TimeSeriesLogger.getInstance().logOptimization(this);
 	}
 
 	void onStart() {
@@ -512,6 +514,50 @@ public abstract class Optimizer {
 			}
 		});
 
+	}
+
+	public String toJson() {
+		String json = "{";
+		json += "\"Generations\": " + maximumGenerations;
+		json += ", \"Population\": " + population.size();
+		json += ", \"Mutation Rate\": " + mutationRate;
+		switch (population.getSelectionMethod()) {
+		case Population.TOURNAMENT:
+			json += ", \"Selection Method\": \"Tournament\"";
+			break;
+		default:
+			json += ", \"Selection Method\": \"Roulette Wheel\"";
+		}
+		switch (searchMethod) {
+		case LOCAL_SEARCH_RANDOM_OPTIMIZATION:
+			json += ", \"Search Method\": \"Local Search Random Optimization\"";
+			break;
+		case GLOBAL_SEARCH_FITNESS_SHARING:
+			json += ", \"Search Method\": \"Global Search Fitness Sharing\"";
+			break;
+		default:
+			json += ", \"Search Method\": \"Global Search Uniform Selection\"";
+		}
+		json += ", \"Convergence Threshold:\": " + population.getConvergenceThreshold();
+		json += ", \"Parameters\": [";
+		final int n = population.getChromosomeLength();
+		for (int i = 0; i < n; i++) {
+			json += "{\"Name\": \"" + geneNames[i] + "\", \"Initial Value\": " + initialGene[i] + ", \"Final Value\": " + finalGene[i] + "}";
+			if (i < n - 1) {
+				json += ", ";
+			}
+		}
+		json += "]";
+		json += ", \"Initial Objective\": " + initialFitness + ", \"Final Objective\": " + finalFitness;
+		switch (objectiveFunction.getType()) {
+		case ObjectiveFunction.ANNUAL:
+			json += ", \"Time Period\": \"Annual\"";
+			break;
+		default:
+			json += ", \"Time Period\": \"Daily\"";
+		}
+		json += "}";
+		return json;
 	}
 
 }

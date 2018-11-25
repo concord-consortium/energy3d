@@ -209,14 +209,14 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							break;
 						case 1:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							break;
 						case 2:
 							op.setOjectiveFunction(ObjectiveFunction.DAILY);
 							op1.setOutputPerSolarPanel(true);
 							break;
 						case 3:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							op1.setOutputPerSolarPanel(true);
 							break;
 						case 4:
@@ -224,7 +224,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 							op1.setNetProfit(true);
 							break;
 						case 5:
-							op.setOjectiveFunction(ObjectiveFunction.ANNUAl);
+							op.setOjectiveFunction(ObjectiveFunction.ANNUAL);
 							op1.setNetProfit(true);
 							break;
 						}
@@ -255,7 +255,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 		op1.setDailyCostPerSolarPanel(dailyCostPerPanel);
 		op1.setMinimumPanelRows(minimumPanelRows);
 		op1.setMaximumPanelRows(maximumPanelRows);
-		op.setOjectiveFunction(daily ? ObjectiveFunction.DAILY : ObjectiveFunction.ANNUAl);
+		op.setOjectiveFunction(daily ? ObjectiveFunction.DAILY : ObjectiveFunction.ANNUAL);
 		op1.setNetProfit(profit);
 		op.setSearchMethod(local ? Optimizer.LOCAL_SEARCH_RANDOM_OPTIMIZATION : Optimizer.GLOBAL_SEARCH_UNIFORM_SELECTION);
 		op.setLocalSearchRadius(0.05);

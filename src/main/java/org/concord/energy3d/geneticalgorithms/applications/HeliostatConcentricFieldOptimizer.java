@@ -107,7 +107,7 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 			final double totalApertureArea = heliostats.size() * heliostat.getApertureWidth() * heliostat.getApertureHeight();
 			if (netProfit) {
 				double cost = dailyCostPerApertureSquareMeter;
-				if (objectiveFunction.getType() == ObjectiveFunction.ANNUAl) {
+				if (objectiveFunction.getType() == ObjectiveFunction.ANNUAL) {
 					cost *= 12;
 				}
 				individual.setFitness(output * pricePerKWh - cost * totalApertureArea);

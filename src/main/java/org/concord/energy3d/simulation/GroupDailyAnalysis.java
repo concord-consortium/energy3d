@@ -237,22 +237,22 @@ public class GroupDailyAnalysis extends DailyAnalysis {
 		final ArrayList<String> names = new ArrayList<String>();
 		for (final HousePart p : selectedParts) {
 			if (p instanceof SolarPanel) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Solar Panel";
 			} else if (p instanceof Rack) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Rack";
 			} else if (p instanceof Mirror) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Mirror";
 			} else if (p instanceof ParabolicTrough) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Parabolic Trough";
 			} else if (p instanceof ParabolicDish) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Parabolic Dish";
 			} else if (p instanceof FresnelReflector) {
-				names.add("Solar " + p.getId());
+				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 				type = "Fresnel Reflector";
 			} else if (p instanceof Wall) {
 				names.add("Heat Gain " + p.getId());
@@ -271,10 +271,10 @@ public class GroupDailyAnalysis extends DailyAnalysis {
 				final Foundation foundation = (Foundation) p;
 				switch (foundation.getProjectType()) {
 				case Foundation.TYPE_PV_PROJECT:
-					names.add("PV " + p.getId());
+					names.add("PV " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 					break;
 				case Foundation.TYPE_CSP_PROJECT:
-					names.add("CSP " + p.getId());
+					names.add("CSP " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
 					break;
 				case Foundation.TYPE_BUILDING:
 					names.add("Building " + p.getId());

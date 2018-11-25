@@ -826,7 +826,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Nothing has been logged.", "No log", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to clear the log?", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+					if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "<html>The logged data (json and ng3 files) will be permanently deleted.<br>Are you sure?</html>", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
 						return;
 					}
 					final File[] files = logFolder.listFiles();
