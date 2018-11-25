@@ -2305,14 +2305,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	// used by the layout manager
 	public int addHeliostats(final HeliostatConcentricFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
-		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		final List<HousePart> removed = removeChildrenOfClass(new Class[] { Mirror.class });
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
-		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
+		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		final double dp = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
@@ -2475,15 +2474,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	// used by the layout manager
 	public int addHeliostats(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
-		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		final List<HousePart> removed = removeChildrenOfClass(new Class[] { Mirror.class });
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 			removed.clear();
 		}
-		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
+		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
@@ -2590,14 +2588,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	// used by the layout manager
 	public int addHeliostats(final HeliostatRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-		final Class<?>[] clazz = new Class[] { Mirror.class };
 		Foundation receiver = null;
-		final List<HousePart> removed = removeChildrenOfClass(clazz);
+		final List<HousePart> removed = removeChildrenOfClass(new Class[] { Mirror.class });
 		if (!removed.isEmpty()) {
 			final Mirror oldMirror = (Mirror) removed.get(0);
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
-		final AddArrayCommand command = new AddArrayCommand(removed, this, clazz);
+		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);
@@ -2725,8 +2722,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, SolarPanel.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);
@@ -2817,8 +2813,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	// used by the layout manager
 	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, Rack.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);

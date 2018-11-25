@@ -178,7 +178,7 @@ public class TimeSeriesLogger {
 					final HousePart p = c.getParent();
 					if (p instanceof Foundation) {
 						final Foundation f = (Foundation) p;
-						stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getTypes()) + "}";
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType()) + "}";
 					} else if (p instanceof Rack) {
 						final Foundation f = p.getTopContainer();
 						stateValue = "{\"Foundation\": " + f.getId() + ", \"Rack\": " + p.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + p.getChildren().size() + "}";
@@ -1066,7 +1066,10 @@ public class TimeSeriesLogger {
 	}
 
 	private void logEventString() {
-		writer.write(",{\"Event String\":" + "\"" + EventUtil.eventsToString(null, 10000, null) + "\"}");
+		if (Scene.getURL() != null) {
+			writer.write(",");
+		}
+		writer.write("{\"Event String\":" + "\"" + EventUtil.eventsToString(null, 10000, null) + "\"}");
 	}
 
 	public void logAction() {
