@@ -1,13 +1,20 @@
 package org.concord.energy3d.undo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+
+/**
+ * @author Charles Xie
+ *
+ */
 
 public class AddArrayCommand extends MyAbstractUndoableEdit {
 
@@ -16,12 +23,22 @@ public class AddArrayCommand extends MyAbstractUndoableEdit {
 	private final List<HousePart> newArray;
 	private final HousePart parent;
 	private final Class<?> type;
+	private final Map<String, Double> parameters;
 
 	public AddArrayCommand(final List<HousePart> parts, final HousePart parent, final Class<?> type) {
 		oldArray = new ArrayList<HousePart>(parts);
 		newArray = new ArrayList<HousePart>();
 		this.parent = parent;
 		this.type = type;
+		parameters = new HashMap<String, Double>();
+	}
+
+	public void put(final String parameter, final double value) {
+		parameters.put(parameter, value);
+	}
+
+	public Map<String, Double> getParameters() {
+		return parameters;
 	}
 
 	public HousePart getParent() {

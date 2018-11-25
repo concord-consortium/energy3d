@@ -2312,6 +2312,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
+		command.put("Heliostat Aperture Width", layout.getApertureWidth());
+		command.put("Heliostat Aperture Height", layout.getApertureHeight());
+		command.put("Starting Field Angle", layout.getStartAngle());
+		command.put("Ending Field Angle", layout.getEndAngle());
+		command.put("Base Height", layout.getBaseHeight());
+		command.put("Radial Spacing", layout.getRadialSpacing());
+		command.put("Radial Expansion Ratio", layout.getRadialExpansionRatio());
+		command.put("Azimuthal Spacing", layout.getAzimuthalSpacing());
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		final double dp = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getScale();
@@ -2482,6 +2490,15 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			removed.clear();
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
+		command.put("Heliostat Aperture Width", layout.getApertureWidth());
+		command.put("Heliostat Aperture Height", layout.getApertureHeight());
+		command.put("Starting Field Angle", layout.getStartAngle());
+		command.put("Ending Field Angle", layout.getEndAngle());
+		command.put("Base Height", layout.getBaseHeight());
+		command.put("Starting Turn", layout.getStartTurn());
+		command.put("Scaling Factor", layout.getScalingFactor());
+		command.put("Radial Expansion Ration", layout.getRadialExpansionRatio());
+		command.put("Divergence Angle", layout.getDivergence());
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.hypot(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getScale();
 		final Vector3 center = getAbsCenter();
@@ -2595,6 +2612,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			receiver = oldMirror.getReceiver(); // here we assume that all the heliostats on this foundation point to the same receiver (this is not always the case as a heliostat can point to any receiver)
 		}
 		final AddArrayCommand command = new AddArrayCommand(removed, this, Mirror.class);
+		command.put("Heliostat Aperture Width", layout.getApertureWidth());
+		command.put("Heliostat Aperture Height", layout.getApertureHeight());
+		command.put("Starting Field Angle", layout.getStartAngle());
+		command.put("Ending Field Angle", layout.getEndAngle());
+		command.put("Base Height", layout.getBaseHeight());
+		command.put("Row Spacing", layout.getRowSpacing());
+		command.put("Column Spacing", layout.getColumnSpacing());
+		command.put("Row Axis", layout.getRowAxis());
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);
@@ -2723,6 +2748,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, SolarPanel.class);
+		command.put("Tilt Angtle", solarPanel.getTiltAngle());
+		command.put("Row Spacing", rowSpacing);
+		command.put("Column Spacing", colSpacing);
+		command.put("Row Axis", rowAxis);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);
@@ -2814,6 +2843,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, Rack.class);
+		command.put("Tilt Angle", tiltAngle);
+		command.put("Solar Panel Rows per Rack", panelRowsPerRack);
+		command.put("Inter-Row Spacing", rowSpacing);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null, false);

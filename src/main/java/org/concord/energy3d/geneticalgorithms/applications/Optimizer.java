@@ -387,6 +387,10 @@ public abstract class Optimizer {
 		stop = true;
 	}
 
+	public boolean wasStopped() {
+		return stop;
+	}
+
 	boolean shouldTerminate() {
 		return outsideGenerationCounter >= maximumGenerations;
 	}

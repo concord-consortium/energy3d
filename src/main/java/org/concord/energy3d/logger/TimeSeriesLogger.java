@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.undo.UndoableEdit;
 
@@ -178,7 +179,14 @@ public class TimeSeriesLogger {
 					final HousePart p = c.getParent();
 					if (p instanceof Foundation) {
 						final Foundation f = (Foundation) p;
-						stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType()) + "}";
+						final Map<String, Double> parameters = c.getParameters();
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType());
+						if (!parameters.isEmpty()) {
+							for (final String key : parameters.keySet()) {
+								stateValue += ", \"" + key + "\": " + parameters.get(key);
+							}
+						}
+						stateValue += "}";
 					} else if (p instanceof Rack) {
 						final Foundation f = p.getTopContainer();
 						stateValue = "{\"Foundation\": " + f.getId() + ", \"Rack\": " + p.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + p.getChildren().size() + "}";
@@ -1041,7 +1049,12 @@ public class TimeSeriesLogger {
 		if (optimizationRequester != null) {
 			line += ", \"" + optimizationRequester.getClass().getSimpleName() + "\": ";
 			if (optimizationRequester instanceof Optimizer) {
-				line += ((Optimizer) optimizationRequester).toJson();
+				final Optimizer optimizer = (Optimizer) optimizationRequester;
+				if (optimizer.wasStopped()) {
+					line += "\"Stopped\"";
+				} else {
+					line += optimizer.toJson();
+				}
 			}
 		}
 
