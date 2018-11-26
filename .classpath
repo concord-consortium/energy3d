@@ -32,15 +32,15 @@
 	<classpathentry kind="lib" path="exe/lib/samskivert.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-jogl-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-jogl-awt-sources.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-extras.jar" sourcepath="exe/lib/ardor3d/ardor3d-extras-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/cmu_time_awb.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/cmu_us_kal.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/cmudict04.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/cmulex.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/cmutimelex.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/en_us.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/freetts.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/freetts-jsapi10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/mbrola.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Charles Xie/git/energy3d/exe/lib/freetts/jsapi.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/cmu_time_awb.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/cmu_us_kal.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/cmudict04.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/cmulex.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/cmutimelex.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/en_us.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/freetts-jsapi10.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/freetts.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/jsapi.jar"/>
+	<classpathentry kind="lib" path="exe/lib/freetts/mbrola.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
