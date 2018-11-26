@@ -547,6 +547,10 @@ public class MyEditorPane {
 		return editorPane.getText();
 	}
 
+	public String getPureText() throws BadLocationException {
+		return editorPane.getDocument().getText(0, editorPane.getDocument().getLength());
+	}
+
 	public void setEditable(final boolean editable) {
 		editorPane.setEditable(editable);
 	}

@@ -8,11 +8,14 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -22,6 +25,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -33,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -55,11 +60,13 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.plaf.metal.MetalTabbedPaneUI;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 import org.concord.energy3d.MainApplication;
@@ -99,6 +106,7 @@ import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
+import org.concord.energy3d.speech.Talker;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
@@ -744,8 +752,56 @@ public class EnergyPanel extends JPanel {
 
 		// instruction panel
 
-		instructionPanel = new JPanel();
-		instructionPanel.setBorder(createTitledBorder("Instruction & Documentation", true));
+		instructionPanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText(final MouseEvent e) {
+				final Border border = getBorder();
+				if (border instanceof TitledBorder) {
+					final TitledBorder tb = (TitledBorder) border;
+					final FontMetrics fm = getFontMetrics(getFont());
+					final int titleWidth = fm.stringWidth(tb.getTitle()) + 20;
+					final Rectangle bounds = new Rectangle(0, 0, titleWidth, fm.getHeight());
+					return bounds.contains(e.getPoint()) ? super.getToolTipText() : null;
+				}
+				return super.getToolTipText(e);
+			}
+		};
+		instructionPanel.setToolTipText("Click here to listen");
+		instructionPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				final Border border = instructionPanel.getBorder();
+				if (border instanceof TitledBorder) {
+					final TitledBorder tb = (TitledBorder) border;
+					final FontMetrics fm = instructionPanel.getFontMetrics(instructionPanel.getFont());
+					final int titleWidth = fm.stringWidth(tb.getTitle()) + 20;
+					final Rectangle bounds = new Rectangle(0, 0, titleWidth, fm.getHeight());
+					if (bounds.contains(e.getPoint())) {
+						final int i = instructionTabbedPane.getSelectedIndex();
+						String text = null;
+						try {
+							text = instructionSheets[i].getPureText();
+						} catch (final BadLocationException ex) {
+							ex.printStackTrace();
+						}
+						if (text != null && !text.trim().equals("")) {
+							if (MainApplication.VERSION.compareTo("8.4.5") >= 0) {
+								Talker.say(text);
+							}
+						}
+					}
+				}
+			}
+		});
+		Image image = null;
+		try {
+			image = ImageIO.read(getClass().getResource("icons/speaker.png"));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		instructionPanel.setBorder(createImageTitledBorder("Instruction & Documentation", image, true));
 		instructionPanel.setLayout(new BoxLayout(instructionPanel, BoxLayout.Y_AXIS));
 		dataPanel.add(instructionPanel);
 
@@ -2114,6 +2170,12 @@ public class EnergyPanel extends JPanel {
 
 	static TitledBorder createTitledBorder(final String title, final boolean smaller) {
 		final TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
+		return b;
+	}
+
+	static ImageTitledBorder createImageTitledBorder(final String title, final Image image, final boolean smaller) {
+		final ImageTitledBorder b = new ImageTitledBorder(title, image);
 		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
 		return b;
 	}

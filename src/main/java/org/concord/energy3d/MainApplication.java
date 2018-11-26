@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "8.4.4";
+	public static final String VERSION = "8.4.5";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -175,7 +175,7 @@ public class MainApplication {
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
-		System.out.println("Initiatialization phase 2 done.");
+		System.out.println("Initialization phase 2 done.");
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 
 	}
