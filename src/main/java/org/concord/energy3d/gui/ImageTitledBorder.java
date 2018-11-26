@@ -7,6 +7,8 @@ import java.awt.Image;
 
 import javax.swing.border.TitledBorder;
 
+import org.concord.energy3d.util.Config;
+
 /**
  * @author Charles Xie
  * 
@@ -27,7 +29,7 @@ public class ImageTitledBorder extends TitledBorder {
 		final FontMetrics fm = c.getFontMetrics(c.getFont());
 		final int titleWidth = fm.stringWidth(getTitle());
 		final int imageWidth = image.getWidth(c);
-		g.drawImage(image, titleWidth - imageWidth + 1, 0, imageWidth, image.getHeight(c), c);
+		g.drawImage(image, titleWidth - imageWidth - (Config.isMac() ? 6 : -2), Config.isMac() ? 2 : 0, imageWidth, image.getHeight(c), c);
 	}
 
 }
