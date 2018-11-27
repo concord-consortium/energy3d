@@ -335,6 +335,9 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (Scene.getInstance().isDateFixed()) {
+					return;
+				}
 				if (!sunGrabbed) {
 					return;
 				}

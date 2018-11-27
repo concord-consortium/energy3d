@@ -790,6 +790,7 @@ public class EnergyPanel extends JPanel {
 							if (MainApplication.VERSION.compareTo("8.4.5") >= 0) {
 								if (canReadInstruction) {
 									setReadInstructionState(true);
+									instructionPanel.setToolTipText("Click here to stop the speaker");
 									Talker.getInstance().say(text);
 									Talker.getInstance().setCompletionCallback(new Runnable() {
 										@Override
@@ -2056,6 +2057,9 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 				timeAndLocationPanel.setBorder(createTitledBorder(author + " " + title + " Project: " + (s != null ? s : ""), true));
+				dateSpinner.setEnabled(!Scene.getInstance().isDateFixed());
+				regionComboBox.setEnabled(!Scene.getInstance().isLocationFixed());
+				latitudeSpinner.setEnabled(!Scene.getInstance().isLocationFixed());
 				buildingInfoPanel.updateAreaBounds();
 				buildingInfoPanel.updateHeightBounds();
 				buildingInfoPanel.updateWindowToFloorRatioBounds();
@@ -2218,6 +2222,7 @@ public class EnergyPanel extends JPanel {
 	public void resetReadInstruction() {
 		setReadInstructionState(false);
 		canReadInstruction = true;
+		instructionPanel.setToolTipText("Click here to listen");
 	}
 
 }

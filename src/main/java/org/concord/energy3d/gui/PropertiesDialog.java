@@ -83,6 +83,10 @@ class PropertiesDialog extends JDialog {
 		groundImageColorationComboBox.setSelectedIndex(Scene.getInstance().isGroundImageLightColored() ? 1 : 0);
 		final JComboBox<String> instructionTabHeaderComboBox = new JComboBox<String>(new String[] { "Show", "Hide" });
 		instructionTabHeaderComboBox.setSelectedIndex(Scene.getInstance().isInstructionTabHeaderVisible() ? 0 : 1);
+		final JComboBox<String> dateFixedComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		dateFixedComboBox.setSelectedIndex(Scene.getInstance().isDateFixed() ? 1 : 0);
+		final JComboBox<String> locationFixedComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		locationFixedComboBox.setSelectedIndex(Scene.getInstance().isLocationFixed() ? 1 : 0);
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
@@ -152,6 +156,8 @@ class PropertiesDialog extends JDialog {
 				Scene.getInstance().setNoSnapshotLogging(snapshotLoggingComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setInstructionTabHeaderVisible(instructionTabHeaderComboBox.getSelectedIndex() == 0);
+				Scene.getInstance().setDateFixed(dateFixedComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setLocationFixed(locationFixedComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
@@ -211,7 +217,15 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Instruction Tab Header: "));
 		panel.add(instructionTabHeaderComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 13, 2, 8, 8, 8, 8);
+		// fixed date
+		panel.add(new JLabel("Fixed Date: "));
+		panel.add(dateFixedComboBox);
+
+		// fixed location
+		panel.add(new JLabel("Fixed Location: "));
+		panel.add(locationFixedComboBox);
+
+		SpringUtilities.makeCompactGrid(panel, 15, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

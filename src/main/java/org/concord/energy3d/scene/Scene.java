@@ -181,6 +181,8 @@ public class Scene implements Serializable {
 	private String[] instructionSheetText;
 	private String[] instructionSheetTextType;
 	private boolean instructionTabHeaderInvisible;
+	private boolean dateFixed;
+	private boolean locationFixed;
 	private boolean noSnapshotLogging;
 	private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
 
@@ -4409,6 +4411,22 @@ public class Scene implements Serializable {
 
 	public boolean getDisableShadowInAction() {
 		return disableShadowInAction;
+	}
+
+	public void setDateFixed(final boolean b) {
+		dateFixed = b;
+	}
+
+	public boolean isDateFixed() {
+		return dateFixed;
+	}
+
+	public void setLocationFixed(final boolean b) {
+		locationFixed = b;
+	}
+
+	public boolean isLocationFixed() {
+		return locationFixed;
 	}
 
 	public void setNoSnapshotLogging(final boolean b) {
