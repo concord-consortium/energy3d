@@ -6,6 +6,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Enumeration;
@@ -52,6 +54,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.util.Html2Text;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -547,8 +550,12 @@ public class MyEditorPane {
 		return editorPane.getText();
 	}
 
-	public String getPureText() throws BadLocationException {
-		return editorPane.getDocument().getText(0, editorPane.getDocument().getLength());
+	public String getRawText() throws IOException {
+		// return editorPane.getDocument().getText(0, editorPane.getDocument().getLength());
+		// use the following method to get a longer pause between paragraphs, instead of the above
+		final Html2Text parser = new Html2Text();
+		parser.parse(new StringReader(editorPane.getText()));
+		return parser.getText();
 	}
 
 	public void setEditable(final boolean editable) {

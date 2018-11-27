@@ -1,42 +1,66 @@
 package org.concord.energy3d.speech;
 
-import java.awt.EventQueue;
-
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-
-import org.concord.energy3d.gui.MainFrame;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
 public class Talker {
 
-	public static void say(final String text) {
-		new SwingWorker<Object, Void>() {
+	private static Talker instance = new Talker();
+	private volatile boolean talking;
+	private volatile SwingWorker<Object, Void> worker;
+	private Voice voice = null;
+	private Runnable completionCallback;
+
+	public static Talker getInstance() {
+		return instance;
+	}
+
+	private Talker() {
+	}
+
+	public void setCompletionCallback(final Runnable completionCallback) {
+		this.completionCallback = completionCallback;
+	}
+
+	public boolean isTalking() {
+		return talking;
+	}
+
+	public void interrupt() {
+		if (talking && worker != null) {
+			if (worker.cancel(true)) {
+				if (voice != null) {
+					voice.deallocate();
+				}
+				talking = false;
+			}
+		}
+	}
+
+	public void say(final String text) {
+		interrupt();
+		worker = new SwingWorker<Object, Void>() {
 			@Override
 			protected Object doInBackground() {
-				try {
-					final VoiceManager vm = VoiceManager.getInstance();
-					final Voice voice = vm.getVoice("kevin16");
-					voice.allocate();
-					voice.speak(text);
-					voice.deallocate();
-				} catch (final Throwable t) {
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error: " + t.getLocalizedMessage());
-						}
-					});
-				}
+				talking = true;
+				voice = VoiceManager.getInstance().getVoice("kevin16");
+				voice.allocate();
+				voice.speak(text);
+				voice.deallocate();
+				talking = false;
 				return null;
 			}
 
 			@Override
 			protected void done() {
+				if (completionCallback != null) {
+					completionCallback.run();
+				}
 			}
-		}.execute();
+		};
+		worker.execute();
 	}
 
 }

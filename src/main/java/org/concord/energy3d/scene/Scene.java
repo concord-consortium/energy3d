@@ -66,6 +66,7 @@ import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.speech.Talker;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.LockEditPointsForAllCommand;
@@ -257,10 +258,12 @@ public class Scene implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				Talker.getInstance().interrupt();
 				final EnergyPanel e = EnergyPanel.getInstance();
 				e.update();
 				e.clearAllGraphs();
 				e.selectInstructionSheet(0);
+				e.resetReadInstruction();
 				if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 					MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);

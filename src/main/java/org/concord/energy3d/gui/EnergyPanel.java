@@ -66,7 +66,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.plaf.metal.MetalTabbedPaneUI;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 import org.concord.energy3d.MainApplication;
@@ -179,6 +178,7 @@ public class EnergyPanel extends JPanel {
 	private JTabbedPane buildingTabbedPane, pvProjectTabbedPane, cspProjectTabbedPane, instructionTabbedPane;
 	private TabbedPaneUI instructionTabbedPaneUI;
 	private JPanel buildingPanel, pvProjectPanel, cspProjectPanel, instructionPanel;
+	private volatile boolean canReadInstruction = true;
 	private final MyEditorPane[] instructionSheets = new MyEditorPane[Scene.INSTRUCTION_SHEET_NUMBER];
 	private boolean disableDateSpinner;
 	private long computingStartMillis;
@@ -782,27 +782,35 @@ public class EnergyPanel extends JPanel {
 						final int i = instructionTabbedPane.getSelectedIndex();
 						String text = null;
 						try {
-							text = instructionSheets[i].getPureText();
-						} catch (final BadLocationException ex) {
+							text = instructionSheets[i].getRawText();
+						} catch (final IOException ex) {
 							ex.printStackTrace();
 						}
 						if (text != null && !text.trim().equals("")) {
 							if (MainApplication.VERSION.compareTo("8.4.5") >= 0) {
-								Talker.say(text);
+								if (canReadInstruction) {
+									setReadInstructionState(true);
+									Talker.getInstance().say(text);
+									Talker.getInstance().setCompletionCallback(new Runnable() {
+										@Override
+										public void run() {
+											resetReadInstruction();
+										}
+									});
+									canReadInstruction = false;
+								} else {
+									Talker.getInstance().interrupt();
+									canReadInstruction = true;
+								}
 							}
 						}
 					}
+					instructionPanel.repaint();
 				}
 			}
 		});
-		Image image = null;
-		try {
-			image = ImageIO.read(getClass().getResource("icons/speaker.png"));
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		instructionPanel.setBorder(createImageTitledBorder("Instruction & Documentation", image, true));
 		instructionPanel.setLayout(new BoxLayout(instructionPanel, BoxLayout.Y_AXIS));
+		setReadInstructionState(false);
 		dataPanel.add(instructionPanel);
 
 		instructionTabbedPane = new JTabbedPane();
@@ -2195,6 +2203,21 @@ public class EnergyPanel extends JPanel {
 			return false;
 		}
 		return true;
+	}
+
+	private void setReadInstructionState(final boolean on) {
+		Image image = null;
+		try {
+			image = ImageIO.read(getClass().getResource(on ? "icons/speaker_on.png" : "icons/speaker_off.png"));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		instructionPanel.setBorder(createImageTitledBorder("Instruction & Documentation", image, true));
+	}
+
+	public void resetReadInstruction() {
+		setReadInstructionState(false);
+		canReadInstruction = true;
 	}
 
 }
