@@ -28,13 +28,13 @@ public class MyServerSocket {
 	public void listen() throws Exception {
 		client = server.accept();
 		final String clientAddress = client.getInetAddress().getHostAddress();
-		System.out.println("\r\nNew connection from " + clientAddress);
+		System.out.println("\r\nConnection from " + clientAddress);
 		final BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		final PrintWriter out = new PrintWriter(client.getOutputStream());
 		String data = null;
 		while ((data = in.readLine()) != null) {
 			System.out.println("\r\nMessage from " + clientAddress + ": " + data);
-			out.println("B");
+			out.println("B\n");
 			out.flush();
 		}
 	}

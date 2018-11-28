@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -51,6 +52,7 @@ import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
@@ -105,6 +107,7 @@ public class MyEditorPane {
 										s = s.substring(12).trim();
 										try {
 											EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
+											Heliodon.getInstance().setDate((Date) EnergyPanel.getInstance().getDateSpinner().getValue());
 										} catch (final ParseException e1) {
 											e1.printStackTrace();
 										}
