@@ -17,8 +17,10 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.BugReporter;
@@ -44,6 +46,10 @@ public class PvDailyAnalysis extends DailyAnalysis {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Tree || selectedPart instanceof Human) { // make sure that we deselect trees or humans, which cannot be attributed to a foundation
+					SceneManager.getInstance().setSelectedPart(null);
+				}
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
@@ -184,6 +190,8 @@ public class PvDailyAnalysis extends DailyAnalysis {
 				s += "\"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
 				s += "\"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+			} else {
+				s += "\"Panel\": \"All\"";
 			}
 		} else {
 			s += "\"Panel\": \"All\"";

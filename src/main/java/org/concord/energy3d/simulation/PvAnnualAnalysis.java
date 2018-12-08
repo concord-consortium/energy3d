@@ -20,8 +20,10 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.PvProjectDailyEnergyGraph;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -55,6 +57,10 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 				@Override
 				public Object call() {
 					if (!analysisStopped) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Tree || selectedPart instanceof Human) { // make sure that we deselect trees or humans, which cannot be attributed to a foundation
+							SceneManager.getInstance().setSelectedPart(null);
+						}
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
 						final Calendar today = (Calendar) c.clone();
@@ -69,7 +75,6 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 								}
 							});
 						}
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
 							final PvProjectDailyEnergyGraph g = e.getPvProjectDailyEnergyGraph();
 							if (g.hasGraph()) {

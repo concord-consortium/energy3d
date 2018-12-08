@@ -74,7 +74,7 @@ public class MainApplication {
 
 	public static void main(final String[] args) {
 
-		// testSocket();
+		testSocket();
 
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();

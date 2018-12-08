@@ -1,6 +1,7 @@
 package org.concord.energy3d;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -29,7 +30,8 @@ public class MyServerSocket {
 		client = server.accept();
 		final String clientAddress = client.getInetAddress().getHostAddress();
 		System.out.println("\r\nConnection from " + clientAddress);
-		final BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		final InputStream inputStream = client.getInputStream();
+		final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 		final PrintWriter out = new PrintWriter(client.getOutputStream());
 		String data = null;
 		while ((data = in.readLine()) != null) {

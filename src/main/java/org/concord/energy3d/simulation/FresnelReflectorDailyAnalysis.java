@@ -18,6 +18,8 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.BugReporter;
@@ -43,6 +45,10 @@ public class FresnelReflectorDailyAnalysis extends DailyAnalysis {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Tree || selectedPart instanceof Human) { // make sure that we deselect trees or humans, which cannot be attributed to a foundation
+					SceneManager.getInstance().setSelectedPart(null);
+				}
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {

@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.swing.undo.UndoableEdit;
 
-import org.concord.energy3d.agents.EventUtil;
 import org.concord.energy3d.geneticalgorithms.applications.Optimizer;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
@@ -1072,18 +1071,18 @@ public class TimeSeriesLogger {
 
 	public void close() {
 		if (writer != null) {
-			logEventString();
+			// logEventString();
 			writer.write("]\n}");
 			writer.close();
 		}
 	}
 
-	private void logEventString() {
-		if (Scene.getURL() != null) {
-			writer.write(",");
-		}
-		writer.write("{\"Event String\":" + "\"" + EventUtil.eventsToString(null, 10000, null) + "\"}");
-	}
+	// private void logEventString() {
+	// if (Scene.getURL() != null) {
+	// writer.write(",");
+	// }
+	// writer.write("{\"Event String\":" + "\"" + EventUtil.eventsToString(null, 10000, null) + "\"}");
+	// }
 
 	public void logAction() {
 		action = SceneManager.getInstance().getUndoManager().getPresentationName();
