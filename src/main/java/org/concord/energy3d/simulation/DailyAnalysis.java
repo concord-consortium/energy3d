@@ -25,7 +25,7 @@ import org.concord.energy3d.util.ClipImage;
  * @author Charles Xie
  *
  */
-public abstract class DailyAnalysis extends Analysis {
+abstract class DailyAnalysis extends Analysis {
 
 	JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll) {
 
