@@ -29,7 +29,7 @@ import org.concord.energy3d.util.ClipImage;
  * @author Charles Xie
  *
  */
-abstract class AnnualAnalysis extends Analysis {
+public abstract class AnnualAnalysis extends Analysis {
 
 	JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll, final boolean exportStoredResults) {
 

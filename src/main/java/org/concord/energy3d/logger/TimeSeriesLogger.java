@@ -14,7 +14,9 @@ import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.geneticalgorithms.applications.Optimizer;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
+import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.gui.PvProjectDailyEnergyGraph;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -36,17 +38,12 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.Analysis;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
-import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
-import org.concord.energy3d.simulation.EnergyDailyAnalysis;
-import org.concord.energy3d.simulation.GroupAnnualAnalysis;
-import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.ProjectCost;
-import org.concord.energy3d.simulation.PvAnnualAnalysis;
-import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Util;
@@ -1006,16 +1003,16 @@ public class TimeSeriesLogger {
 				line += ((AnnualEnvironmentalTemperature) analysisRequester).toJson();
 			} else {
 				if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
-					if (analysisRequester instanceof EnergyDailyAnalysis) {
-						line += ((EnergyDailyAnalysis) analysisRequester).toJson();
-					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
+					if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
 						final String result = Building.getBuildingSolarPotentials();
 						if (result != null) {
 							line += ", \"Solar Potential\": " + result;
 						}
-					} else if (analysisRequester instanceof EnergyAnnualAnalysis) {
-						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof PvProjectDailyEnergyGraph) {
+						line += ((PvProjectDailyEnergyGraph) analysisRequester).toJson();
+					} else if (analysisRequester instanceof CspProjectDailyEnergyGraph) {
+						line += ((CspProjectDailyEnergyGraph) analysisRequester).toJson();
 					} else if (analysisRequester instanceof ProjectCost) {
 						line += ((ProjectCost) analysisRequester).toJson();
 					}
@@ -1028,17 +1025,14 @@ public class TimeSeriesLogger {
 						if (result != null) {
 							line += ", \"Solar Potential\": " + result;
 						}
+					} else if (analysisRequester instanceof PvProjectDailyEnergyGraph) {
+						line += ((PvProjectDailyEnergyGraph) analysisRequester).toJson();
+					} else if (analysisRequester instanceof CspProjectDailyEnergyGraph) {
+						line += ((CspProjectDailyEnergyGraph) analysisRequester).toJson();
 					}
 				}
-				if (analysisRequester instanceof PvDailyAnalysis) {
-					line += ((PvDailyAnalysis) analysisRequester).toJson();
-				} else if (analysisRequester instanceof PvAnnualAnalysis) {
-					line += ((PvAnnualAnalysis) analysisRequester).toJson();
-				}
-				if (analysisRequester instanceof GroupDailyAnalysis) {
-					line += ((GroupDailyAnalysis) analysisRequester).toJson();
-				} else if (analysisRequester instanceof GroupAnnualAnalysis) {
-					line += ((GroupAnnualAnalysis) analysisRequester).toJson();
+				if (analysisRequester instanceof Analysis) {
+					line += ((Analysis) analysisRequester).toJson();
 				}
 			}
 		}
