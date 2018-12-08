@@ -21,7 +21,6 @@ import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -31,7 +30,6 @@ import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Trackable;
-import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -40,9 +38,8 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Analysis;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
-import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
-import org.concord.energy3d.simulation.DailySensorData;
+import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.BugReporter;
@@ -991,49 +988,27 @@ public class TimeSeriesLogger {
 		// analysis requesters
 
 		if (analysisRequester != null) {
-			final HousePart analyzedPart = SceneManager.getInstance().getSelectedPart();
 			line += ", \"" + analysisRequester.getClass().getSimpleName() + "\": ";
-			if (analysisRequester instanceof AnnualSensorData) {
-				line += ((AnnualSensorData) analysisRequester).toJson();
-			} else if (analysisRequester instanceof DailySensorData) {
-				line += ((DailySensorData) analysisRequester).toJson();
-			} else if (analysisRequester instanceof DailyEnvironmentalTemperature) {
+			if (analysisRequester instanceof DailyEnvironmentalTemperature) {
 				line += ((DailyEnvironmentalTemperature) analysisRequester).toJson();
 			} else if (analysisRequester instanceof AnnualEnvironmentalTemperature) {
 				line += ((AnnualEnvironmentalTemperature) analysisRequester).toJson();
-			} else {
-				if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
-					if (analysisRequester instanceof BuildingDailyEnergyGraph) {
-						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						final String result = Building.getBuildingSolarPotentials();
-						if (result != null) {
-							line += ", \"Solar Potential\": " + result;
-						}
-					} else if (analysisRequester instanceof PvProjectDailyEnergyGraph) {
-						line += ((PvProjectDailyEnergyGraph) analysisRequester).toJson();
-					} else if (analysisRequester instanceof CspProjectDailyEnergyGraph) {
-						line += ((CspProjectDailyEnergyGraph) analysisRequester).toJson();
-					} else if (analysisRequester instanceof ProjectCost) {
-						line += ((ProjectCost) analysisRequester).toJson();
-					}
-				} else {
-					if (analysisRequester instanceof ProjectCost) {
-						line += ((ProjectCost) analysisRequester).toJson();
-					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
-						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						final String result = Building.getBuildingSolarPotentials();
-						if (result != null) {
-							line += ", \"Solar Potential\": " + result;
-						}
-					} else if (analysisRequester instanceof PvProjectDailyEnergyGraph) {
-						line += ((PvProjectDailyEnergyGraph) analysisRequester).toJson();
-					} else if (analysisRequester instanceof CspProjectDailyEnergyGraph) {
-						line += ((CspProjectDailyEnergyGraph) analysisRequester).toJson();
-					}
+			} else if (analysisRequester instanceof MonthlySunshineHours) {
+				line += ((MonthlySunshineHours) analysisRequester).toJson();
+			} else if (analysisRequester instanceof Analysis) {
+				line += ((Analysis) analysisRequester).toJson();
+			} else if (analysisRequester instanceof ProjectCost) {
+				line += ((ProjectCost) analysisRequester).toJson();
+			} else if (analysisRequester instanceof BuildingDailyEnergyGraph) { // TODO: If there are multiple foundations, this logs nothing
+				line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
+				final String result = Building.getBuildingSolarPotentials();
+				if (result != null) {
+					line += ", \"Solar Potential\": " + result;
 				}
-				if (analysisRequester instanceof Analysis) {
-					line += ((Analysis) analysisRequester).toJson();
-				}
+			} else if (analysisRequester instanceof PvProjectDailyEnergyGraph) { // TODO: If there are multiple foundations, this logs nothing
+				line += ((PvProjectDailyEnergyGraph) analysisRequester).toJson();
+			} else if (analysisRequester instanceof CspProjectDailyEnergyGraph) { // TODO: If there are multiple foundations, this logs nothing
+				line += ((CspProjectDailyEnergyGraph) analysisRequester).toJson();
 			}
 		}
 
