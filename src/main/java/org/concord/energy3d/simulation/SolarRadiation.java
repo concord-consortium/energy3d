@@ -1519,7 +1519,7 @@ public class SolarRadiation {
 				}
 				rack.getSolarPotential()[iMinute] += min * ny * nx;
 				break;
-			case SolarPanel.PARTIAL_SHADE_TOLERANCE:
+			case SolarPanel.PARTIAL_SHADE_TOLERANCE: // WARNING: Cannot handle portrait/landscape difference as we don't have the exact model.
 				for (int x = 0; x < nx; x++) {
 					min = Double.MAX_VALUE;
 					for (int y = 0; y < ny; y++) {
