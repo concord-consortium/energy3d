@@ -306,6 +306,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 				}
 
+				panel.add(new JLabel("Inter-Row Spacing (Center-to-Center, m):"));
+				final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
+				panel.add(interrowSpacingField);
+				rowCount++;
+
 				panel.add(new JLabel("Tile Angle (\u00B0):"));
 				final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle), 10);
 				panel.add(tiltAngleField);
@@ -314,11 +319,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				panel.add(new JLabel("Solar Panel Rows Per Rack:"));
 				final JTextField rowsPerRackField = new JTextField(threeDecimalsFormat.format(solarPanelRowsPerRack));
 				panel.add(rowsPerRackField);
-				rowCount++;
-
-				panel.add(new JLabel("Inter-Row Spacing (Center-to-Center, m):"));
-				final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
-				panel.add(interrowSpacingField);
 				rowCount++;
 
 				orientationComboBox = new JComboBox<String>(new String[] { "Landscape", "Portrait" });

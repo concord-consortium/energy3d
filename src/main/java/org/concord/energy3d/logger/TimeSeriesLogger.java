@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.geneticalgorithms.applications.Optimizer;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
@@ -1183,7 +1184,9 @@ public class TimeSeriesLogger {
 		} catch (final Exception e) {
 			BugReporter.report(e);
 		}
-		writer.write("{\n\"Activities\": [\n");
+		writer.write("{\n");
+		writer.write("\"Version\": \"" + MainApplication.VERSION + "\",");
+		writer.write("\"Activities\": [\n");
 	}
 
 }

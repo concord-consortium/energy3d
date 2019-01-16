@@ -219,18 +219,21 @@ public class EnergyPanel extends JPanel {
 		dateEditorField.setFont(new Font(dateEditorField.getFont().getName(), Font.PLAIN, dateEditorField.getFont().getSize() - (Config.isMac() ? 2 : 1)));
 		dateEditorField.setColumns((int) ("September 30".length() * 0.7));
 		dateSpinner.addChangeListener(new ChangeListener() {
-			private boolean firstCall = true;
+			// private boolean firstCall = true;
 			private Date lastDate;
 
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (firstCall) {
-					firstCall = false;
-					return;
-				}
+				// if (firstCall) {
+				// firstCall = false;
+				// return;
+				// }
 				if (!disableDateSpinner) {
 					final ChangeDateCommand c = new ChangeDateCommand();
 					final Date d = (Date) dateSpinner.getValue();
+					if (Util.sameDateOfYear(d, c.getOldDate())) { // although GUI may not trigger this event, script can
+						return;
+					}
 					if (lastDate != null) { // fix a bug that causes the spinner to fire when going from Dec into Jan
 						final Calendar c0 = new GregorianCalendar();
 						c0.setTime(lastDate);
@@ -288,6 +291,9 @@ public class EnergyPanel extends JPanel {
 						Scene.getInstance().setCity(city);
 					} else {
 						final ChangeCityCommand c = new ChangeCityCommand();
+						if (c.getOldValue().equals(city)) { // although GUI may not trigger this event, script can
+							return;
+						}
 						setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
 						if (SceneManager.getInstance().getSolarHeatMap()) {
 							updateRadiationHeatMap();
@@ -352,6 +358,9 @@ public class EnergyPanel extends JPanel {
 				}
 				final ChangeTimeCommand c = new ChangeTimeCommand();
 				final Date d = (Date) timeSpinner.getValue();
+				if (Util.sameTimeOfDay(d, c.getOldTime())) {
+					return;
+				}
 				if (lastDate != null) { // fix a bug that causes the spinner to fire when crossing day boundary
 					final Calendar c0 = new GregorianCalendar();
 					c0.setTime(lastDate);

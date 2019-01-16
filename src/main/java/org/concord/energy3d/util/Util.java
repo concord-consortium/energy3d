@@ -16,8 +16,10 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +71,28 @@ public class Util {
 
 	// This is called by DesignReplay to suppress the error dialog when we replay a design process
 	public static boolean suppressReportError = false;
+
+	public static boolean sameDateOfYear(final Date d1, final Date d2) {
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(d1);
+		final int mon1 = cal.get(Calendar.MONTH);
+		final int day1 = cal.get(Calendar.DAY_OF_MONTH);
+		cal.setTime(d2);
+		final int mon2 = cal.get(Calendar.MONTH);
+		final int day2 = cal.get(Calendar.DAY_OF_MONTH);
+		return mon1 == mon2 && day1 == day2;
+	}
+
+	public static boolean sameTimeOfDay(final Date d1, final Date d2) {
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(d1);
+		final int h1 = cal.get(Calendar.HOUR);
+		final int m1 = cal.get(Calendar.MINUTE);
+		cal.setTime(d2);
+		final int h2 = cal.get(Calendar.HOUR);
+		final int m2 = cal.get(Calendar.MINUTE);
+		return h1 == h2 && m1 == m2;
+	}
 
 	/** platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods. */
 	public static boolean isRightClick(final MouseEvent e) {
