@@ -34,15 +34,15 @@ import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorberForAllFresnelReflectorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllFresnelReflectorsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyForAllReflectorsCommand;
@@ -780,8 +780,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -794,7 +794,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final FresnelReflector r = (FresnelReflector) selectedPart;
 					final Foundation foundation = r.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -822,12 +822,12 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(r.getBaseHeight() * Scene.getInstance().getScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(r.getPoleHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -847,13 +847,13 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = val != r.getBaseHeight();
+									boolean changed = val != r.getPoleHeight();
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(r);
-											r.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(r);
+											r.setPoleHeight(val);
 											r.draw();
 											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -862,30 +862,30 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
-												if (x.getBaseHeight() != val) {
+												if (x.getPoleHeight() != val) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, r.getClass());
-											foundation.setBaseHeightForFresnelReflectors(val);
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, r.getClass());
+											foundation.setPoleHeightForFresnelReflectors(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
-												if (x.getBaseHeight() != val) {
+												if (x.getPoleHeight() != val) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(r.getClass());
-											Scene.getInstance().setBaseHeightForAllFresnelReflectors(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(r.getClass());
+											Scene.getInstance().setPoleHeightForAllFresnelReflectors(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -1483,7 +1483,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			popupMenuForFresnelReflector.add(miLength);
 			popupMenuForFresnelReflector.add(miModuleWidth);
 			popupMenuForFresnelReflector.add(miModuleLength);
-			popupMenuForFresnelReflector.add(miBaseHeight);
+			popupMenuForFresnelReflector.add(miPoleHeight);
 			popupMenuForFresnelReflector.add(miAzimuth);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miReflectance);

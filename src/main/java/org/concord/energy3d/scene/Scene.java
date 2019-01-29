@@ -2726,10 +2726,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllSolarPanels(final double baseHeight) {
+	public void setPoleHeightForAllSolarPanels(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
-				((SolarPanel) p).setBaseHeight(baseHeight);
+				((SolarPanel) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}
@@ -2869,10 +2869,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllRacks(final double baseHeight) {
+	public void setPoleHeightForAllRacks(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
-				((Rack) p).setBaseHeight(baseHeight);
+				((Rack) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}
@@ -3098,10 +3098,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllHeliostats(final double baseHeight) {
+	public void setPoleHeightForAllHeliostats(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setBaseHeight(baseHeight);
+				((Mirror) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}
@@ -3141,10 +3141,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllParabolicTroughs(final double baseHeight) {
+	public void setPoleHeightForAllParabolicTroughs(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setBaseHeight(baseHeight);
+				((ParabolicTrough) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}
@@ -3230,10 +3230,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllParabolicDishes(final double baseHeight) {
+	public void setPoleHeightForAllParabolicDishes(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setBaseHeight(baseHeight);
+				((ParabolicDish) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}
@@ -3328,10 +3328,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllFresnelReflectors(final double baseHeight) {
+	public void setPoleHeightForAllFresnelReflectors(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setBaseHeight(baseHeight);
+				((FresnelReflector) p).setPoleHeight(baseHeight);
 				p.draw();
 			}
 		}

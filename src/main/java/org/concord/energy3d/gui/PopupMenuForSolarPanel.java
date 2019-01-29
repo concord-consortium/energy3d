@@ -41,18 +41,18 @@ import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellPropertiesCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelModelCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeModelForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesForAllCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelModelCommand;
@@ -1360,8 +1360,8 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -1374,7 +1374,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final Foundation foundation = sp.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -1409,12 +1409,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						break;
 					}
 					gui.add(panel, BorderLayout.CENTER);
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(sp.getBaseHeight() * Scene.getInstance().getScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(sp.getPoleHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -1434,16 +1434,16 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(val - sp.getBaseHeight()) > 0.000001;
+									boolean changed = Math.abs(val - sp.getPoleHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
-											sp.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(sp);
+											sp.setPoleHeight(val);
 											sp.draw();
 											if (sp.checkContainerIntersection()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().refresh();
@@ -1454,16 +1454,16 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final List<SolarPanel> row = sp.getRow();
 										for (final SolarPanel x : row) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 												changed = true;
 												break;
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+											final ChangePoleHeightForSolarPanelRowCommand c = new ChangePoleHeightForSolarPanelRowCommand(row);
 											boolean intersected = false;
 											for (final SolarPanel x : row) {
-												x.setBaseHeight(val);
+												x.setPoleHeight(val);
 												x.draw();
 												if (x.checkContainerIntersection()) {
 													intersected = true;
@@ -1471,7 +1471,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 												}
 											}
 											if (intersected) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().refresh();
@@ -1481,16 +1481,16 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										for (final SolarPanel x : foundation.getSolarPanels()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 												changed = true;
 												break;
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, sp.getClass());
-											foundation.setBaseHeightForSolarPanels(val);
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, sp.getClass());
+											foundation.setPoleHeightForSolarPanels(val);
 											if (foundation.checkContainerIntersectionForSolarPanels()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1499,16 +1499,16 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										selectedScopeIndex = 2;
 									} else if (rb4.isSelected()) {
 										for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 												changed = true;
 												break;
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(sp.getClass());
-											Scene.getInstance().setBaseHeightForAllSolarPanels(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(sp.getClass());
+											Scene.getInstance().setPoleHeightForAllSolarPanels(val);
 											if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -2240,18 +2240,18 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					} else {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
-						miBaseHeight.setEnabled(true);
+						miPoleHeight.setEnabled(true);
 						if (sp.getContainer() instanceof Roof) {
 							final Roof roof = (Roof) sp.getContainer();
 							if (roof.getHeight() > 0) {
 								miTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
-								miBaseHeight.setEnabled(false);
+								miPoleHeight.setEnabled(false);
 							}
 						} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
 							miTiltAngle.setEnabled(false);
 							miAzimuth.setEnabled(false);
-							miBaseHeight.setEnabled(false);
+							miPoleHeight.setEnabled(false);
 						}
 					}
 				}
@@ -2284,7 +2284,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
-			popupMenuForSolarPanel.add(miBaseHeight);
+			popupMenuForSolarPanel.add(miPoleHeight);
 			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.add(trackerMenu);

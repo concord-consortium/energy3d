@@ -670,12 +670,12 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	}
 
 	@Override
-	public void setBaseHeight(final double baseHeight) {
-		this.baseHeight = baseHeight;
+	public void setPoleHeight(final double poleHeight) {
+		baseHeight = poleHeight;
 	}
 
 	@Override
-	public double getBaseHeight() {
+	public double getPoleHeight() {
 		return baseHeight;
 	}
 

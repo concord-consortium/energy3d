@@ -35,17 +35,17 @@ import org.concord.energy3d.simulation.HeliostatAnnualAnalysis;
 import org.concord.energy3d.simulation.HeliostatDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllHeliostatsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeliostatAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeliostatTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeliostatTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTargetCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
@@ -696,8 +696,8 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -710,7 +710,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
 					final Foundation foundation = m.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -738,12 +738,12 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getBaseHeight() * Scene.getInstance().getScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getPoleHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Heliostat Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Heliostat Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -763,13 +763,13 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(val - m.getBaseHeight()) > 0.000001;
+									boolean changed = Math.abs(val - m.getPoleHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
-											m.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(m);
+											m.setPoleHeight(val);
 											m.draw();
 											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -778,30 +778,30 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final Mirror x : foundation.getHeliostats()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, m.getClass());
-											foundation.setBaseHeightForHeliostats(val);
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, m.getClass());
+											foundation.setPoleHeightForHeliostats(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final Mirror x : Scene.getInstance().getAllHeliostats()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(m.getClass());
-											Scene.getInstance().setBaseHeightForAllHeliostats(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(m.getClass());
+											Scene.getInstance().setPoleHeightForAllHeliostats(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -1343,7 +1343,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			popupMenuForHeliostat.add(miZenith);
 			popupMenuForHeliostat.add(miAzimuth);
 			popupMenuForHeliostat.add(miSize);
-			popupMenuForHeliostat.add(miBaseHeight);
+			popupMenuForHeliostat.add(miPoleHeight);
 			popupMenuForHeliostat.addSeparator();
 			popupMenuForHeliostat.add(miReflectance);
 			popupMenuForHeliostat.add(miApertureRatio);

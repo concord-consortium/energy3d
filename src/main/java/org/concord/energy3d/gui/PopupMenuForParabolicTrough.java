@@ -31,15 +31,15 @@ import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllParabolicTroughsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationParabolicTroughAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorThermalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
@@ -758,8 +758,8 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -772,7 +772,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final ParabolicTrough t = (ParabolicTrough) selectedPart;
 					final Foundation foundation = t.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -800,12 +800,12 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getBaseHeight() * Scene.getInstance().getScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getPoleHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -825,13 +825,13 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(val - t.getBaseHeight()) > 0.000001;
+									boolean changed = Math.abs(val - t.getPoleHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
-											t.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(t);
+											t.setPoleHeight(val);
 											t.draw();
 											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -840,30 +840,30 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, t.getClass());
-											foundation.setBaseHeightForSolarCollectors(val, t.getClass());
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, t.getClass());
+											foundation.setPoleHeightForSolarCollectors(val, t.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(t.getClass());
-											Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(t.getClass());
+											Scene.getInstance().setPoleHeightForAllParabolicTroughs(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -1598,7 +1598,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 			popupMenuForParabolicTrough.add(miApertureWidth);
 			popupMenuForParabolicTrough.add(miFocalLength);
 			popupMenuForParabolicTrough.add(miModuleLength);
-			popupMenuForParabolicTrough.add(miBaseHeight);
+			popupMenuForParabolicTrough.add(miPoleHeight);
 			popupMenuForParabolicTrough.add(miAzimuth);
 			popupMenuForParabolicTrough.addSeparator();
 			popupMenuForParabolicTrough.add(miReflectance);

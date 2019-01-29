@@ -1250,7 +1250,7 @@ public abstract class HousePart implements Serializable {
 				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
 				points.get(0).setZ(p.getZ());
 			} else {
-				if (rack.getBaseHeight() < Math.abs(0.5 * rack.getRackHeight() / Scene.getInstance().getScale() * Math.sin(Math.toRadians(rack.getTiltAngle())))) {
+				if (rack.getPoleHeight() < Math.abs(0.5 * rack.getRackHeight() / Scene.getInstance().getScale() * Math.sin(Math.toRadians(rack.getTiltAngle())))) {
 					final Ray3 ray2 = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.NEG_UNIT_Z);
 					PickingUtil.findPick(container.getCollisionSpatial(), ray2, pickResults, false);
 					if (pickResults.getNumber() != 0) {

@@ -37,7 +37,7 @@ public class HeliostatConcentricFieldOptimizer extends HeliostatFieldOptimizer {
 	public void setFoundation(final Foundation foundation) {
 		super.setFoundation(foundation);
 		final Mirror heliostat = foundation.getHeliostats().get(0);
-		maximumApertureHeight = heliostat.getBaseHeight() * Scene.getInstance().getScale() * 2;
+		maximumApertureHeight = heliostat.getPoleHeight() * Scene.getInstance().getScale() * 2;
 		// initialize the population with the first-born being the current design
 		final Individual firstBorn = population.getIndividual(0);
 		firstBorn.setGene(0, (heliostat.getApertureWidth() - minimumApertureWidth) / (maximumApertureWidth - minimumApertureWidth));

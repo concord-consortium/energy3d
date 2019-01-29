@@ -8,19 +8,19 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeBaseHeightForSolarPanelRowCommand extends MyAbstractUndoableEdit {
+public class ChangePoleHeightForSolarPanelRowCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<SolarPanel> panels;
 
-	public ChangeBaseHeightForSolarPanelRowCommand(final List<SolarPanel> panels) {
+	public ChangePoleHeightForSolarPanelRowCommand(final List<SolarPanel> panels) {
 		this.panels = panels;
 		final int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getBaseHeight();
+			oldValues[i] = panels.get(i).getPoleHeight();
 		}
 	}
 
@@ -31,8 +31,8 @@ public class ChangeBaseHeightForSolarPanelRowCommand extends MyAbstractUndoableE
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			final SolarPanel p = panels.get(i);
-			newValues[i] = p.getBaseHeight();
-			p.setBaseHeight(oldValues[i]);
+			newValues[i] = p.getPoleHeight();
+			p.setPoleHeight(oldValues[i]);
 			p.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -44,7 +44,7 @@ public class ChangeBaseHeightForSolarPanelRowCommand extends MyAbstractUndoableE
 		final int n = panels.size();
 		for (int i = 0; i < n; i++) {
 			final SolarPanel p = panels.get(i);
-			p.setBaseHeight(newValues[i]);
+			p.setPoleHeight(newValues[i]);
 			p.draw();
 		}
 		SceneManager.getInstance().refresh();

@@ -1031,12 +1031,12 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	}
 
 	@Override
-	public void setBaseHeight(final double baseHeight) {
-		this.baseHeight = baseHeight;
+	public void setPoleHeight(final double poleHeight) {
+		baseHeight = poleHeight;
 	}
 
 	@Override
-	public double getBaseHeight() {
+	public double getPoleHeight() {
 		return baseHeight;
 	}
 

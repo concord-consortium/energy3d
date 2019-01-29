@@ -97,7 +97,7 @@ import com.ardor3d.scenegraph.Node;
 class PopupMenuForFoundation extends PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForFoundation;
-	private static double solarPanelArrayBaseHeight = 1;
+	private static double solarPanelArrayPoleHeight = 1;
 	private static int solarPanelArrayRowAxis = 0;
 	private static double solarPanelArrayRowSpacing = solarPanelHeight + 1;
 	private static double solarPanelArrayColSpacing = solarPanelWidth + 1;
@@ -108,7 +108,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static double solarPanelRackArrayInterRowSpacing = solarPanelWidth * solarPanelRowsPerRack + 1;
 	private static double solarPanelRackPoleSpacingX = 4;
 	private static double solarPanelRackPoleSpacingY = 2;
-	private static double solarPanelRackBaseHeight = 3;
+	private static double solarPanelRackPoleHeight = 3;
 	private static double solarPanelTiltAngle = 0;
 	private static int solarPanelShadeTolerance = SolarPanel.PARTIAL_SHADE_TOLERANCE;
 	private static HeliostatRectangularFieldLayout heliostatRectangularFieldLayout = new HeliostatRectangularFieldLayout();
@@ -167,7 +167,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() {
-					foundation.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRackBaseHeight, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
+					foundation.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRackPoleHeight, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
 					return null;
 				}
 			});
@@ -204,7 +204,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					solarPanelOrientation = solarPanel.isRotated() ? 0 : 1;
 					solarPanelTiltAngle = rack0.getTiltAngle();
 					solarPanelRowsPerRack = rack0.getSolarPanelRowAndColumnNumbers()[1];
-					solarPanelRackBaseHeight = rack0.getBaseHeight() * Scene.getInstance().getScale();
+					solarPanelRackPoleHeight = rack0.getPoleHeight() * Scene.getInstance().getScale();
 					solarPanelRackPoleSpacingX = rack0.getPoleDistanceX();
 					solarPanelRackPoleSpacingY = rack0.getPoleDistanceY();
 					if (racks.size() > 1) {
@@ -325,7 +325,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				rowAxisComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
 				final JTextField poleSpacingXField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingX));
 				final JTextField poleSpacingYField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingY));
-				final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackBaseHeight));
+				final JTextField poleHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleHeight));
 				if (operationType != 1) {
 					panel.add(new JLabel("Solar Panel Orientation:"));
 					orientationComboBox.setSelectedIndex(solarPanelOrientation);
@@ -341,8 +341,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					panel.add(new JLabel("Pole Spacing Y (m):"));
 					panel.add(poleSpacingYField);
 					rowCount++;
-					panel.add(new JLabel("Base Height (m):"));
-					panel.add(baseHeightField);
+					panel.add(new JLabel("Pole Height (m):"));
+					panel.add(poleHeightField);
 					rowCount++;
 				}
 
@@ -371,7 +371,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							solarPanelNominalOperatingCellTemperature = Double.parseDouble(noctField.getText());
 							solarPanelRackPoleSpacingX = Double.parseDouble(poleSpacingXField.getText());
 							solarPanelRackPoleSpacingY = Double.parseDouble(poleSpacingYField.getText());
-							solarPanelRackBaseHeight = Double.parseDouble(baseHeightField.getText());
+							solarPanelRackPoleHeight = Double.parseDouble(poleHeightField.getText());
 						} catch (final NumberFormatException exception) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							ok = false;
@@ -385,15 +385,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							solarPanelOrientation = orientationComboBox.getSelectedIndex();
 							final int minimumSolarPanelRowsPerRack = 1;
 							final int maximumSolarPanelRowsPerRack = Rack.MAXIMUM_SOLAR_PANEL_ROWS;
-							final double minimumInterRowSpacing = 0.5 * (maximumSolarPanelRowsPerRack + minimumSolarPanelRowsPerRack) * (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth);
+							final double minimumInterRowSpacing = minimumSolarPanelRowsPerRack * (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth);
 							final double rackHeight = (solarPanelOrientation == 1 ? solarPanelHeight : solarPanelWidth) * solarPanelRowsPerRack;
 							if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else if (solarPanelRackPoleSpacingX < 1 || solarPanelRackPoleSpacingX > 50) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing X must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							} else if (solarPanelRackBaseHeight < 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							} else if (Math.abs(0.5 * rackHeight * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelRackBaseHeight) {
+							} else if (solarPanelRackPoleHeight < 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else if (Math.abs(0.5 * rackHeight * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelRackPoleHeight) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panels intersect with ground.", "Geometry Error", JOptionPane.ERROR_MESSAGE);
 							} else if (solarPanelRackPoleSpacingY < 1 || solarPanelRackPoleSpacingY > 50) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing Y must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -1113,9 +1113,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final JTextField colSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelArrayColSpacing));
 						panel.add(colSpacingField);
 
-						panel.add(new JLabel("Base Height (m):"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayBaseHeight));
-						panel.add(baseHeightField);
+						panel.add(new JLabel("Pole Height (m):"));
+						final JTextField poleHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayPoleHeight));
+						panel.add(poleHeightField);
 
 						SpringUtilities.makeCompactGrid(panel, 15, 2, 6, 6, 6, 6);
 
@@ -1135,7 +1135,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								try {
 									solarPanelArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
 									solarPanelArrayColSpacing = Double.parseDouble(colSpacingField.getText());
-									solarPanelArrayBaseHeight = Double.parseDouble(baseHeightField.getText());
+									solarPanelArrayPoleHeight = Double.parseDouble(poleHeightField.getText());
 									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
@@ -1154,11 +1154,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									solarPanelOrientation = orientationComboBox.getSelectedIndex();
 									if (solarPanelArrayRowSpacing < (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) || solarPanelArrayColSpacing < (solarPanelOrientation == 0 ? solarPanelWidth : solarPanelHeight)) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing is too small.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (solarPanelArrayBaseHeight < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelArrayPoleHeight < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel pole height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (Math.abs(0.5 * (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelArrayBaseHeight) {
+									} else if (Math.abs(0.5 * (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelArrayPoleHeight) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panels intersect with ground.", "Geometry Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -1196,7 +1196,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					sp.setPanelHeight(solarPanelHeight);
 					sp.setNumberOfCellsInX(numberOfCellsInX);
 					sp.setNumberOfCellsInY(numberOfCellsInY);
-					sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getScale());
+					sp.setPoleHeight(solarPanelArrayPoleHeight / Scene.getInstance().getScale());
 					sp.setShadeTolerance(solarPanelShadeTolerance);
 					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
@@ -1284,9 +1284,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(endAngleField);
 						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
 
-						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getBaseHeight()));
-						panel.add(baseHeightField);
+						panel.add(new JLabel("Pole Height:"));
+						final JTextField poleHeightField = new JTextField(threeDecimalsFormat.format(heliostatConcentricFieldLayout.getPoleHeight()));
+						panel.add(poleHeightField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
 						SpringUtilities.makeCompactGrid(panel, 9, 3, 6, 6, 6, 6);
@@ -1310,7 +1310,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									heliostatConcentricFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
 									heliostatConcentricFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
 									heliostatConcentricFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
-									heliostatConcentricFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatConcentricFieldLayout.setPoleHeight(Double.parseDouble(poleHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
@@ -1332,8 +1332,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatConcentricFieldLayout.getApertureHeight() < 1 || heliostatConcentricFieldLayout.getApertureHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatConcentricFieldLayout.getBaseHeight() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatConcentricFieldLayout.getPoleHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addCircularHeliostatArrays();
 										if (choice == options[0]) {
@@ -1427,9 +1427,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(endAngleField);
 						panel.add(new JLabel("<html><font size=2>Counter-clockwise from east (&deg;)"));
 
-						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getBaseHeight()));
-						panel.add(baseHeightField);
+						panel.add(new JLabel("Pole Height:"));
+						final JTextField poleHeightField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getPoleHeight()));
+						panel.add(poleHeightField);
 						panel.add(new JLabel("<html><font size=2>Meters"));
 
 						SpringUtilities.makeCompactGrid(panel, 10, 3, 6, 6, 6, 6);
@@ -1454,7 +1454,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									heliostatSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
 									heliostatSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									heliostatSpiralFieldLayout.setDivergence(Math.toRadians(Double.parseDouble(divergenceField.getText())));
-									heliostatSpiralFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatSpiralFieldLayout.setPoleHeight(Double.parseDouble(poleHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
@@ -1478,8 +1478,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatSpiralFieldLayout.getApertureHeight() < 1 || heliostatSpiralFieldLayout.getApertureHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatSpiralFieldLayout.getBaseHeight() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getPoleHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSpiralHeliostatArrays();
 										if (choice == options[0]) {
@@ -1543,9 +1543,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(new JLabel("Column Spacing:"));
 						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getColumnSpacing()));
 						panel.add(columnSpacingField);
-						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getBaseHeight()));
-						panel.add(baseHeightField);
+						panel.add(new JLabel("Pole Height:"));
+						final JTextField poleHeightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getPoleHeight()));
+						panel.add(poleHeightField);
 						SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -1564,7 +1564,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									heliostatRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
 									heliostatRectangularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
 									heliostatRectangularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
-									heliostatRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatRectangularFieldLayout.setPoleHeight(Double.parseDouble(poleHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
@@ -1576,8 +1576,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (heliostatRectangularFieldLayout.getApertureHeight() < 1 || heliostatRectangularFieldLayout.getApertureHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (heliostatRectangularFieldLayout.getBaseHeight() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getPoleHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addRectangularHeliostatArrays();
 										if (choice == options[0]) {

@@ -2284,7 +2284,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return removed;
 	}
 
-	private Mirror addMirror(final Vector3 p, final double baseHeight, final double w, final double h, final double az, final Foundation receiver) {
+	private Mirror addMirror(final Vector3 p, final double poleHeight, final double w, final double h, final double az, final Foundation receiver) {
 		final Mirror m = new Mirror();
 		m.setContainer(this);
 		Scene.getInstance().add(m, false);
@@ -2296,7 +2296,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		m.points.get(0).setZ(height);
 		m.setApertureWidth(w);
 		m.seApertureHeight(h);
-		m.setBaseHeight(baseHeight / Scene.getInstance().getScale());
+		m.setPoleHeight(poleHeight / Scene.getInstance().getScale());
 		m.setReceiver(receiver);
 		m.draw();
 		return m;
@@ -2316,7 +2316,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		command.put("Heliostat Aperture Height", layout.getApertureHeight());
 		command.put("Starting Field Angle", layout.getStartAngle());
 		command.put("Ending Field Angle", layout.getEndAngle());
-		command.put("Base Height", layout.getBaseHeight());
+		command.put("Pole Height", layout.getPoleHeight());
 		command.put("Radial Spacing", layout.getRadialSpacing());
 		command.put("Radial Expansion Ratio", layout.getRadialExpansionRatio());
 		command.put("Azimuthal Spacing", layout.getAzimuthalSpacing());
@@ -2350,12 +2350,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					if (sameSign) {
 						if (az >= startAngle && az < endAngle) {
 							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+							addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 						}
 					} else { // not the same sign, so we have to reverse the order
 						if (az < endAngle || az >= startAngle) {
 							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+							addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 						}
 					}
 				}
@@ -2371,7 +2371,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows);
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 				theta = (i + 0.5) * 2.0 * Math.PI / n;
@@ -2380,7 +2380,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows) - 0.5 * dr;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2435,12 +2435,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					if (sameSign) {
 						if (az >= startAngle && az < endAngle) {
 							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+							addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 						}
 					} else { // not the same sign, so we have to reverse the order
 						if (az < endAngle || az >= startAngle) {
 							final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-							addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+							addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 						}
 					}
 				}
@@ -2456,7 +2456,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows);
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 				theta = (i + 0.5) * 2.0 * Math.PI / n;
@@ -2465,7 +2465,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows) - 0.5 * dr;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2494,7 +2494,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		command.put("Heliostat Aperture Height", layout.getApertureHeight());
 		command.put("Starting Field Angle", layout.getStartAngle());
 		command.put("Ending Field Angle", layout.getEndAngle());
-		command.put("Base Height", layout.getBaseHeight());
+		command.put("Base Height", layout.getPoleHeight());
 		command.put("Starting Turn", layout.getStartTurn());
 		command.put("Scaling Factor", layout.getScalingFactor());
 		command.put("Radial Expansion Ration", layout.getRadialExpansionRatio());
@@ -2526,12 +2526,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				if (sameSign) {
 					if (az >= startAngle && az < endAngle) {
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				} else { // not the same sign, so we have to reverse the order
 					if (az < endAngle || az >= startAngle) {
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2583,12 +2583,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				if (sameSign) {
 					if (az >= startAngle && az < endAngle) {
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				} else { // not the same sign, so we have to reverse the order
 					if (az < endAngle || az >= startAngle) {
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+						addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 					}
 				}
 			}
@@ -2616,7 +2616,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		command.put("Heliostat Aperture Height", layout.getApertureHeight());
 		command.put("Starting Field Angle", layout.getStartAngle());
 		command.put("Ending Field Angle", layout.getEndAngle());
-		command.put("Base Height", layout.getBaseHeight());
+		command.put("Base Height", layout.getPoleHeight());
 		command.put("Row Spacing", layout.getRowSpacing());
 		command.put("Column Spacing", layout.getColumnSpacing());
 		command.put("Row Axis", layout.getRowAxis());
@@ -2638,7 +2638,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 				}
 			}
 			break;
@@ -2648,7 +2648,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
+					addMirror(p, layout.getPoleHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az, receiver);
 				}
 			}
 			break;
@@ -2840,7 +2840,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by the layout manager
-	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
+	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double poleHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, Rack.class);
 		command.put("Tilt Angle", tiltAngle);
@@ -2896,13 +2896,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							final Rack rack = addRack(panel, tiltAngle, poleHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setY(y0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
+					addRack(panel, tiltAngle, poleHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
 				}
 			}
 			break;
@@ -2929,13 +2929,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							final Rack rack = addRack(panel, tiltAngle, poleHeight, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setX(x0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
+					addRack(panel, tiltAngle, poleHeight, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
 				}
 			}
 			break;
@@ -2953,7 +2953,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		});
 	}
 
-	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double poleHeight, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
 		final Rack rack = new Rack();
 		rack.setContainer(this);
 		rack.setSolarPanel((SolarPanel) panel.copy(false));
@@ -2963,7 +2963,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		rack.roundUpRackWidth();
 		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
-		rack.setBaseHeight(baseHeight / Scene.getInstance().getScale());
+		rack.setPoleHeight(poleHeight / Scene.getInstance().getScale());
 		rack.setPoleDistanceX(poleDistanceX);
 		rack.setPoleDistanceY(poleDistanceY);
 		Scene.getInstance().add(rack, false);
@@ -2975,7 +2975,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// used by GA
-	public void generateSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
+	public void generateSolarRackArrays(final SolarPanel panel, double tiltAngle, final double poleHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
 		removeChildrenOfClass(clazz);
 		final double az = Math.toRadians(getAzimuth());
@@ -3028,13 +3028,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							final Rack rack = addRack(panel, tiltAngle, poleHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setY(y0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, center, rackWidth, rackHeight, false).draw();
+					addRack(panel, tiltAngle, poleHeight, center, rackWidth, rackHeight, false).draw();
 				}
 			}
 			break;
@@ -3061,13 +3061,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getScale();
-							final Rack rack = addRack(panel, tiltAngle, baseHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							final Rack rack = addRack(panel, tiltAngle, poleHeight, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setX(x0 + margin + h * (r + 0.5));
-					addRack(panel, tiltAngle, baseHeight, center, rackWidth, rackHeight, true).draw();
+					addRack(panel, tiltAngle, poleHeight, center, rackWidth, rackHeight, true).draw();
 				}
 			}
 			break;
@@ -3083,7 +3083,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		});
 	}
 
-	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double poleHeight, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
 		final Rack rack = new Rack();
 		rack.setContainer(this);
 		rack.setSolarPanel((SolarPanel) panel.copy(false));
@@ -3093,7 +3093,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		rack.roundUpRackWidth();
 		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
-		rack.setBaseHeight(baseHeight / Scene.getInstance().getScale());
+		rack.setPoleHeight(poleHeight / Scene.getInstance().getScale());
 		Scene.getInstance().add(rack, false);
 		rack.complete();
 		if (rotate90) {
@@ -3204,10 +3204,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return false;
 	}
 
-	public void setBaseHeightForSolarPanels(final double baseHeight) {
+	public void setPoleHeightForSolarPanels(final double poleHeight) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {
-				((SolarPanel) p).setBaseHeight(baseHeight);
+				((SolarPanel) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}
@@ -3337,10 +3337,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForRacks(final double baseHeight) {
+	public void setPoleHeightForRacks(final double poleHeight) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
-				((Rack) p).setBaseHeight(baseHeight);
+				((Rack) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}
@@ -3540,10 +3540,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	public void setBaseHeightForHeliostats(final double baseHeight) {
+	public void setPoleHeightForHeliostats(final double poleHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setBaseHeight(baseHeight);
+				((Mirror) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}
@@ -3682,10 +3682,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	public void setBaseHeightForParabolicDishes(final double baseHeight) {
+	public void setPoleHeightForParabolicDishes(final double poleHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setBaseHeight(baseHeight);
+				((ParabolicDish) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}
@@ -3747,10 +3747,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForFresnelReflectors(final double baseHeight) {
+	public void setPoleHeightForFresnelReflectors(final double poleHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setBaseHeight(baseHeight);
+				((FresnelReflector) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}
@@ -3854,10 +3854,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return list;
 	}
 
-	public void setBaseHeightForSolarCollectors(final double baseHeight, final Class<?> c) {
+	public void setPoleHeightForSolarCollectors(final double poleHeight, final Class<?> c) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarCollector && p.getTopContainer() == this && c.isInstance(p)) {
-				((SolarCollector) p).setBaseHeight(baseHeight);
+				((SolarCollector) p).setPoleHeight(poleHeight);
 				p.draw();
 			}
 		}

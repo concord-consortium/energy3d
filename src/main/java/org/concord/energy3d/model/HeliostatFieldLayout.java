@@ -11,14 +11,14 @@ public abstract class HeliostatFieldLayout {
 	double startAngle = -180;
 	double endAngle = 180;
 	double axisRoadWidth = 0;
-	double baseHeight = 2;
+	double poleHeight = 2;
 
-	public void setBaseHeight(final double baseHeight) {
-		this.baseHeight = baseHeight;
+	public void setPoleHeight(final double poleHeight) {
+		this.poleHeight = poleHeight;
 	}
 
-	public double getBaseHeight() {
-		return baseHeight;
+	public double getPoleHeight() {
+		return poleHeight;
 	}
 
 	public void setApertureWidth(final double apertureWidth) {

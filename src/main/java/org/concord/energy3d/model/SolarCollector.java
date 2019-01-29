@@ -12,9 +12,9 @@ public interface SolarCollector {
 
 	public void move(final Vector3 v, final double steplength);
 
-	public void setBaseHeight(final double baseHeight);
+	public void setPoleHeight(final double poleHeight);
 
-	public double getBaseHeight();
+	public double getPoleHeight();
 
 	public void setSunBeamVisible(final boolean visible);
 

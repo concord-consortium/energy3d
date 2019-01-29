@@ -1317,8 +1317,8 @@ public class EnergyPanel extends JPanel {
 								}
 								partPanelBorder.setTitle(title);
 								partProperty1Label.setText("  Size & Position:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(sp.getPanelHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
-								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the solar panel");
+								partProperty1TextField.setText(TWO_DECIMALS.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(sp.getPanelHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", pole:" + TWO_DECIMALS.format(sp.getPoleHeight() * scale * meterToFoot) + lengthUnit);
+								partProperty1TextField.putClientProperty("tooltip", "The length, width, center coordinates, and pole height of the solar panel");
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(Util.isZero(sp.getTiltAngle()) ? Math.toDegrees(Math.asin(sp.getNormal().getY())) : sp.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
 								partProperty2TextField.putClientProperty("tooltip", "The angles of the solar panel");
@@ -1361,8 +1361,8 @@ public class EnergyPanel extends JPanel {
 								}
 								partPanelBorder.setTitle(title);
 								partProperty1Label.setText("  Size & Center:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(rack.getRackHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
-								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the rack");
+								partProperty1TextField.setText(TWO_DECIMALS.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(rack.getRackHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", pole:" + TWO_DECIMALS.format(rack.getPoleHeight() * scale * meterToFoot) + lengthUnit);
+								partProperty1TextField.putClientProperty("tooltip", "The length, width, center coordinates, and pole height of the rack");
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText("tilt: " + ONE_DECIMAL.format(Util.isZero(rack.getTiltAngle()) ? Math.toDegrees(Math.asin(rack.getNormal().getY())) : rack.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0");
 								partProperty2TextField.putClientProperty("tooltip", "The angles of the rack");
@@ -1402,7 +1402,7 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								partPanelBorder.setTitle("Heliostat (" + m.getId() + ")");
 								partProperty1Label.setText("  Size & Center:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(m.getApertureWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(m.getApertureHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
+								partProperty1TextField.setText(TWO_DECIMALS.format(m.getApertureWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(m.getApertureHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", pole:" + TWO_DECIMALS.format(m.getPoleHeight() * scale * meterToFoot) + lengthUnit);
 								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the heliostat");
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
@@ -1480,7 +1480,7 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								partPanelBorder.setTitle("Parabolic Dish (" + d.getId() + ")");
 								partProperty1Label.setText("  Size & Center:");
-								partProperty1TextField.setText("Rim radius=" + TWO_DECIMALS.format(rimRadius * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
+								partProperty1TextField.setText("Rim radius=" + TWO_DECIMALS.format(rimRadius * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", pole:" + TWO_DECIMALS.format(d.getPoleHeight() * scale * meterToFoot) + lengthUnit);
 								partProperty1TextField.putClientProperty("tooltip", "Rim radius and center coordinates of the parabolic dish");
 								partProperty2Label.setText("  Parabola Shape:");
 								partProperty2TextField.setText("Focal length=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit);
@@ -1514,7 +1514,7 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								partPanelBorder.setTitle("Fresnel Reflector (" + r.getId() + ")");
 								partProperty1Label.setText("  Center & Azimuth:");
-								partProperty1TextField.setText("(" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", azimuth:" + ONE_DECIMAL.format(az) + "\u00B0");
+								partProperty1TextField.setText("(" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", azimuth:" + ONE_DECIMAL.format(az) + "\u00B0" + ", pole:" + TWO_DECIMALS.format(r.getPoleHeight() * scale * meterToFoot) + lengthUnit);
 								partProperty1TextField.putClientProperty("tooltip", "Center coordinates and azimuth of the Fresnel reflector");
 								partProperty2Label.setText("  Length & Width:");
 								partProperty2TextField.setText(TWO_DECIMALS.format(r.getLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(r.getModuleLength() * meterToFoot) + lengthUnit + ", " + ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);

@@ -6,16 +6,16 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarCollector;
 
-public class ChangeBaseHeightCommand extends MyAbstractUndoableEdit {
+public class ChangePoleHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;
 	private double newValue;
 	private final SolarCollector part;
 
-	public ChangeBaseHeightCommand(final SolarCollector part) {
+	public ChangePoleHeightCommand(final SolarCollector part) {
 		this.part = part;
-		oldValue = part.getBaseHeight();
+		oldValue = part.getPoleHeight();
 	}
 
 	public SolarCollector getPart() {
@@ -27,15 +27,15 @@ public class ChangeBaseHeightCommand extends MyAbstractUndoableEdit {
 	}
 
 	public double getNewValue() {
-		newValue = part.getBaseHeight();
+		newValue = part.getPoleHeight();
 		return newValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = part.getBaseHeight();
-		part.setBaseHeight(oldValue);
+		newValue = part.getPoleHeight();
+		part.setPoleHeight(oldValue);
 		if (part instanceof HousePart) {
 			((HousePart) part).draw();
 		}
@@ -44,7 +44,7 @@ public class ChangeBaseHeightCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		part.setBaseHeight(newValue);
+		part.setPoleHeight(newValue);
 		if (part instanceof HousePart) {
 			((HousePart) part).draw();
 		}

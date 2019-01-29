@@ -30,15 +30,15 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationParabolicDishStructureTypeCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorThermalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
@@ -638,8 +638,8 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -652,7 +652,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final Foundation foundation = d.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -680,12 +680,12 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getBaseHeight() * Scene.getInstance().getScale()));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getPoleHeight() * Scene.getInstance().getScale()));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -705,13 +705,13 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(val - d.getBaseHeight()) > 0.000001;
+									boolean changed = Math.abs(val - d.getPoleHeight()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
-											d.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(d);
+											d.setPoleHeight(val);
 											d.draw();
 											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -720,30 +720,30 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final ParabolicDish x : foundation.getParabolicDishes()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, d.getClass());
-											foundation.setBaseHeightForParabolicDishes(val);
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, d.getClass());
+											foundation.setPoleHeightForParabolicDishes(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
-												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												if (Math.abs(val - x.getPoleHeight()) > 0.000001) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(d.getClass());
-											Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(d.getClass());
+											Scene.getInstance().setPoleHeightForAllParabolicDishes(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -1456,7 +1456,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 			popupMenuForParabolicDish.addSeparator();
 			popupMenuForParabolicDish.add(miRimRadius);
 			popupMenuForParabolicDish.add(miFocalLength);
-			popupMenuForParabolicDish.add(miBaseHeight);
+			popupMenuForParabolicDish.add(miPoleHeight);
 			popupMenuForParabolicDish.add(miStructureType);
 			popupMenuForParabolicDish.addSeparator();
 			popupMenuForParabolicDish.add(miReflectance);

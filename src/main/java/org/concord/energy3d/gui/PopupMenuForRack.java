@@ -46,14 +46,14 @@ import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
+import org.concord.energy3d.undo.ChangePoleHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackMonthlyTiltAnglesCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
 import org.concord.energy3d.undo.ChangeMonthlyTiltAnglesCommand;
 import org.concord.energy3d.undo.ChangeMonthlyTiltAnglesForAllRacksCommand;
+import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
@@ -971,8 +971,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
-			miBaseHeight.addActionListener(new ActionListener() {
+			final JMenuItem miPoleHeight = new JMenuItem("Pole Height...");
+			miPoleHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -985,7 +985,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Rack rack = (Rack) selectedPart;
 					final Foundation foundation = rack.getTopContainer();
-					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String title = "<html>Pole Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -1013,12 +1013,12 @@ class PopupMenuForRack extends PopupMenuFactory {
 					}
 					final JPanel gui = new JPanel(new BorderLayout());
 					gui.add(panel, BorderLayout.CENTER);
-					final JTextField inputField = new JTextField(rack.getBaseHeight() * Scene.getInstance().getScale() + "");
+					final JTextField inputField = new JTextField(rack.getPoleHeight() * Scene.getInstance().getScale() + "");
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Base Height");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Pole Height");
 
 					while (true) {
 						inputField.selectAll();
@@ -1038,16 +1038,16 @@ class PopupMenuForRack extends PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 0 || val * Scene.getInstance().getScale() > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = val != rack.getBaseHeight();
+									boolean changed = val != rack.getPoleHeight();
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
-											rack.setBaseHeight(val);
+											final ChangePoleHeightCommand c = new ChangePoleHeightCommand(rack);
+											rack.setPoleHeight(val);
 											rack.draw();
 											if (rack.checkContainerIntersection()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().refresh();
@@ -1058,17 +1058,17 @@ class PopupMenuForRack extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final Rack x : foundation.getRacks()) {
-												if (x.getBaseHeight() != val) {
+												if (x.getPoleHeight() != val) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, rack.getClass());
-											foundation.setBaseHeightForRacks(val);
+											final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, rack.getClass());
+											foundation.setPoleHeightForRacks(val);
 											if (foundation.checkContainerIntersectionForRacks()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1078,17 +1078,17 @@ class PopupMenuForRack extends PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final Rack x : Scene.getInstance().getAllRacks()) {
-												if (x.getBaseHeight() != val) {
+												if (x.getPoleHeight() != val) {
 													changed = true;
 													break;
 												}
 											}
 										}
 										if (changed) {
-											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(rack.getClass());
-											Scene.getInstance().setBaseHeightForAllRacks(val);
+											final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(rack.getClass());
+											Scene.getInstance().setPoleHeightForAllRacks(val);
 											if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -3454,7 +3454,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						miSeasonalTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
 						miRotate.setEnabled(true);
-						miBaseHeight.setEnabled(true);
+						miPoleHeight.setEnabled(true);
 						miPoleSpacing.setEnabled(true);
 						if (rack.getContainer() instanceof Roof) {
 							final Roof roof = (Roof) rack.getContainer();
@@ -3462,7 +3462,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 								miFixedTiltAngle.setEnabled(false);
 								miSeasonalTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
-								miBaseHeight.setEnabled(false);
+								miPoleHeight.setEnabled(false);
 								miPoleSpacing.setEnabled(false);
 								miRotate.setEnabled(false);
 							}
@@ -3501,7 +3501,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 			popupMenuForRack.add(miRotate);
 			popupMenuForRack.add(miRackWidth);
 			popupMenuForRack.add(miRackLength);
-			popupMenuForRack.add(miBaseHeight);
+			popupMenuForRack.add(miPoleHeight);
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();

@@ -427,12 +427,12 @@ public class TimeSeriesLogger {
 
 				/* common actions for tilt, azimuth, and base */
 
-				else if (lastEdit instanceof ChangeFoundationSolarCollectorBaseHeightCommand) {
-					final ChangeFoundationSolarCollectorBaseHeightCommand c = (ChangeFoundationSolarCollectorBaseHeightCommand) lastEdit;
-					stateValue = "{\"Foundation\": " + c.getFoundation().getId() + ", \"New Value\": " + c.getFirstSolarCollector().getBaseHeight() + "}";
-				} else if (lastEdit instanceof ChangeBaseHeightForAllSolarCollectorsCommand) {
-					final ChangeBaseHeightForAllSolarCollectorsCommand c = (ChangeBaseHeightForAllSolarCollectorsCommand) lastEdit;
-					stateValue = "{\"New Value\": " + c.getFirstSolarCollector().getBaseHeight() + "}";
+				else if (lastEdit instanceof ChangeFoundationSolarCollectorPoleHeightCommand) {
+					final ChangeFoundationSolarCollectorPoleHeightCommand c = (ChangeFoundationSolarCollectorPoleHeightCommand) lastEdit;
+					stateValue = "{\"Foundation\": " + c.getFoundation().getId() + ", \"New Value\": " + c.getFirstSolarCollector().getPoleHeight() + "}";
+				} else if (lastEdit instanceof ChangePoleHeightForAllSolarCollectorsCommand) {
+					final ChangePoleHeightForAllSolarCollectorsCommand c = (ChangePoleHeightForAllSolarCollectorsCommand) lastEdit;
+					stateValue = "{\"New Value\": " + c.getFirstSolarCollector().getPoleHeight() + "}";
 				}
 
 				else if (lastEdit instanceof ChangeTiltAngleCommand) {
@@ -443,8 +443,8 @@ public class TimeSeriesLogger {
 					final ChangeAzimuthCommand c = (ChangeAzimuthCommand) lastEdit;
 					final HousePart p = c.getPart();
 					stateValue = "{\"Foundation\": " + (p instanceof Foundation ? (Foundation) p : p.getTopContainer()).getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
-				} else if (lastEdit instanceof ChangeBaseHeightCommand) {
-					final ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
+				} else if (lastEdit instanceof ChangePoleHeightCommand) {
+					final ChangePoleHeightCommand c = (ChangePoleHeightCommand) lastEdit;
 					final SolarCollector s = c.getPart();
 					if (s instanceof HousePart) {
 						final HousePart p = (HousePart) s;

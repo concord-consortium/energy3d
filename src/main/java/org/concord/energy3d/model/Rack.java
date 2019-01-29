@@ -945,12 +945,12 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	@Override
-	public void setBaseHeight(final double baseHeight) {
-		this.baseHeight = baseHeight;
+	public void setPoleHeight(final double poleHeight) {
+		baseHeight = poleHeight;
 	}
 
 	@Override
-	public double getBaseHeight() {
+	public double getPoleHeight() {
 		return baseHeight;
 	}
 

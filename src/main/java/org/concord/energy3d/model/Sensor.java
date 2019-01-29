@@ -280,12 +280,12 @@ public class Sensor extends HousePart implements SolarCollector {
 
 	// Not implemented
 	@Override
-	public void setBaseHeight(final double baseHeight) {
+	public void setPoleHeight(final double poleHeight) {
 	}
 
 	// Not implemented
 	@Override
-	public double getBaseHeight() {
+	public double getPoleHeight() {
 		return 0;
 	}
 
