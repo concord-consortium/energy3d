@@ -311,7 +311,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				panel.add(interrowSpacingField);
 				rowCount++;
 
-				panel.add(new JLabel("Tile Angle (\u00B0):"));
+				panel.add(new JLabel("Tilt Angle (\u00B0):"));
 				final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle), 10);
 				panel.add(tiltAngleField);
 				rowCount++;
@@ -1091,7 +1091,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(inverterEfficiencyPercentage));
 						panel.add(inverterEfficiencyField);
 
-						panel.add(new JLabel("Tile Angle (\u00B0):"));
+						panel.add(new JLabel("Tilt Angle (\u00B0):"));
 						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
 						panel.add(tiltAngleField);
 
