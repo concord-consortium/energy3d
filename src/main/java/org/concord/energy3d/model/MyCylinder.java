@@ -11,7 +11,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * <code>Cylinder</code> provides an extension of <code>Mesh</code>. A <code>Cylinder</code> is defined by a height and radius. The center of the Cylinder is the origin.
  */
-class MyCylinder extends Mesh {
+public class MyCylinder extends Mesh {
 
 	private int _axisSamples;
 	private int _radialSamples;
