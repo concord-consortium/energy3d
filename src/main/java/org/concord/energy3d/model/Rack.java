@@ -624,7 +624,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		if (!text.equals("")) {
 			label.setText(text);
 			final double shift = (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth()) / Scene.getInstance().getScale();
-			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
+			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift / 2, null)));
 			label.setVisible(true);
 		} else {
 			label.setVisible(false);

@@ -6,7 +6,7 @@
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
-	<property name="jdk" value="jdk1.8.0_172" />
+	<property name="jdk" value="jdk1.8.0_202" />
 	<property name="bit64" value="false" />
 	
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">

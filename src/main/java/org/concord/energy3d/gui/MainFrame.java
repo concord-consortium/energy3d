@@ -888,7 +888,7 @@ public class MainFrame extends JFrame {
 
 		label = new JLabel("Java vendor: ");
 		inputPanel.add(label);
-		final JTextField javaVendorField = new JTextField(System.getProperty("java.vendor"));
+		final JTextField javaVendorField = new JTextField(System.getProperty("java.vendor"), 12);
 		javaVendorField.setEditable(false);
 		label.setLabelFor(javaVendorField);
 		inputPanel.add(javaVendorField);

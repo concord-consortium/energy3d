@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="ardor3d-animation">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-animation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-awt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-collada.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-effects.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-extras.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-jogl-awt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-jogl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-math.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-savable.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

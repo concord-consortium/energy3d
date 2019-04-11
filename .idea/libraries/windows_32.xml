@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="windows-32">
+    <CLASSES />
+    <JAVADOC />
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/exe/lib/jogl/native/windows-32" />
+    </NATIVE>
+    <SOURCES />
+  </library>
+</component>

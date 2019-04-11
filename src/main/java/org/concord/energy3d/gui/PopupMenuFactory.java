@@ -492,6 +492,8 @@ public abstract class PopupMenuFactory {
 		miInfo.setBackground(Config.isMac() ? Color.DARK_GRAY : Color.GRAY);
 		miInfo.setForeground(Color.WHITE);
 
+		final JMenuItem miCut = new JMenuItem(pastable ? "Cut" : "Delete");
+
 		final JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
 		popupMenu.addPopupMenuListener(new PopupMenuListener() {
@@ -518,10 +520,12 @@ public abstract class PopupMenuFactory {
 				if (runWhenBecomingVisible != null) {
 					runWhenBecomingVisible.run();
 				}
+				miCut.setEnabled(!selectedPart.getLockEdit());
 			}
 
 			@Override
 			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+				miCut.setEnabled(true);
 			}
 
 			@Override
@@ -530,7 +534,6 @@ public abstract class PopupMenuFactory {
 
 		});
 
-		final JMenuItem miCut = new JMenuItem(pastable ? "Cut" : "Delete");
 		miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 		miCut.addActionListener(new ActionListener() {
 			@Override

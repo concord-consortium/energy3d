@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="getdown">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/exe/lib/getdown.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/google-collections.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/jdom2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/orange-extensions.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/samskivert.jar!/" />
+      <root url="jar://$PROJECT_DIR$/exe/lib/slf4j-api.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/exe/lib/samskivert.jar!/" />
+    </SOURCES>
+  </library>
+</component>
