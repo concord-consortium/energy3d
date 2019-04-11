@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -3856,12 +3857,7 @@ public class MainFrame extends JFrame {
 		if (copyImageMenuItem == null) {
 			copyImageMenuItem = new JMenuItem("Copy Image");
 			copyImageMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.ALT_MASK));
-			copyImageMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new ClipImage().copyImageToClipboard(MainPanel.getInstance().getCanvasPanel());
-				}
-			});
+			copyImageMenuItem.addActionListener(e -> new ClipImage().copyImageToClipboard(MainPanel.getInstance().getCanvasPanel()));
 		}
 		return copyImageMenuItem;
 	}
@@ -3869,12 +3865,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getExportImageMenuItem() {
 		if (exportImageMenuItem == null) {
 			exportImageMenuItem = new JMenuItem("Export Scene As Image...");
-			exportImageMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					exportImage();
-				}
-			});
+			exportImageMenuItem.addActionListener(e -> exportImage());
 		}
 		return exportImageMenuItem;
 	}
@@ -3899,12 +3890,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSpecificationsMenuItem() {
 		if (specificationsMenuItem == null) {
 			specificationsMenuItem = new JMenuItem("Specifications...");
-			specificationsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new SpecsDialog().setVisible(true);
-				}
-			});
+			specificationsMenuItem.addActionListener(e -> new SpecsDialog().setVisible(true));
 		}
 		return specificationsMenuItem;
 	}
@@ -3912,19 +3898,16 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOverallUtilityBillMenuItem() {
 		if (overallUtilityBillMenuItem == null) {
 			overallUtilityBillMenuItem = new JMenuItem("Overall Utility Bill...");
-			overallUtilityBillMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					UtilityBill b = Scene.getInstance().getUtilityBill();
-					if (b == null) {
-						if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
-							return;
-						}
-						b = new UtilityBill();
-						Scene.getInstance().setUtilityBill(b);
+			overallUtilityBillMenuItem.addActionListener(e -> {
+				UtilityBill b = Scene.getInstance().getUtilityBill();
+				if (b == null) {
+					if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
+						return;
 					}
-					new UtilityBillDialog(b).setVisible(true);
+					b = new UtilityBill();
+					Scene.getInstance().setUtilityBill(b);
 				}
+				new UtilityBillDialog(b).setVisible(true);
 			});
 		}
 		return overallUtilityBillMenuItem;
@@ -3933,12 +3916,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSetRegionMenuItem() {
 		if (setRegionMenuItem == null) {
 			setRegionMenuItem = new JMenuItem("Set Region...");
-			setRegionMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new GlobalMap(MainFrame.this).setVisible(true);
-				}
-			});
+			setRegionMenuItem.addActionListener(e -> new GlobalMap(MainFrame.this).setVisible(true));
 		}
 		return setRegionMenuItem;
 	}
@@ -3946,12 +3924,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getCustomPricesMenuItem() {
 		if (customPricesMenuItem == null) {
 			customPricesMenuItem = new JMenuItem("Custom Prices...");
-			customPricesMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new CustomPricesDialog().setVisible(true);
-				}
-			});
+			customPricesMenuItem.addActionListener(e -> new CustomPricesDialog().setVisible(true));
 		}
 		return customPricesMenuItem;
 	}
@@ -3960,12 +3933,7 @@ public class MainFrame extends JFrame {
 		if (propertiesMenuItem == null) {
 			propertiesMenuItem = new JMenuItem("Properties...");
 			propertiesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			propertiesMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new PropertiesDialog().setVisible(true);
-				}
-			});
+			propertiesMenuItem.addActionListener(e -> new PropertiesDialog().setVisible(true));
 		}
 		return propertiesMenuItem;
 	}
@@ -3974,12 +3942,9 @@ public class MainFrame extends JFrame {
 		if (noteCheckBoxMenuItem == null) {
 			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
 			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F11"));
-			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().setNoteVisible(noteCheckBoxMenuItem.isSelected());
-					Util.selectSilently(MainPanel.getInstance().getNoteButton(), noteCheckBoxMenuItem.isSelected());
-				}
+			noteCheckBoxMenuItem.addActionListener(e -> {
+				MainPanel.getInstance().setNoteVisible(noteCheckBoxMenuItem.isSelected());
+				Util.selectSilently(MainPanel.getInstance().getNoteButton(), noteCheckBoxMenuItem.isSelected());
 			});
 		}
 		return noteCheckBoxMenuItem;
@@ -3988,12 +3953,9 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getInfoPanelCheckBoxMenuItem() {
 		if (infoPanelCheckBoxMenuItem == null) {
 			infoPanelCheckBoxMenuItem = new JCheckBoxMenuItem("Show Information Panel", true);
-			infoPanelCheckBoxMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().setSplitComponentVisible(infoPanelCheckBoxMenuItem.isSelected(), MainPanel.getInstance().getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
+			infoPanelCheckBoxMenuItem.addActionListener(e -> {
+				MainPanel.getInstance().setSplitComponentVisible(infoPanelCheckBoxMenuItem.isSelected(), MainPanel.getInstance().getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			});
 		}
 		return infoPanelCheckBoxMenuItem;
@@ -4002,12 +3964,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getAutoRecomputeEnergyMenuItem() {
 		if (autoRecomputeEnergyMenuItem == null) {
 			autoRecomputeEnergyMenuItem = new JCheckBoxMenuItem("Automatically Recalculte Energy");
-			autoRecomputeEnergyMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					EnergyPanel.setAutoRecomputeEnergy(autoRecomputeEnergyMenuItem.isSelected());
-				}
-			});
+			autoRecomputeEnergyMenuItem.addItemListener(e -> EnergyPanel.setAutoRecomputeEnergy(autoRecomputeEnergyMenuItem.isSelected()));
 		}
 		return autoRecomputeEnergyMenuItem;
 	}
@@ -4015,24 +3972,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllRoofsMenuItem() {
 		if (removeAllRoofsMenuItem == null) {
 			removeAllRoofsMenuItem = new JMenuItem("Remove All Roofs");
-			removeAllRoofsMenuItem.addActionListener(new ActionListener() {
+			removeAllRoofsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllRoofs();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllRoofs();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllRoofsMenuItem;
 	}
@@ -4040,24 +3992,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllFloorsMenuItem() {
 		if (removeAllFloorsMenuItem == null) {
 			removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
-			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
+			removeAllFloorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllFloors();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllFloors();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllFloorsMenuItem;
 	}
@@ -4065,24 +4012,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllSolarPanelsMenuItem() {
 		if (removeAllSolarPanelsMenuItem == null) {
 			removeAllSolarPanelsMenuItem = new JMenuItem("Remove All Solar Panels");
-			removeAllSolarPanelsMenuItem.addActionListener(new ActionListener() {
+			removeAllSolarPanelsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllSolarPanels(null);
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllSolarPanels(null);
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllSolarPanelsMenuItem;
 	}
@@ -4090,24 +4032,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllRacksMenuItem() {
 		if (removeAllRacksMenuItem == null) {
 			removeAllRacksMenuItem = new JMenuItem("Remove All Solar Panel Packs");
-			removeAllRacksMenuItem.addActionListener(new ActionListener() {
+			removeAllRacksMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllRacks();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllRacks();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllRacksMenuItem;
 	}
@@ -4115,24 +4052,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllHeliostatsMenuItem() {
 		if (removeAllHeliostatsMenuItem == null) {
 			removeAllHeliostatsMenuItem = new JMenuItem("Remove All Heliostats");
-			removeAllHeliostatsMenuItem.addActionListener(new ActionListener() {
+			removeAllHeliostatsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllHeliostats();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllHeliostats();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllHeliostatsMenuItem;
 	}
@@ -4140,24 +4072,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllParabolicTroughsMenuItem() {
 		if (removeAllParabolicTroughsMenuItem == null) {
 			removeAllParabolicTroughsMenuItem = new JMenuItem("Remove All Parabolic Troughs");
-			removeAllParabolicTroughsMenuItem.addActionListener(new ActionListener() {
+			removeAllParabolicTroughsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllParabolicTroughs();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllParabolicTroughs();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllParabolicTroughsMenuItem;
 	}
@@ -4165,24 +4092,19 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllParabolicDishesMenuItem() {
 		if (removeAllParabolicDishesMenuItem == null) {
 			removeAllParabolicDishesMenuItem = new JMenuItem("Remove All Parabolic Dishes");
-			removeAllParabolicDishesMenuItem.addActionListener(new ActionListener() {
+			removeAllParabolicDishesMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
+				public Object call() {
+					Scene.getInstance().removeAllParabolicDishes();
+					EventQueue.invokeLater(new Runnable() {
 						@Override
-						public Object call() {
-							Scene.getInstance().removeAllParabolicDishes();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
+						public void run() {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 					});
+					return null;
 				}
-			});
+			}));
 		}
 		return removeAllParabolicDishesMenuItem;
 	}
@@ -4190,24 +4112,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllFresnelReflectorsMenuItem() {
 		if (removeAllFresnelReflectorsMenuItem == null) {
 			removeAllFresnelReflectorsMenuItem = new JMenuItem("Remove All Fresnel Reflectors");
-			removeAllFresnelReflectorsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllFresnelReflectors();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllFresnelReflectorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllFresnelReflectors();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllFresnelReflectorsMenuItem;
 	}
@@ -4215,24 +4124,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllSensorsMenuItem() {
 		if (removeAllSensorsMenuItem == null) {
 			removeAllSensorsMenuItem = new JMenuItem("Remove All Sensors");
-			removeAllSensorsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllSensors();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllSensorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllSensors();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllSensorsMenuItem;
 	}
@@ -4240,24 +4136,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllWallsMenuItem() {
 		if (removeAllWallsMenuItem == null) {
 			removeAllWallsMenuItem = new JMenuItem("Remove All Walls");
-			removeAllWallsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllWalls();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllWallsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllWalls();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllWallsMenuItem;
 	}
@@ -4265,24 +4148,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllWindowsMenuItem() {
 		if (removeAllWindowsMenuItem == null) {
 			removeAllWindowsMenuItem = new JMenuItem("Remove All Windows");
-			removeAllWindowsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllWindows();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllWindowsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllWindows();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllWindowsMenuItem;
 	}
@@ -4290,24 +4160,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllWindowShuttersMenuItem() {
 		if (removeAllWindowShuttersMenuItem == null) {
 			removeAllWindowShuttersMenuItem = new JMenuItem("Remove All Window Shutters");
-			removeAllWindowShuttersMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllWindowShutters();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllWindowShuttersMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllWindowShutters();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllWindowShuttersMenuItem;
 	}
@@ -4315,24 +4172,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllFoundationsMenuItem() {
 		if (removeAllFoundationsMenuItem == null) {
 			removeAllFoundationsMenuItem = new JMenuItem("Remove All Foundations");
-			removeAllFoundationsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllFoundations();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			removeAllFoundationsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllFoundations();
+				EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+				return null;
+			}));
 		}
 		return removeAllFoundationsMenuItem;
 	}
@@ -4340,23 +4184,12 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllTreesMenuItem() {
 		if (removeAllTreesMenuItem == null) {
 			removeAllTreesMenuItem = new JMenuItem("Remove All Trees");
-			removeAllTreesMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllTrees();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-								}
-							});
-							return null;
-						}
-					});
-				}
+			removeAllTreesMenuItem.addActionListener(e -> {
+				SceneManager.getTaskManager().update(() -> {
+					Scene.getInstance().removeAllTrees();
+					EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+					return null;
+				});
 			});
 		}
 		return removeAllTreesMenuItem;
@@ -4365,18 +4198,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllHumansMenuItem() {
 		if (removeAllHumansMenuItem == null) {
 			removeAllHumansMenuItem = new JMenuItem("Remove All Humans");
-			removeAllHumansMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().removeAllHumans();
-							return null;
-						}
-					});
-				}
-			});
+			removeAllHumansMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllHumans();
+				return null;
+			}));
 		}
 		return removeAllHumansMenuItem;
 	}
@@ -4384,26 +4209,23 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllUtilityBillsMenuItem() {
 		if (removeAllUtilityBillsMenuItem == null) {
 			removeAllUtilityBillsMenuItem = new JMenuItem("Remove All Utility Bills");
-			removeAllUtilityBillsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ArrayList<Foundation> list = new ArrayList<Foundation>();
-					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Foundation && ((Foundation) p).getUtilityBill() != null) {
-							list.add((Foundation) p);
-						}
+			removeAllUtilityBillsMenuItem.addActionListener(e -> {
+				final ArrayList<Foundation> list = new ArrayList<>();
+				for (final HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Foundation && ((Foundation) p).getUtilityBill() != null) {
+						list.add((Foundation) p);
 					}
-					if (list.isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill to remove.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-						for (final Foundation f : list) {
-							f.setUtilityBill(null);
-						}
-					}
-					Scene.getInstance().setEdited(true);
 				}
+				if (list.isEmpty()) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill to remove.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+					for (final Foundation f : list) {
+						f.setUtilityBill(null);
+					}
+				}
+				Scene.getInstance().setEdited(true);
 			});
 		}
 		return removeAllUtilityBillsMenuItem;
@@ -4412,12 +4234,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRotate180MenuItem() {
 		if (rotate180MenuItem == null) {
 			rotate180MenuItem = new JMenuItem("180\u00B0");
-			rotate180MenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().rotate(Math.PI);
-				}
-			});
+			rotate180MenuItem.addActionListener(e -> SceneManager.getInstance().rotate(Math.PI));
 		}
 		return rotate180MenuItem;
 	}
@@ -4425,12 +4242,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRotate90CwMenuItem() {
 		if (rotate90CwMenuItem == null) {
 			rotate90CwMenuItem = new JMenuItem("90\u00B0 Clockwise");
-			rotate90CwMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().rotate(-Math.PI / 2);
-				}
-			});
+			rotate90CwMenuItem.addActionListener(e -> SceneManager.getInstance().rotate(-Math.PI / 2));
 		}
 		return rotate90CwMenuItem;
 	}
@@ -4438,12 +4250,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRotate90CcwMenuItem() {
 		if (rotate90CcwMenuItem == null) {
 			rotate90CcwMenuItem = new JMenuItem("90\u00B0 Counter Clockwise");
-			rotate90CcwMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().rotate(Math.PI / 2);
-				}
-			});
+			rotate90CcwMenuItem.addActionListener(e -> SceneManager.getInstance().rotate(Math.PI / 2));
 		}
 		return rotate90CcwMenuItem;
 	}
@@ -4451,20 +4258,14 @@ public class MainFrame extends JFrame {
 	private JMenuItem getMoveEastMenuItem() {
 		if (moveEastMenuItem == null) {
 			moveEastMenuItem = new JMenuItem("Move East (or Press 'E' Key)");
-			moveEastMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
-						return;
-					}
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							SceneManager.getInstance().move(new Vector3(1, 0, 0));
-							return null;
-						}
-					});
+			moveEastMenuItem.addActionListener(e -> {
+				if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
+					return;
 				}
+				SceneManager.getTaskManager().update(() -> {
+					SceneManager.getInstance().move(new Vector3(1, 0, 0));
+					return null;
+				});
 			});
 		}
 		return moveEastMenuItem;
@@ -4473,20 +4274,14 @@ public class MainFrame extends JFrame {
 	private JMenuItem getMoveWestMenuItem() {
 		if (moveWestMenuItem == null) {
 			moveWestMenuItem = new JMenuItem("Move West (or Press 'W' Key)");
-			moveWestMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
-						return;
-					}
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							SceneManager.getInstance().move(new Vector3(-1, 0, 0));
-							return null;
-						}
-					});
+			moveWestMenuItem.addActionListener(e -> {
+				if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
+					return;
 				}
+				SceneManager.getTaskManager().update(() -> {
+					SceneManager.getInstance().move(new Vector3(-1, 0, 0));
+					return null;
+				});
 			});
 		}
 		return moveWestMenuItem;
@@ -4495,20 +4290,14 @@ public class MainFrame extends JFrame {
 	private JMenuItem getMoveSouthMenuItem() {
 		if (moveSouthMenuItem == null) {
 			moveSouthMenuItem = new JMenuItem("Move South (or Press 'S' Key)");
-			moveSouthMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
-						return;
-					}
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							SceneManager.getInstance().move(new Vector3(0, -1, 0));
-							return null;
-						}
-					});
+			moveSouthMenuItem.addActionListener(e -> {
+				if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
+					return;
 				}
+				SceneManager.getTaskManager().update(() -> {
+					SceneManager.getInstance().move(new Vector3(0, -1, 0));
+					return null;
+				});
 			});
 		}
 		return moveSouthMenuItem;
@@ -4517,20 +4306,14 @@ public class MainFrame extends JFrame {
 	private JMenuItem getMoveNorthMenuItem() {
 		if (moveNorthMenuItem == null) {
 			moveNorthMenuItem = new JMenuItem("Move North (or Press 'N' Key)");
-			moveNorthMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
-						return;
-					}
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							SceneManager.getInstance().move(new Vector3(0, 1, 0));
-							return null;
-						}
-					});
+			moveNorthMenuItem.addActionListener(e -> {
+				if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
+					return;
 				}
+				SceneManager.getTaskManager().update(() -> {
+					SceneManager.getInstance().move(new Vector3(0, 1, 0));
+					return null;
+				});
 			});
 		}
 		return moveNorthMenuItem;
@@ -4539,18 +4322,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem getFixProblemsMenuItem() {
 		if (fixProblemsMenuItem == null) {
 			fixProblemsMenuItem = new JMenuItem("Fix Problems");
-			fixProblemsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().fixProblems(true);
-							return null;
-						}
-					});
-				}
-			});
+			fixProblemsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().fixProblems(true);
+				return null;
+			}));
 		}
 		return fixProblemsMenuItem;
 	}
@@ -4558,18 +4333,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRemoveAllEditLocksMenuItem() {
 		if (removeAllEditLocksMenuItem == null) {
 			removeAllEditLocksMenuItem = new JMenuItem("Remove All Edit Locks");
-			removeAllEditLocksMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().lockAll(false);
-							return null;
-						}
-					});
-				}
-			});
+			removeAllEditLocksMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().lockAll(false);
+				return null;
+			}));
 		}
 		return removeAllEditLocksMenuItem;
 	}
@@ -4578,21 +4345,15 @@ public class MainFrame extends JFrame {
 		if (enableAllEditPointsMenuItem == null) {
 			enableAllEditPointsMenuItem = new JMenuItem("Enable All Base Edit Points");
 			enableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			enableAllEditPointsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							for (final Foundation f : foundations) {
-								f.setLockEdit(false);
-							}
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-				}
+			enableAllEditPointsMenuItem.addActionListener(e -> {
+				final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+				SceneManager.getTaskManager().update(() -> {
+					for (final Foundation f : foundations) {
+						f.setLockEdit(false);
+					}
+					return null;
+				});
+				Scene.getInstance().setEdited(true);
 			});
 		}
 		return enableAllEditPointsMenuItem;
@@ -4602,21 +4363,15 @@ public class MainFrame extends JFrame {
 		if (disableAllEditPointsMenuItem == null) {
 			disableAllEditPointsMenuItem = new JMenuItem("Disable All Base Edit Points");
 			disableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.SHIFT_MASK));
-			disableAllEditPointsMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							for (final Foundation f : foundations) {
-								f.setLockEdit(true);
-							}
-							return null;
-						}
-					});
-					Scene.getInstance().setEdited(true);
-				}
+			disableAllEditPointsMenuItem.addActionListener(e -> {
+				final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+				final Future<Object> update = SceneManager.getTaskManager().update(() -> {
+					for (final Foundation f : foundations) {
+						f.setLockEdit(true);
+					}
+					return null;
+				});
+				Scene.getInstance().setEdited(true);
 			});
 		}
 		return disableAllEditPointsMenuItem;
