@@ -9,8 +9,8 @@
         <module name="energy3d" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="energy3d" target="1.6" />
+    <bytecodeTargetLevel target="8">
+      <module name="energy3d" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

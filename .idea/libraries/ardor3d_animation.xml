@@ -13,6 +13,8 @@
       <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-savable.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/exe/lib/ardor3d/ardor3d-animation-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
