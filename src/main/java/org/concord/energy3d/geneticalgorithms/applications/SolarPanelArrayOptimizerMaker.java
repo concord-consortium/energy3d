@@ -118,17 +118,14 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 		panel.add(new JLabel("Search method:"));
 		final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[] { "Global Search (Uniform Selection)", "Local Search (Random Optimization)" });
 		searchMethodComboBox.setSelectedIndex(selectedSearchMethod);
-		searchMethodComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final boolean enabled = searchMethodComboBox.getSelectedIndex() > 0;
-					localSearchRadiusLabel.setEnabled(enabled);
-					localSearchRadiusField.setEnabled(enabled);
-					localSearchRadiusLabel2.setEnabled(enabled);
-					mutationRateField.setEnabled(!enabled);
-					mutationRateField.setText(enabled ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
-				}
+		searchMethodComboBox.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				final boolean enabled = searchMethodComboBox.getSelectedIndex() > 0;
+				localSearchRadiusLabel.setEnabled(enabled);
+				localSearchRadiusField.setEnabled(enabled);
+				localSearchRadiusLabel2.setEnabled(enabled);
+				mutationRateField.setEnabled(!enabled);
+				mutationRateField.setText(enabled ? "0" : EnergyPanel.FIVE_DECIMALS.format(mutationRate));
 			}
 		});
 		panel.add(searchMethodComboBox);
@@ -244,7 +241,7 @@ public class SolarPanelArrayOptimizerMaker extends OptimizerMaker {
 	}
 
 	@Override
-	public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation) {
+	public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation, final float convergence) {
 		op = new SolarPanelArrayOptimizer(population > 0 ? population : populationSize, 3, 0);
 		final SolarPanelArrayOptimizer op1 = (SolarPanelArrayOptimizer) op;
 		op.setSelectionMethod(selectedSelectionMethod);

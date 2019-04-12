@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "8.5.6";
+	public static final String VERSION = "8.5.7";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -56,16 +56,13 @@ public class MainApplication {
 	}
 
 	static void testSocket() {
-		final Thread socketThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					final MyServerSocket s = new MyServerSocket(null);
-					System.out.println("\r\nRunning Server: " + "Host=" + s.getSocketAddress().getHostAddress() + " Port=" + s.getPort());
-					s.listen();
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+		final Thread socketThread = new Thread(() -> {
+			try {
+				final MyServerSocket s = new MyServerSocket(null);
+				System.out.println("\r\nRunning Server: " + "Host=" + s.getSocketAddress().getHostAddress() + " Port=" + s.getPort());
+				s.listen();
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 		});
 		socketThread.setPriority(Thread.MIN_PRIORITY);
@@ -81,7 +78,7 @@ public class MainApplication {
 		checkSingleInstance(MainApplication.class, args);
 		// startDeadlockDetectionThread();
 
-		agents = new ArrayList<Agent>();
+		agents = new ArrayList<>();
 		// TODO: temporary test code below
 		// agents.add(new ConformanceChecker("Conformance Checker"));
 		// agents.add(new EventMinerSheet2("Event Miner Sheet 2"));
@@ -118,60 +115,52 @@ public class MainApplication {
 		}
 
 		initializing = true;
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final SceneManager sceneManager = SceneManager.getInstance(); // this calls Swing GUI
-				Scene.getInstance(); // this calls Swing GUI
-				sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
-				sceneManagerThread.start();
+		EventQueue.invokeLater(() -> {
+			final SceneManager sceneManager = SceneManager.getInstance(); // this calls Swing GUI
+			Scene.getInstance(); // this calls Swing GUI
+			sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
+			sceneManagerThread.start();
 
-				final MainFrame mainFrame = MainFrame.getInstance();
-				mainFrame.updateTitleBar();
-				mainFrame.setVisible(true);
-				new Thread("Energy3D Open File") {
-					@Override
-					public void run() {
-						try {
-							if (Config.isMac()) {
-								Thread.sleep(200);
-							}
-							if (isMacOpeningFile) {
-								return;
-							}
-							// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
-							if (Scene.getURL() == null) {
-								Scene.newFile(true);
-							}
-							if (Config.isWebStart()) {
-								if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
-									mainFrame.open(args[args.length - 1]);
-								}
-							} else {
-								if (args.length > 0) {
-									mainFrame.open(args[0]);
-								}
-							}
-						} catch (final Exception e) {
-							e.printStackTrace();
-						} finally {
-							initializing = false;
+			final MainFrame mainFrame = MainFrame.getInstance();
+			mainFrame.updateTitleBar();
+			mainFrame.setVisible(true);
+			new Thread("Energy3D Open File") {
+				@Override
+				public void run() {
+					try {
+						if (Config.isMac()) {
+							Thread.sleep(200);
 						}
+						if (isMacOpeningFile) {
+							return;
+						}
+						// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
+						if (Scene.getURL() == null) {
+							Scene.newFile(true);
+						}
+						if (Config.isWebStart()) {
+							if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
+								mainFrame.open(args[args.length - 1]);
+							}
+						} else {
+							if (args.length > 0) {
+								mainFrame.open(args[0]);
+							}
+						}
+					} catch (final Exception e) {
+						e.printStackTrace();
+					} finally {
+						initializing = false;
 					}
-				}.start();
+				}
+			}.start();
 
-				Updater.download();
+			Updater.download();
 
-			}
 		});
 
 		/* initialize data logging */
-		addShutdownHook(new Runnable() {
-			@Override
-			public void run() {
-				TimeSeriesLogger.getInstance().close();
-			}
-		});
+		addShutdownHook(() -> TimeSeriesLogger.getInstance().close());
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
@@ -182,7 +171,7 @@ public class MainApplication {
 
 	public static void addShutdownHook(final Runnable r) {
 		if (shutdownHooks == null) {
-			shutdownHooks = new ArrayList<Runnable>();
+			shutdownHooks = new ArrayList<>();
 		}
 		if (!shutdownHooks.contains(r)) {
 			shutdownHooks.add(r);
@@ -273,7 +262,7 @@ public class MainApplication {
 			}
 
 			/* Build command: java -jar application.jar */
-			final ArrayList<String> command = new ArrayList<String>();
+			final ArrayList<String> command = new ArrayList<>();
 			command.add(javaBin);
 			command.add("-jar");
 			command.add(currentJar.getPath());
@@ -366,19 +355,16 @@ public class MainApplication {
 
 	private static void showAndBringToFront() {
 		System.out.println("showAndBringToFront");
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (!MainFrame.getInstance().isVisible()) {
-					MainFrame.getInstance().setVisible(true);
-				}
-				if (MainFrame.getInstance().getState() == Frame.ICONIFIED) {
-					MainFrame.getInstance().setState(Frame.NORMAL);
-				} else if (Config.isMac()) {
-					Mac.bringToFront();
-				} else {
-					MainFrame.getInstance().toFront();
-				}
+		EventQueue.invokeLater(() -> {
+			if (!MainFrame.getInstance().isVisible()) {
+				MainFrame.getInstance().setVisible(true);
+			}
+			if (MainFrame.getInstance().getState() == Frame.ICONIFIED) {
+				MainFrame.getInstance().setState(Frame.NORMAL);
+			} else if (Config.isMac()) {
+				Mac.bringToFront();
+			} else {
+				MainFrame.getInstance().toFront();
 			}
 		});
 	}
@@ -393,12 +379,7 @@ public class MainApplication {
 				}
 				while (true) {
 					final boolean[] isInvoked = { false };
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							isInvoked[0] = true;
-						}
-					});
+					EventQueue.invokeLater(() -> isInvoked[0] = true);
 
 					try {
 						sleep(10000);

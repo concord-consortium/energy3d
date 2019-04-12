@@ -475,12 +475,7 @@ public class MainPanel extends JPanel {
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
 			selectButton.setFocusable(false);
-			selectButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					defaultTool();
-				}
-			});
+			selectButton.addActionListener(e -> defaultTool());
 			addMouseOverEffect(selectButton);
 		}
 		return selectButton;
@@ -492,12 +487,9 @@ public class MainPanel extends JPanel {
 			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/exterior_wall.png")));
 			wallButton.setToolTipText("Draw an exterior wall");
 			wallButton.setFocusable(false);
-			wallButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_EXTERIOR_WALL);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
+			wallButton.addActionListener(e -> {
+				SceneManager.getInstance().setOperation(Operation.DRAW_EXTERIOR_WALL);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			});
 			wallButton.addMouseListener(operationStickAndRefreshUponExit);
 			addMouseOverEffect(wallButton);
@@ -512,12 +504,7 @@ public class MainPanel extends JPanel {
 			final Dimension d = new Dimension(12, wallButton.getMaximumSize().height);
 			wallArrowButton.setMaximumSize(d);
 			wallArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
-			wallArrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					wallMenu.show(wallButton, 0, wallButton.getHeight());
-				}
-			});
+			wallArrowButton.addActionListener(e -> wallMenu.show(wallButton, 0, wallButton.getHeight()));
 			wallArrowButton.setBorder(BorderFactory.createEmptyBorder());
 			wallArrowButton.setFocusPainted(false);
 		}

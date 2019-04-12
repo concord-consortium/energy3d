@@ -225,6 +225,7 @@ public final class TaskFactory {
 				int population = -1;
 				int generations = -1;
 				float mutation = -1;
+				float convergence = 0.01f;
 				if (t.length > 1) {
 					population = Integer.parseInt(t[1]);
 				}
@@ -234,10 +235,13 @@ public final class TaskFactory {
 				if (t.length > 3) {
 					mutation = Float.parseFloat(t[3]);
 				}
+				if (t.length > 4) {
+					convergence = Float.parseFloat(t[4]);
+				}
 				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelTiltAngleOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation);
+						SolarPanelTiltAngleOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation, convergence);
 					} else {
 						SolarPanelTiltAngleOptimizer.make((Foundation) p);
 					}
@@ -281,6 +285,7 @@ public final class TaskFactory {
 				int population = -1;
 				int generations = -1;
 				float mutation = -1;
+				float convergence = 0.01f;
 				if (t.length > 1) {
 					population = Integer.parseInt(t[1]);
 				}
@@ -290,10 +295,13 @@ public final class TaskFactory {
 				if (t.length > 3) {
 					mutation = Float.parseFloat(t[3]);
 				}
+				if (t.length > 4) {
+					convergence = Float.parseFloat(t[4]);
+				}
 				final HousePart p = Scene.getInstance().getPart(foundationID);
 				if (p instanceof Foundation) {
 					if (silent) {
-						SolarPanelArrayOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation);
+						SolarPanelArrayOptimizer.runIt((Foundation) p, local, daily, profit, population, generations, mutation, convergence);
 					} else {
 						SolarPanelArrayOptimizer.make((Foundation) p);
 					}

@@ -273,21 +273,18 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 		foundation.setLabelCustomText(s);
 		foundation.draw();
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final Calendar today = Heliodon.getInstance().getCalendar();
-				EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart instanceof Foundation) { // synchronize with daily graph
-					final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
-					g.setCalendar(today);
-					EnergyPanel.getInstance().getPvProjectTabbedPane().setSelectedComponent(g);
-					if (g.hasGraph()) {
-						g.updateGraph();
-					} else {
-						g.addGraph((Foundation) selectedPart);
-					}
+		EventQueue.invokeLater(() -> {
+			final Calendar today = Heliodon.getInstance().getCalendar();
+			EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Foundation) { // synchronize with daily graph
+				final PvProjectDailyEnergyGraph g = EnergyPanel.getInstance().getPvProjectDailyEnergyGraph();
+				g.setCalendar(today);
+				EnergyPanel.getInstance().getPvProjectTabbedPane().setSelectedComponent(g);
+				if (g.hasGraph()) {
+					g.updateGraph();
+				} else {
+					g.addGraph((Foundation) selectedPart);
 				}
 			}
 		});
@@ -308,11 +305,11 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		}
 	}
 
-	public static void runIt(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation) {
+	public static void runIt(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation, final float convergence) {
 		if (maker == null) {
 			maker = new SolarPanelArrayOptimizerMaker();
 		}
-		maker.run(foundation, local, daily, profit, population, generations, mutation);
+		maker.run(foundation, local, daily, profit, population, generations, mutation, convergence);
 	}
 
 	@Override
@@ -326,4 +323,5 @@ public class SolarPanelArrayOptimizer extends SolarOutputOptimizer {
 		json += "}";
 		return json;
 	}
+
 }
