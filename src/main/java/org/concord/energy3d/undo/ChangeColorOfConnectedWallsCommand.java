@@ -9,7 +9,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.util.WallVisitor;
+import org.concord.energy3d.model.WallVisitor;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 

@@ -13,7 +13,6 @@ import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.PolygonWithHoles;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.geometry.primitives.Point;

@@ -5,6 +5,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
 public class FontManager {
+
 	private static final FontManager instance = new FontManager();
 	private final BMFont partNumberFont;
 	private final BMFont annotationFont;
@@ -37,4 +38,5 @@ public class FontManager {
 	public BMFont getAnnotationFont() {
 		return annotationFont;
 	}
+
 }

@@ -2,7 +2,6 @@ package org.concord.energy3d.util;
 
 import java.awt.FileDialog;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -31,7 +30,7 @@ public class FileChooser {
 
 	private static final int MAX = 4;
 	private static FileChooser instance;
-	private final List<String> recentFiles = new ArrayList<String>();
+	private final List<String> recentFiles = new ArrayList<>();
 	private final JFileChooser fileChooser;
 	private FileDialog fileDialog;
 
@@ -81,7 +80,7 @@ public class FileChooser {
 		recentFiles.add(fileName);
 	}
 
-	public void addRecentFile(final String fileName) {
+	private void addRecentFile(final String fileName) {
 		if (fileName != null) {
 			recentFiles.add(fileName);
 		}
@@ -103,12 +102,7 @@ public class FileChooser {
 		if (Config.isMac() && filter != null) {
 			fileDialog.setMode(isSaveDialog ? FileDialog.SAVE : FileDialog.LOAD);
 			fileDialog.setTitle(isSaveDialog ? "Save" : "Open");
-			fileDialog.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(final File dir, final String name) {
-					return name.toLowerCase().endsWith(dotExtension);
-				}
-			});
+			fileDialog.setFilenameFilter((dir, name) -> name.toLowerCase().endsWith(dotExtension));
 
 			if (isSaveDialog && dotExtension.equals(".ng3") && Scene.getURL() != null) {
 				fileDialog.setFile(Scene.getURL().getFile());

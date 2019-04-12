@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URL;
-import java.util.concurrent.Callable;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,13 +42,10 @@ public class BugReporter {
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		final String msg = sw.toString();
-		if (msg.indexOf("java.lang.OutOfMemoryError") != -1) { // in this case, we may not have enough resource to send error report. just advise user to restart
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Energy3D has temporarily run out of memory. If this message<br>persists, please restart the software.</html>", "Out of Memory", JOptionPane.ERROR_MESSAGE);
-					System.gc();
-				}
+		if (msg.contains("java.lang.OutOfMemoryError")) { // in this case, we may not have enough resource to send error report. just advise user to restart
+			EventQueue.invokeLater(() -> {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Energy3D has temporarily run out of memory. If this message<br>persists, please restart the software.</html>", "Out of Memory", JOptionPane.ERROR_MESSAGE);
+				System.gc();
 			});
 		} else {
 			final String text = header + "\n" + msg;
@@ -61,18 +57,15 @@ public class BugReporter {
 				file = null;
 			}
 			final File currentFile = file;
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					final JPanel panel = new JPanel(new BorderLayout(10, 10));
-					final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
-					scrollPane.setPreferredSize(new Dimension(400, 400));
-					panel.add(scrollPane, BorderLayout.CENTER);
-					final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
-					panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
-						new Uploader(text, currentFile).execute();
-					}
+			EventQueue.invokeLater(() -> {
+				final JPanel panel = new JPanel(new BorderLayout(10, 10));
+				final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
+				scrollPane.setPreferredSize(new Dimension(400, 400));
+				panel.add(scrollPane, BorderLayout.CENTER);
+				final boolean corrupted = msg.contains("java.io.EOFException");
+				panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
+					new Uploader(text, currentFile).execute();
 				}
 			});
 		}
@@ -104,12 +97,9 @@ public class BugReporter {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
 			}
 			// attempt to fix problems
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() {
-					Scene.getInstance().fixProblems(true);
-					return null;
-				}
+			SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().fixProblems(true);
+				return null;
 			});
 		}
 	}

@@ -13,50 +13,50 @@ import java.io.IOException;
 
 public class ClipImage implements ClipboardOwner {
 
-	@Override
-	public void lostOwnership(Clipboard clipboard, Transferable contents) {
-	}
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    }
 
-	public void copyImageToClipboard(Component c) {
-		BufferedImage bi = new BufferedImage(c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		c.paintAll(bi.createGraphics());
-		try {
-			TransferableImage trans = new TransferableImage(bi);
-			Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-			clip.setContents(trans, this);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void copyImageToClipboard(Component c) {
+        BufferedImage bi = new BufferedImage(c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        c.paintAll(bi.createGraphics());
+        try {
+            TransferableImage trans = new TransferableImage(bi);
+            Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clip.setContents(trans, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	private class TransferableImage implements Transferable {
+    private class TransferableImage implements Transferable {
 
-		private Image image;
+        private Image image;
 
-		public TransferableImage(Image image) {
-			this.image = image;
-		}
+        public TransferableImage(Image image) {
+            this.image = image;
+        }
 
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-			if (flavor.equals(DataFlavor.imageFlavor) && image != null)
-				return image;
-			throw new UnsupportedFlavorException(flavor);
-		}
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            if (flavor.equals(DataFlavor.imageFlavor) && image != null)
+                return image;
+            throw new UnsupportedFlavorException(flavor);
+        }
 
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[] { DataFlavor.imageFlavor };
-		}
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{DataFlavor.imageFlavor};
+        }
 
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			DataFlavor[] flavors = getTransferDataFlavors();
-			for (int i = 0; i < flavors.length; i++) {
-				if (flavor.equals(flavors[i])) {
-					return true;
-				}
-			}
-			return false;
-		}
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for (DataFlavor x : flavors) {
+                if (flavor.equals(x)) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
-	}
+    }
 
 }

@@ -35,17 +35,14 @@ public class DataCollector {
 			file = null;
 		}
 		final File currentFile = file;
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final JPanel panel = new JPanel(new BorderLayout(10, 10));
-				final JScrollPane scrollPane = new JScrollPane(new JTextArea(info));
-				scrollPane.setPreferredSize(new Dimension(400, 400));
-				panel.add(scrollPane, BorderLayout.CENTER);
-				panel.add(new JLabel("<html><b>Submit your data to the researchers now?</b></html>"), BorderLayout.SOUTH);
-				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
-					new Uploader(info, currentFile).execute();
-				}
+		EventQueue.invokeLater(() -> {
+			final JPanel panel = new JPanel(new BorderLayout(10, 10));
+			final JScrollPane scrollPane = new JScrollPane(new JTextArea(info));
+			scrollPane.setPreferredSize(new Dimension(400, 400));
+			panel.add(scrollPane, BorderLayout.CENTER);
+			panel.add(new JLabel("<html><b>Submit your data to the researchers now?</b></html>"), BorderLayout.SOUTH);
+			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
+				new Uploader(info, currentFile).execute();
 			}
 		});
 	}

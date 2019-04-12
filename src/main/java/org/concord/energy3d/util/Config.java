@@ -7,9 +7,9 @@ public class Config {
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
 	private static final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("win");
 
-	public static enum RenderMode {
+	public enum RenderMode {
 		NEWT, JOGL, LWJGL
-	};
+	}
 
 	public static void setWebStart(final boolean webstart) {
 		isWebstart = webstart;

@@ -1,35 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.concurrent.Callable;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SpringLayout;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -45,6 +15,18 @@ import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+
 class PopupMenuForLand extends PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForLand;
@@ -52,13 +34,10 @@ class PopupMenuForLand extends PopupMenuFactory {
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
 
 		if (e.isShiftDown()) {
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					Scene.getInstance().pasteToPickedLocationOnLand();
-					Scene.getInstance().setEdited(true);
-					return null;
-				}
+			SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().pasteToPickedLocationOnLand();
+				Scene.getInstance().setEdited(true);
+				return null;
 			});
 			return null;
 		}
@@ -73,99 +52,48 @@ class PopupMenuForLand extends PopupMenuFactory {
 
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miPaste.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().pasteToPickedLocationOnLand();
-							return null;
-						}
-					});
-				}
-			});
+			miPaste.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().pasteToPickedLocationOnLand();
+				return null;
+			}));
 
 			final JMenuItem miRemoveAllTrees = new JMenuItem("Remove All Trees");
-			miRemoveAllTrees.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().removeAllTrees();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-									Scene.getInstance().setEdited(true);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			miRemoveAllTrees.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllTrees();
+				EventQueue.invokeLater(() -> {
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
+					Scene.getInstance().setEdited(true);
+				});
+				return null;
+			}));
 
 			final JMenuItem miRemoveAllHumans = new JMenuItem("Remove All Humans");
-			miRemoveAllHumans.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().removeAllHumans();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-									Scene.getInstance().setEdited(true);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			miRemoveAllHumans.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllHumans();
+				EventQueue.invokeLater(() -> {
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
+					Scene.getInstance().setEdited(true);
+				});
+				return null;
+			}));
 
 			final JMenuItem miRemoveAllBuildings = new JMenuItem("Remove All Foundations");
-			miRemoveAllBuildings.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() throws Exception {
-							Scene.getInstance().removeAllFoundations();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									MainPanel.getInstance().getEnergyButton().setSelected(false);
-									Scene.getInstance().setEdited(true);
-								}
-							});
-							return null;
-						}
-					});
-				}
-			});
+			miRemoveAllBuildings.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
+				Scene.getInstance().removeAllFoundations();
+				EventQueue.invokeLater(() -> {
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
+					Scene.getInstance().setEdited(true);
+				});
+				return null;
+			}));
 
 			final JMenuItem miImportEnergy3D = new JMenuItem("Import...");
 			miImportEnergy3D.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
-			miImportEnergy3D.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					MainFrame.getInstance().importFile();
-				}
-			});
+			miImportEnergy3D.addActionListener(e15 -> MainFrame.getInstance().importFile());
 
 			final JMenuItem miImportCollada = new JMenuItem("Import Collada...");
 			miImportCollada.setToolTipText("Import the content in an existing Collada file into the clicked location on the land as the center");
-			miImportCollada.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					MainFrame.getInstance().importColladaFile();
-				}
-			});
+			miImportCollada.addActionListener(e16 -> MainFrame.getInstance().importColladaFile());
 
 			final JMenu miImportPrefabMenu = new JMenu("Import a Prefab");
 			addPrefabMenuItem("Back Hip Roof Porch", "prefabs/back-hip-roof-porch.ng3", miImportPrefabMenu);
@@ -194,112 +122,103 @@ class PopupMenuForLand extends PopupMenuFactory {
 			addPrefabMenuItem("Waterfront Deck", "prefabs/waterfront-deck.ng3", miImportPrefabMenu);
 
 			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
-			miAlbedo.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Examples:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
-					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getAlbedo());
-						if (newValue == null) {
-							break;
-						} else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 1) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									if (val != Scene.getInstance().getGround().getAlbedo()) {
-										final ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
-										Scene.getInstance().getGround().setAlbedo(val);
-										updateAfterEdit();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									break;
+			miAlbedo.addActionListener(event -> {
+				final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Examples:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
+				while (true) {
+					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getAlbedo());
+					if (newValue == null) {
+						break;
+					} else {
+						try {
+							final double val = Double.parseDouble(newValue);
+							if (val < 0 || val > 1) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else {
+								if (val != Scene.getInstance().getGround().getAlbedo()) {
+									final ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
+									Scene.getInstance().getGround().setAlbedo(val);
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								break;
 							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
 			});
 
 			final JMenuItem miSnowReflection = new JMenuItem("Snow Reflection...");
-			miSnowReflection.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final JPanel gui = new JPanel(new BorderLayout());
-					final String title = "<html>Increase of indirect solar radiation due to snow reflection<br>(a dimensionless parameter within [0, 0.2])</html>";
-					gui.add(new JLabel(title), BorderLayout.NORTH);
-					final JPanel inputPanel = new JPanel(new SpringLayout());
-					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-					gui.add(inputPanel, BorderLayout.CENTER);
-					final JTextField[] fields = new JTextField[12];
-					for (int i = 0; i < 12; i++) {
-						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.TRAILING);
-						inputPanel.add(l);
-						fields[i] = new JTextField(threeDecimalsFormat.format(Scene.getInstance().getGround().getSnowReflectionFactor(i)), 5);
-						l.setLabelFor(fields[i]);
-						inputPanel.add(fields[i]);
+			miSnowReflection.addActionListener(event -> {
+				final JPanel gui = new JPanel(new BorderLayout());
+				final String title = "<html>Increase of indirect solar radiation due to snow reflection<br>(a dimensionless parameter within [0, 0.2])</html>";
+				gui.add(new JLabel(title), BorderLayout.NORTH);
+				final JPanel inputPanel = new JPanel(new SpringLayout());
+				inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+				gui.add(inputPanel, BorderLayout.CENTER);
+				final JTextField[] fields = new JTextField[12];
+				for (int i = 0; i < 12; i++) {
+					final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.TRAILING);
+					inputPanel.add(l);
+					fields[i] = new JTextField(threeDecimalsFormat.format(Scene.getInstance().getGround().getSnowReflectionFactor(i)), 5);
+					l.setLabelFor(fields[i]);
+					inputPanel.add(fields[i]);
+				}
+				SpringUtilities.makeCompactGrid(inputPanel, 12, 2, 6, 6, 6, 6);
+				while (true) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Snow reflection factor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						break;
 					}
-					SpringUtilities.makeCompactGrid(inputPanel, 12, 2, 6, 6, 6, 6);
-					while (true) {
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Snow reflection factor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-							break;
-						}
-						boolean pass = true;
-						final double[] val = new double[12];
-						for (int i = 0; i < 12; i++) {
-							try {
-								val[i] = Double.parseDouble(fields[i].getText());
-								if (val[i] < 0 || val[i] > 0.2) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Snow reflection factor must be in 0-0.2.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									pass = false;
-								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), fields[i].getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+					boolean pass = true;
+					final double[] val = new double[12];
+					for (int i = 0; i < 12; i++) {
+						try {
+							val[i] = Double.parseDouble(fields[i].getText());
+							if (val[i] < 0 || val[i] > 0.2) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Snow reflection factor must be in 0-0.2.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								pass = false;
 							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), fields[i].getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							pass = false;
 						}
-						if (pass) {
-							final ChangeSnowReflectionFactorCommand c = new ChangeSnowReflectionFactorCommand();
-							for (int i = 0; i < 12; i++) {
-								Scene.getInstance().getGround().setSnowReflectionFactor(val[i], i);
-							}
-							updateAfterEdit();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-							break;
+					}
+					if (pass) {
+						final ChangeSnowReflectionFactorCommand c = new ChangeSnowReflectionFactorCommand();
+						for (int i = 0; i < 12; i++) {
+							Scene.getInstance().getGround().setSnowReflectionFactor(val[i], i);
 						}
+						updateAfterEdit();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						break;
 					}
 				}
 			});
 
 			final JMenuItem miThermalDiffusivity = new JMenuItem("Ground Thermal Diffusivity...");
-			miThermalDiffusivity.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Examples:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
-					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getThermalDiffusivity());
-						if (newValue == null) {
-							break;
-						} else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									if (val != Scene.getInstance().getGround().getThermalDiffusivity()) {
-										final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
-										Scene.getInstance().getGround().setThermalDiffusivity(val);
-										updateAfterEdit();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									break;
+			miThermalDiffusivity.addActionListener(event -> {
+				final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Examples:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
+				while (true) {
+					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getThermalDiffusivity());
+					if (newValue == null) {
+						break;
+					} else {
+						try {
+							final double val = Double.parseDouble(newValue);
+							if (val <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else {
+								if (val != Scene.getInstance().getGround().getThermalDiffusivity()) {
+									final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
+									Scene.getInstance().getGround().setThermalDiffusivity(val);
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								break;
 							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
@@ -333,82 +252,65 @@ class PopupMenuForLand extends PopupMenuFactory {
 			});
 
 			final JMenuItem miUseEarthView = new JMenuItem("Use Image from Earth View...");
-			miUseEarthView.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new MapDialog(MainFrame.getInstance()).setVisible(true);
-				}
-			});
+			miUseEarthView.addActionListener(event -> new MapDialog(MainFrame.getInstance()).setVisible(true));
 			groundImageMenu.add(miUseEarthView);
 
 			final JMenuItem miUseImageFile = new JMenuItem("Use Image from File...");
-			miUseImageFile.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final File file = FileChooser.getInstance().showDialog(".png", FileChooser.pngFilter, false);
-					if (file == null) {
-						return;
-					}
-					try {
-						Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
-						Scene.getInstance().setGroundImageEarthView(false);
-					} catch (final Throwable t) {
-						t.printStackTrace();
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-					}
-					Scene.getInstance().setEdited(true);
+			miUseImageFile.addActionListener(event -> {
+				final File file = FileChooser.getInstance().showDialog(".png", FileChooser.pngFilter, false);
+				if (file == null) {
+					return;
 				}
+				try {
+					Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
+					Scene.getInstance().setGroundImageEarthView(false);
+				} catch (final Throwable t) {
+					t.printStackTrace();
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				Scene.getInstance().setEdited(true);
 			});
 			groundImageMenu.add(miUseImageFile);
 			groundImageMenu.addSeparator();
 
-			miRescaleImage.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String title = "Scale the ground image";
-					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundImageScale());
-						if (newValue == null) {
-							break;
-						} else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									// final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
-									Scene.getInstance().setGroundImageScale(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
-									break;
-								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+			miRescaleImage.addActionListener(event -> {
+				final String title = "Scale the ground image";
+				while (true) {
+					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundImageScale());
+					if (newValue == null) {
+						break;
+					} else {
+						try {
+							final double val = Double.parseDouble(newValue);
+							if (val <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else {
+								// final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
+								Scene.getInstance().setGroundImageScale(val);
+								// SceneManager.getInstance().getUndoManager().addEdit(c);
+								break;
 							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
-					Scene.getInstance().setEdited(true);
 				}
+				Scene.getInstance().setEdited(true);
 			});
 			groundImageMenu.add(miRescaleImage);
 
-			miClearImage.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setGroundImage(null, 1);
-					Scene.getInstance().setEdited(true);
-				}
+			miClearImage.addActionListener(event -> {
+				Scene.getInstance().setGroundImage(null, 1);
+				Scene.getInstance().setEdited(true);
 			});
 			groundImageMenu.add(miClearImage);
 
-			miShowImage.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final boolean b = miShowImage.isSelected();
-					SceneManager.getInstance().getGroundImageLand().setVisible(b);
-					Scene.getInstance().setShowGroundImage(b);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().refresh();
-				}
+			miShowImage.addItemListener(event -> {
+				final boolean b = miShowImage.isSelected();
+				SceneManager.getInstance().getGroundImageLand().setVisible(b);
+				Scene.getInstance().setShowGroundImage(b);
+				Scene.getInstance().setEdited(true);
+				SceneManager.getInstance().refresh();
 			});
 			groundImageMenu.add(miShowImage);
 

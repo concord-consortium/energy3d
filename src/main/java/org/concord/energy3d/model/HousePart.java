@@ -20,7 +20,6 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Image;

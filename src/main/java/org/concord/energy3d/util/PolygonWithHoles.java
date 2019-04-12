@@ -9,12 +9,12 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 
 public class PolygonWithHoles extends Polygon {
 
-	public PolygonWithHoles(final List<PolygonPoint> points) {
-		super(points);
-	}
+    public PolygonWithHoles(final List<PolygonPoint> points) {
+        super(points);
+    }
 
-	public ArrayList<Polygon> getHoles() {
-		return _holes;
-	}
+    public ArrayList<Polygon> getHoles() {
+        return _holes;
+    }
 
 }

@@ -101,46 +101,43 @@ public class VsgSubmitter {
 
 		final File currentFile = file;
 		final String info = s;
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
+		EventQueue.invokeLater(() -> {
 
-				final JTextArea textArea = new JTextArea(info);
-				textArea.setEditable(false);
-				final JPanel panel = new JPanel(new BorderLayout(10, 10));
-				final JScrollPane scrollPane = new JScrollPane(textArea);
-				scrollPane.setPreferredSize(new Dimension(400, 300));
-				panel.add(scrollPane, BorderLayout.NORTH);
+			final JTextArea textArea = new JTextArea(info);
+			textArea.setEditable(false);
+			final JPanel panel = new JPanel(new BorderLayout(10, 10));
+			final JScrollPane scrollPane = new JScrollPane(textArea);
+			scrollPane.setPreferredSize(new Dimension(400, 300));
+			panel.add(scrollPane, BorderLayout.NORTH);
 
-				final JTextField nameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
-				final JTextField emailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
-				final JTextField organizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
-				final JPanel personalInfoPanel = new JPanel(new SpringLayout());
-				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information (for earning scores and making contact only)"));
-				personalInfoPanel.add(new JLabel("Name: "));
-				personalInfoPanel.add(nameField);
-				personalInfoPanel.add(new JLabel("Email: "));
-				personalInfoPanel.add(emailField);
-				personalInfoPanel.add(new JLabel("Organization: "));
-				personalInfoPanel.add(organizationField);
-				SpringUtilities.makeCompactGrid(personalInfoPanel, 3, 2, 8, 8, 8, 8);
-				panel.add(personalInfoPanel, BorderLayout.CENTER);
+			final JTextField nameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
+			final JTextField emailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
+			final JTextField organizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
+			final JPanel personalInfoPanel = new JPanel(new SpringLayout());
+			personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information (for earning scores and making contact only)"));
+			personalInfoPanel.add(new JLabel("Name: "));
+			personalInfoPanel.add(nameField);
+			personalInfoPanel.add(new JLabel("Email: "));
+			personalInfoPanel.add(emailField);
+			personalInfoPanel.add(new JLabel("Organization: "));
+			personalInfoPanel.add(organizationField);
+			SpringUtilities.makeCompactGrid(personalInfoPanel, 3, 2, 8, 8, 8, 8);
+			panel.add(personalInfoPanel, BorderLayout.CENTER);
 
-				String s = "<html><font size=2>";
-				s += "By pressing the Yes button below, you agree to contribute your work to the Virtual Solar Grid, a public<br>";
-				s += "website that collects many virtual solar power systems. Your work will be reviewed by experts to determine<br>";
-				s += "its readiness for publication. You will be notified about its status through the email you provide above.<br>";
-				s += "If you agree on these terms, please continue. Otherwise, click the No button to abort.</font><br><br>";
-				s += "<b>Do you want to submit your work to the Virtual Solar Grid now?";
-				s += "</b></html>";
-				panel.add(new JLabel(s), BorderLayout.SOUTH);
+			String s1 = "<html><font size=2>";
+			s1 += "By pressing the Yes button below, you agree to contribute your work to the Virtual Solar Grid, a public<br>";
+			s1 += "website that collects many virtual solar power systems. Your work will be reviewed by experts to determine<br>";
+			s1 += "its readiness for publication. You will be notified about its status through the email you provide above.<br>";
+			s1 += "If you agree on these terms, please continue. Otherwise, click the No button to abort.</font><br><br>";
+			s1 += "<b>Do you want to submit your work to the Virtual Solar Grid now?";
+			s1 += "</b></html>";
+			panel.add(new JLabel(s1), BorderLayout.SOUTH);
 
-				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Virtual Solar Grid", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.YES_OPTION) {
-					Scene.getInstance().getDesigner().setName(nameField.getText());
-					Scene.getInstance().getDesigner().setEmail(emailField.getText());
-					Scene.getInstance().getDesigner().setOrganization(organizationField.getText());
-					new Uploader(nameField.getText(), emailField.getText(), organizationField.getText(), info, currentFile).execute();
-				}
+			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Virtual Solar Grid", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.YES_OPTION) {
+				Scene.getInstance().getDesigner().setName(nameField.getText());
+				Scene.getInstance().getDesigner().setEmail(emailField.getText());
+				Scene.getInstance().getDesigner().setOrganization(organizationField.getText());
+				new Uploader(nameField.getText(), emailField.getText(), organizationField.getText(), info, currentFile).execute();
 			}
 		});
 

@@ -15,7 +15,7 @@ import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.WallVisitor;
+import org.concord.energy3d.model.WallVisitor;
 
 public class ChangeHeightForConnectedWallsCommand extends MyAbstractUndoableEdit {
 

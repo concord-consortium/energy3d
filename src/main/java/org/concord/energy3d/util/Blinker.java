@@ -7,6 +7,7 @@ import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.util.ReadOnlyTimer;
 
 public class Blinker implements Updater {
+
 	private static final Blinker instance = new Blinker();
 	private Spatial target = null;
 	private double lastTime;	
@@ -39,4 +40,5 @@ public class Blinker implements Updater {
 			this.target.getSceneHints().setCullHint(CullHint.Inherit);
 		this.target = target;
 	}
+
 }

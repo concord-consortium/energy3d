@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
-import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.type.ReadOnlyVector3;

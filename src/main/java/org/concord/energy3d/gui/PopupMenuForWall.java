@@ -55,7 +55,7 @@ import org.concord.energy3d.undo.SetTextureForPartsCommand;
 import org.concord.energy3d.undo.SetTextureForWallsOnFoundationCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
-import org.concord.energy3d.util.WallVisitor;
+import org.concord.energy3d.model.WallVisitor;
 
 class PopupMenuForWall extends PopupMenuFactory {
 
