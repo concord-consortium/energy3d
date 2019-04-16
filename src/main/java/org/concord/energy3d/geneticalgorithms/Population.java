@@ -22,7 +22,7 @@ public class Population {
 	private final boolean[] violations;
 	private double beta = 0.5;
 	private final List<Individual> survivors = new ArrayList<Individual>();
-	private final List<Individual> mutants = new ArrayList<Individual>();
+	private final List<Individual> mutants = new ArrayList<>();
 	private int selectionMethod = ROULETTE_WHEEL;
 	private double convergenceThreshold = 0.01;
 	private int discretizationSteps;
@@ -179,12 +179,12 @@ public class Population {
 		final int n = getChromosomeLength();
 		for (int i = 0; i < n; i++) {
 			double average = 0;
-			for (int j = 0; j < individuals.length; j++) {
-				average += individuals[j].getGene(i);
+			for (Individual individual : individuals) {
+				average += individual.getGene(i);
 			}
 			average /= individuals.length;
-			for (int j = 0; j < individuals.length; j++) {
-				if (Math.abs(individuals[j].getGene(i) / average - 1.0) > convergenceThreshold) {
+			for (Individual individual : individuals) {
+				if (Math.abs(individual.getGene(i) / average - 1.0) > convergenceThreshold) {
 					return false;
 				}
 			}
@@ -290,7 +290,7 @@ public class Population {
 		}
 
 		final int newBorn = individuals.length - numberOfSurvivers;
-		final List<Parents> oldFolks = new ArrayList<Parents>(newBorn);
+		final List<Parents> oldFolks = new ArrayList<>(newBorn);
 		while (oldFolks.size() * 2 < newBorn) { // multiplying 2 because each couple produces two children as shown in the mating algorithm below
 			final Parents p;
 			switch (selectionMethod) {

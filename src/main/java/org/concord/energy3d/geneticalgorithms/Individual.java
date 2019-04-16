@@ -84,13 +84,7 @@ public class Individual implements Comparable<Individual> {
 	/** highest fitness first, lowest fitness last */
 	@Override
 	public int compareTo(final Individual o) {
-		if (fitness > o.fitness) {
-			return -1;
-		}
-		if (fitness < o.fitness) {
-			return 1;
-		}
-		return 0;
+		return Double.compare(o.fitness, fitness);
 	}
 
 	@Override

@@ -9,7 +9,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.concurrent.Callable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -158,22 +157,14 @@ public abstract class PopupMenuFactory {
 
 	static void addPrefabMenuItem(final String type, final String url, final JMenu menu) {
 		final JMenuItem mi = new JMenuItem(type);
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				SceneManager.getTaskManager().update(new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						try {
-							Scene.getInstance().importFile(MainApplication.class.getResource(url));
-						} catch (final Throwable err) {
-							BugReporter.report(err);
-						}
-						return null;
-					}
-				});
+		mi.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+			try {
+				Scene.getInstance().importFile(MainApplication.class.getResource(url));
+			} catch (final Throwable err) {
+				BugReporter.report(err);
 			}
-		});
+			return null;
+		}));
 		menu.add(mi);
 	}
 
@@ -445,38 +436,35 @@ public abstract class PopupMenuFactory {
 
 	static JMenuItem createVolumetricHeatCapacityMenuItem() {
 		final JMenuItem mi = new JMenuItem("Volumeric Heat Capacity...");
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (!(selectedPart instanceof Thermal)) {
-					return;
-				}
-				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-				final Thermal t = (Thermal) selectedPart;
-				final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
-				while (true) {
-					// final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
-					final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), title, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, t.getVolumetricHeatCapacity());
-					if (newValue == null) {
-						break;
-					} else {
-						try {
-							final double val = Double.parseDouble(newValue);
-							if (val <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Volumeric heat capacity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							} else {
-								if (val != t.getVolumetricHeatCapacity()) {
-									final ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
-									t.setVolumetricHeatCapacity(val);
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-								}
-								break;
+		mi.addActionListener(e -> {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (!(selectedPart instanceof Thermal)) {
+				return;
+			}
+			final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+			final Thermal t = (Thermal) selectedPart;
+			final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
+			while (true) {
+				// final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
+				final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), title, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, t.getVolumetricHeatCapacity());
+				if (newValue == null) {
+					break;
+				} else {
+					try {
+						final double val = Double.parseDouble(newValue);
+						if (val <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Volumeric heat capacity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						} else {
+							if (val != t.getVolumetricHeatCapacity()) {
+								final ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
+								t.setVolumetricHeatCapacity(val);
+								updateAfterEdit();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 							}
-						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							break;
 						}
+					} catch (final NumberFormatException exception) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -535,14 +523,11 @@ public abstract class PopupMenuFactory {
 		});
 
 		miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-		miCut.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart != null) {
-					Scene.getInstance().setCopyBuffer(selectedPart);
-					SceneManager.getInstance().deleteCurrentSelection();
-				}
+		miCut.addActionListener(e -> {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart != null) {
+				Scene.getInstance().setCopyBuffer(selectedPart);
+				SceneManager.getInstance().deleteCurrentSelection();
 			}
 		});
 
@@ -553,13 +538,10 @@ public abstract class PopupMenuFactory {
 		if (hasCopyMenu) {
 			final JMenuItem miCopy = new JMenuItem("Copy");
 			miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCopy.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Scene.getInstance().setCopyBuffer(selectedPart.copy(false));
-					}
+			miCopy.addActionListener(e -> {
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart != null) {
+					Scene.getInstance().setCopyBuffer(selectedPart.copy(false));
 				}
 			});
 			popupMenu.add(miCopy);

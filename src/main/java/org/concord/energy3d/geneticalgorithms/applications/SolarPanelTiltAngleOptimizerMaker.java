@@ -1,7 +1,6 @@
 package org.concord.energy3d.geneticalgorithms.applications;
 
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -180,7 +179,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
     }
 
     @Override
-    public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation, final float convergence) {
+    public void run(final Foundation foundation, final boolean local, final boolean daily, final boolean profit, final int population, final int generations, final float mutation, final float convergence, final float searchRadius) {
         op = new SolarPanelTiltAngleOptimizer(population > 0 ? population : populationSize, foundation.getRacks().size(), 0);
         op.setSelectionMethod(selectedSelectionMethod);
         op.setConvergenceThreshold(convergence > 0 ? convergence : convergenceThreshold);
@@ -188,7 +187,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
         op.setMutationRate(mutation >= 0 ? mutation : mutationRate);
         op.setOjectiveFunction(selectedObjectiveFunction);
         op.setSearchMethod(local ? Optimizer.LOCAL_SEARCH_RANDOM_OPTIMIZATION : Optimizer.GLOBAL_SEARCH_UNIFORM_SELECTION);
-        op.setLocalSearchRadius(0.05);
+        op.setLocalSearchRadius(searchRadius > 0 ? searchRadius : 0.05);
         op.setFoundation(foundation);
         op.evolve();
     }

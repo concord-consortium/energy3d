@@ -279,7 +279,7 @@ public class MyEditorPane {
                                         buttonActionPerformed(a, qm, bm);
                                     }
                                 } else {
-                                    buttonActionPerformed(a, qm, bm);
+                                    buttonActionPerformed(a, null, bm);
                                 }
                             });
                         } else {
