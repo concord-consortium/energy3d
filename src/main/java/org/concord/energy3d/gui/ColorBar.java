@@ -28,22 +28,22 @@ class ColorBar extends JPanel {
     private boolean verticalLineRepresentation = true;
     private final DecimalFormat decimalFormat = new DecimalFormat();
 
-    public ColorBar(final Color background, final Color foreground) {
+    ColorBar(final Color background, final Color foreground) {
         super();
         setBackground(background);
         setForeground(foreground);
         setDecimalDigits(0);
     }
 
-    public void setDecimalDigits(final int n) {
+    void setDecimalDigits(final int n) {
         decimalFormat.setMaximumFractionDigits(n);
     }
 
-    public void setUnitPrefix(final boolean b) {
+    void setUnitPrefix(final boolean b) {
         unitPrefix = b;
     }
 
-    public void setVerticalLineRepresentation(final boolean b) {
+    void setVerticalLineRepresentation(final boolean b) {
         verticalLineRepresentation = b;
     }
 

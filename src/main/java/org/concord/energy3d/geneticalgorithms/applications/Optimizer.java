@@ -41,35 +41,36 @@ import com.ardor3d.math.Vector3;
  */
 public abstract class Optimizer {
 
-    public final static int GLOBAL_SEARCH_UNIFORM_SELECTION = 0;
-    public final static int LOCAL_SEARCH_RANDOM_OPTIMIZATION = 1; // https://en.wikipedia.org/wiki/Random_optimization
-    public final static int GLOBAL_SEARCH_FITNESS_SHARING = 2; // https://stackoverflow.com/questions/13775810/what-is-niching-scheme
+    final static int GLOBAL_SEARCH_UNIFORM_SELECTION = 0;
+    final static int LOCAL_SEARCH_RANDOM_OPTIMIZATION = 1; // https://en.wikipedia.org/wiki/Random_optimization
+    final static int GLOBAL_SEARCH_FITNESS_SHARING = 2; // https://stackoverflow.com/questions/13775810/what-is-niching-scheme
     private final static int MICRO_GA_MAX_POPULATION = 9;
 
-    volatile boolean stop;
-    double mutationRate = 0.1;
-    double crossoverRate = 0.5;
-    double selectionRate = 0.5;
-    int maximumGenerations = 5;
-    Individual[] fittestOfGenerations;
     Population population;
-    int outsideGenerationCounter;
-    int computeCounter;
     double[] mins, maxs;
     Foundation foundation;
-    double cx, cy, lx, ly;
-    List<Constraint> constraints;
-    volatile boolean converged;
     ObjectiveFunction objectiveFunction;
     double fitnessSharingRadius = 0.1;
     int searchMethod = GLOBAL_SEARCH_UNIFORM_SELECTION;
     double localSearchRadius = 0.1;
-    String[] geneNames;
-    double[] geneMinima;
-    double[] geneMaxima;
-    boolean[] isGeneInteger;
-    double[] initialGene, finalGene;
-    double initialFitness, finalFitness;
+
+    private List<Constraint> constraints;
+    private volatile boolean stop;
+    private double mutationRate = 0.1;
+    private double crossoverRate = 0.5;
+    private double selectionRate = 0.5;
+    private int maximumGenerations = 5;
+    private Individual[] fittestOfGenerations;
+    private int outsideGenerationCounter;
+    private int computeCounter;
+    private double cx, cy, lx, ly;
+    private volatile boolean converged;
+    private String[] geneNames;
+    private double[] geneMinima;
+    private double[] geneMaxima;
+    private boolean[] isGeneInteger;
+    private double[] initialGene, finalGene;
+    private double initialFitness, finalFitness;
 
     public Optimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
         population = new Population(populationSize, chromosomeLength, discretizationSteps);

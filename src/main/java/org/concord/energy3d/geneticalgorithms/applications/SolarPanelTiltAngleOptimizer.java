@@ -65,6 +65,7 @@ public class SolarPanelTiltAngleOptimizer extends SolarOutputOptimizer {
 			final double gene = individual.getGene(i);
 			final Rack rack = racks.get(i);
 			rack.setTiltAngle((2 * gene - 1) * 90);
+			rack.draw(); // draw to ensure that the normal vector is updated
 		}
 		individual.setFitness(objectiveFunction.compute());
 	}
