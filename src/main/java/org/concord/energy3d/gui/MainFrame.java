@@ -2760,11 +2760,7 @@ public class MainFrame extends JFrame {
         if (file != null) {
             EnergyPanel.getInstance().updateRadiationHeatMap();
             SceneManager.getTaskManager().update(() -> {
-                try {
-                    Scene.getInstance().importCollada(file);
-                } catch (final Throwable err) {
-                    BugReporter.report(err);
-                }
+                Scene.getInstance().importCollada(file);
                 return null;
             });
         }
@@ -2775,11 +2771,7 @@ public class MainFrame extends JFrame {
         if (file != null) {
             EnergyPanel.getInstance().updateRadiationHeatMap();
             SceneManager.getTaskManager().update(() -> {
-                try {
-                    Scene.getInstance().exportObj(file);
-                } catch (final Throwable err) {
-                    BugReporter.report(err);
-                }
+                Scene.getInstance().exportObj(file);
                 return null;
             });
         }
