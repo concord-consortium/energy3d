@@ -18,9 +18,7 @@ public class AdjustThermostatCommand extends MyAbstractUndoableEdit {
 		final int[][][] values = foundation.getThermostat().getTemperatures();
 		for (int i = 0; i < 12; i++) {
 			for (int j = 0; j < 7; j++) {
-				for (int k = 0; k < 25; k++) {
-					oldTemperatures[i][j][k] = values[i][j][k];
-				}
+				System.arraycopy(values[i][j], 0, oldTemperatures[i][j], 0, 25);
 			}
 		}
 	}
@@ -32,9 +30,7 @@ public class AdjustThermostatCommand extends MyAbstractUndoableEdit {
 		final int[][][] values = foundation.getThermostat().getTemperatures();
 		for (int i = 0; i < 12; i++) {
 			for (int j = 0; j < 7; j++) {
-				for (int k = 0; k < 25; k++) {
-					newTemperatures[i][j][k] = values[i][j][k];
-				}
+				System.arraycopy(values[i][j], 0, newTemperatures[i][j], 0, 25);
 			}
 		}
 		foundation.getThermostat().setTemperatures(oldTemperatures);

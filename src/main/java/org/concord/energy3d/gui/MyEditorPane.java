@@ -61,13 +61,13 @@ import org.concord.energy3d.util.Util;
  *
  * @author Charles Xie
  */
-public class MyEditorPane {
+class MyEditorPane {
 
     private final JEditorPane editorPane;
     private final JPopupMenu popupMenu;
     private final int id;
 
-    public MyEditorPane(final int id, final boolean popup) {
+    MyEditorPane(final int id, final boolean popup) {
 
         this.id = id;
 
@@ -195,7 +195,7 @@ public class MyEditorPane {
         return id;
     }
 
-    public JEditorPane getEditorPane() {
+    JEditorPane getEditorPane() {
         return editorPane;
     }
 
@@ -520,7 +520,7 @@ public class MyEditorPane {
         return editorPane.getText();
     }
 
-    public String getRawText() throws IOException {
+    String getRawText() throws IOException {
         // return editorPane.getDocument().getText(0, editorPane.getDocument().getLength());
         // use the following method to get a longer pause between paragraphs, instead of the above
         final Html2Text parser = new Html2Text();
@@ -532,11 +532,11 @@ public class MyEditorPane {
         editorPane.setEditable(editable);
     }
 
-    public void setContentType(final String type) {
+    void setContentType(final String type) {
         editorPane.setContentType(type);
     }
 
-    public String getContentType() {
+    String getContentType() {
         return editorPane.getContentType();
     }
 

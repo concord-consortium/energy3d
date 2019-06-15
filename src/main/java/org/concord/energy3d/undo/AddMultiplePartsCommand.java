@@ -19,7 +19,7 @@ public class AddMultiplePartsCommand extends MyAbstractUndoableEdit {
 	private final URL url; // if null, adding part happens through importing from an existing file
 
 	public AddMultiplePartsCommand(final List<HousePart> parts, final URL url) {
-		this.parts = new ArrayList<HousePart>(parts);
+		this.parts = new ArrayList<>(parts);
 		this.url = url;
 	}
 
