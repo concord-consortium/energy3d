@@ -1,37 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Path2D;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.gui.EnergyPanel;
@@ -41,6 +9,17 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
+
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Path2D;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This graph shows the daily variation of air and ground temperatures for the current day and location.
@@ -92,7 +71,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		setPreferredSize(new Dimension(600, 400));
 		setBackground(Color.WHITE);
 
-		hideData = new HashMap<double[], Boolean>();
+		hideData = new HashMap<>();
 
 		depth = new double[] { 0, 0.5, 1, 2, 6 };
 		symbol = new int[] { -1, CIRCLE, DIAMOND, SQUARE, -1 };
@@ -149,7 +128,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			final String s = i + "";
 			final int sWidth = g2.getFontMetrics().stringWidth(s);
 			xTick = left + tickWidth * i;
-			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + 16);
+			g2.drawString(s, xTick - sWidth / 2f, height - bottom / 2 + 16);
 			g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
 		}
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -200,7 +179,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	}
 
-	void drawLegends(final Graphics2D g2) {
+	private void drawLegends(final Graphics2D g2) {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
@@ -363,13 +342,10 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 		for (int i = 0; i < depth.length; i++) {
 			final int i2 = i;
-			cbmiGroundTemperature[i].addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-					hideData.put(groundTemperature[i2], !source.isSelected());
-					DailyEnvironmentalTemperature.this.repaint();
-				}
+			cbmiGroundTemperature[i].addItemListener(e -> {
+				final JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+				hideData.put(groundTemperature[i2], !source.isSelected());
+				DailyEnvironmentalTemperature.this.repaint();
 			});
 			menuView.add(cbmiGroundTemperature[i]);
 		}
@@ -378,12 +354,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		menuBar.add(menuExport);
 
 		final JMenuItem mi = new JMenuItem("Copy Image");
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(DailyEnvironmentalTemperature.this);
-			}
-		});
+		mi.addActionListener(e -> new ClipImage().copyImageToClipboard(DailyEnvironmentalTemperature.this));
 		menuExport.add(mi);
 
 		final JPanel panel = new JPanel(new BorderLayout());
@@ -396,12 +367,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
 		final JButton button = new JButton("Close");
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				dialog.dispose();
-			}
-		});
+		button.addActionListener(e -> dialog.dispose());
 		buttonPanel.add(button);
 
 		dialog.addWindowListener(new WindowAdapter() {
@@ -416,7 +382,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		dialog.setVisible(true);
 
 		TimeSeriesLogger.getInstance().logAnalysis(this);
-		final HashMap<String, Object> attributes = new HashMap<String, Object>();
+		final HashMap<String, Object> attributes = new HashMap<>();
 		attributes.put("Location", Scene.getInstance().getCity());
 		attributes.put("Date", Scene.getInstance().getDate().toString());
 		MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getSimpleName(), attributes));

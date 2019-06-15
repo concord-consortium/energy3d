@@ -39,8 +39,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.prefs.Preferences;
 
 public class MainFrame extends JFrame {
@@ -189,7 +187,7 @@ public class MainFrame extends JFrame {
     private JMenuItem clearGroundImageMenuItem;
     private JCheckBoxMenuItem showGroundImageMenuItem;
 
-    public final static FilenameFilter ng3NameFilter = (dir, name) -> name.endsWith(".ng3");
+    private final static FilenameFilter ng3NameFilter = (dir, name) -> name.endsWith(".ng3");
 
     public static MainFrame getInstance() {
         return instance;
@@ -318,12 +316,7 @@ public class MainFrame extends JFrame {
         for (final Component c : menu.getMenuComponents()) {
             if (c instanceof JMenuItem) {
                 final JMenuItem menuItem = (JMenuItem) c;
-                menuItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        MainPanel.getInstance().defaultTool();
-                    }
-                });
+                menuItem.addActionListener(e -> MainPanel.getInstance().defaultTool());
             }
         }
     }
@@ -497,42 +490,39 @@ public class MainFrame extends JFrame {
         if (newMenuItem == null) {
             newMenuItem = new JMenuItem("New");
             newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-            newMenuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    boolean ok = false;
-                    if (Scene.getInstance().isEdited()) {
-                        final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                        if (save == JOptionPane.YES_OPTION) {
-                            save();
-                            if (!Scene.getInstance().isEdited()) {
-                                ok = true;
-                            }
-                        } else if (save != JOptionPane.CANCEL_OPTION) {
+            newMenuItem.addActionListener(e -> {
+                boolean ok = false;
+                if (Scene.getInstance().isEdited()) {
+                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (save == JOptionPane.YES_OPTION) {
+                        save();
+                        if (!Scene.getInstance().isEdited()) {
                             ok = true;
                         }
-                    } else {
+                    } else if (save != JOptionPane.CANCEL_OPTION) {
                         ok = true;
                     }
-                    if (ok) {
-                        SceneManager.getTaskManager().update(() -> {
-                            try {
-                                Scene.newFile(true);
-                                SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-                                SceneManager.getInstance().getCameraControl().reset();
-                                EventQueue.invokeLater(() -> {
-                                    updateTitleBar();
-                                    EnergyPanel.getInstance().update();
-                                    EnergyPanel.getInstance().clearAllGraphs();
-                                    EnergyPanel.getInstance().selectInstructionSheet(0);
-                                    MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "New File", null));
-                                });
-                            } catch (final Throwable err) {
-                                BugReporter.report(err);
-                            }
-                            return null;
-                        });
-                    }
+                } else {
+                    ok = true;
+                }
+                if (ok) {
+                    SceneManager.getTaskManager().update(() -> {
+                        try {
+                            Scene.newFile(true);
+                            SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+                            SceneManager.getInstance().getCameraControl().reset();
+                            EventQueue.invokeLater(() -> {
+                                updateTitleBar();
+                                EnergyPanel.getInstance().update();
+                                EnergyPanel.getInstance().clearAllGraphs();
+                                EnergyPanel.getInstance().selectInstructionSheet(0);
+                                MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "New File", null));
+                            });
+                        } catch (final Throwable err) {
+                            BugReporter.report(err);
+                        }
+                        return null;
+                    });
                 }
             });
         }
@@ -543,22 +533,19 @@ public class MainFrame extends JFrame {
         if (openMenuItem == null) {
             openMenuItem = new JMenuItem("Open...");
             openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-            openMenuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (Scene.getInstance().isEdited()) {
-                        final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                        if (save == JOptionPane.YES_OPTION) {
-                            save();
-                            if (!Scene.getInstance().isEdited()) {
-                                open();
-                            }
-                        } else if (save != JOptionPane.CANCEL_OPTION) {
+            openMenuItem.addActionListener(e -> {
+                if (Scene.getInstance().isEdited()) {
+                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (save == JOptionPane.YES_OPTION) {
+                        save();
+                        if (!Scene.getInstance().isEdited()) {
                             open();
                         }
-                    } else {
+                    } else if (save != JOptionPane.CANCEL_OPTION) {
                         open();
                     }
+                } else {
+                    open();
                 }
             });
         }
@@ -571,22 +558,19 @@ public class MainFrame extends JFrame {
         if (file == null) {
             return;
         }
-        SceneManager.getTaskManager().update(new Callable<Object>() {
-            @Override
-            public Object call() {
-                try {
-                    Scene.open(file.toURI().toURL());
-                    FileChooser.getInstance().rememberFile(file.getPath());
-                } catch (final Throwable err) {
-                    BugReporter.report(err, file.getAbsolutePath());
-                }
-                return null;
+        SceneManager.getTaskManager().update(() -> {
+            try {
+                Scene.open(file.toURI().toURL());
+                FileChooser.getInstance().rememberFile(file.getPath());
+            } catch (final Throwable err) {
+                BugReporter.report(err, file.getAbsolutePath());
             }
+            return null;
         });
         topViewCheckBoxMenuItem.setSelected(false);
     }
 
-    public void reopen() {
+    void reopen() {
         if (Scene.getInstance().isEdited()) {
             final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save as", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (save == JOptionPane.YES_OPTION) {
@@ -605,16 +589,13 @@ public class MainFrame extends JFrame {
     private void reload() {
         final URL url = Scene.getURL();
         if (url != null) {
-            SceneManager.getTaskManager().update(new Callable<Object>() {
-                @Override
-                public Object call() {
-                    try {
-                        Scene.open(url);
-                    } catch (final Exception e) {
-                        BugReporter.report(e, "Error in reopening " + url);
-                    }
-                    return null;
+            SceneManager.getTaskManager().update(() -> {
+                try {
+                    Scene.open(url);
+                } catch (final Exception e) {
+                    BugReporter.report(e, "Error in reopening " + url);
                 }
+                return null;
             });
         }
     }
@@ -686,26 +667,27 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(MainFrame.this, "Nothing has been logged.", "No log", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
-                if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "<html>The logged data (json and ng3 files) will be permanently deleted.<br>Are you sure?</html>", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+                if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this,
+                        "<html>The logged data (json and ng3 files) will be permanently deleted.<br>Are you sure?</html>", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
                     return;
                 }
                 final File[] files = logFolder.listFiles();
-                new SwingWorker<Object, Void>() {
-
-                    @Override
-                    protected Object doInBackground() {
-                        for (final File f : files) {
-                            f.delete();
+                if (files != null) {
+                    new SwingWorker<Object, Void>() {
+                        @Override
+                        protected Object doInBackground() {
+                            for (final File f : files) {
+                                f.delete();
+                            }
+                            return null;
                         }
-                        return null;
-                    }
 
-                    @Override
-                    protected void done() {
-                        JOptionPane.showMessageDialog(MainFrame.this, files.length + " files were deleted.", "Deletion completed", JOptionPane.INFORMATION_MESSAGE);
-                    }
-
-                }.execute();
+                        @Override
+                        protected void done() {
+                            JOptionPane.showMessageDialog(MainFrame.this, files.length + " files were deleted.", "Deletion completed", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }.execute();
+                }
             });
         }
         return clearLogMenuItem;
@@ -775,12 +757,7 @@ public class MainFrame extends JFrame {
                 }
 
                 if (dir.isDirectory()) {
-                    PostProcessor.getInstance().analyze(dir.listFiles(ng3NameFilter), new File(dir + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
-                        @Override
-                        public void run() {
-                            updateTitleBar();
-                        }
-                    });
+                    PostProcessor.getInstance().analyze(dir.listFiles(ng3NameFilter), new File(dir + System.getProperty("file.separator") + "prop.txt"), () -> updateTitleBar());
                 }
             });
         }
@@ -1742,7 +1719,7 @@ public class MainFrame extends JFrame {
         return showGroundImageMenuItem;
     }
 
-    public JCheckBoxMenuItem getAxesMenuItem() {
+    private JCheckBoxMenuItem getAxesMenuItem() {
         if (axesMenuItem == null) {
             axesMenuItem = new JCheckBoxMenuItem("Axes", true);
             axesMenuItem.addItemListener(e -> {
@@ -1858,7 +1835,7 @@ public class MainFrame extends JFrame {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
-                    if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+                    if (SceneManager.getInstance().autoSelectBuilding(true) != null) {
                         new EnergyAnnualAnalysis().show("Annual Energy");
                     }
                 }
@@ -1887,7 +1864,7 @@ public class MainFrame extends JFrame {
         return annualEnergyAnalysisForSelectionMenuItem;
     }
 
-    public JMenuItem getDailyEnergyAnalysisMenuItem() {
+    private JMenuItem getDailyEnergyAnalysisMenuItem() {
         if (dailyEnergyAnalysisMenuItem == null) {
             dailyEnergyAnalysisMenuItem = new JMenuItem("Daily Energy Analysis for Selected Building...");
             dailyEnergyAnalysisMenuItem.addActionListener(e -> {
@@ -1895,7 +1872,7 @@ public class MainFrame extends JFrame {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
-                    if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+                    if (SceneManager.getInstance().autoSelectBuilding(true) != null) {
                         final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
                         if (SceneManager.getInstance().getSolarHeatMap()) {
                             analysis.updateGraph();
@@ -2496,7 +2473,7 @@ public class MainFrame extends JFrame {
         return annotationsInwardMenuItem;
     }
 
-    public JMenu getEditMenu() {
+    JMenu getEditMenu() {
         if (editMenu == null) {
             editMenu = new JMenu("Edit");
             editMenu.addMenuListener(new MenuListener() {
@@ -2718,7 +2695,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public void saveFile(final boolean outsideTaskManager) {
+    void saveFile(final boolean outsideTaskManager) {
         final File file = FileChooser.getInstance().showDialog(".ng3", FileChooser.ng3Filter, true);
         if (file == null) {
             return;
@@ -3223,22 +3200,19 @@ public class MainFrame extends JFrame {
     }
 
     public void open(final String filename) {
-        SceneManager.getTaskManager().update(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                try {
-                    Scene.open(new File(filename).toURI().toURL());
-                    FileChooser.getInstance().rememberFile(filename);
-                } catch (final Throwable e) {
-                    BugReporter.report(e, new File(filename).getAbsolutePath());
-                    throw e;
-                }
-                return null;
+        SceneManager.getTaskManager().update(() -> {
+            try {
+                Scene.open(new File(filename).toURI().toURL());
+                FileChooser.getInstance().rememberFile(filename);
+            } catch (final Throwable e) {
+                BugReporter.report(e, new File(filename).getAbsolutePath());
+                throw e;
             }
+            return null;
         });
     }
 
-    public void openModel(final URL url) {
+    void openModel(final URL url) {
         boolean ok = false;
         if (Scene.getInstance().isEdited()) {
             final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -3590,13 +3564,11 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllTreesMenuItem() {
         if (removeAllTreesMenuItem == null) {
             removeAllTreesMenuItem = new JMenuItem("Remove All Trees");
-            removeAllTreesMenuItem.addActionListener(e -> {
-                SceneManager.getTaskManager().update(() -> {
-                    Scene.getInstance().removeAllTrees();
-                    EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                    return null;
-                });
-            });
+            removeAllTreesMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+                Scene.getInstance().removeAllTrees();
+                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+                return null;
+            }));
         }
         return removeAllTreesMenuItem;
     }
@@ -3771,7 +3743,7 @@ public class MainFrame extends JFrame {
             disableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.SHIFT_MASK));
             disableAllEditPointsMenuItem.addActionListener(e -> {
                 final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-                final Future<Object> update = SceneManager.getTaskManager().update(() -> {
+                SceneManager.getTaskManager().update(() -> {
                     for (final Foundation f : foundations) {
                         f.setLockEdit(true);
                     }
