@@ -581,49 +581,37 @@ class PopupMenuForFoundation extends PopupMenuFactory {
             clearMenu.add(removeAllFloorsMenuItem);
 
             final JMenuItem miRemoveAllImportedNodes = new JMenuItem("Remove All Nodes");
-            miRemoveAllImportedNodes.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+            miRemoveAllImportedNodes.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 if (selectedPart instanceof Foundation) {
                     final Foundation f = (Foundation) selectedPart;
-                    f.removeAllImports();
+                    f.removeAllImports(); // already run in Task Manager thread
                     f.setMeshSelectionVisible(false);
-                    EventQueue.invokeLater(() -> {
-                        MainPanel.getInstance().getEnergyButton().setSelected(false);
-                        Scene.getInstance().setEdited(true);
-                    });
+                    MainPanel.getInstance().getEnergyButton().setSelected(false);
+                    Scene.getInstance().setEdited(true);
                 }
-                return null;
-            }));
+            });
             clearMenu.add(miRemoveAllImportedNodes);
 
             final JMenuItem miRemoveAllWithinInset = new JMenuItem("Remove All Objects within Inset");
             miRemoveAllWithinInset.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                if (!(selectedPart instanceof Foundation)) {
-                    return;
+                if (selectedPart instanceof Foundation) {
+                    ((Foundation) selectedPart).removeAllWithinPolygon(); // already run in Task Manager thread
+                    MainPanel.getInstance().getEnergyButton().setSelected(false);
+                    Scene.getInstance().setEdited(true);
                 }
-                SceneManager.getTaskManager().update(() -> {
-                    ((Foundation) selectedPart).removeAllWithinPolygon();
-                    EventQueue.invokeLater(() -> {
-                        MainPanel.getInstance().getEnergyButton().setSelected(false);
-                        Scene.getInstance().setEdited(true);
-                    });
-                    return null;
-                });
             });
             clearMenu.add(miRemoveAllWithinInset);
 
             final JMenuItem miResetPolygonInset = new JMenuItem("Reset Inset");
             miResetPolygonInset.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                if (!(selectedPart instanceof Foundation)) {
-                    return;
-                }
-                SceneManager.getTaskManager().update(() -> {
-                    ((Foundation) selectedPart).resetPolygon();
+                if (selectedPart instanceof Foundation) {
+                    ((Foundation) selectedPart).resetPolygon(); // already run in Task Manager thread
                     EventQueue.invokeLater(() -> Scene.getInstance().setEdited(true));
-                    return null;
-                });
+                    Scene.getInstance().setEdited(true);
+                }
             });
             clearMenu.add(miResetPolygonInset);
 
@@ -997,7 +985,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     SceneManager.getTaskManager().update(() -> {
                         final int count = f.addHeliostats(heliostatConcentricFieldLayout);
                         if (count == 0) {
-                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                    "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE));
                         }
                         return null;
                     });
@@ -1140,7 +1129,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     SceneManager.getTaskManager().update(() -> {
                         final int count = f.addHeliostats(heliostatSpiralFieldLayout);
                         if (count == 0) {
-                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                    "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE));
                         }
                         return null;
                     });
@@ -1235,7 +1225,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     SceneManager.getTaskManager().update(() -> {
                         final int count = f.addHeliostats(heliostatRectangularFieldLayout);
                         if (count == 0) {
-                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                    "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE));
                         }
                         return null;
                     });
@@ -1407,8 +1398,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                 if (selectedPart instanceof Foundation) {
                     final Foundation foundation = (Foundation) selectedPart;
                     SceneManager.getInstance().getUndoManager().addEdit(new ShowFoundationInsetCommand(foundation));
-                    foundation.getPolygon().setVisible(miEnableInset.isSelected());
-                    foundation.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        foundation.getPolygon().setVisible(miEnableInset.isSelected());
+                        foundation.draw();
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                 }
             });
@@ -1583,11 +1577,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be within 0.01 and 100 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                             } else {
                                 if (lx1 != lx0 || ly1 != ly0 || lz1 != lz0) {
-                                    f.rescale(lx1 / lx0, ly1 / ly0, 1);
-                                    f.setHeight(lz1 / Scene.getInstance().getScale());
-                                    f.draw();
-                                    f.drawChildren();
-                                    SceneManager.getInstance().refresh();
+                                    final double scaleX = lx1 / lx0;
+                                    final double scaleY = ly1 / ly0;
+                                    final double scaleZ = lz1 / Scene.getInstance().getScale();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        f.rescale(scaleX, scaleY, 1);
+                                        f.setHeight(scaleZ);
+                                        f.draw();
+                                        f.drawChildren();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
                                     updateAfterEdit();
                                     lx0 = lx1;
@@ -1615,14 +1615,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                 if (f.getChildren().isEmpty()) {
                     return;
                 }
-                for (final HousePart p : Scene.getInstance().getParts()) {
-                    if (p instanceof Foundation) {
-                        if (p != f) {
-                            ((Foundation) p).setResizeHouseMode(false);
+                SceneManager.getTaskManager().update(() -> {
+                    for (final HousePart p : Scene.getInstance().getParts()) {
+                        if (p instanceof Foundation) {
+                            if (p != f) {
+                                ((Foundation) p).setResizeHouseMode(false);
+                            }
                         }
                     }
-                }
-                f.setResizeHouseMode(true);
+                    f.setResizeHouseMode(true);
+                    return null;
+                });
             });
 
             final JMenu labelMenu = new JMenu("Label");
@@ -1634,11 +1637,14 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     if (selectedPart instanceof Foundation) {
                         final Foundation f = (Foundation) selectedPart;
                         final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
-                        f.clearLabels();
-                        f.draw();
+                        SceneManager.getTaskManager().update(() -> {
+                            f.clearLabels();
+                            f.draw();
+                            SceneManager.getInstance().refresh();
+                            return null;
+                        });
                         SceneManager.getInstance().getUndoManager().addEdit(c);
                         Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().refresh();
                     }
                 }
             });
@@ -1654,10 +1660,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     if (f.getLabelCustom()) {
                         f.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", f.getLabelCustomText()));
                     }
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelCustom);
@@ -1669,10 +1678,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelId(miLabelId.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelId);
@@ -1684,10 +1696,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelNumberOfSolarPanels(miLabelNumberOfSolarPanels.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelNumberOfSolarPanels);
@@ -1699,10 +1714,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelPvEnergy(miLabelPvEnergy.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelPvEnergy);
@@ -1714,10 +1732,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelSolarPotential(miLabelSolarPotential.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelSolarPotential);
@@ -1729,10 +1750,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelBuildingEnergy(miLabelBuildingEnergy.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelBuildingEnergy);
@@ -1747,10 +1771,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelNumberOfMirrors(miLabelNumberOfHeliostats.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             powerTowerLabelMenu.add(miLabelNumberOfHeliostats);
@@ -1762,10 +1789,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelPowerTowerHeight(miLabelPowerTowerHeight.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             powerTowerLabelMenu.add(miLabelPowerTowerHeight);
@@ -1777,10 +1807,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
                     f.setLabelPowerTowerOutput(miLabelPowerTowerOutput.isSelected());
-                    f.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        f.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             powerTowerLabelMenu.add(miLabelPowerTowerOutput);
@@ -1874,13 +1907,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                             Util.selectSilently(rbmiTypeAutoDetected, true);
                     }
                     miResize.setEnabled(!f.getChildren().isEmpty());
-                    for (final HousePart x : Scene.getInstance().getParts()) {
-                        if (x instanceof Foundation) {
-                            if (x != f) {
-                                ((Foundation) x).setResizeHouseMode(false);
+                    SceneManager.getTaskManager().update(() -> {
+                        for (final HousePart x : Scene.getInstance().getParts()) {
+                            if (x instanceof Foundation) {
+                                if (x != f) {
+                                    ((Foundation) x).setResizeHouseMode(false);
+                                }
                             }
                         }
-                    }
+                        return null;
+                    });
                 }
                 final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
                 final Node copyNode = Scene.getInstance().getCopyNode();
@@ -2221,7 +2257,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 final ChangeTextureCommand c = new ChangeTextureCommand(foundation);
                                 foundation.setTextureType(type);
-                                foundation.draw();
+                                SceneManager.getTaskManager().update(() -> {
+                                    foundation.draw();
+                                    return null;
+                                });
                                 SceneManager.getInstance().getUndoManager().addEdit(c);
                                 selectedScopeIndex = 0;
                             } else if (rb2.isSelected()) {
@@ -2232,7 +2271,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                                     final SetTextureForPartsCommand c = new SetTextureForPartsCommand(parts);
                                     for (final Foundation f : group) {
                                         f.setTextureType(type);
-                                        f.draw();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            f.draw();
+                                            return null;
+                                        });
                                     }
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
@@ -2242,7 +2284,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                                 final SetTextureForPartsCommand c = new SetTextureForPartsCommand(foundations);
                                 for (final HousePart f : foundations) {
                                     f.setTextureType(type);
-                                    f.draw();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        f.draw();
+                                        return null;
+                                    });
                                 }
                                 SceneManager.getInstance().getUndoManager().addEdit(c);
                                 selectedScopeIndex = 2;

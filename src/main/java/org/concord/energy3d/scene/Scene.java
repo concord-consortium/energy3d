@@ -1731,12 +1731,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
-        for (final HousePart part : trees) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
+            for (final HousePart part : trees) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1754,12 +1758,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
-        for (final HousePart part : humans) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
+            for (final HousePart part : humans) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1777,12 +1785,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
-        for (final HousePart part : roofs) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
+            for (final HousePart part : roofs) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2216,12 +2228,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
-        for (final HousePart part : foundations) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
+            for (final HousePart part : foundations) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2285,13 +2301,16 @@ public class Scene implements Serializable {
             }
         }
         SceneManager.getInstance().getUndoManager().addEdit(new LockEditPointsForAllCommand());
-        for (final HousePart part : parts) {
-            part.setLockEdit(lock);
-        }
-        if (lock) {
-            SceneManager.getInstance().hideAllEditPoints();
-        }
-        redrawAll();
+        SceneManager.getTaskManager().update(() -> {
+            for (final HousePart part : parts) {
+                part.setLockEdit(lock);
+            }
+            if (lock) {
+                SceneManager.getInstance().hideAllEditPoints();
+            }
+            redrawAll();
+            return null;
+        });
         edited = true;
     }
 

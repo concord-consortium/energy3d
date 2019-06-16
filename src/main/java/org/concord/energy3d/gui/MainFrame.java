@@ -3408,11 +3408,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllRoofsMenuItem() {
         if (removeAllRoofsMenuItem == null) {
             removeAllRoofsMenuItem = new JMenuItem("Remove All Roofs");
-            removeAllRoofsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllRoofs();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllRoofsMenuItem.addActionListener(e -> Scene.getInstance().removeAllRoofs());
         }
         return removeAllRoofsMenuItem;
     }
@@ -3508,11 +3504,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllFoundationsMenuItem() {
         if (removeAllFoundationsMenuItem == null) {
             removeAllFoundationsMenuItem = new JMenuItem("Remove All Foundations");
-            removeAllFoundationsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllFoundations();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllFoundationsMenuItem.addActionListener(e -> Scene.getInstance().removeAllFoundations());
         }
         return removeAllFoundationsMenuItem;
     }
@@ -3520,11 +3512,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllTreesMenuItem() {
         if (removeAllTreesMenuItem == null) {
             removeAllTreesMenuItem = new JMenuItem("Remove All Trees");
-            removeAllTreesMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllTrees();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllTreesMenuItem.addActionListener(e -> Scene.getInstance().removeAllTrees());
         }
         return removeAllTreesMenuItem;
     }
@@ -3532,10 +3520,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllHumansMenuItem() {
         if (removeAllHumansMenuItem == null) {
             removeAllHumansMenuItem = new JMenuItem("Remove All Humans");
-            removeAllHumansMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllHumans();
-                return null;
-            }));
+            removeAllHumansMenuItem.addActionListener(e -> Scene.getInstance().removeAllHumans());
         }
         return removeAllHumansMenuItem;
     }
@@ -3667,10 +3652,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllEditLocksMenuItem() {
         if (removeAllEditLocksMenuItem == null) {
             removeAllEditLocksMenuItem = new JMenuItem("Remove All Edit Locks");
-            removeAllEditLocksMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().lockAll(false);
-                return null;
-            }));
+            removeAllEditLocksMenuItem.addActionListener(e -> Scene.getInstance().lockAll(false));
         }
         return removeAllEditLocksMenuItem;
     }
