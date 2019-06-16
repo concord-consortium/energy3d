@@ -1800,12 +1800,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + floors.size() + " floors?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
-        for (final HousePart part : floors) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
+            for (final HousePart part : floors) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1843,12 +1847,17 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(new ArrayList<>(panels));
-        for (final HousePart part : panels) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        final List<SolarPanel> panels2 = panels;
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(new ArrayList<>(panels2));
+            for (final HousePart part : panels2) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1876,12 +1885,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + racks.size() + " solar panel racks" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(racks);
-        for (final HousePart part : racks) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(racks);
+            for (final HousePart part : racks) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1909,12 +1922,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + heliostats.size() + " heliostats" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(heliostats);
-        for (final HousePart part : heliostats) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(heliostats);
+            for (final HousePart part : heliostats) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1942,12 +1959,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + troughs.size() + " parabolic troughs" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(troughs);
-        for (final HousePart part : troughs) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(troughs);
+            for (final HousePart part : troughs) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -1975,12 +1996,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + dishes.size() + " parabolic dishes" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(dishes);
-        for (final HousePart part : dishes) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(dishes);
+            for (final HousePart part : dishes) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2008,12 +2033,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + reflectors.size() + " Fresnel reflectors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(reflectors);
-        for (final HousePart part : reflectors) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(reflectors);
+            for (final HousePart part : reflectors) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2041,12 +2070,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + sensors.size() + " sensors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(sensors);
-        for (final HousePart part : sensors) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(sensors);
+            for (final HousePart part : sensors) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2074,12 +2107,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + walls.size() + " walls" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(walls);
-        for (final HousePart part : walls) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(walls);
+            for (final HousePart part : walls) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2107,12 +2144,16 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
-        for (final HousePart part : windows) {
-            remove(part, false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
+            for (final HousePart part : windows) {
+                remove(part, false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 
@@ -2146,14 +2187,18 @@ public class Scene implements Serializable {
         if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " window shutters" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
-        final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
-        for (final HousePart part : windows) {
-            final Window w = (Window) part;
-            w.setLeftShutter(false);
-            w.setRightShutter(false);
-        }
-        redrawAll();
-        SceneManager.getInstance().getUndoManager().addEdit(c);
+        SceneManager.getTaskManager().update(() -> {
+            final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
+            for (final HousePart part : windows) {
+                final Window w = (Window) part;
+                w.setLeftShutter(false);
+                w.setRightShutter(false);
+            }
+            redrawAll();
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+            return null;
+        });
+        MainPanel.getInstance().getEnergyButton().setSelected(false);
         edited = true;
     }
 

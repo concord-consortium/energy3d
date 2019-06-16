@@ -416,21 +416,21 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
             final JMenuItem mi180 = new JMenuItem("180\u00B0");
             mi180.addActionListener(e -> {
-                SceneManager.getInstance().rotate(Math.PI);
+                SceneManager.getInstance().rotate(Math.PI); // already run in the Task Manager thread
                 Scene.getInstance().setEdited(true);
             });
             rotateMenu.add(mi180);
 
             final JMenuItem mi90CW = new JMenuItem("90\u00B0 Clockwise");
             mi90CW.addActionListener(e -> {
-                SceneManager.getInstance().rotate(-Math.PI / 2);
+                SceneManager.getInstance().rotate(-Math.PI / 2); // already run in the Task Manager thread
                 Scene.getInstance().setEdited(true);
             });
             rotateMenu.add(mi90CW);
 
             final JMenuItem mi90CCW = new JMenuItem("90\u00B0 Counter Clockwise");
             mi90CCW.addActionListener(e -> {
-                SceneManager.getInstance().rotate(Math.PI / 2);
+                SceneManager.getInstance().rotate(Math.PI / 2); // already run in the Task Manager thread
                 Scene.getInstance().setEdited(true);
             });
             rotateMenu.add(mi90CCW);
@@ -471,7 +471,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                         }
                         if (ok) {
                             if (!Util.isZero(a)) {
-                                SceneManager.getInstance().rotate(-Math.toRadians(a));
+                                SceneManager.getInstance().rotate(-Math.toRadians(a)); // already run in the Task Manager thread
                                 updateAfterEdit();
                             }
                             if (choice == options[0]) {
@@ -516,10 +516,16 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                             ok = false;
                         }
                         if (ok) {
-                            final ChangeFoundationAzimuthCommand c = new ChangeFoundationAzimuthCommand(foundation);
-                            foundation.setAzimuth(a);
-                            updateAfterEdit();
-                            SceneManager.getInstance().getUndoManager().addEdit(c);
+                            final double a2 = a;
+                            SceneManager.getTaskManager().update(() -> {
+                                final ChangeFoundationAzimuthCommand c = new ChangeFoundationAzimuthCommand(foundation);
+                                foundation.setAzimuth(a2);
+                                EventQueue.invokeLater(() -> {
+                                    updateAfterEdit();
+                                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                                });
+                                return null;
+                            });
                             if (choice == options[0]) {
                                 break;
                             }
@@ -531,124 +537,47 @@ class PopupMenuForFoundation extends PopupMenuFactory {
             final JMenu clearMenu = new JMenu("Clear");
 
             final JMenuItem miRemoveAllWalls = new JMenuItem("Remove All Walls");
-            miRemoveAllWalls.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWalls();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllWalls.addActionListener(e -> Scene.getInstance().removeAllWalls()); // actual scene removal already runs in the Task Manager thread
             clearMenu.add(miRemoveAllWalls);
 
             final JMenuItem miRemoveAllWindows = new JMenuItem("Remove All Windows");
-            miRemoveAllWindows.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWindows();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllWindows.addActionListener(e -> Scene.getInstance().removeAllWindows());
             clearMenu.add(miRemoveAllWindows);
 
             final JMenuItem miRemoveAllWindowShutters = new JMenuItem("Remove All Window Shutters");
-            miRemoveAllWindowShutters.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWindowShutters();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllWindowShutters.addActionListener(e -> Scene.getInstance().removeAllWindowShutters());
             clearMenu.add(miRemoveAllWindowShutters);
 
             final JMenuItem miRemoveAllSolarPanels = new JMenuItem("Remove All Solar Panels");
-            miRemoveAllSolarPanels.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllSolarPanels(null);
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllSolarPanels.addActionListener(e -> Scene.getInstance().removeAllSolarPanels(null));
             clearMenu.add(miRemoveAllSolarPanels);
 
             final JMenuItem miRemoveAllRacks = new JMenuItem("Remove All Solar Panel Racks");
-            miRemoveAllRacks.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllRacks();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllRacks.addActionListener(e -> Scene.getInstance().removeAllRacks());
             clearMenu.add(miRemoveAllRacks);
 
             final JMenuItem miRemoveAllHeliostats = new JMenuItem("Remove All Heliostats");
-            miRemoveAllHeliostats.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllHeliostats();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllHeliostats.addActionListener(e -> Scene.getInstance().removeAllHeliostats());
             clearMenu.add(miRemoveAllHeliostats);
 
             final JMenuItem miRemoveAllParabolicTroughs = new JMenuItem("Remove All Parabolic Troughs");
-            miRemoveAllParabolicTroughs.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllParabolicTroughs();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllParabolicTroughs.addActionListener(e -> Scene.getInstance().removeAllParabolicTroughs());
             clearMenu.add(miRemoveAllParabolicTroughs);
 
             final JMenuItem miRemoveAllParabolicDishes = new JMenuItem("Remove All Parabolic Dishes");
-            miRemoveAllParabolicDishes.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllParabolicDishes();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllParabolicDishes.addActionListener(e -> Scene.getInstance().removeAllParabolicDishes());
             clearMenu.add(miRemoveAllParabolicDishes);
 
             final JMenuItem miRemoveAllFresnelReflectors = new JMenuItem("Remove All Fresnel Reflectors");
-            miRemoveAllFresnelReflectors.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllFresnelReflectors();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllFresnelReflectors.addActionListener(e -> Scene.getInstance().removeAllFresnelReflectors());
             clearMenu.add(miRemoveAllFresnelReflectors);
 
             final JMenuItem miRemoveAllSensors = new JMenuItem("Remove All Sensors");
-            miRemoveAllSensors.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllSensors();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            miRemoveAllSensors.addActionListener(e -> Scene.getInstance().removeAllSensors());
             clearMenu.add(miRemoveAllSensors);
 
             final JMenuItem removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
-            removeAllFloorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllFloors();
-                EventQueue.invokeLater(() -> {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                    Scene.getInstance().setEdited(true);
-                });
-                return null;
-            }));
+            removeAllFloorsMenuItem.addActionListener(e -> Scene.getInstance().removeAllFloors());
             clearMenu.add(removeAllFloorsMenuItem);
 
             final JMenuItem miRemoveAllImportedNodes = new JMenuItem("Remove All Nodes");

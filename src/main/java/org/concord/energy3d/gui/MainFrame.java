@@ -3420,11 +3420,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllFloorsMenuItem() {
         if (removeAllFloorsMenuItem == null) {
             removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
-            removeAllFloorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllFloors();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllFloorsMenuItem.addActionListener(e -> Scene.getInstance().removeAllFloors());
         }
         return removeAllFloorsMenuItem;
     }
@@ -3432,11 +3428,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllSolarPanelsMenuItem() {
         if (removeAllSolarPanelsMenuItem == null) {
             removeAllSolarPanelsMenuItem = new JMenuItem("Remove All Solar Panels");
-            removeAllSolarPanelsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllSolarPanels(null);
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllSolarPanelsMenuItem.addActionListener(e -> Scene.getInstance().removeAllSolarPanels(null));
         }
         return removeAllSolarPanelsMenuItem;
     }
@@ -3444,11 +3436,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllRacksMenuItem() {
         if (removeAllRacksMenuItem == null) {
             removeAllRacksMenuItem = new JMenuItem("Remove All Solar Panel Packs");
-            removeAllRacksMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllRacks();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllRacksMenuItem.addActionListener(e -> Scene.getInstance().removeAllRacks());
         }
         return removeAllRacksMenuItem;
     }
@@ -3456,11 +3444,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllHeliostatsMenuItem() {
         if (removeAllHeliostatsMenuItem == null) {
             removeAllHeliostatsMenuItem = new JMenuItem("Remove All Heliostats");
-            removeAllHeliostatsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllHeliostats();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllHeliostatsMenuItem.addActionListener(e -> Scene.getInstance().removeAllHeliostats());
         }
         return removeAllHeliostatsMenuItem;
     }
@@ -3468,11 +3452,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllParabolicTroughsMenuItem() {
         if (removeAllParabolicTroughsMenuItem == null) {
             removeAllParabolicTroughsMenuItem = new JMenuItem("Remove All Parabolic Troughs");
-            removeAllParabolicTroughsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllParabolicTroughs();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllParabolicTroughsMenuItem.addActionListener(e -> Scene.getInstance().removeAllParabolicTroughs());
         }
         return removeAllParabolicTroughsMenuItem;
     }
@@ -3480,11 +3460,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllParabolicDishesMenuItem() {
         if (removeAllParabolicDishesMenuItem == null) {
             removeAllParabolicDishesMenuItem = new JMenuItem("Remove All Parabolic Dishes");
-            removeAllParabolicDishesMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllParabolicDishes();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllParabolicDishesMenuItem.addActionListener(e -> Scene.getInstance().removeAllParabolicDishes());
         }
         return removeAllParabolicDishesMenuItem;
     }
@@ -3492,11 +3468,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllFresnelReflectorsMenuItem() {
         if (removeAllFresnelReflectorsMenuItem == null) {
             removeAllFresnelReflectorsMenuItem = new JMenuItem("Remove All Fresnel Reflectors");
-            removeAllFresnelReflectorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllFresnelReflectors();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllFresnelReflectorsMenuItem.addActionListener(e -> Scene.getInstance().removeAllFresnelReflectors());
         }
         return removeAllFresnelReflectorsMenuItem;
     }
@@ -3504,11 +3476,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllSensorsMenuItem() {
         if (removeAllSensorsMenuItem == null) {
             removeAllSensorsMenuItem = new JMenuItem("Remove All Sensors");
-            removeAllSensorsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllSensors();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllSensorsMenuItem.addActionListener(e -> Scene.getInstance().removeAllSensors());
         }
         return removeAllSensorsMenuItem;
     }
@@ -3516,11 +3484,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllWallsMenuItem() {
         if (removeAllWallsMenuItem == null) {
             removeAllWallsMenuItem = new JMenuItem("Remove All Walls");
-            removeAllWallsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWalls();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllWallsMenuItem.addActionListener(e -> Scene.getInstance().removeAllWalls()); // actual scene removal already runs in the Task Manager thread
         }
         return removeAllWallsMenuItem;
     }
@@ -3528,11 +3492,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllWindowsMenuItem() {
         if (removeAllWindowsMenuItem == null) {
             removeAllWindowsMenuItem = new JMenuItem("Remove All Windows");
-            removeAllWindowsMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWindows();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllWindowsMenuItem.addActionListener(e -> Scene.getInstance().removeAllWindows());
         }
         return removeAllWindowsMenuItem;
     }
@@ -3540,11 +3500,7 @@ public class MainFrame extends JFrame {
     private JMenuItem getRemoveAllWindowShuttersMenuItem() {
         if (removeAllWindowShuttersMenuItem == null) {
             removeAllWindowShuttersMenuItem = new JMenuItem("Remove All Window Shutters");
-            removeAllWindowShuttersMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllWindowShutters();
-                EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-                return null;
-            }));
+            removeAllWindowShuttersMenuItem.addActionListener(e -> Scene.getInstance().removeAllWindowShutters());
         }
         return removeAllWindowShuttersMenuItem;
     }
