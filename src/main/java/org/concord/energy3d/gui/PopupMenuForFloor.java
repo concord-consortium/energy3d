@@ -3,6 +3,8 @@ package org.concord.energy3d.gui;
 import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.ChangeFloorTypeCommand;
+import org.concord.energy3d.undo.ChangeRoofTypeCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -63,12 +65,17 @@ class PopupMenuForFloor extends PopupMenuFactory {
                     final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                     if (selectedPart instanceof Floor) {
                         final Floor floor = (Floor) selectedPart;
-                        // final ChangeRoofTypeCommand c = new ChangeRoofTypeCommand(roof);
-                        floor.setType(Floor.SOLID);
-                        floor.draw();
-                        SceneManager.getInstance().refresh();
-                        Scene.getInstance().setEdited(true);
-                        // SceneManager.getInstance().getUndoManager().addEdit(c);
+                        SceneManager.getTaskManager().update(() -> {
+                            final ChangeFloorTypeCommand c = new ChangeFloorTypeCommand(floor);
+                            floor.setType(Floor.SOLID);
+                            floor.draw();
+                            SceneManager.getInstance().refresh();
+                            EventQueue.invokeLater(() -> {
+                                Scene.getInstance().setEdited(true);
+                                SceneManager.getInstance().getUndoManager().addEdit(c);
+                            });
+                            return null;
+                        });
                     }
                 }
             });
@@ -81,12 +88,17 @@ class PopupMenuForFloor extends PopupMenuFactory {
                     final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                     if (selectedPart instanceof Floor) {
                         final Floor floor = (Floor) selectedPart;
-                        // final ChangeRoofTypeCommand c = new ChangeRoofTypeCommand(roof);
-                        floor.setType(Floor.TRANSPARENT);
-                        floor.draw();
-                        SceneManager.getInstance().refresh();
-                        Scene.getInstance().setEdited(true);
-                        // SceneManager.getInstance().getUndoManager().addEdit(c);
+                        SceneManager.getTaskManager().update(() -> {
+                            final ChangeFloorTypeCommand c = new ChangeFloorTypeCommand(floor);
+                            floor.setType(Floor.TRANSPARENT);
+                            floor.draw();
+                            SceneManager.getInstance().refresh();
+                            EventQueue.invokeLater(() -> {
+                                Scene.getInstance().setEdited(true);
+                                SceneManager.getInstance().getUndoManager().addEdit(c);
+                            });
+                            return null;
+                        });
                     }
                 }
             });
@@ -209,15 +221,20 @@ class PopupMenuForFloor extends PopupMenuFactory {
                     return;
                 }
                 final Floor floor = (Floor) selectedPart;
-                final ChangeTextureCommand c = new ChangeTextureCommand(floor);
-                floor.setTextureType(type);
-                floor.draw();
-                SceneManager.getInstance().refresh();
-                Scene.getInstance().setEdited(true);
-                if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-                    MainPanel.getInstance().getEnergyButton().setSelected(false);
-                }
-                SceneManager.getInstance().getUndoManager().addEdit(c);
+                SceneManager.getTaskManager().update(() -> {
+                    final ChangeTextureCommand c = new ChangeTextureCommand(floor);
+                    floor.setTextureType(type);
+                    floor.draw();
+                    SceneManager.getInstance().refresh();
+                    EventQueue.invokeLater(() -> {
+                        Scene.getInstance().setEdited(true);
+                        if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+                            MainPanel.getInstance().getEnergyButton().setSelected(false);
+                        }
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                    });
+                    return null;
+                });
             }
         });
 

@@ -1,7 +1,6 @@
 package org.concord.energy3d.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -132,15 +131,22 @@ class PopupMenuForDoor extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = Math.abs(w - door.getDoorWidth()) > 0.000001 || Math.abs(h - door.getDoorHeight()) > 0.000001;
+                                    final double w2 = w;
+                                    final double h2 = h;
                                     if (rb1.isSelected()) {
                                         if (changed) {
-                                            final SetPartSizeCommand c = new SetPartSizeCommand(door);
-                                            door.setDoorWidth(w);
-                                            door.setDoorHeight(h);
-                                            door.draw();
-                                            door.getContainer().draw();
-                                            SceneManager.getInstance().refresh();
-                                            SceneManager.getInstance().getUndoManager().addEdit(c);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                final SetPartSizeCommand c = new SetPartSizeCommand(door);
+                                                door.setDoorWidth(w2);
+                                                door.setDoorHeight(h2);
+                                                door.draw();
+                                                door.getContainer().draw();
+                                                SceneManager.getInstance().refresh();
+                                                EventQueue.invokeLater(() -> {
+                                                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                                                });
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -158,9 +164,14 @@ class PopupMenuForDoor extends PopupMenuFactory {
                                         if (changed) {
                                             if (door.getContainer() instanceof Wall) {
                                                 final Wall wall = (Wall) door.getContainer();
-                                                final ChangeDoorSizeOnWallCommand c = new ChangeDoorSizeOnWallCommand(wall);
-                                                wall.setDoorSize(w, h);
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
+                                                SceneManager.getTaskManager().update(() -> {
+                                                    final ChangeDoorSizeOnWallCommand c = new ChangeDoorSizeOnWallCommand(wall);
+                                                    wall.setDoorSize(w2, h2);
+                                                    EventQueue.invokeLater(() -> {
+                                                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                                                    });
+                                                    return null;
+                                                });
                                             }
                                         }
                                         selectedScopeIndex = 1;
@@ -174,9 +185,14 @@ class PopupMenuForDoor extends PopupMenuFactory {
                                             }
                                         }
                                         if (changed) {
-                                            final SetSizeForDoorsOnFoundationCommand c = new SetSizeForDoorsOnFoundationCommand(foundation);
-                                            foundation.setSizeForDoors(w, h);
-                                            SceneManager.getInstance().getUndoManager().addEdit(c);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                final SetSizeForDoorsOnFoundationCommand c = new SetSizeForDoorsOnFoundationCommand(foundation);
+                                                foundation.setSizeForDoors(w2, h2);
+                                                EventQueue.invokeLater(() -> {
+                                                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                                                });
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     }
@@ -407,24 +423,39 @@ class PopupMenuForDoor extends PopupMenuFactory {
                             break;
                         } else {
                             if (rb1.isSelected()) {
-                                final ChangeTextureCommand c = new ChangeTextureCommand(door);
-                                door.setTextureType(type);
-                                door.draw();
-                                SceneManager.getInstance().refresh();
-                                SceneManager.getInstance().getUndoManager().addEdit(c);
+                                SceneManager.getTaskManager().update(() -> {
+                                    final ChangeTextureCommand c = new ChangeTextureCommand(door);
+                                    door.setTextureType(type);
+                                    door.draw();
+                                    SceneManager.getInstance().refresh();
+                                    EventQueue.invokeLater(() -> {
+                                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                                    });
+                                    return null;
+                                });
                                 selectedScopeIndex = 0;
                             } else if (rb2.isSelected()) {
                                 if (container instanceof Wall) {
                                     final Wall wall = (Wall) container;
-                                    final ChangeDoorTextureOnWallCommand c = new ChangeDoorTextureOnWallCommand(wall);
-                                    wall.setDoorTexture(type);
-                                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        final ChangeDoorTextureOnWallCommand c = new ChangeDoorTextureOnWallCommand(wall);
+                                        wall.setDoorTexture(type);
+                                        EventQueue.invokeLater(() -> {
+                                            SceneManager.getInstance().getUndoManager().addEdit(c);
+                                        });
+                                        return null;
+                                    });
                                 }
                                 selectedScopeIndex = 1;
                             } else if (rb3.isSelected()) {
-                                final SetTextureForDoorsOnFoundationCommand c = new SetTextureForDoorsOnFoundationCommand(foundation);
-                                foundation.setTextureForDoors(type);
-                                SceneManager.getInstance().getUndoManager().addEdit(c);
+                                SceneManager.getTaskManager().update(() -> {
+                                    final SetTextureForDoorsOnFoundationCommand c = new SetTextureForDoorsOnFoundationCommand(foundation);
+                                    foundation.setTextureForDoors(type);
+                                    EventQueue.invokeLater(() -> {
+                                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                                    });
+                                    return null;
+                                });
                                 selectedScopeIndex = 2;
                             }
                             updateAfterEdit();
