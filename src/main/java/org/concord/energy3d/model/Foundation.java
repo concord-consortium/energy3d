@@ -86,9 +86,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     public static final int TYPE_PV_PROJECT = 2;
     public static final int TYPE_CSP_PROJECT = 3;
 
-    public static final int FERMAT_SPIRAL = 0;
-    public static final int EQUAL_AZIMUTHAL_SPACING = 0;
-    public static final int RADIAL_STAGGER = 1;
+    static final int FERMAT_SPIRAL = 0;
+    static final int EQUAL_AZIMUTHAL_SPACING = 0;
+    static final int RADIAL_STAGGER = 1;
 
     private static transient BloomRenderPass bloomRenderPass;
     private transient ArrayList<Vector3> orgPoints;
@@ -2134,7 +2134,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return list;
     }
 
-    public FresnelReflector getNearestFresnelReflector(final FresnelReflector reflector) {
+    FresnelReflector getNearestFresnelReflector(final FresnelReflector reflector) {
         if (reflector.getTopContainer() != this) {
             return null;
         }
@@ -3086,12 +3086,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         if (!Util.isZero(az)) {
             rotate(-az, null, false);
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
     }
 
     private Rack addRack(final SolarPanel panel, final double tiltAngle, final double poleHeight, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
@@ -3562,7 +3557,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public void setTargetForHeliostats(final Foundation target) {
-        final List<Foundation> oldTargets = new ArrayList<Foundation>();
+        final List<Foundation> oldTargets = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Mirror) {
                 final Mirror m = (Mirror) p;
@@ -3769,7 +3764,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public void setAbsorberForFresnelReflectors(final Foundation target) {
-        final List<Foundation> oldTargets = new ArrayList<Foundation>();
+        final List<Foundation> oldTargets = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof FresnelReflector) {
                 final FresnelReflector r = (FresnelReflector) p;
@@ -3833,7 +3828,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 final FresnelReflector r = (FresnelReflector) p;
                 r.setNSectionLength(nLength);
                 r.setNSectionWidth(nWidth);
-                r.draw();
+                SceneManager.getTaskManager().update(() -> {
+                    r.draw();
+                    return null;
+                });
             }
         }
         SceneManager.getInstance().refresh();
@@ -3876,7 +3874,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<SolarReflector> getSolarReflectors(final Class<?> c) {
-        final List<SolarReflector> list = new ArrayList<SolarReflector>();
+        final List<SolarReflector> list = new ArrayList<>();
         // solar reflectors at this point can only be direct children of the foundation
         for (final HousePart p : children) {
             if (p instanceof SolarReflector && c.isInstance(p)) {
@@ -4653,7 +4651,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         for (final HousePart c : children) {
             if (c instanceof Wall) {
                 if (walls == null) {
-                    walls = new ArrayList<Wall>();
+                    walls = new ArrayList<>();
                 }
                 walls.add((Wall) c);
                 c.reset();

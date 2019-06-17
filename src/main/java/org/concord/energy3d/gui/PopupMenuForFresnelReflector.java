@@ -146,14 +146,17 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     if (rb1.isSelected()) {
                                         r.setNSectionLength(nSectionLength);
                                         r.setNSectionWidth(nSectionWidth);
-                                        r.draw();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            r.draw();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().refresh();
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
-                                        foundation.setSectionsForFresnelReflectors(nSectionLength, nSectionWidth);
+                                        foundation.setSectionsForFresnelReflectors(nSectionLength, nSectionWidth); // call draw in Task Manager thread
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
-                                        Scene.getInstance().setSectionsForAllFresnelReflectors(nSectionLength, nSectionWidth);
+                                        Scene.getInstance().setSectionsForAllFresnelReflectors(nSectionLength, nSectionWidth); // call draw in Task Manager thread
                                         selectedScopeIndex = 2;
                                     }
                                     updateAfterEdit();
@@ -248,9 +251,12 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                 final FresnelReflector r = (FresnelReflector) selectedPart;
                 final ShowSunBeamCommand c = new ShowSunBeamCommand(r);
                 r.setSunBeamVisible(cbmiDrawBeam.isSelected());
-                r.drawSunBeam();
-                r.draw();
-                SceneManager.getInstance().refresh();
+                SceneManager.getTaskManager().update(() -> {
+                    r.drawSunBeam();
+                    r.draw();
+                    SceneManager.getInstance().refresh();
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().addEdit(c);
                 Scene.getInstance().setEdited(true);
             });
@@ -297,7 +303,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 
                     final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
                     final JComboBox<String> comboBox = new JComboBox<>();
-                    comboBox.addItemListener(e1 -> {
+                    comboBox.addItemListener(event -> {
                         // TODO
                     });
                     comboBox.addItem("None");
@@ -343,16 +349,20 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                 }
                             }
                             boolean changed = absorber != r.getReceiver();
+                            final Foundation absorber2 = absorber;
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final Foundation oldTarget = r.getReceiver();
                                     final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
                                     r.setReceiver(absorber);
-                                    r.draw();
-                                    if (oldTarget != null) {
-                                        oldTarget.drawSolarReceiver();
-                                    }
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        r.draw();
+                                        if (oldTarget != null) {
+                                            oldTarget.drawSolarReceiver();
+                                        }
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -368,7 +378,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
-                                    foundation.setAbsorberForFresnelReflectors(absorber);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setAbsorberForFresnelReflectors(absorber2);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -383,14 +396,20 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
-                                    Scene.getInstance().setAbsorberForAllFresnelReflectors(absorber);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setAbsorberForAllFresnelReflectors(absorber2);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
                             }
                             if (changed) {
-                                if (absorber != null) {
-                                    absorber.drawSolarReceiver();
+                                if (absorber2 != null) {
+                                    SceneManager.getTaskManager().update(() -> {
+                                        absorber2.drawSolarReceiver();
+                                        return null;
+                                    });
                                 }
                                 updateAfterEdit();
                             }
@@ -472,13 +491,17 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = length != r.getLength();
+                                    final double length2 = length;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(r);
-                                            r.setLength(length);
-                                            r.ensureFullModules(false);
-                                            r.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                r.setLength(length2);
+                                                r.ensureFullModules(false);
+                                                r.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -493,7 +516,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-                                            foundation.setLengthForFresnelReflectors(length);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setLengthForFresnelReflectors(length2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -508,7 +534,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-                                            Scene.getInstance().setLengthForAllFresnelReflectors(length);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setLengthForAllFresnelReflectors(length2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -596,13 +625,17 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 0.1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = moduleWidth != r.getModuleWidth();
+                                    final double moduleWidth2 = moduleWidth;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(r);
-                                            r.setModuleWidth(moduleWidth);
-                                            r.ensureFullModules(false);
-                                            r.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                r.setModuleWidth(moduleWidth2);
+                                                r.ensureFullModules(false);
+                                                r.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -617,7 +650,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-                                            foundation.setModuleWidthForFresnelReflectors(moduleWidth);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setModuleWidthForFresnelReflectors(moduleWidth2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -632,7 +668,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-                                            Scene.getInstance().setModuleWidthForAllFresnelReflectors(moduleWidth);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setModuleWidthForAllFresnelReflectors(moduleWidth2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -720,13 +759,17 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 100 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = moduleLength != r.getModuleLength();
+                                    final double moduleLength2 = moduleLength;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(r);
-                                            r.setModuleLength(moduleLength);
-                                            r.ensureFullModules(false);
-                                            r.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                r.setModuleLength(moduleLength2);
+                                                r.ensureFullModules(false);
+                                                r.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -741,7 +784,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-                                            foundation.setModuleLengthForFresnelReflectors(moduleLength);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setModuleLengthForFresnelReflectors(moduleLength2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -756,7 +802,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-                                            Scene.getInstance().setModuleLengthForAllFresnelReflectors(moduleLength);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setModuleLengthForAllFresnelReflectors(moduleLength2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -844,12 +893,16 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = val != r.getPoleHeight();
+                                    final double height = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangePoleHeightCommand c = new ChangePoleHeightCommand(r);
-                                            r.setPoleHeight(val);
-                                            r.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                r.setPoleHeight(height);
+                                                r.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -864,7 +917,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, r.getClass());
-                                            foundation.setPoleHeightForFresnelReflectors(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setPoleHeightForFresnelReflectors(height);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -879,7 +935,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(r.getClass());
-                                            Scene.getInstance().setPoleHeightForAllFresnelReflectors(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setPoleHeightForAllFresnelReflectors(height);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -973,12 +1032,16 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     a += 360;
                                 }
                                 boolean changed = Math.abs(a - fresnel.getRelativeAzimuth()) > 0.000001;
+                                final double azimuth = a;
                                 if (rb1.isSelected()) {
                                     if (changed) {
                                         final ChangeAzimuthCommand c = new ChangeAzimuthCommand(fresnel);
-                                        fresnel.setRelativeAzimuth(a);
-                                        fresnel.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            fresnel.setRelativeAzimuth(azimuth);
+                                            fresnel.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 0;
@@ -993,7 +1056,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeFoundationFresnelReflectorAzimuthCommand c = new ChangeFoundationFresnelReflectorAzimuthCommand(foundation);
-                                        foundation.setAzimuthForParabolicFresnelReflectors(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            foundation.setAzimuthForParabolicFresnelReflectors(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 1;
@@ -1008,7 +1074,10 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeAzimuthForAllFresnelReflectorsCommand c = new ChangeAzimuthForAllFresnelReflectorsCommand();
-                                        Scene.getInstance().setAzimuthForAllFresnelReflectors(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setAzimuthForAllFresnelReflectors(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 2;
@@ -1034,11 +1103,14 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                     if (selectedPart instanceof FresnelReflector) {
                         final FresnelReflector r = (FresnelReflector) selectedPart;
                         final SetFresnelReflectorLabelCommand c = new SetFresnelReflectorLabelCommand(r);
-                        r.clearLabels();
-                        r.draw();
+                        SceneManager.getTaskManager().update(() -> {
+                            r.clearLabels();
+                            r.draw();
+                            SceneManager.getInstance().refresh();
+                            return null;
+                        });
                         SceneManager.getInstance().getUndoManager().addEdit(c);
                         Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().refresh();
                     }
                 }
             });
@@ -1054,10 +1126,13 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                     if (r.getLabelCustom()) {
                         r.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", r.getLabelCustomText()));
                     }
-                    r.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        r.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelCustom);
@@ -1069,10 +1144,13 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                     final FresnelReflector r = (FresnelReflector) selectedPart;
                     final SetFresnelReflectorLabelCommand c = new SetFresnelReflectorLabelCommand(r);
                     r.setLabelId(miLabelId.isSelected());
-                    r.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        r.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelId);
@@ -1084,10 +1162,13 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
                     final FresnelReflector r = (FresnelReflector) selectedPart;
                     final SetFresnelReflectorLabelCommand c = new SetFresnelReflectorLabelCommand(r);
                     r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
-                    r.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        r.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelEnergyOutput);

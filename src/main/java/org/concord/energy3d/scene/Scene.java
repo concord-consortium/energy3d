@@ -1175,7 +1175,7 @@ public class Scene implements Serializable {
         add(c, true);
         copyBuffer = c;
         SceneManager.getInstance().setSelectedPart(c);
-        SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
     }
 
     public void pasteToPickedLocationOnRoof() {
@@ -1226,7 +1226,7 @@ public class Scene implements Serializable {
         add(c, true);
         copyBuffer = c;
         SceneManager.getInstance().setSelectedPart(c);
-        SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
     }
 
     public void pasteToPickedLocationOnFloor() {
@@ -1277,7 +1277,7 @@ public class Scene implements Serializable {
         add(c, true);
         copyBuffer = c;
         SceneManager.getInstance().setSelectedPart(c);
-        SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
     }
 
     public void pasteToPickedLocationOnRack() {
@@ -1311,7 +1311,7 @@ public class Scene implements Serializable {
         add(c, true);
         copyBuffer = c;
         SceneManager.getInstance().setSelectedPart(c);
-        SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
     }
 
     public void pasteToPickedLocationOnFoundation() {
@@ -1393,7 +1393,7 @@ public class Scene implements Serializable {
                 add(c, true);
                 copyBuffer = c;
                 SceneManager.getInstance().setSelectedPart(c);
-                SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
             }
         }
     }
@@ -1446,7 +1446,7 @@ public class Scene implements Serializable {
         add(c, true);
         copyBuffer = c;
         SceneManager.getInstance().setSelectedPart(c);
-        SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
     }
 
     public List<HousePart> getParts() {
@@ -3399,7 +3399,10 @@ public class Scene implements Serializable {
                 final FresnelReflector r = (FresnelReflector) p;
                 r.setNSectionLength(nLength);
                 r.setNSectionWidth(nWidth);
-                r.draw();
+                SceneManager.getTaskManager().update(() -> {
+                    r.draw();
+                    return null;
+                });
             }
         }
         SceneManager.getInstance().refresh();

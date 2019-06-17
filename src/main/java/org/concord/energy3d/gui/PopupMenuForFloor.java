@@ -22,9 +22,9 @@ class PopupMenuForFloor extends PopupMenuFactory {
 
     private static JPopupMenu popupMenuForFloor;
 
-    static JPopupMenu getPopupMenu(final MouseEvent e) {
+    static JPopupMenu getPopupMenu(final MouseEvent mouseEvent) {
 
-        if (e.isShiftDown()) {
+        if (mouseEvent.isShiftDown()) {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnFloor();
                 Scene.getInstance().setEdited(true);
@@ -43,7 +43,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
+            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnFloor();
                 Scene.getInstance().setEdited(true);
                 return null;

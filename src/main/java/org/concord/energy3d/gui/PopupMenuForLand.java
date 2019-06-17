@@ -240,13 +240,16 @@ class PopupMenuForLand extends PopupMenuFactory {
                 if (file == null) {
                     return;
                 }
-                try {
-                    Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
-                    Scene.getInstance().setGroundImageEarthView(false);
-                } catch (final Throwable t) {
-                    t.printStackTrace();
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(), t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                SceneManager.getTaskManager().update(() -> {
+                    try {
+                        Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
+                        Scene.getInstance().setGroundImageEarthView(false);
+                    } catch (final Throwable t) {
+                        t.printStackTrace();
+                        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(), t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE));
+                    }
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
             });
             groundImageMenu.add(miUseImageFile);
@@ -264,8 +267,11 @@ class PopupMenuForLand extends PopupMenuFactory {
                             if (val <= 0) {
                                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                // final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
-                                Scene.getInstance().setGroundImageScale(val);
+                                // final RescaleGroundImageCommand c = new RescaleGroundImageCommand();
+                                SceneManager.getTaskManager().update(() -> {
+                                    Scene.getInstance().setGroundImageScale(val);
+                                    return null;
+                                });
                                 // SceneManager.getInstance().getUndoManager().addEdit(c);
                                 break;
                             }
@@ -279,7 +285,10 @@ class PopupMenuForLand extends PopupMenuFactory {
             groundImageMenu.add(miRescaleImage);
 
             miClearImage.addActionListener(e -> {
-                Scene.getInstance().setGroundImage(null, 1);
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setGroundImage(null, 1);
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
             });
             groundImageMenu.add(miClearImage);

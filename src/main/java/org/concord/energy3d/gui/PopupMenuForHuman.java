@@ -1,6 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.awt.*;
 import java.awt.event.ItemEvent;
 
 import javax.swing.ButtonGroup;
@@ -32,16 +31,14 @@ class PopupMenuForHuman extends PopupMenuFactory {
                     return;
                 }
                 final Human human = (Human) selectedPart;
+                final ChangeFigureCommand c = new ChangeFigureCommand(human);
                 SceneManager.getTaskManager().update(() -> {
-                    final ChangeFigureCommand c = new ChangeFigureCommand(human);
                     human.setHumanType(humanType);
                     human.draw();
-                    EventQueue.invokeLater(() -> {
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
-                    });
                     return null;
                 });
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+                Scene.getInstance().setEdited(true);
             }
         });
         return rbmi;

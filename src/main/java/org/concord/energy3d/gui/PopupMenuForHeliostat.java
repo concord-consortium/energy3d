@@ -154,12 +154,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                 SceneManager.getTaskManager().update(() -> {
                     m.draw();
                     SceneManager.getInstance().refresh();
-                    EventQueue.invokeLater(() -> {
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
-                    });
                     return null;
                 });
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+                Scene.getInstance().setEdited(true);
             });
 
             final JMenuItem miSetHeliostat = new JMenuItem("Set Target Tower...");
@@ -204,7 +202,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 
                     final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
                     final JComboBox<String> comboBox = new JComboBox<String>();
-                    comboBox.addItemListener(e1 -> {
+                    comboBox.addItemListener(event -> {
                         // TODO
                     });
                     comboBox.addItem("None");
@@ -250,16 +248,20 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                 }
                             }
                             boolean changed = target != m.getReceiver();
+                            final Foundation target2 = target;
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final Foundation oldTarget = m.getReceiver();
                                     final ChangeHeliostatTargetCommand c = new ChangeHeliostatTargetCommand(m);
                                     m.setReceiver(target);
-                                    m.draw();
-                                    if (oldTarget != null) {
-                                        oldTarget.drawSolarReceiver();
-                                    }
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        m.draw();
+                                        if (oldTarget != null) {
+                                            oldTarget.drawSolarReceiver();
+                                        }
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -275,7 +277,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeFoundationHeliostatTargetCommand c = new ChangeFoundationHeliostatTargetCommand(foundation);
-                                    foundation.setTargetForHeliostats(target);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setTargetForHeliostats(target2);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -290,14 +295,20 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeTargetForAllHeliostatsCommand c = new ChangeTargetForAllHeliostatsCommand();
-                                    Scene.getInstance().setTargetForAllHeliostats(target);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setTargetForAllHeliostats(target2);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
                             }
                             if (changed) {
-                                if (target != null) {
-                                    target.drawSolarReceiver();
+                                if (target2 != null) {
+                                    SceneManager.getTaskManager().update(() -> {
+                                        target2.drawSolarReceiver();
+                                        return null;
+                                    });
                                 }
                                 updateAfterEdit();
                             }
@@ -383,12 +394,16 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         val = -89.999;
                                     }
                                     boolean changed = Math.abs(val - m.getTiltAngle()) > 0.000001;
+                                    final double tiltAngle = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
-                                            m.setTiltAngle(val);
-                                            m.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                m.setTiltAngle(tiltAngle);
+                                                m.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -404,7 +419,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationHeliostatTiltAngleCommand c = new ChangeFoundationHeliostatTiltAngleCommand(foundation);
-                                            foundation.setTiltAngleForHeliostats(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setTiltAngleForHeliostats(tiltAngle);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -419,7 +437,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeTiltAngleForAllHeliostatsCommand c = new ChangeTiltAngleForAllHeliostatsCommand();
-                                            Scene.getInstance().setTiltAngleForAllHeliostats(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setTiltAngleForAllHeliostats(tiltAngle);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -512,12 +533,16 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                     a += 360;
                                 }
                                 boolean changed = Math.abs(a - mirror.getRelativeAzimuth()) > 0.000001;
+                                final double azimuth = a;
                                 if (rb1.isSelected()) {
                                     if (changed) {
                                         final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
-                                        mirror.setRelativeAzimuth(a);
-                                        mirror.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            mirror.setRelativeAzimuth(azimuth);
+                                            mirror.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 0;
@@ -532,7 +557,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeFoundationHeliostatAzimuthCommand c = new ChangeFoundationHeliostatAzimuthCommand(foundation);
-                                        foundation.setAzimuthForHeliostats(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            foundation.setAzimuthForHeliostats(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 1;
@@ -547,7 +575,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeAzimuthForAllHeliostatsCommand c = new ChangeAzimuthForAllHeliostatsCommand();
-                                        Scene.getInstance().setAzimuthForAllHeliostats(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setAzimuthForAllHeliostats(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 2;
@@ -640,13 +671,18 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = Math.abs(w - m.getApertureWidth()) > 0.000001 || Math.abs(h - m.getApertureHeight()) > 0.000001;
+                                    final double w2 = w;
+                                    final double h2 = h;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(m);
-                                            m.setApertureWidth(w);
-                                            m.seApertureHeight(h);
-                                            m.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                m.setApertureWidth(w2);
+                                                m.seApertureHeight(h2);
+                                                m.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -661,7 +697,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForHeliostatsOnFoundationCommand c = new SetSizeForHeliostatsOnFoundationCommand(foundation);
-                                            foundation.setSizeForHeliostats(w, h);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setSizeForHeliostats(w2, h2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -676,7 +715,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllHeliostatsCommand c = new SetSizeForAllHeliostatsCommand();
-                                            Scene.getInstance().setSizeForAllHeliostats(w, h);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setSizeForAllHeliostats(w2, h2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -764,12 +806,16 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = Math.abs(val - m.getPoleHeight()) > 0.000001;
+                                    final double poleHeight = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangePoleHeightCommand c = new ChangePoleHeightCommand(m);
-                                            m.setPoleHeight(val);
-                                            m.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                m.setPoleHeight(poleHeight);
+                                                m.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -784,7 +830,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, m.getClass());
-                                            foundation.setPoleHeightForHeliostats(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setPoleHeightForHeliostats(poleHeight);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -799,7 +848,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(m.getClass());
-                                            Scene.getInstance().setPoleHeightForAllHeliostats(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setPoleHeightForAllHeliostats(poleHeight);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -828,10 +880,13 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                         final Mirror m = (Mirror) selectedPart;
                         final SetHeliostatLabelCommand c = new SetHeliostatLabelCommand(m);
                         m.clearLabels();
-                        m.draw();
+                        SceneManager.getTaskManager().update(() -> {
+                            m.draw();
+                            SceneManager.getInstance().refresh();
+                            return null;
+                        });
                         SceneManager.getInstance().getUndoManager().addEdit(c);
                         Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().refresh();
                     }
                 }
             });
@@ -847,10 +902,13 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     if (m.getLabelCustom()) {
                         m.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", m.getLabelCustomText()));
                     }
-                    m.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        m.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelCustom);
@@ -862,10 +920,13 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     final Mirror m = (Mirror) selectedPart;
                     final SetHeliostatLabelCommand c = new SetHeliostatLabelCommand(m);
                     m.setLabelId(miLabelId.isSelected());
-                    m.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        m.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelId);
@@ -877,10 +938,13 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     final Mirror m = (Mirror) selectedPart;
                     final SetHeliostatLabelCommand c = new SetHeliostatLabelCommand(m);
                     m.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
-                    m.draw();
+                    SceneManager.getTaskManager().update(() -> {
+                        m.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     Scene.getInstance().setEdited(true);
-                    SceneManager.getInstance().refresh();
                 }
             });
             labelMenu.add(miLabelEnergyOutput);
@@ -898,7 +962,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     if (MainPanel.getInstance().getEnergyButton().isSelected()) {
                         MainPanel.getInstance().getEnergyButton().setSelected(false);
                     }
-                    Scene.getInstance().redrawAll();
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().redrawAll();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
@@ -914,7 +981,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     if (MainPanel.getInstance().getEnergyButton().isSelected()) {
                         MainPanel.getInstance().getEnergyButton().setSelected(false);
                     }
-                    Scene.getInstance().redrawAll();
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().redrawAll();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
@@ -930,7 +1000,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     if (MainPanel.getInstance().getEnergyButton().isSelected()) {
                         MainPanel.getInstance().getEnergyButton().setSelected(false);
                     }
-                    Scene.getInstance().redrawAll();
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().redrawAll();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
@@ -946,7 +1019,10 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
                     if (MainPanel.getInstance().getEnergyButton().isSelected()) {
                         MainPanel.getInstance().getEnergyButton().setSelected(false);
                     }
-                    Scene.getInstance().redrawAll();
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().redrawAll();
+                        return null;
+                    });
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
