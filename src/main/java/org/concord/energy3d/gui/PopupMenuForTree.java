@@ -1,17 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
@@ -20,125 +8,124 @@ import org.concord.energy3d.undo.ChangePlantCommand;
 import org.concord.energy3d.undo.LockEditPointsCommand;
 import org.concord.energy3d.util.Util;
 
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.event.ItemEvent;
+
 class PopupMenuForTree extends PopupMenuFactory {
 
-	private static JPopupMenu popupMenuForTree;
+    private static JPopupMenu popupMenuForTree;
 
-	static JPopupMenu getPopupMenu() {
+    static JPopupMenu getPopupMenu() {
 
-		if (popupMenuForTree == null) {
+        if (popupMenuForTree == null) {
 
-			final JCheckBoxMenuItem miPolygon = new JCheckBoxMenuItem("Show Polygon");
-			miPolygon.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final HousePart p = SceneManager.getInstance().getSelectedPart();
-					if (p instanceof Tree) {
-						((Tree) p).setShowPolygons(miPolygon.isSelected());
-					}
-					Scene.getInstance().setEdited(true);
-				}
-			});
+            final JCheckBoxMenuItem miPolygon = new JCheckBoxMenuItem("Show Polygon");
+            miPolygon.addItemListener(e -> {
+                final HousePart p = SceneManager.getInstance().getSelectedPart();
+                if (p instanceof Tree) {
+                    ((Tree) p).setShowPolygons(miPolygon.isSelected());
+                }
+                Scene.getInstance().setEdited(true);
+            });
 
-			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Disable Edit Point");
-			miLock.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Tree) {
-						final Tree tree = (Tree) selectedPart;
-						SceneManager.getInstance().getUndoManager().addEdit(new LockEditPointsCommand(tree));
-						final boolean lock = miLock.isSelected();
-						tree.setLockEdit(lock);
-						if (lock) {
-							SceneManager.getInstance().hideAllEditPoints();
-						}
-						tree.draw();
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
+            final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Disable Edit Point");
+            miLock.addItemListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Tree) {
+                    final Tree tree = (Tree) selectedPart;
+                    SceneManager.getInstance().getUndoManager().addEdit(new LockEditPointsCommand(tree));
+                    final boolean lock = miLock.isSelected();
+                    SceneManager.getTaskManager().update(() -> {
+                        tree.setLockEdit(lock);
+                        if (lock) {
+                            SceneManager.getInstance().hideAllEditPoints();
+                        }
+                        tree.draw();
+                        return null;
+                    });
+                    Scene.getInstance().setEdited(true);
+                }
+            });
 
-			popupMenuForTree = createPopupMenu(true, true, new Runnable() {
-				@Override
-				public void run() {
-					final HousePart p = SceneManager.getInstance().getSelectedPart();
-					if (p instanceof Tree) {
-						Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
-						Util.selectSilently(miLock, p.getLockEdit());
-					}
-				}
-			});
+            popupMenuForTree = createPopupMenu(true, true, () -> {
+                final HousePart p = SceneManager.getInstance().getSelectedPart();
+                if (p instanceof Tree) {
+                    Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
+                    Util.selectSilently(miLock, p.getLockEdit());
+                }
+            });
 
-			popupMenuForTree.addSeparator();
-			popupMenuForTree.add(miLock);
-			popupMenuForTree.add(miPolygon);
-			popupMenuForTree.addSeparator();
+            popupMenuForTree.addSeparator();
+            popupMenuForTree.add(miLock);
+            popupMenuForTree.add(miPolygon);
+            popupMenuForTree.addSeparator();
 
-			final JMenu treeMenu = new JMenu("Select Tree");
-			popupMenuForTree.add(treeMenu);
+            final JMenu treeMenu = new JMenu("Select Tree");
+            popupMenuForTree.add(treeMenu);
 
-			final ButtonGroup treeButtonGroup = new ButtonGroup();
+            final ButtonGroup treeButtonGroup = new ButtonGroup();
 
-			final JRadioButtonMenuItem[] rbmi = new JRadioButtonMenuItem[Tree.PLANTS.length];
-			for (int i = 0; i < rbmi.length; i++) {
-				rbmi[i] = createMenuItem(i);
-				treeMenu.add(rbmi[i]);
-				treeButtonGroup.add(rbmi[i]);
-			}
+            final JRadioButtonMenuItem[] rbmi = new JRadioButtonMenuItem[Tree.PLANTS.length];
+            for (int i = 0; i < rbmi.length; i++) {
+                rbmi[i] = createMenuItem(i);
+                treeMenu.add(rbmi[i]);
+                treeButtonGroup.add(rbmi[i]);
+            }
 
-			treeMenu.addMenuListener(new MenuListener() {
+            treeMenu.addMenuListener(new MenuListener() {
 
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Tree)) {
-						return;
-					}
-					treeButtonGroup.clearSelection();
-					Util.selectSilently(rbmi[((Tree) selectedPart).getPlantType()], true);
-				}
+                @Override
+                public void menuSelected(final MenuEvent e) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (!(selectedPart instanceof Tree)) {
+                        return;
+                    }
+                    treeButtonGroup.clearSelection();
+                    Util.selectSilently(rbmi[((Tree) selectedPart).getPlantType()], true);
+                }
 
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-				}
+                @Override
+                public void menuDeselected(final MenuEvent e) {
+                }
 
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
+                @Override
+                public void menuCanceled(final MenuEvent e) {
+                }
 
-			});
+            });
 
-		}
+        }
 
-		return popupMenuForTree;
+        return popupMenuForTree;
 
-	}
+    }
 
-	private static JRadioButtonMenuItem createMenuItem(final int plantType) {
-		final JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/" + Tree.getPlantName(plantType).toLowerCase() + ".png")));
-		rbmi.setText(Tree.getPlantName(plantType));
-		rbmi.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Tree)) {
-						return;
-					}
-					final Tree plant = (Tree) selectedPart;
-					final ChangePlantCommand c = new ChangePlantCommand(plant);
-					plant.setPlantType(plantType);
-					plant.draw();
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
-						MainPanel.getInstance().getEnergyButton().setSelected(false);
-					}
-				}
-			}
-		});
-		return rbmi;
-	}
+    private static JRadioButtonMenuItem createMenuItem(final int plantType) {
+        final JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/" + Tree.getPlantName(plantType).toLowerCase() + ".png")));
+        rbmi.setText(Tree.getPlantName(plantType));
+        rbmi.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof Tree)) {
+                    return;
+                }
+                final Tree plant = (Tree) selectedPart;
+                final ChangePlantCommand c = new ChangePlantCommand(plant);
+                SceneManager.getTaskManager().update(() -> {
+                    plant.setPlantType(plantType);
+                    plant.draw();
+                    return null;
+                });
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+                Scene.getInstance().setEdited(true);
+                if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+                    MainPanel.getInstance().getEnergyButton().setSelected(false);
+                }
+            }
+        });
+        return rbmi;
+    }
 
 }

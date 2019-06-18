@@ -1,24 +1,14 @@
 package org.concord.energy3d.gui;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.border.EmptyBorder;
-
 import org.concord.energy3d.Designer;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.SpringUtilities;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 
 /**
  * @author Charles Xie
@@ -28,7 +18,7 @@ class PropertiesDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	public PropertiesDialog() {
+	PropertiesDialog() {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -39,130 +29,124 @@ class PropertiesDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		final JComboBox<String> onlySolarAnalysisComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		final JComboBox<String> onlySolarAnalysisComboBox = new JComboBox<>(new String[] { "No", "Yes" });
 		final JTextField designerNameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
 		final JTextField designerEmailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
 		final JTextField designerOrganizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
-		final JComboBox<String> projectTypeComboBox = new JComboBox<String>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
+		final JComboBox<String> projectTypeComboBox = new JComboBox<>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
 		projectTypeComboBox.setSelectedIndex(Scene.getInstance().getProjectType() - 1);
-		projectTypeComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					if (projectTypeComboBox.getSelectedIndex() == 0) {
-						onlySolarAnalysisComboBox.setSelectedIndex(0);
-					} else {
-						onlySolarAnalysisComboBox.setSelectedIndex(1);
-					}
+		projectTypeComboBox.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				if (projectTypeComboBox.getSelectedIndex() == 0) {
+					onlySolarAnalysisComboBox.setSelectedIndex(0);
+				} else {
+					onlySolarAnalysisComboBox.setSelectedIndex(1);
 				}
 			}
 		});
-		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
+		final JComboBox<String> unitSystemComboBox = new JComboBox<>(new String[] { "International System of Units", "United States Customary Units" });
 		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits) {
 			unitSystemComboBox.setSelectedIndex(1);
 		}
-		final JComboBox<String> studentModeComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		final JComboBox<String> studentModeComboBox = new JComboBox<>(new String[]{"No", "Yes"});
 		if (Scene.getInstance().isStudentMode()) {
 			studentModeComboBox.setSelectedIndex(1);
 		}
 		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
 		final JTextField projectDescriptionField = new JTextField(Scene.getInstance().getProjectDescription());
 		projectDescriptionField.setColumns(10);
-		final JComboBox<String> foundationOverlapComboBox = new JComboBox<String>(new String[] { "Disallowed", "Allowed" });
+		final JComboBox<String> foundationOverlapComboBox = new JComboBox<>(new String[] { "Disallowed", "Allowed" });
 		if (!Scene.getInstance().getDisallowFoundationOverlap()) {
 			foundationOverlapComboBox.setSelectedIndex(1);
 		}
 		if (Scene.getInstance().getOnlySolarAnalysis()) {
 			onlySolarAnalysisComboBox.setSelectedIndex(1);
 		}
-		final JComboBox<String> snapshotLoggingComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+		final JComboBox<String> snapshotLoggingComboBox = new JComboBox<>(new String[]{"Yes", "No"});
 		if (Scene.getInstance().getNoSnaphshotLogging()) {
 			snapshotLoggingComboBox.setSelectedIndex(1);
 		}
-		final JComboBox<String> groundImageColorationComboBox = new JComboBox<String>(new String[] { "Dark Colored", "Light Colored" });
+		final JComboBox<String> groundImageColorationComboBox = new JComboBox<>(new String[]{"Dark Colored", "Light Colored"});
 		groundImageColorationComboBox.setSelectedIndex(Scene.getInstance().isGroundImageLightColored() ? 1 : 0);
-		final JComboBox<String> instructionTabHeaderComboBox = new JComboBox<String>(new String[] { "Show", "Hide" });
+		final JComboBox<String> instructionTabHeaderComboBox = new JComboBox<>(new String[] { "Show", "Hide" });
 		instructionTabHeaderComboBox.setSelectedIndex(Scene.getInstance().isInstructionTabHeaderVisible() ? 0 : 1);
-		final JComboBox<String> dateFixedComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		final JComboBox<String> dateFixedComboBox = new JComboBox<>(new String[] { "No", "Yes" });
 		dateFixedComboBox.setSelectedIndex(Scene.getInstance().isDateFixed() ? 1 : 0);
-		final JComboBox<String> locationFixedComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		final JComboBox<String> locationFixedComboBox = new JComboBox<>(new String[] { "No", "Yes" });
 		locationFixedComboBox.setSelectedIndex(Scene.getInstance().isLocationFixed() ? 1 : 0);
 
-		final ActionListener okListener = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				switch (unitSystemComboBox.getSelectedIndex()) {
-				case 0:
-					Scene.getInstance().setUnit(Scene.Unit.InternationalSystemOfUnits);
-					break;
-				case 1:
-					Scene.getInstance().setUnit(Scene.Unit.USCustomaryUnits);
-					break;
-				}
-				final String designerName = designerNameField.getText();
-				final String designerEmail = designerEmailField.getText();
-				final String designerOrganization = designerOrganizationField.getText();
-				if (designerName != null && !designerName.trim().equals("")) {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setName(designerName);
-				} else {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setName("User");
-				}
-				if (designerEmail != null && !designerEmail.trim().equals("")) {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setEmail(designerEmail);
-				} else {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setEmail(null);
-				}
-				if (designerOrganization != null && !designerOrganization.trim().equals("")) {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setOrganization(designerOrganization);
-				} else {
-					Designer designer = Scene.getInstance().getDesigner();
-					if (designer == null) {
-						designer = new Designer();
-						Scene.getInstance().setDesigner(designer);
-					}
-					designer.setOrganization(null);
-				}
-				Scene.getInstance().setProjectType(projectTypeComboBox.getSelectedIndex() + 1);
-				Scene.getInstance().setProjectName(projectNameField.getText());
-				Scene.getInstance().setProjectDescription(projectDescriptionField.getText());
-				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
-				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setNoSnapshotLogging(snapshotLoggingComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setInstructionTabHeaderVisible(instructionTabHeaderComboBox.getSelectedIndex() == 0);
-				Scene.getInstance().setDateFixed(dateFixedComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setLocationFixed(locationFixedComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().updateWeatherData();
-				EnergyPanel.getInstance().update();
-				PropertiesDialog.this.dispose();
+		final ActionListener okListener = e -> {
+			switch (unitSystemComboBox.getSelectedIndex()) {
+			case 0:
+				Scene.getInstance().setUnit(Scene.Unit.InternationalSystemOfUnits);
+				break;
+			case 1:
+				Scene.getInstance().setUnit(Scene.Unit.USCustomaryUnits);
+				break;
 			}
+			final String designerName = designerNameField.getText();
+			final String designerEmail = designerEmailField.getText();
+			final String designerOrganization = designerOrganizationField.getText();
+			if (designerName != null && !designerName.trim().equals("")) {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setName(designerName);
+			} else {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setName("User");
+			}
+			if (designerEmail != null && !designerEmail.trim().equals("")) {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setEmail(designerEmail);
+			} else {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setEmail(null);
+			}
+			if (designerOrganization != null && !designerOrganization.trim().equals("")) {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setOrganization(designerOrganization);
+			} else {
+				Designer designer = Scene.getInstance().getDesigner();
+				if (designer == null) {
+					designer = new Designer();
+					Scene.getInstance().setDesigner(designer);
+				}
+				designer.setOrganization(null);
+			}
+			Scene.getInstance().setProjectType(projectTypeComboBox.getSelectedIndex() + 1);
+			Scene.getInstance().setProjectName(projectNameField.getText());
+			Scene.getInstance().setProjectDescription(projectDescriptionField.getText());
+			Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
+			Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setNoSnapshotLogging(snapshotLoggingComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setInstructionTabHeaderVisible(instructionTabHeaderComboBox.getSelectedIndex() == 0);
+			Scene.getInstance().setDateFixed(dateFixedComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setLocationFixed(locationFixedComboBox.getSelectedIndex() == 1);
+			Scene.getInstance().setEdited(true);
+			EnergyPanel.getInstance().updateWeatherData();
+			EnergyPanel.getInstance().update();
+			PropertiesDialog.this.dispose();
 		};
 
 		// set designer name
@@ -238,12 +222,7 @@ class PropertiesDialog extends JDialog {
 		getRootPane().setDefaultButton(okButton);
 
 		final JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				PropertiesDialog.this.dispose();
-			}
-		});
+		cancelButton.addActionListener(e -> PropertiesDialog.this.dispose());
 		cancelButton.setActionCommand("Cancel");
 		buttonPanel.add(cancelButton);
 

@@ -69,7 +69,10 @@ class PopupMenuForSky extends PopupMenuFactory {
             miDefault.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -81,7 +84,10 @@ class PopupMenuForSky extends PopupMenuFactory {
             miDesert.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -93,7 +99,10 @@ class PopupMenuForSky extends PopupMenuFactory {
             miGrassland.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -105,7 +114,10 @@ class PopupMenuForSky extends PopupMenuFactory {
             miForest.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }

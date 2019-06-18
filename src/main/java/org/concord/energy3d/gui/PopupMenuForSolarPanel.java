@@ -1,82 +1,24 @@
 package org.concord.energy3d.gui;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Rack;
-import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Trackable;
-import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
-import org.concord.energy3d.undo.ChangeAzimuthCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCellPropertiesCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCollectorPoleHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelModelCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeModelForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangePoleHeightCommand;
-import org.concord.energy3d.undo.ChangePoleHeightForAllSolarCollectorsCommand;
-import org.concord.energy3d.undo.ChangePoleHeightForSolarPanelRowCommand;
-import org.concord.energy3d.undo.ChangeSolarCellPropertiesCommand;
-import org.concord.energy3d.undo.ChangeSolarCellPropertiesForAllCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelModelCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForSolarPanelRowCommand;
-import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
-import org.concord.energy3d.undo.LockEditPointsCommand;
-import org.concord.energy3d.undo.LockEditPointsForClassCommand;
-import org.concord.energy3d.undo.LockEditPointsOnFoundationCommand;
-import org.concord.energy3d.undo.RotateSolarPanelCommand;
-import org.concord.energy3d.undo.SetFoundationTemperatureEffectsCommand;
-import org.concord.energy3d.undo.SetShadeToleranceCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForSolarPanelsOnFoundationCommand;
-import org.concord.energy3d.undo.SetSolarPanelLabelCommand;
-import org.concord.energy3d.undo.SetSolarTrackerCommand;
-import org.concord.energy3d.undo.SetSolarTrackersForAllCommand;
-import org.concord.energy3d.undo.SetSolarTrackersOnFoundationCommand;
-import org.concord.energy3d.undo.SetTemperatrureEffectsForAllCommand;
-import org.concord.energy3d.undo.SetTemperatureEffectsCommand;
-import org.concord.energy3d.undo.ShowSunBeamCommand;
+import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.List;
+import java.util.Map;
 
 class PopupMenuForSolarPanel extends PopupMenuFactory {
 
@@ -145,7 +87,6 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 if (changed) {
                                     final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
                                     sp.setShadeTolerance(SolarPanel.HIGH_SHADE_TOLERANCE);
-                                    sp.draw();
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -246,7 +187,6 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 if (changed) {
                                     final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
                                     sp.setShadeTolerance(SolarPanel.PARTIAL_SHADE_TOLERANCE);
-                                    sp.draw();
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -347,7 +287,6 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 if (changed) {
                                     final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
                                     sp.setShadeTolerance(SolarPanel.NO_SHADE_TOLERANCE);
-                                    sp.draw();
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -449,9 +388,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "No Tracker");
-                                    sp.setTracker(Trackable.NO_TRACKER);
-                                    sp.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        sp.setTracker(Trackable.NO_TRACKER);
+                                        sp.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -466,8 +408,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                 }
                                 if (changed) {
-                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "No Tracker for All Solar Panels on Selected Foundation");
-                                    foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
+                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp,
+                                            "No Tracker for All Solar Panels on Selected Foundation");
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -482,7 +428,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "No Tracker for All Solar Panels");
-                                    Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -551,9 +500,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Horizontal Single-Axis Tracker");
-                                    sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
-                                    sp.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                        sp.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -568,8 +520,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                 }
                                 if (changed) {
-                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation");
-                                    foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp,
+                                            "Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation");
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -584,7 +540,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Horizontal Single-Axis Tracker for All Solar Panels");
-                                    Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -653,9 +612,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Vertical Single-Axis Tracker");
-                                    sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
-                                    sp.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+                                        sp.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -670,8 +632,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                 }
                                 if (changed) {
-                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation");
-                                    foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp,
+                                            "Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation");
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -686,7 +652,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Vertical Single-Axis Tracker for All Solar Panels");
-                                    Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -755,9 +724,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Dual-Axis Tracker");
-                                    sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-                                    sp.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                        sp.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -772,8 +744,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                 }
                                 if (changed) {
-                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Dual-Axis Tracker for All Solar Panels on Selected Foundation");
-                                    foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                    final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp,
+                                            "Dual-Axis Tracker for All Solar Panels on Selected Foundation");
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -788,7 +764,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Dual-Axis Tracker for All Solar Panels");
-                                    Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -808,23 +787,23 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             final ButtonGroup orientationGroup = new ButtonGroup();
 
             final JRadioButtonMenuItem rbmiLandscape = new JRadioButtonMenuItem("Landscape");
-            rbmiLandscape.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (rbmiLandscape.isSelected()) {
-                        final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                        if (!(selectedPart instanceof SolarPanel)) {
-                            return;
-                        }
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        if (!s.isRotated()) {
-                            final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+            rbmiLandscape.addActionListener(e -> {
+                if (rbmiLandscape.isSelected()) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (!(selectedPart instanceof SolarPanel)) {
+                        return;
+                    }
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    if (!s.isRotated()) {
+                        final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+                        SceneManager.getTaskManager().update(() -> {
                             s.setRotated(true);
-                            SceneManager.getInstance().getUndoManager().addEdit(c);
                             s.draw();
                             SceneManager.getInstance().refresh();
-                            updateAfterEdit();
-                        }
+                            return null;
+                        });
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                        updateAfterEdit();
                     }
                 }
             });
@@ -832,23 +811,23 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             orientationGroup.add(rbmiLandscape);
 
             final JRadioButtonMenuItem rbmiPortrait = new JRadioButtonMenuItem("Portrait", true);
-            rbmiPortrait.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (rbmiPortrait.isSelected()) {
-                        final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                        if (!(selectedPart instanceof SolarPanel)) {
-                            return;
-                        }
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        if (s.isRotated()) {
-                            final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+            rbmiPortrait.addActionListener(e -> {
+                if (rbmiPortrait.isSelected()) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (!(selectedPart instanceof SolarPanel)) {
+                        return;
+                    }
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    if (s.isRotated()) {
+                        final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+                        SceneManager.getTaskManager().update(() -> {
                             s.setRotated(false);
-                            SceneManager.getInstance().getUndoManager().addEdit(c);
                             s.draw();
                             SceneManager.getInstance().refresh();
-                            updateAfterEdit();
-                        }
+                            return null;
+                        });
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                        updateAfterEdit();
                     }
                 }
             });
@@ -858,150 +837,150 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             final JMenu labelMenu = new JMenu("Label");
 
             final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
-            miLabelNone.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (miLabelNone.isSelected()) {
-                        final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                        if (selectedPart instanceof SolarPanel) {
-                            final SolarPanel s = (SolarPanel) selectedPart;
-                            final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                            s.clearLabels();
+            miLabelNone.addActionListener(e -> {
+                if (miLabelNone.isSelected()) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (selectedPart instanceof SolarPanel) {
+                        final SolarPanel s = (SolarPanel) selectedPart;
+                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                        s.clearLabels();
+                        SceneManager.getTaskManager().update(() -> {
                             s.draw();
-                            SceneManager.getInstance().getUndoManager().addEdit(c);
-                            Scene.getInstance().setEdited(true);
                             SceneManager.getInstance().refresh();
-                        }
+                            return null;
+                        });
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                        Scene.getInstance().setEdited(true);
                     }
                 }
             });
             labelMenu.add(miLabelNone);
 
             final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
-            miLabelCustom.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelCustom(miLabelCustom.isSelected());
-                        if (s.getLabelCustom()) {
-                            s.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", s.getLabelCustomText()));
-                        }
-                        s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().refresh();
+            miLabelCustom.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelCustom(miLabelCustom.isSelected());
+                    if (s.getLabelCustom()) {
+                        s.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", s.getLabelCustomText()));
                     }
+                    SceneManager.getTaskManager().update(() -> {
+                        s.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelCustom);
 
             final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
-            miLabelId.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelId(miLabelId.isSelected());
+            miLabelId.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelId(miLabelId.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelId);
 
             final JCheckBoxMenuItem miLabelModelName = new JCheckBoxMenuItem("Model");
-            miLabelModelName.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelModelName(miLabelModelName.isSelected());
+            miLabelModelName.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelModelName(miLabelModelName.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelModelName);
 
             final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
-            miLabelCellEfficiency.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+            miLabelCellEfficiency.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelCellEfficiency);
 
             final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
-            miLabelTiltAngle.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+            miLabelTiltAngle.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelTiltAngle);
 
             final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
-            miLabelTracker.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelTracker(miLabelTracker.isSelected());
+            miLabelTracker.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelTracker(miLabelTracker.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelTracker);
 
             final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
-            miLabelEnergyOutput.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof SolarPanel) {
-                        final SolarPanel s = (SolarPanel) selectedPart;
-                        final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
-                        s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+            miLabelEnergyOutput.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof SolarPanel) {
+                    final SolarPanel s = (SolarPanel) selectedPart;
+                    final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+                    s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         s.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelEnergyOutput);
@@ -1087,18 +1066,26 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         val = -89.999;
                                     }
                                     boolean changed = Math.abs(val - sp.getTiltAngle()) > 0.000001;
+                                    final double tiltAngle = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
-                                            sp.setTiltAngle(val);
-                                            sp.draw();
-                                            if (sp.checkContainerIntersection()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as the solar panel would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                sp.setTiltAngle(tiltAngle);
+                                                sp.draw();
+                                                if (sp.checkContainerIntersection()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This tilt angle cannot be set as the solar panel would cut into the underlying surface.",
+                                                                "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -1113,23 +1100,29 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeTiltAngleForSolarPanelRowCommand c = new ChangeTiltAngleForSolarPanelRowCommand(row);
-                                            boolean intersected = false;
-                                            for (final SolarPanel x : row) {
-                                                x.setTiltAngle(val);
-                                                x.draw();
-                                                if (x.checkContainerIntersection()) {
-                                                    intersected = true;
-                                                    break;
+                                            SceneManager.getTaskManager().update(() -> {
+                                                boolean intersected = false;
+                                                for (final SolarPanel x : row) {
+                                                    x.setTiltAngle(tiltAngle);
+                                                    x.draw();
+                                                    if (x.checkContainerIntersection()) {
+                                                        intersected = true;
+                                                        break;
+                                                    }
                                                 }
-                                            }
-                                            SceneManager.getInstance().refresh();
-                                            if (intersected) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                                if (intersected) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.",
+                                                                "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
@@ -1144,13 +1137,20 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
-                                            foundation.setTiltAngleForSolarPanels(val);
-                                            if (foundation.checkContainerIntersectionForSolarPanels()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setTiltAngleForSolarPanels(tiltAngle);
+                                                if (foundation.checkContainerIntersectionForSolarPanels()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.",
+                                                                "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     } else if (rb4.isSelected()) {
@@ -1164,13 +1164,20 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
-                                            Scene.getInstance().setTiltAngleForAllSolarPanels(val);
-                                            if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setTiltAngleForAllSolarPanels(tiltAngle);
+                                                if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.",
+                                                                "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 3;
                                     }
@@ -1263,12 +1270,16 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     a += 360;
                                 }
                                 boolean changed = Math.abs(a - sp.getRelativeAzimuth()) > 0.000001;
+                                final double azimuth = a;
                                 if (rb1.isSelected()) {
                                     if (changed) {
                                         final ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
-                                        sp.setRelativeAzimuth(a);
-                                        sp.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            sp.setRelativeAzimuth(azimuth);
+                                            sp.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 0;
@@ -1283,7 +1294,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
-                                        foundation.setAzimuthForSolarPanels(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            foundation.setAzimuthForSolarPanels(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 1;
@@ -1298,7 +1312,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
-                                        Scene.getInstance().setAzimuthForAllSolarPanels(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setAzimuthForAllSolarPanels(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 2;
@@ -1316,47 +1333,46 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             });
 
             final JMenuItem miSize = new JMenuItem("Size...");
-            miSize.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof SolarPanel)) {
-                        return;
+            miSize.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof SolarPanel)) {
+                    return;
+                }
+                final SolarPanel s = (SolarPanel) selectedPart;
+                final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+                final JPanel gui = new JPanel(new BorderLayout(5, 5));
+                gui.setBorder(BorderFactory.createTitledBorder("Choose Size for " + partInfo));
+                final JComboBox<String> sizeComboBox = new JComboBox<>(solarPanelNominalSize.getStrings());
+                final int nItems = sizeComboBox.getItemCount();
+                for (int i = 0; i < nItems; i++) {
+                    if (Util.isZero(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) && Util.isZero(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i])) {
+                        sizeComboBox.setSelectedIndex(i);
                     }
-                    final SolarPanel s = (SolarPanel) selectedPart;
-                    final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-                    final JPanel gui = new JPanel(new BorderLayout(5, 5));
-                    gui.setBorder(BorderFactory.createTitledBorder("Choose Size for " + partInfo));
-                    final JComboBox<String> sizeComboBox = new JComboBox<String>(solarPanelNominalSize.getStrings());
-                    final int nItems = sizeComboBox.getItemCount();
-                    for (int i = 0; i < nItems; i++) {
-                        if (Util.isZero(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) && Util.isZero(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i])) {
-                            sizeComboBox.setSelectedIndex(i);
-                        }
+                }
+                gui.add(sizeComboBox, BorderLayout.NORTH);
+                if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+                    return;
+                }
+                final int i = sizeComboBox.getSelectedIndex();
+                boolean changed = s.getNumberOfCellsInX() != solarPanelNominalSize.getCellNx()[i] || s.getNumberOfCellsInY() != solarPanelNominalSize.getCellNy()[i];
+                if (!changed) {
+                    if (Math.abs(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i]) > 0.000001 || Math.abs(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) > 0.000001) {
+                        changed = true;
                     }
-                    gui.add(sizeComboBox, BorderLayout.NORTH);
-                    if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-                        return;
-                    }
-                    final int i = sizeComboBox.getSelectedIndex();
-                    boolean changed = s.getNumberOfCellsInX() != solarPanelNominalSize.getCellNx()[i] || s.getNumberOfCellsInY() != solarPanelNominalSize.getCellNy()[i];
-                    if (!changed) {
-                        if (Math.abs(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i]) > 0.000001 || Math.abs(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) > 0.000001) {
-                            changed = true;
-                        }
-                    }
-                    if (changed) {
-                        final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
+                }
+                if (changed) {
+                    final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
+                    SceneManager.getTaskManager().update(() -> {
                         s.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
                         s.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
                         s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
                         s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
                         s.draw();
                         SceneManager.getInstance().refresh();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        updateAfterEdit();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    updateAfterEdit();
                 }
             });
 
@@ -1437,18 +1453,26 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = Math.abs(val - sp.getPoleHeight()) > 0.000001;
+                                    final double poleHeight = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangePoleHeightCommand c = new ChangePoleHeightCommand(sp);
-                                            sp.setPoleHeight(val);
-                                            sp.draw();
-                                            if (sp.checkContainerIntersection()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                sp.setPoleHeight(poleHeight);
+                                                sp.draw();
+                                                if (sp.checkContainerIntersection()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This pole height cannot be set as the solar panel would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -1461,22 +1485,29 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleHeightForSolarPanelRowCommand c = new ChangePoleHeightForSolarPanelRowCommand(row);
-                                            boolean intersected = false;
-                                            for (final SolarPanel x : row) {
-                                                x.setPoleHeight(val);
-                                                x.draw();
-                                                if (x.checkContainerIntersection()) {
-                                                    intersected = true;
-                                                    break;
+                                            SceneManager.getTaskManager().update(() -> {
+                                                boolean intersected = false;
+                                                for (final SolarPanel x : row) {
+                                                    x.setPoleHeight(poleHeight);
+                                                    x.draw();
+                                                    if (x.checkContainerIntersection()) {
+                                                        intersected = true;
+                                                        break;
+                                                    }
                                                 }
-                                            }
-                                            if (intersected) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                                if (intersected) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This pole height cannot be set as one or more solar panels in the row would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
@@ -1488,13 +1519,20 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, sp.getClass());
-                                            foundation.setPoleHeightForSolarPanels(val);
-                                            if (foundation.checkContainerIntersectionForSolarPanels()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setPoleHeightForSolarPanels(poleHeight);
+                                                if (foundation.checkContainerIntersectionForSolarPanels()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This pole height cannot be set as one or more solar panels would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     } else if (rb4.isSelected()) {
@@ -1506,13 +1544,20 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(sp.getClass());
-                                            Scene.getInstance().setPoleHeightForAllSolarPanels(val);
-                                            if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This pole height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setPoleHeightForAllSolarPanels(poleHeight);
+                                                if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                                "This pole height cannot be set as one or more solar panels would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 3;
                                     }
@@ -1579,18 +1624,27 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                     if (optionPane.getValue() == options[0]) {
                         if (rb1.isSelected()) {
                             final LockEditPointsCommand c = new LockEditPointsCommand(sp);
-                            sp.setLockEdit(disabled);
+                            SceneManager.getTaskManager().update(() -> {
+                                sp.setLockEdit(disabled);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 0;
                         } else if (rb2.isSelected()) {
                             final Foundation foundation = sp.getTopContainer();
                             final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, sp.getClass());
-                            foundation.setLockEditForClass(disabled, sp.getClass());
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setLockEditForClass(disabled, sp.getClass());
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 1;
                         } else if (rb3.isSelected()) {
                             final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(sp);
-                            Scene.getInstance().setLockEditForClass(disabled, sp.getClass());
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setLockEditForClass(disabled, sp.getClass());
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 2;
                         }
@@ -1602,22 +1656,22 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             });
 
             final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
-            cbmiDrawSunBeam.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof SolarPanel)) {
-                        return;
-                    }
-                    final SolarPanel sp = (SolarPanel) selectedPart;
-                    final ShowSunBeamCommand c = new ShowSunBeamCommand(sp);
-                    sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+            cbmiDrawSunBeam.addItemListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof SolarPanel)) {
+                    return;
+                }
+                final SolarPanel sp = (SolarPanel) selectedPart;
+                final ShowSunBeamCommand c = new ShowSunBeamCommand(sp);
+                sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+                SceneManager.getTaskManager().update(() -> {
                     sp.drawSunBeam();
                     sp.draw();
                     SceneManager.getInstance().refresh();
-                    SceneManager.getInstance().getUndoManager().addEdit(c);
-                    Scene.getInstance().setEdited(true);
-                }
+                    return null;
+                });
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+                Scene.getInstance().setEdited(true);
             });
 
             final JMenuItem miCells = new JMenuItem("Solar Cells...");
@@ -1668,13 +1722,13 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                     gui.add(inputPanel, BorderLayout.CENTER);
                     JLabel label = new JLabel("Type: ", JLabel.LEFT);
                     inputPanel.add(label);
-                    final JComboBox<String> typeComboBox = new JComboBox<String>(new String[]{"Polycrystalline", "Monocrystalline", "Thin Film"});
+                    final JComboBox<String> typeComboBox = new JComboBox<>(new String[]{"Polycrystalline", "Monocrystalline", "Thin Film"});
                     typeComboBox.setSelectedIndex(solarPanel.getCellType());
                     label.setLabelFor(typeComboBox);
                     inputPanel.add(typeComboBox);
                     label = new JLabel("Color: ", JLabel.LEFT);
                     inputPanel.add(label);
-                    final JComboBox<String> colorComboBox = new JComboBox<String>(new String[]{"Blue", "Black", "Gray"});
+                    final JComboBox<String> colorComboBox = new JComboBox<>(new String[]{"Blue", "Black", "Gray"});
                     colorComboBox.setSelectedIndex(solarPanel.getColorOption());
                     label.setLabelFor(colorComboBox);
                     inputPanel.add(colorComboBox);
@@ -2068,14 +2122,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                     modelName = specs.getModel();
                     final JPanel gui = new JPanel(new BorderLayout(5, 5));
                     gui.setBorder(BorderFactory.createTitledBorder("Model for " + partInfo));
-                    final JComboBox<String> typeComboBox = new JComboBox<String>(models);
+                    final JComboBox<String> typeComboBox = new JComboBox<>(models);
                     typeComboBox.setSelectedItem(specs.getModel());
-                    typeComboBox.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                modelName = (String) typeComboBox.getSelectedItem();
-                            }
+                    typeComboBox.addItemListener(e1 -> {
+                        if (e1.getStateChange() == ItemEvent.SELECTED) {
+                            modelName = (String) typeComboBox.getSelectedItem();
                         }
                     });
                     gui.add(typeComboBox, BorderLayout.NORTH);
@@ -2120,8 +2171,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 if (changed) {
                                     final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(s);
                                     s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-                                    s.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -2136,7 +2190,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeFoundationSolarPanelModelCommand c = new ChangeFoundationSolarPanelModelCommand(foundation);
-                                    foundation.setModelForSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setModelForSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -2151,7 +2208,10 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeModelForAllSolarPanelsCommand c = new ChangeModelForAllSolarPanelsCommand();
-                                    Scene.getInstance().setModelForAllSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setModelForAllSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -2167,92 +2227,89 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                 }
             });
 
-            popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
-                @Override
-                public void run() {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof SolarPanel)) {
-                        return;
-                    }
-                    final SolarPanel sp = (SolarPanel) selectedPart;
-                    switch (sp.getShadeTolerance()) {
-                        case SolarPanel.HIGH_SHADE_TOLERANCE:
-                            Util.selectSilently(miHighTolerance, true);
-                            break;
-                        case SolarPanel.PARTIAL_SHADE_TOLERANCE:
-                            Util.selectSilently(miPartialTolerance, true);
-                            break;
-                        case SolarPanel.NO_SHADE_TOLERANCE:
-                            Util.selectSilently(miNoTolerance, true);
-                            break;
-                    }
-                    Util.selectSilently(cbmiDrawSunBeam, sp.isSunBeamVisible());
-                    Util.selectSilently(cbmiDisableEditPoint, sp.getLockEdit());
-                    Util.selectSilently(rbmiLandscape, sp.isRotated());
-                    Util.selectSilently(rbmiPortrait, !sp.isRotated());
-                    Util.selectSilently(miLabelNone, !sp.isLabelVisible());
-                    Util.selectSilently(miLabelCustom, sp.getLabelCustom());
-                    Util.selectSilently(miLabelId, sp.getLabelId());
-                    Util.selectSilently(miLabelModelName, sp.getLabelModelName());
-                    Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
-                    Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
-                    Util.selectSilently(miLabelTracker, sp.getLabelTracker());
-                    Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
+            popupMenuForSolarPanel = createPopupMenu(true, true, () -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof SolarPanel)) {
+                    return;
+                }
+                final SolarPanel sp = (SolarPanel) selectedPart;
+                switch (sp.getShadeTolerance()) {
+                    case SolarPanel.HIGH_SHADE_TOLERANCE:
+                        Util.selectSilently(miHighTolerance, true);
+                        break;
+                    case SolarPanel.PARTIAL_SHADE_TOLERANCE:
+                        Util.selectSilently(miPartialTolerance, true);
+                        break;
+                    case SolarPanel.NO_SHADE_TOLERANCE:
+                        Util.selectSilently(miNoTolerance, true);
+                        break;
+                }
+                Util.selectSilently(cbmiDrawSunBeam, sp.isSunBeamVisible());
+                Util.selectSilently(cbmiDisableEditPoint, sp.getLockEdit());
+                Util.selectSilently(rbmiLandscape, sp.isRotated());
+                Util.selectSilently(rbmiPortrait, !sp.isRotated());
+                Util.selectSilently(miLabelNone, !sp.isLabelVisible());
+                Util.selectSilently(miLabelCustom, sp.getLabelCustom());
+                Util.selectSilently(miLabelId, sp.getLabelId());
+                Util.selectSilently(miLabelModelName, sp.getLabelModelName());
+                Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
+                Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
+                Util.selectSilently(miLabelTracker, sp.getLabelTracker());
+                Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
 
-                    final PvModuleSpecs pms = sp.getPvModuleSpecs();
-                    final boolean isCustom = "Custom".equals(pms.getModel());
-                    miCells.setEnabled(isCustom);
-                    miSize.setEnabled(isCustom);
-                    miTemperatureEffects.setEnabled(isCustom);
-                    shadeToleranceMenu.setEnabled(isCustom);
+                final PvModuleSpecs pms = sp.getPvModuleSpecs();
+                final boolean isCustom = "Custom".equals(pms.getModel());
+                miCells.setEnabled(isCustom);
+                miSize.setEnabled(isCustom);
+                miTemperatureEffects.setEnabled(isCustom);
+                shadeToleranceMenu.setEnabled(isCustom);
 
-                    switch (sp.getTracker()) {
-                        case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                            Util.selectSilently(miAltazimuthDualAxisTracker, true);
-                            break;
-                        case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                            Util.selectSilently(miHorizontalSingleAxisTracker, true);
-                            break;
-                        case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                            Util.selectSilently(miVerticalSingleAxisTracker, true);
-                            break;
-                        case Trackable.NO_TRACKER:
-                            Util.selectSilently(miNoTracker, true);
-                            break;
-                    }
-                    miAltazimuthDualAxisTracker.setEnabled(true);
-                    miHorizontalSingleAxisTracker.setEnabled(true);
-                    miVerticalSingleAxisTracker.setEnabled(true);
+                switch (sp.getTracker()) {
+                    case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+                        Util.selectSilently(miAltazimuthDualAxisTracker, true);
+                        break;
+                    case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+                        Util.selectSilently(miHorizontalSingleAxisTracker, true);
+                        break;
+                    case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+                        Util.selectSilently(miVerticalSingleAxisTracker, true);
+                        break;
+                    case Trackable.NO_TRACKER:
+                        Util.selectSilently(miNoTracker, true);
+                        break;
+                }
+                miAltazimuthDualAxisTracker.setEnabled(true);
+                miHorizontalSingleAxisTracker.setEnabled(true);
+                miVerticalSingleAxisTracker.setEnabled(true);
+                if (sp.getContainer() instanceof Roof) {
+                    final Roof roof = (Roof) sp.getContainer();
+                    final boolean flat = Util.isZero(roof.getHeight());
+                    miAltazimuthDualAxisTracker.setEnabled(flat);
+                    miHorizontalSingleAxisTracker.setEnabled(flat);
+                    miVerticalSingleAxisTracker.setEnabled(flat);
+                } else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
+                    miAltazimuthDualAxisTracker.setEnabled(false);
+                    miHorizontalSingleAxisTracker.setEnabled(false);
+                    miVerticalSingleAxisTracker.setEnabled(false);
+                }
+                if (sp.getTracker() != Trackable.NO_TRACKER) {
+                    miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || sp.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
+                    miAzimuth.setEnabled(sp.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && sp.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
+                } else {
+                    miTiltAngle.setEnabled(true);
+                    miAzimuth.setEnabled(true);
+                    miPoleHeight.setEnabled(true);
                     if (sp.getContainer() instanceof Roof) {
                         final Roof roof = (Roof) sp.getContainer();
-                        final boolean flat = Util.isZero(roof.getHeight());
-                        miAltazimuthDualAxisTracker.setEnabled(flat);
-                        miHorizontalSingleAxisTracker.setEnabled(flat);
-                        miVerticalSingleAxisTracker.setEnabled(flat);
-                    } else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
-                        miAltazimuthDualAxisTracker.setEnabled(false);
-                        miHorizontalSingleAxisTracker.setEnabled(false);
-                        miVerticalSingleAxisTracker.setEnabled(false);
-                    }
-                    if (sp.getTracker() != Trackable.NO_TRACKER) {
-                        miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || sp.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
-                        miAzimuth.setEnabled(sp.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && sp.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
-                    } else {
-                        miTiltAngle.setEnabled(true);
-                        miAzimuth.setEnabled(true);
-                        miPoleHeight.setEnabled(true);
-                        if (sp.getContainer() instanceof Roof) {
-                            final Roof roof = (Roof) sp.getContainer();
-                            if (roof.getHeight() > 0) {
-                                miTiltAngle.setEnabled(false);
-                                miAzimuth.setEnabled(false);
-                                miPoleHeight.setEnabled(false);
-                            }
-                        } else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
+                        if (roof.getHeight() > 0) {
                             miTiltAngle.setEnabled(false);
                             miAzimuth.setEnabled(false);
                             miPoleHeight.setEnabled(false);
                         }
+                    } else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
+                        miTiltAngle.setEnabled(false);
+                        miAzimuth.setEnabled(false);
+                        miPoleHeight.setEnabled(false);
                     }
                 }
             });
@@ -2263,7 +2320,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
                 if (!(selectedPart instanceof SolarPanel)) {
                     return;
                 }
-                Scene.getInstance().removeAllSolarPanels(((SolarPanel) selectedPart).getRow());
+                Scene.getInstance().removeAllSolarPanels(((SolarPanel) selectedPart).getRow()); // already use Task Manager thread
             });
             popupMenuForSolarPanel.add(miDeleteRow);
             popupMenuForSolarPanel.addSeparator();
@@ -2286,29 +2343,23 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
             popupMenuForSolarPanel.addSeparator();
 
             JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
-            mi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
-                        new PvDailyAnalysis().show();
-                    }
+            mi.addActionListener(e -> {
+                if (EnergyPanel.getInstance().adjustCellSize()) {
+                    return;
+                }
+                if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
+                    new PvDailyAnalysis().show();
                 }
             });
             popupMenuForSolarPanel.add(mi);
 
             mi = new JMenuItem("Annual Yield Analysis...");
-            mi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
-                        new PvAnnualAnalysis().show();
-                    }
+            mi.addActionListener(e -> {
+                if (EnergyPanel.getInstance().adjustCellSize()) {
+                    return;
+                }
+                if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
+                    new PvAnnualAnalysis().show();
                 }
             });
             popupMenuForSolarPanel.add(mi);

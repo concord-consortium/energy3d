@@ -3525,6 +3525,7 @@ public class Scene implements Serializable {
                     }
                 }
             }
+            SceneManager.getInstance().refresh();
         }
     }
 
