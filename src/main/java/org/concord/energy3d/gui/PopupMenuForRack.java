@@ -118,48 +118,29 @@ class PopupMenuForRack extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    SceneManager.getTaskManager().update(new Callable<Object>() {
-                        @Override
-                        public Object call() throws Exception {
-                            Scene.getInstance().pasteToPickedLocationOnRack();
-                            Scene.getInstance().setEdited(true);
-                            return null;
-                        }
-                    });
-                }
-            });
+            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+                Scene.getInstance().pasteToPickedLocationOnRack();
+                Scene.getInstance().setEdited(true);
+                return null;
+            }));
 
             final JMenuItem miClear = new JMenuItem("Clear");
-            miClear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof Rack)) {
-                        return;
-                    }
-                    final Rack rack = (Rack) selectedPart;
-                    SceneManager.getTaskManager().update(new Callable<Object>() {
-                        @Override
-                        public Object call() {
-                            if (rack.isMonolithic()) {
-                                rack.setMonolithic(false);
-                                rack.draw();
-                            } else {
-                                Scene.getInstance().removeAllSolarPanels(null);
-                                EventQueue.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        MainPanel.getInstance().getEnergyButton().setSelected(false);
-                                    }
-                                });
-                            }
-                            return null;
-                        }
-                    });
+            miClear.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof Rack)) {
+                    return;
                 }
+                final Rack rack = (Rack) selectedPart;
+                SceneManager.getTaskManager().update(() -> {
+                    if (rack.isMonolithic()) {
+                        rack.setMonolithic(false);
+                        rack.draw();
+                    } else {
+                        Scene.getInstance().removeAllSolarPanels(null);
+                        EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
+                    }
+                    return null;
+                });
             });
 
             final JMenuItem miFixedTiltAngle = new JMenuItem("Fixed Tilt Angle...");
@@ -241,18 +222,25 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         val = -89.999;
                                     }
                                     boolean changed = val != rack.getTiltAngle();
+                                    final double tiltAngle = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(rack);
-                                            rack.setTiltAngle(val);
-                                            rack.draw();
-                                            if (rack.checkContainerIntersection()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                rack.setTiltAngle(tiltAngle);
+                                                rack.draw();
+                                                if (rack.checkContainerIntersection()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.",
+                                                                "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -267,13 +255,18 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
-                                            foundation.setTiltAngleForRacks(val);
-                                            if (foundation.checkContainerIntersectionForRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setTiltAngleForRacks(tiltAngle);
+                                                if (foundation.checkContainerIntersectionForRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
@@ -287,13 +280,18 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
-                                            Scene.getInstance().setTiltAngleForAllRacks(val);
-                                            if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setTiltAngleForAllRacks(tiltAngle);
+                                                if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     }
@@ -407,15 +405,21 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 if (rb1.isSelected()) {
                                     if (changed) {
                                         final ChangeMonthlyTiltAnglesCommand c = new ChangeMonthlyTiltAnglesCommand(rack);
-                                        rack.setMonthlyTiltAngles(val);
-                                        rack.draw();
-                                        if (rack.checkContainerIntersection()) {
-                                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                            c.undo();
-                                        } else {
-                                            SceneManager.getInstance().refresh();
-                                            SceneManager.getInstance().getUndoManager().addEdit(c);
-                                        }
+                                        SceneManager.getTaskManager().update(() -> {
+                                            rack.setMonthlyTiltAngles(val);
+                                            rack.draw();
+                                            if (rack.checkContainerIntersection()) {
+                                                EventQueue.invokeLater(() -> {
+                                                    JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.",
+                                                            "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                    c.undo();
+                                                });
+                                            } else {
+                                                SceneManager.getInstance().refresh();
+                                                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                            }
+                                            return null;
+                                        });
                                     }
                                     selectedScopeIndex = 0;
                                 } else if (rb2.isSelected()) {
@@ -432,13 +436,18 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeFoundationRackMonthlyTiltAnglesCommand c = new ChangeFoundationRackMonthlyTiltAnglesCommand(foundation);
-                                        foundation.setMonthlyTiltAnglesForRacks(val);
-                                        if (foundation.checkContainerIntersectionForRacks()) {
-                                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                            c.undo();
-                                        } else {
-                                            SceneManager.getInstance().getUndoManager().addEdit(c);
-                                        }
+                                        SceneManager.getTaskManager().update(() -> {
+                                            foundation.setMonthlyTiltAnglesForRacks(val);
+                                            if (foundation.checkContainerIntersectionForRacks()) {
+                                                EventQueue.invokeLater(() -> {
+                                                    JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                    c.undo();
+                                                });
+                                            } else {
+                                                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                            }
+                                            return null;
+                                        });
                                     }
                                     selectedScopeIndex = 1;
                                 } else if (rb3.isSelected()) {
@@ -454,13 +463,18 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeMonthlyTiltAnglesForAllRacksCommand c = new ChangeMonthlyTiltAnglesForAllRacksCommand();
-                                        Scene.getInstance().setMonthlyTiltAnglesForAllRacks(val);
-                                        if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-                                            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-                                            c.undo();
-                                        } else {
-                                            SceneManager.getInstance().getUndoManager().addEdit(c);
-                                        }
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setMonthlyTiltAnglesForAllRacks(val);
+                                            if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+                                                EventQueue.invokeLater(() -> {
+                                                    JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+                                                    c.undo();
+                                                });
+                                            } else {
+                                                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                            }
+                                            return null;
+                                        });
                                     }
                                     selectedScopeIndex = 2;
                                 }
@@ -549,12 +563,16 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     a += 360;
                                 }
                                 boolean changed = a != rack.getRelativeAzimuth();
+                                final double azimuth = a;
                                 if (rb1.isSelected()) {
                                     if (changed) {
                                         final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
-                                        rack.setRelativeAzimuth(a);
-                                        rack.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            rack.setRelativeAzimuth(azimuth);
+                                            rack.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 0;
@@ -569,7 +587,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
-                                        foundation.setAzimuthForRacks(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            foundation.setAzimuthForRacks(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 1;
@@ -584,7 +605,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     }
                                     if (changed) {
                                         final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
-                                        Scene.getInstance().setAzimuthForAllRacks(a);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setAzimuthForAllRacks(azimuth);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(c);
                                     }
                                     selectedScopeIndex = 2;
@@ -652,42 +676,51 @@ class PopupMenuForRack extends PopupMenuFactory {
                             break;
                         } else {
                             if (rb1.isSelected()) {
-                                double a = rack.getRelativeAzimuth() + 90;
-                                if (a > 360) {
-                                    a -= 360;
-                                }
                                 final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
-                                rack.setRelativeAzimuth(a);
-                                rack.draw();
-                                SceneManager.getInstance().refresh();
+                                SceneManager.getTaskManager().update(() -> {
+                                    double a = rack.getRelativeAzimuth() + 90;
+                                    if (a > 360) {
+                                        a -= 360;
+                                    }
+                                    rack.setRelativeAzimuth(a);
+                                    rack.draw();
+                                    SceneManager.getInstance().refresh();
+                                    return null;
+                                });
                                 SceneManager.getInstance().getUndoManager().addEdit(c);
                                 selectedScopeIndex = 0;
                             } else if (rb2.isSelected()) {
                                 final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
-                                final List<Rack> racks = foundation.getRacks();
-                                for (final Rack r : racks) {
-                                    double a = r.getRelativeAzimuth() + 90;
-                                    if (a > 360) {
-                                        a -= 360;
+                                SceneManager.getTaskManager().update(() -> {
+                                    final List<Rack> racks = foundation.getRacks();
+                                    for (final Rack r : racks) {
+                                        double a = r.getRelativeAzimuth() + 90;
+                                        if (a > 360) {
+                                            a -= 360;
+                                        }
+                                        r.setRelativeAzimuth(a);
+                                        r.draw();
                                     }
-                                    r.setRelativeAzimuth(a);
-                                    r.draw();
-                                }
-                                SceneManager.getInstance().refresh();
+                                    SceneManager.getInstance().refresh();
+                                    return null;
+                                });
                                 SceneManager.getInstance().getUndoManager().addEdit(c);
                                 selectedScopeIndex = 1;
                             } else if (rb3.isSelected()) {
                                 final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
-                                final List<Rack> racks = Scene.getInstance().getAllRacks();
-                                for (final Rack r : racks) {
-                                    double a = r.getRelativeAzimuth() + 90;
-                                    if (a > 360) {
-                                        a -= 360;
+                                SceneManager.getTaskManager().update(() -> {
+                                    final List<Rack> racks = Scene.getInstance().getAllRacks();
+                                    for (final Rack r : racks) {
+                                        double a = r.getRelativeAzimuth() + 90;
+                                        if (a > 360) {
+                                            a -= 360;
+                                        }
+                                        r.setRelativeAzimuth(a);
+                                        r.draw();
                                     }
-                                    r.setRelativeAzimuth(a);
-                                    r.draw();
-                                }
-                                SceneManager.getInstance().refresh();
+                                    SceneManager.getInstance().refresh();
+                                    return null;
+                                });
                                 SceneManager.getInstance().getUndoManager().addEdit(c);
                                 selectedScopeIndex = 2;
                             }
@@ -773,19 +806,26 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 0.5 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = val != rack.getRackHeight();
+                                    final double val2 = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-                                            rack.setRackHeight(val);
-                                            rack.ensureFullSolarPanels(false);
-                                            rack.draw();
-                                            if (rack.checkContainerIntersection()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                rack.setRackHeight(val2);
+                                                rack.ensureFullSolarPanels(false);
+                                                rack.draw();
+                                                if (rack.checkContainerIntersection()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as the rack would cut into the underlying surface.",
+                                                                "Illegal Size", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -799,13 +839,19 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-                                            foundation.setWidthForRacks(val);
-                                            if (foundation.checkContainerIntersectionForRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setWidthForRacks(val2);
+                                                if (foundation.checkContainerIntersectionForRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.",
+                                                                "Illegal Size", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
@@ -819,13 +865,19 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-                                            Scene.getInstance().setWidthForAllRacks(val);
-                                            if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setWidthForAllRacks(val2);
+                                                if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.",
+                                                                "Illegal Size", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     }
@@ -917,13 +969,17 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = val != rack.getRackWidth();
+                                    final double val2 = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-                                            rack.setRackWidth(val);
-                                            rack.ensureFullSolarPanels(false);
-                                            rack.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                rack.setRackWidth(val2); // width = length, height = width
+                                                rack.ensureFullSolarPanels(false);
+                                                rack.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -938,7 +994,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-                                            foundation.setLengthForRacks(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setLengthForRacks(val2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -953,7 +1012,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-                                            Scene.getInstance().setLengthForAllRacks(val);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setLengthForAllRacks(val2);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -1041,18 +1103,25 @@ class PopupMenuForRack extends PopupMenuFactory {
                                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                                 } else {
                                     boolean changed = val != rack.getPoleHeight();
+                                    final double poleHeight = val;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangePoleHeightCommand c = new ChangePoleHeightCommand(rack);
-                                            rack.setPoleHeight(val);
-                                            rack.draw();
-                                            if (rack.checkContainerIntersection()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().refresh();
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                rack.setPoleHeight(poleHeight);
+                                                rack.draw();
+                                                if (rack.checkContainerIntersection()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "The pole height cannot be set this low as the rack would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    SceneManager.getInstance().refresh();
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 0;
                                     } else if (rb2.isSelected()) {
@@ -1066,13 +1135,19 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangeFoundationSolarCollectorPoleHeightCommand c = new ChangeFoundationSolarCollectorPoleHeightCommand(foundation, rack.getClass());
-                                            foundation.setPoleHeightForRacks(val);
-                                            if (foundation.checkContainerIntersectionForRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setPoleHeightForRacks(poleHeight);
+                                                if (foundation.checkContainerIntersectionForRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 1;
                                     } else if (rb3.isSelected()) {
@@ -1086,13 +1161,19 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleHeightForAllSolarCollectorsCommand c = new ChangePoleHeightForAllSolarCollectorsCommand(rack.getClass());
-                                            Scene.getInstance().setPoleHeightForAllRacks(val);
-                                            if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-                                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
-                                                c.undo();
-                                            } else {
-                                                SceneManager.getInstance().getUndoManager().addEdit(c);
-                                            }
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setPoleHeightForAllRacks(poleHeight);
+                                                if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+                                                    EventQueue.invokeLater(() -> {
+                                                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole heights cannot be set this low as one or more racks would cut into the underlying surface.",
+                                                                "Illegal Pole Height", JOptionPane.ERROR_MESSAGE);
+                                                        c.undo();
+                                                    });
+                                                } else {
+                                                    EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(c));
+                                                }
+                                                return null;
+                                            });
                                         }
                                         selectedScopeIndex = 2;
                                     }
@@ -1191,14 +1272,19 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 } else {
                                     final boolean visible = visibleComboBox.getSelectedIndex() == 0;
                                     boolean changed = dx != rack.getPoleDistanceX() || dy != rack.getPoleDistanceY();
+                                    final double dx2 = dx;
+                                    final double dy2 = dy;
                                     if (rb1.isSelected()) {
                                         if (changed) {
                                             final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
-                                            rack.setPoleDistanceX(dx);
-                                            rack.setPoleDistanceY(dy);
-                                            rack.setPoleVisible(visible);
-                                            rack.draw();
-                                            SceneManager.getInstance().refresh();
+                                            SceneManager.getTaskManager().update(() -> {
+                                                rack.setPoleDistanceX(dx2);
+                                                rack.setPoleDistanceY(dy2);
+                                                rack.setPoleVisible(visible);
+                                                rack.draw();
+                                                SceneManager.getInstance().refresh();
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 0;
@@ -1214,7 +1300,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
-                                            foundation.setPoleSpacingForRacks(dx, dy, visible);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                foundation.setPoleSpacingForRacks(dx2, dy2, visible);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 1;
@@ -1229,7 +1318,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                         }
                                         if (changed) {
                                             final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
-                                            Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
+                                            SceneManager.getTaskManager().update(() -> {
+                                                Scene.getInstance().setPoleSpacingForAllRacks(dx2, dy2, visible);
+                                                return null;
+                                            });
                                             SceneManager.getInstance().getUndoManager().addEdit(c);
                                         }
                                         selectedScopeIndex = 2;
@@ -1274,7 +1366,9 @@ class PopupMenuForRack extends PopupMenuFactory {
                     }
                     rack = (Rack) selectedPart;
                     final int n = rack.getChildren().size();
-                    if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this rack must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                    if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(),
+                            "All existing " + n + " solar panels on this rack must be removed before\na new layout can be applied. Do you want to continue?",
+                            "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
                         return;
                     }
                     final SolarPanel solarPanel = rack.getSolarPanel();
@@ -1290,29 +1384,26 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (solarPanel.getModelName() != null) {
                         modelComboBox.setSelectedItem(solarPanel.getModelName());
                     }
-                    modelComboBox.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
-                                sizeComboBox.setEnabled(isCustom);
-                                cellTypeComboBox.setEnabled(isCustom);
-                                colorOptionComboBox.setEnabled(isCustom);
-                                shadeToleranceComboBox.setEnabled(isCustom);
-                                cellEfficiencyField.setEnabled(isCustom);
-                                noctField.setEnabled(isCustom);
-                                pmaxTcField.setEnabled(isCustom);
-                                if (!isCustom) {
-                                    final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
-                                    cellTypeComboBox.setSelectedItem(specs.getCellType());
-                                    shadeToleranceComboBox.setSelectedItem(specs.getShadeTolerance());
-                                    cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
-                                    noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
-                                    pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-                                    final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
-                                    sizeComboBox.setSelectedItem(s);
-                                    colorOptionComboBox.setSelectedItem(specs.getColor());
-                                }
+                    modelComboBox.addItemListener(e1 -> {
+                        if (e1.getStateChange() == ItemEvent.SELECTED) {
+                            final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
+                            sizeComboBox.setEnabled(isCustom);
+                            cellTypeComboBox.setEnabled(isCustom);
+                            colorOptionComboBox.setEnabled(isCustom);
+                            shadeToleranceComboBox.setEnabled(isCustom);
+                            cellEfficiencyField.setEnabled(isCustom);
+                            noctField.setEnabled(isCustom);
+                            pmaxTcField.setEnabled(isCustom);
+                            if (!isCustom) {
+                                final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
+                                cellTypeComboBox.setSelectedItem(specs.getCellType());
+                                shadeToleranceComboBox.setSelectedItem(specs.getShadeTolerance());
+                                cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
+                                noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
+                                pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
+                                final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
+                                sizeComboBox.setSelectedItem(s);
+                                colorOptionComboBox.setSelectedItem(specs.getColor());
                             }
                         }
                     });
@@ -1441,15 +1532,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                         s.setRotated(orientationComboBox.getSelectedIndex() == 1);
                         s.setInverterEfficiency(inverterEfficiency * 0.01);
                         s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-                        SceneManager.getTaskManager().update(new Callable<Object>() {
-                            @Override
-                            public Object call() {
-                                rack.addSolarPanels();
-                                if (command != null) {
-                                    SceneManager.getInstance().getUndoManager().addEdit(command);
-                                }
-                                return null;
+                        SceneManager.getTaskManager().update(() -> {
+                            rack.addSolarPanels();
+                            if (command != null) {
+                                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(command));
                             }
+                            return null;
                         });
                         updateAfterEdit();
                     }
@@ -1500,15 +1588,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                         s.setTemperatureCoefficientPmax(pmax * 0.01);
                         s.setNominalOperatingCellTemperature(noct);
                         s.setShadeTolerance(shadeToleranceComboBox.getSelectedIndex());
-                        SceneManager.getTaskManager().update(new Callable<Object>() {
-                            @Override
-                            public Object call() {
-                                rack.addSolarPanels();
-                                if (command != null) {
-                                    SceneManager.getInstance().getUndoManager().addEdit(command);
-                                }
-                                return null;
+                        SceneManager.getTaskManager().update(() -> {
+                            rack.addSolarPanels();
+                            if (command != null) {
+                                EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(command));
                             }
+                            return null;
                         });
                         updateAfterEdit();
                     }
@@ -1548,12 +1633,9 @@ class PopupMenuForRack extends PopupMenuFactory {
                     final JComboBox<String> typeComboBox = new JComboBox<String>(models);
                     typeComboBox.setSelectedItem(specs.getModel());
                     modelName = specs.getModel();
-                    typeComboBox.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                modelName = (String) typeComboBox.getSelectedItem();
-                            }
+                    typeComboBox.addItemListener(e12 -> {
+                        if (e12.getStateChange() == ItemEvent.SELECTED) {
+                            modelName = (String) typeComboBox.getSelectedItem();
                         }
                     });
                     gui.add(typeComboBox, BorderLayout.NORTH);
@@ -1597,10 +1679,13 @@ class PopupMenuForRack extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final ChangeSolarPanelModelForRackCommand c = new ChangeSolarPanelModelForRackCommand(r);
-                                    s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-                                    r.ensureFullSolarPanels(false);
-                                    r.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                        r.ensureFullSolarPanels(false);
+                                        r.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -1615,7 +1700,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeSolarPanelModelForRacksOnFoundationCommand c = new ChangeSolarPanelModelForRacksOnFoundationCommand(foundation);
-                                    foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -1630,7 +1718,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final ChangeSolarPanelModelForAllRacksCommand c = new ChangeSolarPanelModelForAllRacksCommand();
-                                    Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -1726,13 +1817,16 @@ class PopupMenuForRack extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final ChooseSolarPanelSizeForRackCommand c = new ChooseSolarPanelSizeForRackCommand(r);
-                                    s.setPanelWidth(w);
-                                    s.setPanelHeight(h);
-                                    s.setNumberOfCellsInX(numberOfCellsInX);
-                                    s.setNumberOfCellsInY(numberOfCellsInY);
-                                    r.ensureFullSolarPanels(false);
-                                    r.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.setPanelWidth(w);
+                                        s.setPanelHeight(h);
+                                        s.setNumberOfCellsInX(numberOfCellsInX);
+                                        s.setNumberOfCellsInY(numberOfCellsInY);
+                                        r.ensureFullSolarPanels(false);
+                                        r.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -1752,7 +1846,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelSizeForRacksOnFoundationCommand c = new SetSolarPanelSizeForRacksOnFoundationCommand(foundation);
-                                    foundation.setSolarPanelSizeForRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setSolarPanelSizeForRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -1772,7 +1869,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
-                                    Scene.getInstance().setSolarPanelSizeForAllRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setSolarPanelSizeForAllRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -1850,9 +1950,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarPanelCellTypeForRackCommand c = new SetSolarPanelCellTypeForRackCommand(r);
-                                    s.setCellType(selectedIndex);
-                                    r.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.setCellType(selectedIndex);
+                                        r.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -1867,7 +1970,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelCellTypeForRacksOnFoundationCommand c = new SetSolarPanelCellTypeForRacksOnFoundationCommand(foundation);
-                                    foundation.setSolarPanelCellTypeForRacks(selectedIndex);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setSolarPanelCellTypeForRacks(selectedIndex);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -1882,7 +1988,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelCellTypeForAllRacksCommand c = new SetSolarPanelCellTypeForAllRacksCommand();
-                                    Scene.getInstance().setSolarPanelCellTypeForAllRacks(selectedIndex);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setSolarPanelCellTypeForAllRacks(selectedIndex);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -1960,9 +2069,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final SetSolarPanelColorForRackCommand c = new SetSolarPanelColorForRackCommand(r);
-                                    s.setColorOption(selectedIndex);
-                                    r.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.setColorOption(selectedIndex);
+                                        r.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -1977,7 +2089,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelColorForRacksOnFoundationCommand c = new SetSolarPanelColorForRacksOnFoundationCommand(foundation);
-                                    foundation.setSolarPanelColorForRacks(selectedIndex);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.setSolarPanelColorForRacks(selectedIndex);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -1992,7 +2107,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final SetSolarPanelColorForAllRacksCommand c = new SetSolarPanelColorForAllRacksCommand();
-                                    Scene.getInstance().setSolarPanelColorForAllRacks(selectedIndex);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().setSolarPanelColorForAllRacks(selectedIndex);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -2543,10 +2661,13 @@ class PopupMenuForRack extends PopupMenuFactory {
                             if (rb1.isSelected()) {
                                 if (changed) {
                                     final RotateSolarPanelsForRackCommand c = new RotateSolarPanelsForRackCommand(r);
-                                    s.setRotated(orientationComboBox.getSelectedIndex() == 1);
-                                    r.ensureFullSolarPanels(false);
-                                    r.draw();
-                                    SceneManager.getInstance().refresh();
+                                    SceneManager.getTaskManager().update(() -> {
+                                        s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+                                        r.ensureFullSolarPanels(false);
+                                        r.draw();
+                                        SceneManager.getInstance().refresh();
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 0;
@@ -2561,7 +2682,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
-                                    foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 1;
@@ -2576,7 +2700,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                                 }
                                 if (changed) {
                                     final RotateSolarPanelsForAllRacksCommand c = new RotateSolarPanelsForAllRacksCommand();
-                                    Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
+                                    SceneManager.getTaskManager().update(() -> {
+                                        Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
+                                        return null;
+                                    });
                                     SceneManager.getInstance().getUndoManager().addEdit(c);
                                 }
                                 selectedScopeIndex = 2;
@@ -2763,9 +2890,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (rb1.isSelected()) {
                         if (changed) {
                             final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "No Tracker");
-                            rack.setTracker(Trackable.NO_TRACKER);
-                            rack.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                rack.setTracker(Trackable.NO_TRACKER);
+                                rack.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 0;
@@ -2781,7 +2911,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "No Tracker for All Racks on Selected Foundation");
-                            foundation.setTrackerForRacks(Trackable.NO_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setTrackerForRacks(Trackable.NO_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 1;
@@ -2796,7 +2929,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "No Tracker for All Racks");
-                            Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 2;
@@ -2855,9 +2991,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (rb1.isSelected()) {
                         if (changed) {
                             final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Horizontal Single-Axis Tracker");
-                            rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-                            rack.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                rack.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 0;
@@ -2872,8 +3011,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             }
                         }
                         if (changed) {
-                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Horizontal Single-Axis Tracker for All Racks on Selected Foundation");
-                            foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack,
+                                    "Horizontal Single-Axis Tracker for All Racks on Selected Foundation");
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 1;
@@ -2888,7 +3031,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Horizontal Single-Axis Tracker for All Racks");
-                            Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 2;
@@ -2947,9 +3093,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (rb1.isSelected()) {
                         if (changed) {
                             final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Vertical Single-Axis Tracker");
-                            rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-                            rack.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+                                rack.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 0;
@@ -2964,8 +3113,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             }
                         }
                         if (changed) {
-                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Vertical Single-Axis Tracker for All Racks on Selected Foundation");
-                            foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack,
+                                    "Vertical Single-Axis Tracker for All Racks on Selected Foundation");
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 1;
@@ -2980,7 +3133,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Vertical Single-Axis Tracker for All Racks");
-                            Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 2;
@@ -3040,9 +3196,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (rb1.isSelected()) {
                         if (changed) {
                             final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Tilted Single-Axis Tracker");
-                            rack.setTracker(Trackable.TILTED_SINGLE_AXIS_TRACKER);
-                            rack.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                rack.setTracker(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+                                rack.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 0;
@@ -3057,8 +3216,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             }
                         }
                         if (changed) {
-                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Tilted Single-Axis Tracker for All Racks on Selected Foundation");
-                            foundation.setTrackerForRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack,
+                                    "Tilted Single-Axis Tracker for All Racks on Selected Foundation");
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setTrackerForRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 1;
@@ -3073,7 +3236,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Tilted Single-Axis Tracker for All Racks");
-                            Scene.getInstance().setTrackerForAllRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setTrackerForAllRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 2;
@@ -3132,9 +3298,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (rb1.isSelected()) {
                         if (changed) {
                             final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Dual-Axis Tracker");
-                            rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-                            rack.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                rack.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 0;
@@ -3149,8 +3318,12 @@ class PopupMenuForRack extends PopupMenuFactory {
                             }
                         }
                         if (changed) {
-                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Dual-Axis Tracker for All Racks on Selected Foundation");
-                            foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                            final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack,
+                                    "Dual-Axis Tracker for All Racks on Selected Foundation");
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 1;
@@ -3165,7 +3338,10 @@ class PopupMenuForRack extends PopupMenuFactory {
                         }
                         if (changed) {
                             final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Dual-Axis Tracker for All Racks");
-                            Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                         }
                         selectedScopeIndex = 2;
@@ -3232,18 +3408,27 @@ class PopupMenuForRack extends PopupMenuFactory {
                     if (optionPane.getValue() == options[0]) {
                         if (rb1.isSelected()) {
                             final LockEditPointsCommand c = new LockEditPointsCommand(r);
-                            r.setLockEdit(disabled);
+                            SceneManager.getTaskManager().update(() -> {
+                                r.setLockEdit(disabled);
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 0;
                         } else if (rb2.isSelected()) {
                             final Foundation foundation = r.getTopContainer();
                             final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, r.getClass());
-                            foundation.setLockEditForClass(disabled, r.getClass());
+                            SceneManager.getTaskManager().update(() -> {
+                                foundation.setLockEditForClass(disabled, r.getClass());
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 1;
                         } else if (rb3.isSelected()) {
                             final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(r);
-                            Scene.getInstance().setLockEditForClass(disabled, r.getClass());
+                            SceneManager.getTaskManager().update(() -> {
+                                Scene.getInstance().setLockEditForClass(disabled, r.getClass());
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(c);
                             selectedScopeIndex = 2;
                         }
@@ -3255,238 +3440,233 @@ class PopupMenuForRack extends PopupMenuFactory {
             });
 
             final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
-            cbmiDrawSunBeam.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof Rack)) {
-                        return;
-                    }
-                    final Rack rack = (Rack) selectedPart;
-                    final ShowSunBeamCommand c = new ShowSunBeamCommand(rack);
-                    rack.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+            cbmiDrawSunBeam.addItemListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof Rack)) {
+                    return;
+                }
+                final Rack rack = (Rack) selectedPart;
+                final ShowSunBeamCommand c = new ShowSunBeamCommand(rack);
+                rack.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+                SceneManager.getTaskManager().update(() -> {
                     rack.drawSunBeam();
                     rack.draw();
                     SceneManager.getInstance().refresh();
-                    SceneManager.getInstance().getUndoManager().addEdit(c);
-                    Scene.getInstance().setEdited(true);
-                }
+                    return null;
+                });
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+                Scene.getInstance().setEdited(true);
             });
 
             final JMenu labelMenu = new JMenu("Label");
 
             final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
-            miLabelNone.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (miLabelNone.isSelected()) {
-                        final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                        if (selectedPart instanceof Rack) {
-                            final Rack r = (Rack) selectedPart;
-                            final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                            r.clearLabels();
+            miLabelNone.addActionListener(e -> {
+                if (miLabelNone.isSelected()) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (selectedPart instanceof Rack) {
+                        final Rack r = (Rack) selectedPart;
+                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                        r.clearLabels();
+                        SceneManager.getTaskManager().update(() -> {
                             r.draw();
-                            SceneManager.getInstance().getUndoManager().addEdit(c);
-                            Scene.getInstance().setEdited(true);
                             SceneManager.getInstance().refresh();
-                        }
+                            return null;
+                        });
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                        Scene.getInstance().setEdited(true);
                     }
                 }
             });
             labelMenu.add(miLabelNone);
 
             final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
-            miLabelCustom.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelCustom(miLabelCustom.isSelected());
-                        if (r.getLabelCustom()) {
-                            r.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", r.getLabelCustomText()));
-                        }
-                        r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().refresh();
+            miLabelCustom.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelCustom(miLabelCustom.isSelected());
+                    if (r.getLabelCustom()) {
+                        r.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", r.getLabelCustomText()));
                     }
+                    SceneManager.getTaskManager().update(() -> {
+                        r.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelCustom);
 
             final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
-            miLabelId.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelId(miLabelId.isSelected());
+            miLabelId.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelId(miLabelId.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelId);
 
             final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
-            miLabelCellEfficiency.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+            miLabelCellEfficiency.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelCellEfficiency);
 
             final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
-            miLabelTiltAngle.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+            miLabelTiltAngle.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelTiltAngle);
 
             final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
-            miLabelTracker.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelTracker(miLabelTracker.isSelected());
+            miLabelTracker.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelTracker(miLabelTracker.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelTracker);
 
             final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
-            miLabelEnergyOutput.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Rack) {
-                        final Rack r = (Rack) selectedPart;
-                        final SetRackLabelCommand c = new SetRackLabelCommand(r);
-                        r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+            miLabelEnergyOutput.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Rack) {
+                    final Rack r = (Rack) selectedPart;
+                    final SetRackLabelCommand c = new SetRackLabelCommand(r);
+                    r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
                         r.draw();
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                        Scene.getInstance().setEdited(true);
                         SceneManager.getInstance().refresh();
-                    }
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
                 }
             });
             labelMenu.add(miLabelEnergyOutput);
 
-            popupMenuForRack = createPopupMenu(true, true, new Runnable() {
-
-                @Override
-                public void run() {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (!(selectedPart instanceof Rack)) {
-                        return;
-                    }
-                    final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-                    miPaste.setEnabled(copyBuffer instanceof SolarPanel);
-                    final Rack rack = (Rack) selectedPart;
-                    switch (rack.getTracker()) {
-                        case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                            Util.selectSilently(miAltazimuthDualAxisTracker, true);
-                            break;
-                        case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                            Util.selectSilently(miHorizontalSingleAxisTracker, true);
-                            break;
-                        case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                            Util.selectSilently(miVerticalSingleAxisTracker, true);
-                            break;
-                        case Trackable.TILTED_SINGLE_AXIS_TRACKER:
-                            Util.selectSilently(miTiltedSingleAxisTracker, true);
-                            break;
-                        case Trackable.NO_TRACKER:
-                            Util.selectSilently(miNoTracker, true);
-                            break;
-                    }
-                    miAltazimuthDualAxisTracker.setEnabled(true);
-                    miHorizontalSingleAxisTracker.setEnabled(true);
-                    miVerticalSingleAxisTracker.setEnabled(true);
+            popupMenuForRack = createPopupMenu(true, true, () -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (!(selectedPart instanceof Rack)) {
+                    return;
+                }
+                final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+                miPaste.setEnabled(copyBuffer instanceof SolarPanel);
+                final Rack rack = (Rack) selectedPart;
+                switch (rack.getTracker()) {
+                    case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+                        Util.selectSilently(miAltazimuthDualAxisTracker, true);
+                        break;
+                    case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+                        Util.selectSilently(miHorizontalSingleAxisTracker, true);
+                        break;
+                    case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+                        Util.selectSilently(miVerticalSingleAxisTracker, true);
+                        break;
+                    case Trackable.TILTED_SINGLE_AXIS_TRACKER:
+                        Util.selectSilently(miTiltedSingleAxisTracker, true);
+                        break;
+                    case Trackable.NO_TRACKER:
+                        Util.selectSilently(miNoTracker, true);
+                        break;
+                }
+                miAltazimuthDualAxisTracker.setEnabled(true);
+                miHorizontalSingleAxisTracker.setEnabled(true);
+                miVerticalSingleAxisTracker.setEnabled(true);
+                if (rack.getContainer() instanceof Roof) {
+                    final Roof roof = (Roof) rack.getContainer();
+                    final boolean flat = Util.isZero(roof.getHeight());
+                    miAltazimuthDualAxisTracker.setEnabled(flat);
+                    miHorizontalSingleAxisTracker.setEnabled(flat);
+                    miVerticalSingleAxisTracker.setEnabled(flat);
+                }
+                if (rack.getTracker() != Trackable.NO_TRACKER) {
+                    miFixedTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || rack.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
+                    miSeasonalTiltAngle.setEnabled(miFixedTiltAngle.isEnabled());
+                    miAzimuth.setEnabled(rack.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && rack.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
+                    miRotate.setEnabled(miAzimuth.isEnabled());
+                } else {
+                    miFixedTiltAngle.setEnabled(true);
+                    miSeasonalTiltAngle.setEnabled(true);
+                    miAzimuth.setEnabled(true);
+                    miRotate.setEnabled(true);
+                    miPoleHeight.setEnabled(true);
+                    miPoleSpacing.setEnabled(true);
                     if (rack.getContainer() instanceof Roof) {
                         final Roof roof = (Roof) rack.getContainer();
-                        final boolean flat = Util.isZero(roof.getHeight());
-                        miAltazimuthDualAxisTracker.setEnabled(flat);
-                        miHorizontalSingleAxisTracker.setEnabled(flat);
-                        miVerticalSingleAxisTracker.setEnabled(flat);
-                    }
-                    if (rack.getTracker() != Trackable.NO_TRACKER) {
-                        miFixedTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || rack.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
-                        miSeasonalTiltAngle.setEnabled(miFixedTiltAngle.isEnabled());
-                        miAzimuth.setEnabled(rack.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && rack.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
-                        miRotate.setEnabled(miAzimuth.isEnabled());
-                    } else {
-                        miFixedTiltAngle.setEnabled(true);
-                        miSeasonalTiltAngle.setEnabled(true);
-                        miAzimuth.setEnabled(true);
-                        miRotate.setEnabled(true);
-                        miPoleHeight.setEnabled(true);
-                        miPoleSpacing.setEnabled(true);
-                        if (rack.getContainer() instanceof Roof) {
-                            final Roof roof = (Roof) rack.getContainer();
-                            if (roof.getHeight() > 0) {
-                                miFixedTiltAngle.setEnabled(false);
-                                miSeasonalTiltAngle.setEnabled(false);
-                                miAzimuth.setEnabled(false);
-                                miPoleHeight.setEnabled(false);
-                                miPoleSpacing.setEnabled(false);
-                                miRotate.setEnabled(false);
-                            }
+                        if (roof.getHeight() > 0) {
+                            miFixedTiltAngle.setEnabled(false);
+                            miSeasonalTiltAngle.setEnabled(false);
+                            miAzimuth.setEnabled(false);
+                            miPoleHeight.setEnabled(false);
+                            miPoleSpacing.setEnabled(false);
+                            miRotate.setEnabled(false);
                         }
                     }
-                    Util.selectSilently(cbmiDisableEditPoints, rack.getLockEdit());
-                    Util.selectSilently(cbmiDrawSunBeam, rack.isSunBeamVisible());
-                    Util.selectSilently(miLabelNone, !rack.isLabelVisible());
-                    Util.selectSilently(miLabelCustom, rack.getLabelCustom());
-                    Util.selectSilently(miLabelId, rack.getLabelId());
-                    Util.selectSilently(miLabelCellEfficiency, rack.getLabelCellEfficiency());
-                    Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
-                    Util.selectSilently(miLabelTracker, rack.getLabelTracker());
-                    Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
-                    final boolean isCustom = "Custom".equals(rack.getSolarPanel().getModelName());
-                    miSolarPanelCellEfficiency.setEnabled(isCustom);
-                    miSolarPanelCellType.setEnabled(isCustom);
-                    miSolarPanelColor.setEnabled(isCustom);
-                    miSolarPanelSize.setEnabled(isCustom);
-                    miSolarPanelShadeTolerance.setEnabled(isCustom);
-                    miSolarPanelNoct.setEnabled(isCustom);
-                    miSolarPanelPmaxTc.setEnabled(isCustom);
                 }
-
+                Util.selectSilently(cbmiDisableEditPoints, rack.getLockEdit());
+                Util.selectSilently(cbmiDrawSunBeam, rack.isSunBeamVisible());
+                Util.selectSilently(miLabelNone, !rack.isLabelVisible());
+                Util.selectSilently(miLabelCustom, rack.getLabelCustom());
+                Util.selectSilently(miLabelId, rack.getLabelId());
+                Util.selectSilently(miLabelCellEfficiency, rack.getLabelCellEfficiency());
+                Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
+                Util.selectSilently(miLabelTracker, rack.getLabelTracker());
+                Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
+                final boolean isCustom = "Custom".equals(rack.getSolarPanel().getModelName());
+                miSolarPanelCellEfficiency.setEnabled(isCustom);
+                miSolarPanelCellType.setEnabled(isCustom);
+                miSolarPanelColor.setEnabled(isCustom);
+                miSolarPanelSize.setEnabled(isCustom);
+                miSolarPanelShadeTolerance.setEnabled(isCustom);
+                miSolarPanelNoct.setEnabled(isCustom);
+                miSolarPanelPmaxTc.setEnabled(isCustom);
             });
 
             popupMenuForRack.add(miPaste);
@@ -3511,29 +3691,23 @@ class PopupMenuForRack extends PopupMenuFactory {
             popupMenuForRack.addSeparator();
 
             JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
-            mi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
-                        new PvDailyAnalysis().show();
-                    }
+            mi.addActionListener(e -> {
+                if (EnergyPanel.getInstance().adjustCellSize()) {
+                    return;
+                }
+                if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
+                    new PvDailyAnalysis().show();
                 }
             });
             popupMenuForRack.add(mi);
 
             mi = new JMenuItem("Annual Yield Analysis...");
-            mi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
-                        new PvAnnualAnalysis().show();
-                    }
+            mi.addActionListener(e -> {
+                if (EnergyPanel.getInstance().adjustCellSize()) {
+                    return;
+                }
+                if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
+                    new PvAnnualAnalysis().show();
                 }
             });
             popupMenuForRack.add(mi);
