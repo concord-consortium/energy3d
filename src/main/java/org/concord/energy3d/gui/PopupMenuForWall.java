@@ -285,6 +285,7 @@ class PopupMenuForWall extends PopupMenuFactory {
                                                         } else if (x instanceof Mirror) {
                                                             final Mirror heliostat = (Mirror) x;
                                                             if (foundation == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
+                                                                heliostat.setNormal();
                                                                 heliostat.drawSunBeam();
                                                             }
                                                         }

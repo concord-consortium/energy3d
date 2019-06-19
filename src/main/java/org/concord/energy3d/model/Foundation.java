@@ -3958,6 +3958,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 } else if (x instanceof Mirror) {
                     final Mirror heliostat = (Mirror) x;
                     if (this == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
+                        heliostat.setNormal();
                         heliostat.drawSunBeam();
                     }
                 }

@@ -25,7 +25,7 @@ public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 
 	public ChangeFoundationWallHeightCommand(final Foundation foundation) {
 		this.foundation = foundation;
-		walls = new ArrayList<Wall>();
+		walls = new ArrayList<>();
 		for (final HousePart p : foundation.getChildren()) {
 			if (p instanceof Wall) {
 				walls.add((Wall) p);
@@ -92,6 +92,7 @@ public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 				} else if (x instanceof Mirror) {
 					final Mirror heliostat = (Mirror) x;
 					if (foundation == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
+						heliostat.setNormal();
 						heliostat.drawSunBeam();
 					}
 				}
