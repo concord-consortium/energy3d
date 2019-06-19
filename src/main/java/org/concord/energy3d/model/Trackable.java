@@ -4,18 +4,17 @@ package org.concord.energy3d.model;
  * For solar panels and racks (not including mirrors as mirrors must do exact tracking -- no option)
  *
  * @author Charles Xie
- *
  */
 public interface Trackable extends SolarCollector {
 
-	public static final int NO_TRACKER = 0;
-	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
-	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
-	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 3;
-	public static final int TILTED_SINGLE_AXIS_TRACKER = 4;
+    int NO_TRACKER = 0;
+    int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
+    int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
+    int VERTICAL_SINGLE_AXIS_TRACKER = 3;
+    int TILTED_SINGLE_AXIS_TRACKER = 4;
 
-	public void setTracker(final int tracker);
+    void setTracker(final int tracker);
 
-	public int getTracker();
+    int getTracker();
 
 }

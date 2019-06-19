@@ -10,50 +10,52 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class PyramidRoof extends Roof {
-	private static final long serialVersionUID = 1L;
-	private transient boolean recalculateEditPoints;
 
-	public PyramidRoof() {
-		super(1);
-	}
+    private static final long serialVersionUID = 1L;
+    private transient boolean recalculateEditPoints;
 
-	@Override
-	public void setPreviewPoint(final int x, final int y) {
-		final Foundation foundation = getTopContainer();
-		if (foundation != null && foundation.getLockEdit()) {
-			return;
-		}
-		final EditState editState = new EditState();
-		if (editPointIndex == -1) {
-			pickContainer(x, y, Wall.class);
-			recalculateEditPoints = true;
-		} else {
-			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
-			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			if (p != null) {
-				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
-				height = Math.max(0, p.getZ() - base.getZ());
-			}
-		}
-		postEdit(editState);
-	}
+    public PyramidRoof() {
+        super(1);
+    }
 
-	@Override
-	protected Polygon applySteinerPoint(final Polygon polygon) {
-		polygon.addSteinerPoint(new ArdorVector3PolygonPoint(getAbsPoint(0)));
-		return polygon;
-	}
+    @Override
+    public void setPreviewPoint(final int x, final int y) {
+        final Foundation foundation = getTopContainer();
+        if (foundation != null && foundation.getLockEdit()) {
+            return;
+        }
+        final EditState editState = new EditState();
+        if (editPointIndex == -1) {
+            pickContainer(x, y, Wall.class);
+            recalculateEditPoints = true;
+        } else {
+            final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
+            final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
+            if (p != null) {
+                snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
+                height = Math.max(0, p.getZ() - base.getZ());
+            }
+        }
+        postEdit(editState);
+    }
 
-	@Override
-	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
-		final ReadOnlyVector3 center = getCenter();
-		if (recalculateEditPoints) {
-			recalculateEditPoints = false;
-			points.get(0).set(toRelative(center));
-			computeHeight(wallUpperPoints);
-			applyHeight();
-		} else {
-			applyHeight();
-		}
-	}
+    @Override
+    protected Polygon applySteinerPoint(final Polygon polygon) {
+        polygon.addSteinerPoint(new ArdorVector3PolygonPoint(getAbsPoint(0)));
+        return polygon;
+    }
+
+    @Override
+    protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+        final ReadOnlyVector3 center = getCenter();
+        if (recalculateEditPoints) {
+            recalculateEditPoints = false;
+            points.get(0).set(toRelative(center));
+            computeHeight(wallUpperPoints);
+            applyHeight();
+        } else {
+            applyHeight();
+        }
+    }
+
 }

@@ -101,10 +101,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     private transient Line azimuthArrow;
     private transient double newBoundingHeight;
     private transient double boundingHeight;
-    private transient double minX;
-    private transient double minY;
-    private transient double maxX;
-    private transient double maxY;
     private transient double passiveSolarNow; // energy terms of current hour
     private transient double photovoltaicNow;
     private transient double cspNow;
@@ -300,16 +296,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                     final Node n = importCollada(ns.getSourceURL(), null);
                     if (n == null) {
                         it.remove();
-                        EventQueue.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    JOptionPane.showMessageDialog(MainFrame.getInstance(), Paths.get(ns.getSourceURL().toURI()).toFile() + " was not found!", "File problem", JOptionPane.ERROR_MESSAGE);
-                                } catch (final HeadlessException e) {
-                                    e.printStackTrace();
-                                } catch (final URISyntaxException e) {
-                                    e.printStackTrace();
-                                }
+                        EventQueue.invokeLater(() -> {
+                            try {
+                                JOptionPane.showMessageDialog(MainFrame.getInstance(), Paths.get(ns.getSourceURL().toURI()).toFile() + " was not found!",
+                                        "File problem", JOptionPane.ERROR_MESSAGE);
+                            } catch (final HeadlessException e) {
+                                e.printStackTrace();
+                            } catch (final URISyntaxException e) {
+                                e.printStackTrace();
                             }
                         });
                     } else {
@@ -450,7 +444,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     private void reverseFoundationResizeEffect(final ArrayList<HousePart> children, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
-        final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
+        final ArrayList<HousePart> roofs = new ArrayList<>();
         for (final HousePart child : children) {
             reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
             if (child instanceof Wall) {
@@ -639,7 +633,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
     @Override
     public void drawChildren() {
-        final List<HousePart> children = new ArrayList<HousePart>();
+        final List<HousePart> children = new ArrayList<>();
         collectChildren(this, children);
         for (final HousePart part : children) {
             if (part instanceof Roof) {
@@ -674,7 +668,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
 
         useOrgPoints = true;
-        final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
+        final List<Vector2> insidePoints = new ArrayList<>(children.size() * 2);
         for (final HousePart part : children) {
             if (part.children.size() > 2 && part.getPoints().size() > 1) {
                 final Vector3 p0 = part.getAbsPoint(0);
@@ -832,8 +826,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
         final Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
         move(center.negateLocal(), center.length());
-        for (int i = 0; i < points.size(); i++) {
-            points.get(i).multiplyLocal(scaleX, scaleY, 1);
+        for (Vector3 point : points) {
+            point.multiplyLocal(scaleX, scaleY, 1);
         }
         if (!Util.isEqual(scaleZ, 1)) {
             applyNewHeight(children, scaleZ, true);
@@ -1182,7 +1176,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
     }
 
-    public void drawTopMesh() {
+    private void drawTopMesh() {
         mesh.setVisible(!Scene.getInstance().isGroundImageEnabled());
         final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
         vertexBuffer.rewind();
@@ -1268,7 +1262,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         final ReadOnlyVector3 p2 = getAbsPoint(2);
         final ReadOnlyVector3 width = p2.subtract(p0, null);
         final ReadOnlyVector3 height = p1.subtract(p0, null);
-        final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+        final ArrayList<ReadOnlyVector3> points = new ArrayList<>();
 
         final int cols = (int) (width.length() / gridSize);
 
@@ -1298,13 +1292,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         gridsMesh.getMeshData().setVertexBuffer(buf);
     }
 
-    public void drawLinePattern() {
+    void drawLinePattern() {
         final ReadOnlyVector3 p0 = getAbsPoint(0);
         final ReadOnlyVector3 p1 = getAbsPoint(1);
         final ReadOnlyVector3 p2 = getAbsPoint(2);
         final ReadOnlyVector3 width = p2.subtract(p0, null);
         final ReadOnlyVector3 height = p1.subtract(p0, null);
-        final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+        final ArrayList<ReadOnlyVector3> points = new ArrayList<>();
         final int count = 10;
         if (width.length() < height.length()) {
             final double step = width.length() / count;
@@ -1341,7 +1335,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + height);
     }
 
-    public void scanChildrenHeight() {
+    void scanChildrenHeight() {
         if (!isFirstPointInserted()) {
             return;
         }
@@ -1412,10 +1406,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
         if (!resizeHouseMode) {
             saveOrgPoints();
-            minX = Double.MAX_VALUE;
-            minY = Double.MAX_VALUE;
-            maxX = -Double.MAX_VALUE;
-            maxY = -Double.MAX_VALUE;
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            double maxX = -Double.MAX_VALUE;
+            double maxY = -Double.MAX_VALUE;
             for (final HousePart part : children) {
                 if (part.children.size() > 2 && part.getPoints().size() > 1) {
                     final Vector3 p1 = part.getAbsPoint(0);
@@ -1439,8 +1433,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
     }
 
-    public void saveOrgPoints() {
-        orgPoints = new ArrayList<Vector3>(4);
+    private void saveOrgPoints() {
+        orgPoints = new ArrayList<>(4);
         for (int i = 0; i < 4; i++) {
             orgPoints.add(points.get(i).clone());
         }
@@ -1480,9 +1474,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         if (!SceneManager.getInstance().getSolarHeatMap() && importedNodes != null) {
             final int n = importedNodes.size();
             if (n > 0) {
-                Node ni;
-                for (int i = 0; i < n; i++) {
-                    ni = importedNodes.get(i);
+                for (Node ni : importedNodes) {
                     if (root.getChildren().contains(ni)) {
                         for (final Spatial s : ni.getChildren()) {
                             if (s instanceof Mesh) {
@@ -1521,10 +1513,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
             draw();
             drawMeshSelection(selectedMesh);
         } else {
-            final List<Vector3> orgPoints = new ArrayList<Vector3>(movePoints.size());
-            for (int i = 0; i < points.size(); i++) {
-                orgPoints.add(points.get(i));
-            }
+            final List<Vector3> orgPoints = new ArrayList<>(movePoints.size());
+            orgPoints.addAll(points);
             for (int i = 0; i < points.size(); i++) {
                 final Vector3 newP = movePoints.get(i).add(d, null);
                 points.set(i, newP);
@@ -1552,7 +1542,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public void move(final Vector3 v) {
-        final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+        final ArrayList<Vector3> movePoints = new ArrayList<>(points.size());
         for (final Vector3 p : points) {
             movePoints.add(p.clone());
         }
@@ -1768,10 +1758,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     @Override
     public void drawHeatFlux() {
 
-        FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
         final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / Scene.getInstance().getHeatVectorGridSize());
         final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / Scene.getInstance().getHeatVectorGridSize());
-        arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+        FloatBuffer arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
         heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
         final double heat = calculateHeatVector();
         if (heat != 0) {
@@ -1867,7 +1856,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
     // assuming that there may be multiple roofs on this foundation, return a list of them
     public List<Roof> getRoofs() {
-        final List<Roof> roofs = new ArrayList<Roof>();
+        final List<Roof> roofs = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Wall) {
                 final Roof r = ((Wall) p).getRoof();
@@ -1880,7 +1869,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<Wall> getWalls() {
-        final List<Wall> walls = new ArrayList<Wall>();
+        final List<Wall> walls = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Wall) {
                 walls.add((Wall) p);
@@ -1890,7 +1879,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<Window> getWindows() {
-        final List<Window> list = new ArrayList<Window>();
+        final List<Window> list = new ArrayList<>();
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof Window && p.getTopContainer() == this) {
                 list.add((Window) p);
@@ -1900,7 +1889,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<Door> getDoors() {
-        final List<Door> list = new ArrayList<Door>();
+        final List<Door> list = new ArrayList<>();
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof Door && p.getTopContainer() == this) {
                 list.add((Door) p);
@@ -1948,7 +1937,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<HousePart> getChildrenOfClass(final Class<?> clazz) {
-        final List<HousePart> selectedChildren = new ArrayList<HousePart>();
+        final List<HousePart> selectedChildren = new ArrayList<>();
         for (final HousePart p : children) {
             if (clazz.isInstance(p)) {
                 selectedChildren.add(p);
@@ -1958,7 +1947,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<SolarPanel> getSolarPanels() {
-        final List<SolarPanel> list = new ArrayList<SolarPanel>();
+        final List<SolarPanel> list = new ArrayList<>();
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof SolarPanel && p.getTopContainer() == this) {
                 list.add((SolarPanel) p);
@@ -1968,7 +1957,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<Rack> getRacks() {
-        final List<Rack> list = new ArrayList<Rack>();
+        final List<Rack> list = new ArrayList<>();
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof Rack && p.getTopContainer() == this) {
                 list.add((Rack) p);
@@ -1977,7 +1966,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return list;
     }
 
-    public Rack getNearestRack(final Rack rack) {
+    Rack getNearestRack(final Rack rack) {
         if (rack.getTopContainer() != this) {
             return null;
         }
@@ -2020,7 +2009,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<Mirror> getHeliostats() {
-        final List<Mirror> list = new ArrayList<Mirror>();
+        final List<Mirror> list = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Mirror) {
                 list.add((Mirror) p);
@@ -2029,7 +2018,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return list;
     }
 
-    public Mirror getNearestHeliostat(final Mirror mirror) {
+    Mirror getNearestHeliostat(final Mirror mirror) {
         if (mirror.getTopContainer() != this) {
             return null;
         }
@@ -2055,7 +2044,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<ParabolicTrough> getParabolicTroughs() {
-        final List<ParabolicTrough> list = new ArrayList<ParabolicTrough>();
+        final List<ParabolicTrough> list = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof ParabolicTrough) {
                 list.add((ParabolicTrough) p);
@@ -2064,7 +2053,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return list;
     }
 
-    public ParabolicTrough getNearestParabolicTrough(final ParabolicTrough trough) {
+    ParabolicTrough getNearestParabolicTrough(final ParabolicTrough trough) {
         if (trough.getTopContainer() != this) {
             return null;
         }
@@ -2090,7 +2079,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<ParabolicDish> getParabolicDishes() {
-        final List<ParabolicDish> list = new ArrayList<ParabolicDish>();
+        final List<ParabolicDish> list = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof ParabolicDish) {
                 list.add((ParabolicDish) p);
@@ -2099,7 +2088,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return list;
     }
 
-    public ParabolicDish getNearestParabolicDish(final ParabolicDish dish) {
+    ParabolicDish getNearestParabolicDish(final ParabolicDish dish) {
         if (dish.getTopContainer() != this) {
             return null;
         }
@@ -2125,7 +2114,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<FresnelReflector> getFresnelReflectors() {
-        final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
+        final List<FresnelReflector> list = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof FresnelReflector) {
                 list.add((FresnelReflector) p);
@@ -2167,7 +2156,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
     }
 
-    public void updateHandles() {
+    private void updateHandles() {
         if (points.size() < 8) {
             return;
         }
@@ -2276,7 +2265,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     private List<HousePart> removeChildrenOfClass(final Class<?>[] clazz) {
-        final List<HousePart> removed = new ArrayList<HousePart>();
+        final List<HousePart> removed = new ArrayList<>();
         for (final HousePart c : children) {
             for (final Class<?> z : clazz) {
                 if (z.isInstance(c)) {
@@ -2397,12 +2386,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 break;
         }
         SceneManager.getInstance().getUndoManager().addEdit(command);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
         return countParts(Mirror.class);
     }
 
@@ -2481,12 +2465,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 }
                 break;
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
     }
 
     // used by the layout manager
@@ -2548,12 +2527,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 break;
         }
         SceneManager.getInstance().getUndoManager().addEdit(command);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
         return countParts(Mirror.class);
     }
 
@@ -2604,12 +2578,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
                 }
                 break;
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
     }
 
     // used by the layout manager
@@ -2695,7 +2664,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
             path.lineTo(v.getX(), v.getY());
         }
         path.closePath();
-        final List<HousePart> selectedParts = new ArrayList<HousePart>();
+        final List<HousePart> selectedParts = new ArrayList<>();
         for (final HousePart child : children) {
             final Vector3 center = child.getAbsCenter();
             if (path.contains(center.getX(), center.getY())) {
@@ -2733,7 +2702,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
             path.lineTo(v.getX(), v.getY());
         }
         path.closePath();
-        final List<HousePart> selectedParts = new ArrayList<HousePart>();
+        final List<HousePart> selectedParts = new ArrayList<>();
         for (final HousePart child : children) {
             final Vector3 center = child.getAbsCenter();
             if (path.contains(center.getX(), center.getY())) {
@@ -2842,12 +2811,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
         Scene.getInstance().redrawFoundationNow(this);
         SceneManager.getInstance().getUndoManager().addEdit(command);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
     }
 
     // used by the layout manager
@@ -2881,7 +2845,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         final Vector3 center = new Vector3();
         final Vector3 v1 = new Vector3();
         final Vector3 v2 = new Vector3();
-        final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
+        final List<Point2D.Double> intersections = new ArrayList<>();
         double[] bounds = null;
         switch (rowAxis) {
             case 0:
@@ -2956,12 +2920,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         }
         Scene.getInstance().redrawFoundationNow(this);
         SceneManager.getInstance().getUndoManager().addEdit(command);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                EnergyPanel.getInstance().updateProperties();
-            }
-        });
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
     }
 
     private Rack addRack(final SolarPanel panel, final double tiltAngle, final double poleHeight, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
@@ -3013,7 +2972,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         final Vector3 center = new Vector3();
         final Vector3 v1 = new Vector3();
         final Vector3 v2 = new Vector3();
-        final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
+        final List<Point2D.Double> intersections = new ArrayList<>();
         double[] bounds = null;
         switch (rowAxis) {
             case 1:
@@ -3149,7 +3108,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return foundationPolygon;
     }
 
-    public boolean containsPoint(final double x, final double y) {
+    boolean containsPoint(final double x, final double y) {
         final Path2D foundationPoly = new Path2D.Double();
         foundationPoly.moveTo(points.get(0).getX(), points.get(0).getY());
         foundationPoly.lineTo(points.get(2).getX(), points.get(2).getY());
@@ -3840,7 +3799,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     // common methods for solar collectors and reflectors
 
     public List<SolarCollector> getSolarCollectors() {
-        final List<SolarCollector> list = new ArrayList<SolarCollector>();
+        final List<SolarCollector> list = new ArrayList<>();
         // we have to scan the entire list of parts because solar panels and racks may also be the children of roof but not the direct children of foundation
         // when we have a lot of foundation, we could speed up the search a bit by going to the foundation and then its roofs
         for (final HousePart p : Scene.getInstance().getParts()) {
@@ -3852,7 +3811,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public List<SolarCollector> getSolarCollectors(final Class<?> c) {
-        final List<SolarCollector> list = new ArrayList<SolarCollector>();
+        final List<SolarCollector> list = new ArrayList<>();
         // we have to scan the entire list of parts because solar panels and racks may also be the children of roof but not the direct children of foundation
         // when we have a lot of foundations, we could speed up the search a bit by going to the foundation and then its roofs
         for (final HousePart p : Scene.getInstance().getParts()) {
@@ -4063,7 +4022,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public void deleteNode(final Node n) {
-        final List<HousePart> toDelete = new ArrayList<HousePart>();
+        final List<HousePart> toDelete = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Meshable) {
                 final MeshLocator l = ((Meshable) p).getMeshLocator();
@@ -4101,7 +4060,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return importedNodeStates.get(importedNodes.indexOf(n));
     }
 
-    public Node getNode(final NodeState s) {
+    private Node getNode(final NodeState s) {
         return importedNodes.get(importedNodeStates.indexOf(s));
     }
 
@@ -4163,7 +4122,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
             // now construct a new node that is a parent of all planar meshes
             final Node newNode = new Node(originalNode.getName());
             final String nodeString = "Node #" + importedNodes.size() + ", Foundation #" + id;
-            final List<Mesh> meshes = new ArrayList<Mesh>();
+            final List<Mesh> meshes = new ArrayList<>();
             Util.getMeshes(originalNode, meshes);
             String warnInfo = null;
             final int nodeIndex = importedNodes.size();
@@ -4215,11 +4174,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         } else {
             if (position != null) {
                 // get rid of the dead nodes no longer linked to files
-                for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext(); ) {
-                    if (file.equals(it.next().getSourceURL())) {
-                        it.remove();
-                    }
-                }
+                importedNodeStates.removeIf(nodeState -> file.equals(nodeState.getSourceURL()));
             }
         }
         return null;
@@ -4272,7 +4227,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
             return;
         }
         final int count = importedNodes.size();
-        if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + count + " imported structures?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + count + " imported structures?", "Confirm",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
             return;
         }
         if (importedNodes != null) {
@@ -4318,7 +4274,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         return selectedMesh;
     }
 
-    public void removeEmptyNodes() {
+    private void removeEmptyNodes() {
         if (importedNodes != null) {
             for (final Iterator<Node> it = importedNodes.iterator(); it.hasNext(); ) {
                 final Node n = it.next();
@@ -4342,7 +4298,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
     }
 
     public void deleteMesh(final Mesh m) {
-        final List<HousePart> toDelete = new ArrayList<HousePart>();
+        final List<HousePart> toDelete = new ArrayList<>();
         for (final HousePart p : children) {
             if (p instanceof Meshable) {
                 final MeshLocator l = ((Meshable) p).getMeshLocator();
@@ -4400,7 +4356,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
         // Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
     }
 
-    public void drawImportedNodes() {
+    private void drawImportedNodes() {
         if (importedNodes != null) {
             final int n = importedNodes.size();
             if (n > 0) {

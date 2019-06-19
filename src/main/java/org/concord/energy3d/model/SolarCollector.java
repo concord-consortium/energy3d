@@ -4,30 +4,29 @@ import com.ardor3d.math.Vector3;
 
 /**
  * A component that collects solar energy, such as solar panels and mirrors
- * 
- * @author Charles Xie
  *
+ * @author Charles Xie
  */
 public interface SolarCollector {
 
-	public void move(final Vector3 v, final double steplength);
+    void move(final Vector3 v, final double steplength);
 
-	public void setPoleHeight(final double poleHeight);
+    void setPoleHeight(final double poleHeight);
 
-	public double getPoleHeight();
+    double getPoleHeight();
 
-	public void setSunBeamVisible(final boolean visible);
+    void setSunBeamVisible(final boolean visible);
 
-	public boolean isSunBeamVisible();
+    boolean isSunBeamVisible();
 
-	public void drawSunBeam();
+    void drawSunBeam();
 
-	public double getYieldNow();
+    double getYieldNow();
 
-	public void setYieldNow(final double yieldNow);
+    void setYieldNow(final double yieldNow);
 
-	public double getYieldToday();
+    double getYieldToday();
 
-	public void setYieldToday(final double yieldToday);
+    void setYieldToday(final double yieldToday);
 
 }

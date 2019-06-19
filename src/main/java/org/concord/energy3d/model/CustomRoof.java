@@ -15,106 +15,108 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
-	private static final long serialVersionUID = 1L;
-	protected transient boolean recalculateEditPoints;
 
-	public CustomRoof() {
-		super(1);
-	}
+    private static final long serialVersionUID = 1L;
+    transient boolean recalculateEditPoints;
 
-	public CustomRoof(final int numOfPoints) {
-		super(numOfPoints);
-	}
+    public CustomRoof() {
+        super(1);
+    }
 
-	@Override
-	public void setPreviewPoint(final int x, final int y) {
-		final Foundation foundation = getTopContainer();
-		if (foundation != null && foundation.getLockEdit()) {
-			return;
-		}
-		final EditState editState = new EditState();
-		if (editPointIndex == -1) {
-			recalculateEditPoints = true;
-			pickContainer(x, y, Wall.class);
-		} else if (editPointIndex == 0) {
-			final ReadOnlyVector3 base = getCenter();
-			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			if (p == null) {
-				return;
-			}
-			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
-			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
-			final double z = container.getPoints().get(1).getZ() + height;
-			for (final Vector3 v : points) {
-				v.setZ(z);
-			}
-		} else {
-			final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-			final Vector3 p = new Vector3();
-			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
-				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-				snapToWallsPolygon(p);
-				points.get(editPointIndex).set(toRelative(p));
-			}
-		}
-		postEdit(editState);
-	}
+    CustomRoof(final int numOfPoints) {
+        super(numOfPoints);
+    }
 
-	@Override
-	protected Polygon applySteinerPoint(final Polygon polygon) {
-		final ArrayList<Vector3> steinerPoints = new ArrayList<Vector3>(points.size());
-		for (int i = 1; i < points.size(); i++) {
-			final Vector3 p = getAbsPoint(i);
-			boolean found = false;
-			for (final Vector3 existingP : steinerPoints) {
-				if (Util.isEqual(p, existingP)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				steinerPoints.add(p);
-				polygon.addSteinerPoint(new ArdorVector3PolygonPoint(p));
-			}
-		}
-		return polygon;
-	}
+    @Override
+    public void setPreviewPoint(final int x, final int y) {
+        final Foundation foundation = getTopContainer();
+        if (foundation != null && foundation.getLockEdit()) {
+            return;
+        }
+        final EditState editState = new EditState();
+        if (editPointIndex == -1) {
+            recalculateEditPoints = true;
+            pickContainer(x, y, Wall.class);
+        } else if (editPointIndex == 0) {
+            final ReadOnlyVector3 base = getCenter();
+            final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
+            if (p == null) {
+                return;
+            }
+            snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
+            height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
+            final double z = container.getPoints().get(1).getZ() + height;
+            for (final Vector3 v : points) {
+                v.setZ(z);
+            }
+        } else {
+            final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
+            final Vector3 p = new Vector3();
+            if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
+                snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+                snapToWallsPolygon(p);
+                points.get(editPointIndex).set(toRelative(p));
+            }
+        }
+        postEdit(editState);
+    }
 
-	@Override
-	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
-		if (recalculateEditPoints) {
-			recalculateEditPoints = false;
-			points.clear();
-			points.add(toRelative(getCenter()));
-			// add or update edit points
-			final int n = wallUpperPoints.size();
-			for (int i = 0; i < n; i++) {
-				final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
-				final ReadOnlyVector3 p2 = wallUpperPoints.get((i + 1) % n);
-				// middle of wall = (p1 + p2) / 2
-				final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
-				// add -normal*0.2 to middle point of wall
-				final HousePart wall = findGableWall(p1, p2);
-				if (wall != null) {
-					final ReadOnlyVector3 normal = wall.getNormal();
-					v.addLocal(normal.multiply(0.2, null).negateLocal());
-				}
-				v.set(toRelative(v));
-				points.add(v);
-			}
+    @Override
+    protected Polygon applySteinerPoint(final Polygon polygon) {
+        final ArrayList<Vector3> steinerPoints = new ArrayList<>(points.size());
+        for (int i = 1; i < points.size(); i++) {
+            final Vector3 p = getAbsPoint(i);
+            boolean found = false;
+            for (final Vector3 existingP : steinerPoints) {
+                if (Util.isEqual(p, existingP)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                steinerPoints.add(p);
+                polygon.addSteinerPoint(new ArdorVector3PolygonPoint(p));
+            }
+        }
+        return polygon;
+    }
 
-			computeHeight(wallUpperPoints);
-			applyHeight();
-		} else {
-			applyHeight();
-		}
-	}
+    @Override
+    protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+        if (recalculateEditPoints) {
+            recalculateEditPoints = false;
+            points.clear();
+            points.add(toRelative(getCenter()));
+            // add or update edit points
+            final int n = wallUpperPoints.size();
+            for (int i = 0; i < n; i++) {
+                final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
+                final ReadOnlyVector3 p2 = wallUpperPoints.get((i + 1) % n);
+                // middle of wall = (p1 + p2) / 2
+                final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
+                // add -normal*0.2 to middle point of wall
+                final HousePart wall = findGableWall(p1, p2);
+                if (wall != null) {
+                    final ReadOnlyVector3 normal = wall.getNormal();
+                    v.addLocal(normal.multiply(0.2, null).negateLocal());
+                }
+                v.set(toRelative(v));
+                points.add(v);
+            }
 
-	@Override
-	protected void setHeight(final double newHeight, final boolean finalize) {
-		super.setHeight(newHeight, finalize);
-		for (final Vector3 p : points) {
-			p.setZ(container.getPoints().get(1).getZ() + newHeight);
-		}
-	}
+            computeHeight(wallUpperPoints);
+            applyHeight();
+        } else {
+            applyHeight();
+        }
+    }
+
+    @Override
+    protected void setHeight(final double newHeight, final boolean finalize) {
+        super.setHeight(newHeight, finalize);
+        for (final Vector3 p : points) {
+            p.setZ(container.getPoints().get(1).getZ() + newHeight);
+        }
+    }
+
 }
