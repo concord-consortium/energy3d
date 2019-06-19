@@ -75,7 +75,7 @@ public class PvCustomPrice implements Serializable {
             }
         }
         cost += solarPanelRackBasePrice;
-        boolean flat = false;
+        boolean flat;
         final HousePart container = r.getContainer();
         if (container instanceof Roof) {
             final Roof roof = (Roof) container;

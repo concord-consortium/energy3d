@@ -5,212 +5,212 @@ import java.io.Serializable;
 
 /**
  * @author Charles Xie
- *
  */
 public class PvModuleSpecs implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	private String model = "Custom";
-	private String brand = "Custom";
-	private String color = "Blue";
-	private String cellType = "Monocrystalline"; // monocrystalline, polycrystalline, thin film
-	private double cellEfficiency = 0.1833; // peak solar cell efficiency (0-1, not %)
-	private double length = 1.65; // m
-	private double width = 0.99; // m
-	private double nominalLength = 1.65; // m (Energy3D-specific GUI thing)
-	private double nominalWidth = 0.99; // m (Energy3D-specific GUI thing)
-	private double thickness = 0.04; // mm
-	private Dimension layout = new Dimension(10, 6); // cell layout
-	private double pmax = 300; // Maximum Power Point (W)
-	private double vmpp = 32.6; // Voltage at Maximum Power Point (V)
-	private double impp = 9.21; // Current at Maximum Power Point (A)
-	private double voc = 40.1; // Voltage at Open Circuit (V). The output Voltage of a PV under no load.
-	private double isc = 9.72; // Current under short-circuit conditions (A). Used for calculating wire size and circuit protection ratings.
-	private double pmaxTc = -0.0039; // Temperature Coefficient of Pmax (0-1, not % / degree C)
-	private double noct = 45; // Nominal operating cell temperature (degree C)
-	private double weight = 19; // kg
-	private String shadeTolerance = "Partial"; // ad hoc
-	private double price = 1000; // reference price
+    private static final long serialVersionUID = 1L;
+    private String model = "Custom";
+    private String brand = "Custom";
+    private String color = "Blue";
+    private String cellType = "Monocrystalline"; // monocrystalline, polycrystalline, thin film
+    private double cellEfficiency = 0.1833; // peak solar cell efficiency (0-1, not %)
+    private double length = 1.65; // m
+    private double width = 0.99; // m
+    private double nominalLength = 1.65; // m (Energy3D-specific GUI thing)
+    private double nominalWidth = 0.99; // m (Energy3D-specific GUI thing)
+    private double thickness = 0.04; // mm
+    private Dimension layout = new Dimension(10, 6); // cell layout
+    private double pmax = 300; // Maximum Power Point (W)
+    private double vmpp = 32.6; // Voltage at Maximum Power Point (V)
+    private double impp = 9.21; // Current at Maximum Power Point (A)
+    private double voc = 40.1; // Voltage at Open Circuit (V). The output Voltage of a PV under no load.
+    private double isc = 9.72; // Current under short-circuit conditions (A). Used for calculating wire size and circuit protection ratings.
+    private double pmaxTc = -0.0039; // Temperature Coefficient of Pmax (0-1, not % / degree C)
+    private double noct = 45; // Nominal operating cell temperature (degree C)
+    private double weight = 19; // kg
+    private String shadeTolerance = "Partial"; // ad hoc
+    private double price = 1000; // reference price
 
-	@Override
-	public String toString() {
-		return model + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight + ", " + color;
-	}
+    @Override
+    public String toString() {
+        return model + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", "
+                + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight + ", " + color;
+    }
 
-	public PvModuleSpecs() {
-		model = "Custom";
-	}
+    public PvModuleSpecs() {
+        model = "Custom";
+    }
 
-	public PvModuleSpecs(final String model) {
-		this.model = model;
-	}
+    public PvModuleSpecs(final String model) {
+        this.model = model;
+    }
 
-	public void setModel(final String model) {
-		this.model = model;
-	}
+    public void setModel(final String model) {
+        this.model = model;
+    }
 
-	public String getModel() {
-		return model;
-	}
+    public String getModel() {
+        return model;
+    }
 
-	public void setBrand(final String brand) {
-		this.brand = brand;
-	}
+    public void setBrand(final String brand) {
+        this.brand = brand;
+    }
 
-	public String getBrand() {
-		return brand;
-	}
+    public String getBrand() {
+        return brand;
+    }
 
-	public void setColor(final String color) {
-		this.color = color;
-	}
+    public void setColor(final String color) {
+        this.color = color;
+    }
 
-	public String getColor() {
-		return color;
-	}
+    public String getColor() {
+        return color;
+    }
 
-	public void setShadeTolerance(final String shadeTolerance) {
-		this.shadeTolerance = shadeTolerance;
-	}
+    public void setShadeTolerance(final String shadeTolerance) {
+        this.shadeTolerance = shadeTolerance;
+    }
 
-	public String getShadeTolerance() {
-		return shadeTolerance;
-	}
+    public String getShadeTolerance() {
+        return shadeTolerance;
+    }
 
-	public void setCellType(final String cellType) {
-		this.cellType = cellType;
-	}
+    public void setCellType(final String cellType) {
+        this.cellType = cellType;
+    }
 
-	public String getCellType() {
-		return cellType;
-	}
+    public String getCellType() {
+        return cellType;
+    }
 
-	public void setCellEfficiency(final double cellEfficiency) {
-		this.cellEfficiency = cellEfficiency;
-	}
+    public void setCellEfficiency(final double cellEfficiency) {
+        this.cellEfficiency = cellEfficiency;
+    }
 
-	public double getCelLEfficiency() {
-		return cellEfficiency;
-	}
+    public double getCelLEfficiency() {
+        return cellEfficiency;
+    }
 
-	public void setLength(final double length) {
-		this.length = length;
-	}
+    public void setLength(final double length) {
+        this.length = length;
+    }
 
-	public double getLength() {
-		return length;
-	}
+    public double getLength() {
+        return length;
+    }
 
-	public void setWidth(final double width) {
-		this.width = width;
-	}
+    public void setWidth(final double width) {
+        this.width = width;
+    }
 
-	public double getWidth() {
-		return width;
-	}
+    public double getWidth() {
+        return width;
+    }
 
-	public void setThickness(final double thickness) {
-		this.thickness = thickness;
-	}
+    public void setThickness(final double thickness) {
+        this.thickness = thickness;
+    }
 
-	public double getThickness() {
-		return thickness;
-	}
+    public double getThickness() {
+        return thickness;
+    }
 
-	public void setNominalLength(final double nominalLength) {
-		this.nominalLength = nominalLength;
-	}
+    public void setNominalLength(final double nominalLength) {
+        this.nominalLength = nominalLength;
+    }
 
-	public double getNominalLength() {
-		return nominalLength;
-	}
+    public double getNominalLength() {
+        return nominalLength;
+    }
 
-	public void setNominalWidth(final double nominalWidth) {
-		this.nominalWidth = nominalWidth;
-	}
+    public void setNominalWidth(final double nominalWidth) {
+        this.nominalWidth = nominalWidth;
+    }
 
-	public double getNominalWidth() {
-		return nominalWidth;
-	}
+    public double getNominalWidth() {
+        return nominalWidth;
+    }
 
-	public void setLayout(final int m, final int n) {
-		layout = new Dimension(m, n);
-	}
+    public void setLayout(final int m, final int n) {
+        layout = new Dimension(m, n);
+    }
 
-	public Dimension getLayout() {
-		return layout;
-	}
+    public Dimension getLayout() {
+        return layout;
+    }
 
-	public void setPmax(final double pmax) {
-		this.pmax = pmax;
-	}
+    public void setPmax(final double pmax) {
+        this.pmax = pmax;
+    }
 
-	public double getPmax() {
-		return pmax;
-	}
+    public double getPmax() {
+        return pmax;
+    }
 
-	public void setVmpp(final double vmpp) {
-		this.vmpp = vmpp;
-	}
+    public void setVmpp(final double vmpp) {
+        this.vmpp = vmpp;
+    }
 
-	public double getVmpp() {
-		return vmpp;
-	}
+    public double getVmpp() {
+        return vmpp;
+    }
 
-	public void setImpp(final double impp) {
-		this.impp = impp;
-	}
+    public void setImpp(final double impp) {
+        this.impp = impp;
+    }
 
-	public double getImpp() {
-		return impp;
-	}
+    public double getImpp() {
+        return impp;
+    }
 
-	public void setVoc(final double voc) {
-		this.voc = voc;
-	}
+    public void setVoc(final double voc) {
+        this.voc = voc;
+    }
 
-	public double getVoc() {
-		return voc;
-	}
+    public double getVoc() {
+        return voc;
+    }
 
-	public void setIsc(final double isc) {
-		this.isc = isc;
-	}
+    public void setIsc(final double isc) {
+        this.isc = isc;
+    }
 
-	public double getIsc() {
-		return isc;
-	}
+    public double getIsc() {
+        return isc;
+    }
 
-	public void setPmaxTc(final double pmaxTc) {
-		this.pmaxTc = pmaxTc;
-	}
+    public void setPmaxTc(final double pmaxTc) {
+        this.pmaxTc = pmaxTc;
+    }
 
-	public double getPmaxTc() {
-		return pmaxTc;
-	}
+    public double getPmaxTc() {
+        return pmaxTc;
+    }
 
-	public void setNoct(final double noct) {
-		this.noct = noct;
-	}
+    public void setNoct(final double noct) {
+        this.noct = noct;
+    }
 
-	public double getNoct() {
-		return noct;
-	}
+    public double getNoct() {
+        return noct;
+    }
 
-	public void setWeight(final double weight) {
-		this.weight = weight;
-	}
+    public void setWeight(final double weight) {
+        this.weight = weight;
+    }
 
-	public double getWeight() {
-		return weight;
-	}
+    public double getWeight() {
+        return weight;
+    }
 
-	public void setPrice(final double price) {
-		this.price = price;
-	}
+    public void setPrice(final double price) {
+        this.price = price;
+    }
 
-	public double getPrice() {
-		return price;
-	}
+    public double getPrice() {
+        return price;
+    }
 
 }

@@ -24,7 +24,7 @@ public class UtilityBill implements Serializable {
         return monthlyEnergy[month];
     }
 
-    public double[] getMonthlyEnergy() {
+    double[] getMonthlyEnergy() {
         return monthlyEnergy;
     }
 

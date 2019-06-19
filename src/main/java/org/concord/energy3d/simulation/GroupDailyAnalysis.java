@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
@@ -29,278 +28,264 @@ import org.concord.energy3d.util.BugReporter;
 
 /**
  * @author Charles Xie
- *
  */
 public class GroupDailyAnalysis extends DailyAnalysis {
 
-	private final List<HousePart> selectedParts;
-	private final PartGroup group;
+    private final List<HousePart> selectedParts;
+    private final PartGroup group;
 
-	public GroupDailyAnalysis(final PartGroup group) {
-		super();
-		this.group = group;
-		selectedParts = new ArrayList<HousePart>();
-		for (final Long i : group.getIds()) {
-			selectedParts.add(Scene.getInstance().getPart(i));
-		}
-		graph = new PartEnergyDailyGraph();
-		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.WHITE);
-		double i = 0;
-		final double n = selectedParts.size();
-		for (final HousePart p : selectedParts) {
-			final int a = (int) ((n - i) / n * 128);
-			final int b = 255 - a;
-			String s = p.getLabelCustomText();
-			if (s != null) {
-				s = graph.getDataNameDelimiter() + s;
-				Graph.setColor("Solar " + p.getId() + s, new Color(255, a, b));
-				Graph.setColor("PV " + p.getId() + s, new Color(255, a, b));
-				Graph.setColor("CSP " + p.getId() + s, new Color(255, a, b));
-				Graph.setColor("PV " + p.getId() + s + " mean", new Color(255, a, b));
-				Graph.setColor("CSP " + p.getId() + s + " mean", new Color(255, a, b));
-				Graph.setColor("Heat Gain " + p.getId() + s, new Color(a, b, 255));
-				Graph.setColor("Building " + p.getId() + s, new Color(a, b, 255));
-			} else {
-				Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
-				Graph.setColor("PV " + p.getId(), new Color(255, a, b));
-				Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
-				Graph.setColor("PV " + p.getId() + " mean", new Color(255, a, b));
-				Graph.setColor("CSP " + p.getId() + " mean", new Color(255, a, b));
-				Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
-				Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
-			}
-			i++;
-		}
-	}
+    public GroupDailyAnalysis(final PartGroup group) {
+        super();
+        this.group = group;
+        selectedParts = new ArrayList<>();
+        for (final Long i : group.getIds()) {
+            selectedParts.add(Scene.getInstance().getPart(i));
+        }
+        graph = new PartEnergyDailyGraph();
+        graph.setPreferredSize(new Dimension(600, 400));
+        graph.setBackground(Color.WHITE);
+        double i = 0;
+        final double n = selectedParts.size();
+        for (final HousePart p : selectedParts) {
+            final int a = (int) ((n - i) / n * 128);
+            final int b = 255 - a;
+            String s = p.getLabelCustomText();
+            if (s != null) {
+                s = graph.getDataNameDelimiter() + s;
+                Graph.setColor("Solar " + p.getId() + s, new Color(255, a, b));
+                Graph.setColor("PV " + p.getId() + s, new Color(255, a, b));
+                Graph.setColor("CSP " + p.getId() + s, new Color(255, a, b));
+                Graph.setColor("PV " + p.getId() + s + " mean", new Color(255, a, b));
+                Graph.setColor("CSP " + p.getId() + s + " mean", new Color(255, a, b));
+                Graph.setColor("Heat Gain " + p.getId() + s, new Color(a, b, 255));
+                Graph.setColor("Building " + p.getId() + s, new Color(a, b, 255));
+            } else {
+                Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
+                Graph.setColor("PV " + p.getId(), new Color(255, a, b));
+                Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
+                Graph.setColor("PV " + p.getId() + " mean", new Color(255, a, b));
+                Graph.setColor("CSP " + p.getId() + " mean", new Color(255, a, b));
+                Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
+                Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
+            }
+            i++;
+        }
+    }
 
-	@Override
-	void runAnalysis(final JDialog parent) {
-		graph.info = "Calculating...";
-		graph.repaint();
-		onStart();
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-				final Throwable t = compute();
-				if (t != null) {
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							BugReporter.report(t);
-						}
-					});
-				}
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						onCompletion();
-					}
-				});
-				return null;
-			}
-		});
-	}
+    @Override
+    void runAnalysis(final JDialog parent) {
+        graph.info = "Calculating...";
+        graph.repaint();
+        onStart();
+        SceneManager.getTaskManager().update(() -> {
+            final Throwable t = compute();
+            if (t != null) {
+                EventQueue.invokeLater(() -> BugReporter.report(t));
+            }
+            EventQueue.invokeLater(this::onCompletion);
+            return null;
+        });
+    }
 
-	@Override
-	public void updateGraph() {
-		final int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
-		for (int i = 0; i < 24; i++) {
-			SolarRadiation.getInstance().computeEnergyAtHour(i);
-			for (final HousePart p : selectedParts) {
-				final String customText = p.getLabelCustomText();
-				if (p instanceof Window) {
-					final Window window = (Window) p;
-					final double solar = p.getSolarPotentialNow() * window.getSolarHeatGainCoefficient();
-					graph.addData("Solar " + p.getId(), solar);
-					final double[] loss = p.getHeatLoss();
-					final int t0 = n * i;
-					double sum = 0;
-					for (int k = t0; k < t0 + n; k++) {
-						sum += loss[k];
-					}
-					graph.addData("Heat Gain " + p.getId(), -sum);
-				} else if (p instanceof Wall || p instanceof Roof) {
-					final double[] loss = p.getHeatLoss();
-					final int t0 = n * i;
-					double sum = 0;
-					for (int k = t0; k < t0 + n; k++) {
-						sum += loss[k];
-					}
-					graph.addData("Heat Gain " + p.getId(), -sum);
-				} else if (p instanceof SolarPanel) {
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((SolarPanel) p).getYieldNow());
-					} else {
-						graph.addData("Solar " + p.getId(), ((SolarPanel) p).getYieldNow());
-					}
-				} else if (p instanceof Rack) {
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((Rack) p).getYieldNow());
-					} else {
-						graph.addData("Solar " + p.getId(), ((Rack) p).getYieldNow());
-					}
-				} else if (p instanceof Mirror) {
-					final Mirror mirror = (Mirror) p;
-					final double solar = mirror.getSolarPotentialNow() * mirror.getSystemEfficiency();
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
-					} else {
-						graph.addData("Solar " + p.getId(), solar);
-					}
-				} else if (p instanceof ParabolicTrough) {
-					final ParabolicTrough trough = (ParabolicTrough) p;
-					final double solar = trough.getSolarPotentialNow() * trough.getSystemEfficiency();
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
-					} else {
-						graph.addData("Solar " + p.getId(), solar);
-					}
-				} else if (p instanceof ParabolicDish) {
-					final ParabolicDish dish = (ParabolicDish) p;
-					final double solar = dish.getSolarPotentialNow() * dish.getSystemEfficiency();
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
-					} else {
-						graph.addData("Solar " + p.getId(), solar);
-					}
-				} else if (p instanceof FresnelReflector) {
-					final FresnelReflector reflector = (FresnelReflector) p;
-					final double solar = reflector.getSolarPotentialNow() * reflector.getSystemEfficiency();
-					if (customText != null) {
-						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
-					} else {
-						graph.addData("Solar " + p.getId(), solar);
-					}
-				} else if (p instanceof Foundation) {
-					final boolean mean = group.getType().endsWith("(Mean)");
-					final Foundation foundation = (Foundation) p;
-					switch (foundation.getProjectType()) {
-					case Foundation.TYPE_PV_PROJECT:
-						double pv = foundation.getPhotovoltaicNow();
-						if (mean) {
-							pv /= foundation.getNumberOfSolarPanels();
-							if (customText != null) {
-								graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", pv);
-							} else {
-								graph.addData("PV " + p.getId() + " mean", pv);
-							}
-						} else {
-							if (customText != null) {
-								graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText, pv);
-							} else {
-								graph.addData("PV " + p.getId(), pv);
-							}
-						}
-						break;
-					case Foundation.TYPE_CSP_PROJECT:
-						double csp = foundation.getCspNow();
-						if (mean) {
-							csp /= foundation.countParts(new Class[] { Mirror.class, ParabolicTrough.class, ParabolicDish.class });
-							if (customText != null) {
-								graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", csp);
-							} else {
-								graph.addData("CSP " + p.getId() + " mean", csp);
-							}
-						} else {
-							if (customText != null) {
-								graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText, csp);
-							} else {
-								graph.addData("CSP " + p.getId(), csp);
-							}
-						}
-						break;
-					case Foundation.TYPE_BUILDING:
-						final double totalEnergy = foundation.getTotalEnergyNow();
-						graph.addData("Building " + p.getId(), totalEnergy);
-						break;
-					}
-				}
-			}
-		}
-		graph.repaint();
-	}
+    @Override
+    public void updateGraph() {
+        final int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
+        for (int i = 0; i < 24; i++) {
+            SolarRadiation.getInstance().computeEnergyAtHour(i);
+            for (final HousePart p : selectedParts) {
+                final String customText = p.getLabelCustomText();
+                if (p instanceof Window) {
+                    final Window window = (Window) p;
+                    final double solar = p.getSolarPotentialNow() * window.getSolarHeatGainCoefficient();
+                    graph.addData("Solar " + p.getId(), solar);
+                    final double[] loss = p.getHeatLoss();
+                    final int t0 = n * i;
+                    double sum = 0;
+                    for (int k = t0; k < t0 + n; k++) {
+                        sum += loss[k];
+                    }
+                    graph.addData("Heat Gain " + p.getId(), -sum);
+                } else if (p instanceof Wall || p instanceof Roof) {
+                    final double[] loss = p.getHeatLoss();
+                    final int t0 = n * i;
+                    double sum = 0;
+                    for (int k = t0; k < t0 + n; k++) {
+                        sum += loss[k];
+                    }
+                    graph.addData("Heat Gain " + p.getId(), -sum);
+                } else if (p instanceof SolarPanel) {
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((SolarPanel) p).getYieldNow());
+                    } else {
+                        graph.addData("Solar " + p.getId(), ((SolarPanel) p).getYieldNow());
+                    }
+                } else if (p instanceof Rack) {
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((Rack) p).getYieldNow());
+                    } else {
+                        graph.addData("Solar " + p.getId(), ((Rack) p).getYieldNow());
+                    }
+                } else if (p instanceof Mirror) {
+                    final Mirror mirror = (Mirror) p;
+                    final double solar = mirror.getSolarPotentialNow() * mirror.getSystemEfficiency();
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+                    } else {
+                        graph.addData("Solar " + p.getId(), solar);
+                    }
+                } else if (p instanceof ParabolicTrough) {
+                    final ParabolicTrough trough = (ParabolicTrough) p;
+                    final double solar = trough.getSolarPotentialNow() * trough.getSystemEfficiency();
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+                    } else {
+                        graph.addData("Solar " + p.getId(), solar);
+                    }
+                } else if (p instanceof ParabolicDish) {
+                    final ParabolicDish dish = (ParabolicDish) p;
+                    final double solar = dish.getSolarPotentialNow() * dish.getSystemEfficiency();
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+                    } else {
+                        graph.addData("Solar " + p.getId(), solar);
+                    }
+                } else if (p instanceof FresnelReflector) {
+                    final FresnelReflector reflector = (FresnelReflector) p;
+                    final double solar = reflector.getSolarPotentialNow() * reflector.getSystemEfficiency();
+                    if (customText != null) {
+                        graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+                    } else {
+                        graph.addData("Solar " + p.getId(), solar);
+                    }
+                } else if (p instanceof Foundation) {
+                    final boolean mean = group.getType().endsWith("(Mean)");
+                    final Foundation foundation = (Foundation) p;
+                    switch (foundation.getProjectType()) {
+                        case Foundation.TYPE_PV_PROJECT:
+                            double pv = foundation.getPhotovoltaicNow();
+                            if (mean) {
+                                pv /= foundation.getNumberOfSolarPanels();
+                                if (customText != null) {
+                                    graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", pv);
+                                } else {
+                                    graph.addData("PV " + p.getId() + " mean", pv);
+                                }
+                            } else {
+                                if (customText != null) {
+                                    graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText, pv);
+                                } else {
+                                    graph.addData("PV " + p.getId(), pv);
+                                }
+                            }
+                            break;
+                        case Foundation.TYPE_CSP_PROJECT:
+                            double csp = foundation.getCspNow();
+                            if (mean) {
+                                csp /= foundation.countParts(new Class[]{Mirror.class, ParabolicTrough.class, ParabolicDish.class});
+                                if (customText != null) {
+                                    graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", csp);
+                                } else {
+                                    graph.addData("CSP " + p.getId() + " mean", csp);
+                                }
+                            } else {
+                                if (customText != null) {
+                                    graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText, csp);
+                                } else {
+                                    graph.addData("CSP " + p.getId(), csp);
+                                }
+                            }
+                            break;
+                        case Foundation.TYPE_BUILDING:
+                            final double totalEnergy = foundation.getTotalEnergyNow();
+                            graph.addData("Building " + p.getId(), totalEnergy);
+                            break;
+                    }
+                }
+            }
+        }
+        graph.repaint();
+    }
 
-	public void show(final String title) {
-		final JDialog dialog = createDialog(title);
-		final JMenuBar menuBar = new JMenuBar();
-		dialog.setJMenuBar(menuBar);
-		menuBar.add(createOptionsMenu(dialog, selectedParts, true));
-		menuBar.add(createTypesMenu());
-		menuBar.add(createRunsMenu());
-		dialog.setVisible(true);
-	}
+    public void show(final String title) {
+        final JDialog dialog = createDialog(title);
+        final JMenuBar menuBar = new JMenuBar();
+        dialog.setJMenuBar(menuBar);
+        menuBar.add(createOptionsMenu(dialog, selectedParts, true));
+        menuBar.add(createTypesMenu());
+        menuBar.add(createRunsMenu());
+        dialog.setVisible(true);
+    }
 
-	@Override
-	public String toJson() {
-		String type = "Unknown";
-		final ArrayList<String> names = new ArrayList<String>();
-		for (final HousePart p : selectedParts) {
-			if (p instanceof SolarPanel) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Solar Panel";
-			} else if (p instanceof Rack) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Rack";
-			} else if (p instanceof Mirror) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Mirror";
-			} else if (p instanceof ParabolicTrough) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Parabolic Trough";
-			} else if (p instanceof ParabolicDish) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Parabolic Dish";
-			} else if (p instanceof FresnelReflector) {
-				names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-				type = "Fresnel Reflector";
-			} else if (p instanceof Wall) {
-				names.add("Heat Gain " + p.getId());
-				type = "Wall";
-			} else if (p instanceof Roof) {
-				names.add("Heat Gain " + p.getId());
-				type = "Roof";
-			} else if (p instanceof Door) {
-				names.add("Heat Gain " + p.getId());
-				type = "Door";
-			} else if (p instanceof Window) {
-				names.add("Solar " + p.getId());
-				names.add("Heat Gain " + p.getId());
-				type = "Window";
-			} else if (p instanceof Foundation) {
-				final Foundation foundation = (Foundation) p;
-				switch (foundation.getProjectType()) {
-				case Foundation.TYPE_PV_PROJECT:
-					names.add("PV " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-					break;
-				case Foundation.TYPE_CSP_PROJECT:
-					names.add("CSP " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
-					break;
-				case Foundation.TYPE_BUILDING:
-					names.add("Building " + p.getId());
-					break;
-				}
-				type = "Foundation";
-			}
-		}
-		String s = "{\"Type\": \"" + type + "\"";
-		for (final String name : names) {
-			final List<Double> data = graph.getData(name);
-			if (data == null) {
-				continue;
-			}
-			s += ", \"" + name + "\": {";
-			s += "\"Hourly\": [";
-			for (final Double x : data) {
-				s += Graph.FIVE_DECIMALS.format(x) + ",";
-			}
-			s = s.substring(0, s.length() - 1);
-			s += "]\n";
-			s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
-			s += "}";
-		}
-		s += "}";
-		return s;
-	}
+    @Override
+    public String toJson() {
+        String type = "Unknown";
+        final ArrayList<String> names = new ArrayList<String>();
+        for (final HousePart p : selectedParts) {
+            if (p instanceof SolarPanel) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Solar Panel";
+            } else if (p instanceof Rack) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Rack";
+            } else if (p instanceof Mirror) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Mirror";
+            } else if (p instanceof ParabolicTrough) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Parabolic Trough";
+            } else if (p instanceof ParabolicDish) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Parabolic Dish";
+            } else if (p instanceof FresnelReflector) {
+                names.add("Solar " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                type = "Fresnel Reflector";
+            } else if (p instanceof Wall) {
+                names.add("Heat Gain " + p.getId());
+                type = "Wall";
+            } else if (p instanceof Roof) {
+                names.add("Heat Gain " + p.getId());
+                type = "Roof";
+            } else if (p instanceof Door) {
+                names.add("Heat Gain " + p.getId());
+                type = "Door";
+            } else if (p instanceof Window) {
+                names.add("Solar " + p.getId());
+                names.add("Heat Gain " + p.getId());
+                type = "Window";
+            } else if (p instanceof Foundation) {
+                final Foundation foundation = (Foundation) p;
+                switch (foundation.getProjectType()) {
+                    case Foundation.TYPE_PV_PROJECT:
+                        names.add("PV " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                        break;
+                    case Foundation.TYPE_CSP_PROJECT:
+                        names.add("CSP " + p.getId() + (p.getLabelCustom() ? graph.getDataNameDelimiter() + p.getLabelCustomText() : ""));
+                        break;
+                    case Foundation.TYPE_BUILDING:
+                        names.add("Building " + p.getId());
+                        break;
+                }
+                type = "Foundation";
+            }
+        }
+        String s = "{\"Type\": \"" + type + "\"";
+        for (final String name : names) {
+            final List<Double> data = graph.getData(name);
+            if (data == null) {
+                continue;
+            }
+            s += ", \"" + name + "\": {";
+            s += "\"Hourly\": [";
+            for (final Double x : data) {
+                s += Graph.FIVE_DECIMALS.format(x) + ",";
+            }
+            s = s.substring(0, s.length() - 1);
+            s += "]\n";
+            s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+            s += "}";
+        }
+        s += "}";
+        return s;
+    }
 
 }
