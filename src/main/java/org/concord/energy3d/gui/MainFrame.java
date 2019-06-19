@@ -236,8 +236,10 @@ public class MainFrame extends JFrame {
 
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-        setSize(Math.min(pref.getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(pref.getInt("window_size_height", 600), screenSize.height));
-        setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2), pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
+        setSize(Math.min(pref.getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width),
+                Math.min(pref.getInt("window_size_height", 600), screenSize.height));
+        setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2),
+                pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
         setLocation(MathUtils.clamp(getLocation().x, 0, screenSize.width - getSize().width), MathUtils.clamp(getLocation().y, 0, screenSize.height - getSize().height));
         final int windowState = pref.getInt("window_state", JFrame.NORMAL);
         if ((windowState & JFrame.ICONIFIED) == 0) {
@@ -379,7 +381,8 @@ public class MainFrame extends JFrame {
                                 x.addActionListener(e1 -> {
                                     boolean ok = false;
                                     if (Scene.getInstance().isEdited()) {
-                                        final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                        final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?",
+                                                "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                                         if (save == JOptionPane.YES_OPTION) {
                                             save();
                                             if (!Scene.getInstance().isEdited()) {
@@ -395,8 +398,10 @@ public class MainFrame extends JFrame {
                                         SceneManager.getTaskManager().update(() -> {
                                             try {
                                                 Scene.open(rf.toURI().toURL());
-                                                updateTitleBar();
-                                                FileChooser.getInstance().rememberFile(rf.getPath());
+                                                EventQueue.invokeLater(() -> {
+                                                    updateTitleBar();
+                                                    FileChooser.getInstance().rememberFile(rf.getPath());
+                                                });
                                             } catch (final Throwable err) {
                                                 BugReporter.report(err, rf.getAbsolutePath());
                                             }
@@ -493,7 +498,8 @@ public class MainFrame extends JFrame {
             newMenuItem.addActionListener(e -> {
                 boolean ok = false;
                 if (Scene.getInstance().isEdited()) {
-                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (save == JOptionPane.YES_OPTION) {
                         save();
                         if (!Scene.getInstance().isEdited()) {
@@ -535,7 +541,8 @@ public class MainFrame extends JFrame {
             openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
             openMenuItem.addActionListener(e -> {
                 if (Scene.getInstance().isEdited()) {
-                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?",
+                            "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (save == JOptionPane.YES_OPTION) {
                         save();
                         if (!Scene.getInstance().isEdited()) {
@@ -561,7 +568,7 @@ public class MainFrame extends JFrame {
         SceneManager.getTaskManager().update(() -> {
             try {
                 Scene.open(file.toURI().toURL());
-                FileChooser.getInstance().rememberFile(file.getPath());
+                EventQueue.invokeLater(() -> FileChooser.getInstance().rememberFile(file.getPath()));
             } catch (final Throwable err) {
                 BugReporter.report(err, file.getAbsolutePath());
             }
@@ -668,7 +675,8 @@ public class MainFrame extends JFrame {
                     return;
                 }
                 if (JOptionPane.CANCEL_OPTION == JOptionPane.showConfirmDialog(MainFrame.this,
-                        "<html>The logged data (json and ng3 files) will be permanently deleted.<br>Are you sure?</html>", "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+                        "<html>The logged data (json and ng3 files) will be permanently deleted.<br>Are you sure?</html>",
+                        "Clear Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)) {
                     return;
                 }
                 final File[] files = logFolder.listFiles();
@@ -722,6 +730,13 @@ public class MainFrame extends JFrame {
         label.setLabelFor(totalMemoryField);
         inputPanel.add(totalMemoryField);
 
+        label = new JLabel("Processors: ");
+        inputPanel.add(label);
+        final JTextField processorsField = new JTextField(Runtime.getRuntime().availableProcessors() + "");
+        processorsField.setEditable(false);
+        label.setLabelFor(processorsField);
+        inputPanel.add(processorsField);
+
         label = new JLabel("Java vendor: ");
         inputPanel.add(label);
         final JTextField javaVendorField = new JTextField(System.getProperty("java.vendor"), 12);
@@ -736,9 +751,10 @@ public class MainFrame extends JFrame {
         label.setLabelFor(javaVersionField);
         inputPanel.add(javaVersionField);
 
-        SpringUtilities.makeCompactGrid(inputPanel, 4, 2, 6, 6, 6, 6);
+        SpringUtilities.makeCompactGrid(inputPanel, 5, 2, 6, 6, 6, 6);
         final Object[] options = new Object[]{"OK", "Cancel"};
-        final JOptionPane optionPane = new JOptionPane(new Object[]{"<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui}, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
+        final JOptionPane optionPane = new JOptionPane(new Object[]{"<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui},
+                JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
         final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
         dialog.setVisible(true);
     }
@@ -747,7 +763,8 @@ public class MainFrame extends JFrame {
         if (analyzeFolderMenuItem == null) {
             analyzeFolderMenuItem = new JMenuItem("Analyze Folder...");
             analyzeFolderMenuItem.addActionListener(e -> {
-                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?",
+                        "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
                     return;
                 }
                 SceneManager.getInstance().refresh(1);
@@ -755,7 +772,6 @@ public class MainFrame extends JFrame {
                 if (dir == null) {
                     return;
                 }
-
                 if (dir.isDirectory()) {
                     PostProcessor.getInstance().analyze(dir.listFiles(ng3NameFilter), new File(dir + System.getProperty("file.separator") + "prop.txt"), () -> updateTitleBar());
                 }
@@ -768,7 +784,8 @@ public class MainFrame extends JFrame {
         if (replayFolderMenuItem == null) {
             replayFolderMenuItem = new JMenuItem("Replay Folder...");
             replayFolderMenuItem.addActionListener(e -> {
-                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?",
+                        "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
                     return;
                 }
                 SceneManager.getInstance().refresh(1);
@@ -1041,7 +1058,8 @@ public class MainFrame extends JFrame {
                             if (remoteLastModified <= localLastModified) {
                                 JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
                             } else {
-                                JOptionPane.showMessageDialog(instance, "<html>Your software is out of date. But for some reason, it cannot update itself.<br>Please go to http://energy3d.concord.org to download and reinstall the latest version.</html>", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+                                JOptionPane.showMessageDialog(instance, "<html>Your software is out of date. But for some reason, it cannot update itself." +
+                                        "<br>Please go to http://energy3d.concord.org to download and reinstall the latest version.</html>", "Update Status", JOptionPane.INFORMATION_MESSAGE);
                                 Util.openBrowser("http://energy3d.concord.org");
                             }
                         }
@@ -1101,19 +1119,27 @@ public class MainFrame extends JFrame {
             final JPanel p = new JPanel(new BorderLayout(10, 10));
             p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
             final String title = "<h3>Energy3D</h3><h4><i>Learning to build a sustainable world</i></h4>Version: " + MainApplication.VERSION + ", &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR);
-            final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Java, Ardor3D, Getdown, JOGL, and Poly2tri.";
+            final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:" +
+                    "<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Java, Ardor3D, Getdown, JOGL, and Poly2tri.";
             final String license = "<br>The program is provided to you under the MIT License.";
-            final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079, awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
+            final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants" +
+                    "<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by" +
+                    "<br>General Motors through grant 34871079, awarded to Charles Xie. Any" +
+                    "<br>opinions, findings, and conclusions or recommendations expressed in the" +
+                    "<br>materials associated with this program are those of the author(s) and do" +
+                    "<br>not necessarily reflect the views of the National Science Foundation or" +
+                    "<br>General Motors.";
             final String source = "<h4>Source Code</h4>https://github.com/concord-consortium/energy3d";
             String acknowledge = "<h4>Acknowledgement</h4>";
             acknowledge += "<font size=2>This program is dedicated to Dr. Robert Tinker (1941-2017), the founder of<br>the Concord Consortium. ";
             acknowledge += "The help from the following people to improve<br>this program is much appreciated: Katie Armstrong, Siobhan Bailey, Jie Chao,<br>";
             acknowledge += "Guanhua Chen, Amos Decker, Maya Haigis, Xudong Huang, Shiyan Jiang,<br>";
             acknowledge += "Mark Liao, Shasha Liu, Jeff Lockwood, Joy Massicotte, Ethan McElroy, Scott Ogle,<br>";
-            acknowledge += "Cormac Paterson, Allison Pearson, Corey Schimpf, Zhenghui Sha";
+            acknowledge += "Cormac Paterson, Allison Pearson, Molla Rahman, Corey Schimpf, Elena Sereiviene,<br>";
+            acknowledge += "Zhenghui Sha, Helen Zhang";
             p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
             final JButton button = new JButton("Close");
-            button.addActionListener(arg0 -> aboutDialog.dispose());
+            button.addActionListener(e -> aboutDialog.dispose());
             final JPanel p2 = new JPanel();
             p2.add(button);
             p.add(p2, BorderLayout.SOUTH);
@@ -1651,8 +1677,11 @@ public class MainFrame extends JFrame {
                     return;
                 }
                 try {
-                    Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
                     Scene.getInstance().setGroundImageEarthView(false);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
+                        return null;
+                    });
                 } catch (final Throwable t) {
                     t.printStackTrace();
                     JOptionPane.showMessageDialog(MainFrame.this, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1678,8 +1707,11 @@ public class MainFrame extends JFrame {
                             if (val <= 0) {
                                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                // final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
-                                Scene.getInstance().setGroundImageScale(val);
+                                // final RescaleGroundImageCommand c = new RescaleGroundImageCommand();
+                                SceneManager.getTaskManager().update(() -> {
+                                    Scene.getInstance().setGroundImageScale(val);
+                                    return null;
+                                });
                                 // SceneManager.getInstance().getUndoManager().addEdit(c);
                                 break;
                             }
@@ -1698,7 +1730,10 @@ public class MainFrame extends JFrame {
         if (clearGroundImageMenuItem == null) {
             clearGroundImageMenuItem = new JMenuItem("Clear Image");
             clearGroundImageMenuItem.addActionListener(e -> {
-                Scene.getInstance().setGroundImage(null, 1);
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setGroundImage(null, 1);
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
             });
         }
@@ -1724,7 +1759,10 @@ public class MainFrame extends JFrame {
             axesMenuItem = new JCheckBoxMenuItem("Axes", true);
             axesMenuItem.addItemListener(e -> {
                 final ShowAxesCommand c = new ShowAxesCommand();
-                SceneManager.getInstance().setAxesVisible(axesMenuItem.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().setAxesVisible(axesMenuItem.isSelected());
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
@@ -1737,8 +1775,11 @@ public class MainFrame extends JFrame {
             sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles with Heliodon");
             sunAnglesMenuItem.addItemListener(e -> {
                 final ShowSunAnglesCommand c = new ShowSunAnglesCommand();
-                Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
-                Heliodon.getInstance().drawSunTriangle();
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
+                    Heliodon.getInstance().drawSunTriangle();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
@@ -1753,7 +1794,10 @@ public class MainFrame extends JFrame {
                 final ShowReflectorLightBeamsCommand c = new ShowReflectorLightBeamsCommand();
                 Scene.getInstance().setLightBeamsVisible(lightBeamsMenuItem.isSelected());
                 Scene.getInstance().setEdited(true);
-                Scene.getInstance().redrawAll();
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().redrawAll();
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
         }
@@ -1775,8 +1819,11 @@ public class MainFrame extends JFrame {
         if (roofDashedLineMenuItem == null) {
             roofDashedLineMenuItem = new JCheckBoxMenuItem("Roof Dashed Lines", false);
             roofDashedLineMenuItem.addItemListener(e -> {
-                Scene.getInstance().setDashedLinesOnRoofShown(roofDashedLineMenuItem.isSelected());
-                Scene.getInstance().redrawAll();
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setDashedLinesOnRoofShown(roofDashedLineMenuItem.isSelected());
+                    Scene.getInstance().redrawAll();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
             });
         }
@@ -1788,7 +1835,10 @@ public class MainFrame extends JFrame {
             shadowMenuItem = new JCheckBoxMenuItem("Shadows", false);
             shadowMenuItem.addItemListener(e -> {
                 final ShowShadowCommand c = new ShowShadowCommand();
-                SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
+                    return null;
+                });
                 Util.selectSilently(MainPanel.getInstance().getShadowButton(), shadowMenuItem.isSelected());
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
@@ -1800,7 +1850,8 @@ public class MainFrame extends JFrame {
         if (sortIdMenuItem == null) {
             sortIdMenuItem = new JMenuItem("Sort ID");
             sortIdMenuItem.addActionListener(e -> {
-                if (JOptionPane.showConfirmDialog(MainFrame.this, "Sorting IDs may break scripts. Do you want to continue?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
+                if (JOptionPane.showConfirmDialog(MainFrame.this, "Sorting IDs may break scripts. Do you want to continue?",
+                        "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
                     return;
                 }
                 Scene.getInstance().sortID();
@@ -1853,7 +1904,13 @@ public class MainFrame extends JFrame {
                         return;
                     }
                     final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
+                    if (selectedPart instanceof Window
+                            || selectedPart instanceof Wall
+                            || selectedPart instanceof Roof
+                            || selectedPart instanceof Door
+                            || selectedPart instanceof SolarPanel
+                            || selectedPart instanceof Rack
+                            || selectedPart instanceof Foundation) {
                         new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
@@ -1894,7 +1951,13 @@ public class MainFrame extends JFrame {
                         return;
                     }
                     final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
+                    if (selectedPart instanceof Window
+                            || selectedPart instanceof Wall
+                            || selectedPart instanceof Roof
+                            || selectedPart instanceof Door
+                            || selectedPart instanceof SolarPanel
+                            || selectedPart instanceof Rack
+                            || selectedPart instanceof Foundation) {
                         new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
@@ -2023,7 +2086,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(ParabolicTrough.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.",
+                                        "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2064,7 +2128,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(ParabolicTrough.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.",
+                                        "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2100,7 +2165,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(ParabolicDish.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.",
+                                        "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2141,7 +2207,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(ParabolicDish.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.",
+                                        "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2177,7 +2244,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(FresnelReflector.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.",
+                                        "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2218,7 +2286,8 @@ public class MainFrame extends JFrame {
                         if (foundation != null) {
                             n = foundation.countParts(FresnelReflector.class);
                             if (n <= 0) {
-                                JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.",
+                                        "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
                                 return;
                             }
                         }
@@ -2335,11 +2404,14 @@ public class MainFrame extends JFrame {
             showSolarLandMenuItem.addItemListener(e -> {
                 // final ShowSolarLandCommand c = new ShowSolarLandCommand();
                 final boolean b = showSolarLandMenuItem.isSelected();
-                SceneManager.getInstance().getSolarLand().setVisible(b);
-                Scene.getInstance().setSolarMapForLand(b);
-                MainPanel.getInstance().getEnergyButton().setSelected(false);
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().getSolarLand().setVisible(b);
+                    Scene.getInstance().setSolarMapForLand(b);
+                    Scene.getInstance().redrawAll();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                Scene.getInstance().redrawAll();
+                MainPanel.getInstance().getEnergyButton().setSelected(false);
                 // SceneManager.getInstance().getUndoManager().addEdit(c);
             });
         }
@@ -2377,7 +2449,10 @@ public class MainFrame extends JFrame {
             showHeatFluxVectorsMenuItem = new JCheckBoxMenuItem("Heat Flux Vectors");
             showHeatFluxVectorsMenuItem.addActionListener(e -> {
                 final ShowHeatFluxCommand c = new ShowHeatFluxCommand();
-                Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
@@ -2454,7 +2529,10 @@ public class MainFrame extends JFrame {
             annotationsMenuItem = new JCheckBoxMenuItem("Annotations");
             annotationsMenuItem.addItemListener(e -> {
                 final ShowAnnotationCommand c = new ShowAnnotationCommand();
-                Scene.getInstance().setAnnotationsVisible(annotationsMenuItem.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setAnnotationsVisible(annotationsMenuItem.isSelected());
+                    return null;
+                });
                 ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
                 Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -2468,7 +2546,10 @@ public class MainFrame extends JFrame {
     private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
         if (annotationsInwardMenuItem == null) {
             annotationsInwardMenuItem = new JCheckBoxMenuItem("Annotations for Cutouts");
-            annotationsInwardMenuItem.addItemListener(e -> Scene.setDrawAnnotationsInside(annotationsInwardMenuItem.isSelected()));
+            annotationsInwardMenuItem.addItemListener(e -> SceneManager.getTaskManager().update(() -> {
+                Scene.setDrawAnnotationsInside(annotationsInwardMenuItem.isSelected());
+                return null;
+            }));
         }
         return annotationsInwardMenuItem;
     }
@@ -2605,14 +2686,16 @@ public class MainFrame extends JFrame {
             undoMenuItem = new JMenuItem("Undo");
             undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
             undoMenuItem.setEnabled(false);
-            undoMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+            undoMenuItem.addActionListener(e -> {
                 MainPanel.getInstance().defaultTool();
-                SceneManager.getInstance().hideAllEditPoints();
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().hideAllEditPoints();
+                    SceneManager.getInstance().refresh();
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().undo();
-                SceneManager.getInstance().refresh();
                 EnergyPanel.getInstance().update();
-                return null;
-            }));
+            });
         }
         return undoMenuItem;
     }
@@ -2622,14 +2705,16 @@ public class MainFrame extends JFrame {
             redoMenuItem = new JMenuItem("Redo");
             redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
             redoMenuItem.setEnabled(false);
-            redoMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+            redoMenuItem.addActionListener(e -> {
                 MainPanel.getInstance().defaultTool();
-                SceneManager.getInstance().hideAllEditPoints();
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().hideAllEditPoints();
+                    SceneManager.getInstance().refresh();
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().redo();
-                SceneManager.getInstance().refresh();
                 EnergyPanel.getInstance().update();
-                return null;
-            }));
+            });
         }
         return redoMenuItem;
     }
@@ -2642,7 +2727,7 @@ public class MainFrame extends JFrame {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 if (selectedPart != null) {
                     Scene.getInstance().setCopyBuffer(selectedPart);
-                    SceneManager.getInstance().deleteCurrentSelection();
+                    SceneManager.getInstance().deleteCurrentSelection(); // this runs in the Task Manager thread
                 }
             });
         }
@@ -2713,8 +2798,10 @@ public class MainFrame extends JFrame {
             Scene.save(url, true);
         }
         Scene.getInstance().setEdited(false);
-        updateTitleBar();
-        FileChooser.getInstance().rememberFile(file.getAbsolutePath());
+        EventQueue.invokeLater(() -> {
+            updateTitleBar();
+            FileChooser.getInstance().rememberFile(file.getAbsolutePath());
+        });
     }
 
     void importFile() {
@@ -2829,20 +2916,22 @@ public class MainFrame extends JFrame {
         if (topViewCheckBoxMenuItem == null) {
             topViewCheckBoxMenuItem = new JCheckBoxMenuItem("2D Top View");
             topViewCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-            topViewCheckBoxMenuItem.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
+            topViewCheckBoxMenuItem.addActionListener(e -> {
                 final TopViewCommand c = new TopViewCommand();
                 final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
-                if (isTopView) {
-                    Scene.saveCameraLocation();
-                    SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
-                } else {
-                    SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-                    Scene.loadCameraLocation();
-                }
-                SceneManager.getInstance().refresh();
+                SceneManager.getTaskManager().update(() -> {
+                    if (isTopView) {
+                        Scene.saveCameraLocation();
+                        SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
+                    } else {
+                        SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+                        Scene.loadCameraLocation();
+                    }
+                    SceneManager.getInstance().refresh();
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().addEdit(c);
-                return null;
-            }));
+            });
         }
         return topViewCheckBoxMenuItem;
     }
@@ -2853,7 +2942,10 @@ public class MainFrame extends JFrame {
             zoomInMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
             zoomInMenuItem.addActionListener(e -> {
                 final ZoomCommand c = new ZoomCommand(true);
-                SceneManager.getInstance().zoom(true);
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().zoom(true);
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
         }
@@ -2866,7 +2958,10 @@ public class MainFrame extends JFrame {
             zoomOutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
             zoomOutMenuItem.addActionListener(e -> {
                 final ZoomCommand c = new ZoomCommand(false);
-                SceneManager.getInstance().zoom(false);
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().zoom(false);
+                    return null;
+                });
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
         }
@@ -2879,7 +2974,10 @@ public class MainFrame extends JFrame {
             defaultMenuItem.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.DEFAULT_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -2895,7 +2993,10 @@ public class MainFrame extends JFrame {
             desertMenuItem.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.DESERT_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -2911,7 +3012,10 @@ public class MainFrame extends JFrame {
             grasslandMenuItem.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.GRASSLAND_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -2927,7 +3031,10 @@ public class MainFrame extends JFrame {
             forestMenuItem.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ChangeEnvironmentCommand c = new ChangeEnvironmentCommand();
-                    Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().setEnvironment(Scene.FOREST_THEME);
+                        return null;
+                    });
                     Scene.getInstance().setEdited(true);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
@@ -3012,10 +3119,13 @@ public class MainFrame extends JFrame {
                                 if (rb1.isSelected()) { // apply to only this part
                                     if (changed) {
                                         final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-                                        selectedPart.setColor(color);
-                                        selectedPart.setTextureType(HousePart.TEXTURE_NONE);
-                                        selectedPart.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            selectedPart.setColor(color);
+                                            selectedPart.setTextureType(HousePart.TEXTURE_NONE);
+                                            selectedPart.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 } else if (rb2.isSelected()) {
@@ -3029,7 +3139,10 @@ public class MainFrame extends JFrame {
                                     }
                                     if (changed) {
                                         final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand(w);
-                                        Scene.getInstance().setColorOfConnectedWalls(w, color);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setColorOfConnectedWalls(w, color);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 } else if (rb3.isSelected()) {
@@ -3043,7 +3156,10 @@ public class MainFrame extends JFrame {
                                     }
                                     if (changed) {
                                         final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
-                                        Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 } else if (rb4.isSelected()) {
@@ -3057,7 +3173,10 @@ public class MainFrame extends JFrame {
                                     }
                                     if (changed) {
                                         final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-                                        Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 }
@@ -3091,10 +3210,13 @@ public class MainFrame extends JFrame {
                                 if (rb1.isSelected()) { // apply to only this part
                                     if (changed) {
                                         final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-                                        selectedPart.setColor(color);
-                                        selectedPart.setTextureType(HousePart.TEXTURE_NONE);
-                                        selectedPart.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            selectedPart.setColor(color);
+                                            selectedPart.setTextureType(HousePart.TEXTURE_NONE);
+                                            selectedPart.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 } else {
@@ -3108,7 +3230,10 @@ public class MainFrame extends JFrame {
                                     }
                                     if (changed) {
                                         final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-                                        Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 }
@@ -3142,10 +3267,13 @@ public class MainFrame extends JFrame {
                                 if (rb1.isSelected()) { // apply to only this part
                                     if (changed) {
                                         final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-                                        selectedPart.setColor(color);
-                                        selectedPart.setTextureType(HousePart.TEXTURE_NONE);
-                                        selectedPart.draw();
-                                        SceneManager.getInstance().refresh();
+                                        SceneManager.getTaskManager().update(() -> {
+                                            selectedPart.setColor(color);
+                                            selectedPart.setTextureType(HousePart.TEXTURE_NONE);
+                                            selectedPart.draw();
+                                            SceneManager.getInstance().refresh();
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 } else {
@@ -3159,7 +3287,10 @@ public class MainFrame extends JFrame {
                                     }
                                     if (changed) {
                                         final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-                                        Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                        SceneManager.getTaskManager().update(() -> {
+                                            Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+                                            return null;
+                                        });
                                         SceneManager.getInstance().getUndoManager().addEdit(cmd);
                                     }
                                 }
@@ -3174,10 +3305,13 @@ public class MainFrame extends JFrame {
                         changed = !color.equals(selectedPart.getColor());
                         if (changed) {
                             final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-                            selectedPart.setColor(color);
-                            selectedPart.setTextureType(HousePart.TEXTURE_NONE);
-                            selectedPart.draw();
-                            SceneManager.getInstance().refresh();
+                            SceneManager.getTaskManager().update(() -> {
+                                selectedPart.setColor(color);
+                                selectedPart.setTextureType(HousePart.TEXTURE_NONE);
+                                selectedPart.draw();
+                                SceneManager.getInstance().refresh();
+                                return null;
+                            });
                             SceneManager.getInstance().getUndoManager().addEdit(cmd);
                             if (selectedPart instanceof Door) { // remember the color decision for the next part
                                 Scene.getInstance().setDefaultDoorColor(color);
@@ -3203,7 +3337,7 @@ public class MainFrame extends JFrame {
         SceneManager.getTaskManager().update(() -> {
             try {
                 Scene.open(new File(filename).toURI().toURL());
-                FileChooser.getInstance().rememberFile(filename);
+                EventQueue.invokeLater(() -> FileChooser.getInstance().rememberFile(filename));
             } catch (final Throwable e) {
                 BugReporter.report(e, new File(filename).getAbsolutePath());
                 throw e;
@@ -3215,7 +3349,8 @@ public class MainFrame extends JFrame {
     void openModel(final URL url) {
         boolean ok = false;
         if (Scene.getInstance().isEdited()) {
-            final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save",
+                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (save == JOptionPane.YES_OPTION) {
                 save();
                 if (!Scene.getInstance().isEdited()) {
@@ -3337,7 +3472,8 @@ public class MainFrame extends JFrame {
             overallUtilityBillMenuItem.addActionListener(e -> {
                 UtilityBill b = Scene.getInstance().getUtilityBill();
                 if (b == null) {
-                    if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
+                    if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?" + "<br>(This applies to all the structures in this scene.)</html>",
+                            "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
                         return;
                     }
                     b = new UtilityBill();

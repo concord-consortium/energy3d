@@ -323,7 +323,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
         }
     }
 
-    public double getOutputToday() {
+    double getOutputToday() {
         return solarPotentialToday * getSystemEfficiency();
     }
 

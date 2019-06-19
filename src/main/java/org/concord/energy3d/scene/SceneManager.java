@@ -153,7 +153,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         public void run() {
             if (!arrowKeyBlock) {
                 arrowKeyBlock = true;
-                SceneManager.getTaskManager().update(() -> {
+                taskManager.update(() -> {
                     moveWithKey(keyboardState, direction);
                     arrowKeyBlock = false;
                     return null;
@@ -1270,7 +1270,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
             this.operation = operation;
             operationFlag = true;
             // need to be here to ensure immediate removal of unfinished house part before computeEnergy thread is started
-            SceneManager.getTaskManager().update(() -> {
+            taskManager.update(() -> {
                 if (selectedPart != null) {
                     if (selectedPart.isDrawCompleted()) {
                         selectedPart.setEditPointsVisible(false);
@@ -2264,7 +2264,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         EnergyPanel.getInstance().clearAlreadyRendered();
         EnergyPanel.getInstance().updateRadiationHeatMap();
         // For some reason, rack's texture doesn't change correctly until it is redrawn. Rack has to change between a repeated texture (solar panel) and a single texture (solar radiation)
-        SceneManager.getTaskManager().update(() -> {
+        taskManager.update(() -> {
             for (final SolarPanel panel : Scene.getInstance().getAllSolarPanels()) { // draw the cell outlines
                 panel.draw();
             }
