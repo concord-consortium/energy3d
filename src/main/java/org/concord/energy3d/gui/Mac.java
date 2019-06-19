@@ -11,40 +11,40 @@ import java.io.File;
 
 public class Mac {
 
-	public static void init() {
+    public static void init() {
 
-		final Application application = Application.getApplication();
-		application.setDockIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("icons/icon.png")));
+        final Application application = Application.getApplication();
+        application.setDockIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("icons/icon.png")));
 
-		application.setOpenFileHandler(e -> {
-			MainApplication.isMacOpeningFile = true;
-			SceneManager.getTaskManager().update(() -> {
-				// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
-				if (Scene.getURL() == null) {
-					Scene.newFile(false);
-				}
-				try {
-					Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
-				} catch (final Throwable err) {
-					BugReporter.report(err, e.getFiles().get(0).toString());
-				}
-				return null;
-			});
-		});
+        application.setOpenFileHandler(e -> {
+            MainApplication.isMacOpeningFile = true;
+            SceneManager.getTaskManager().update(() -> {
+                // somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
+                if (Scene.getURL() == null) {
+                    Scene.newFile(false);
+                }
+                try {
+                    Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
+                } catch (final Throwable err) {
+                    BugReporter.report(err, e.getFiles().get(0).toString());
+                }
+                return null;
+            });
+        });
 
-		application.setAboutHandler(e -> MainFrame.getInstance().showAbout());
+        application.setAboutHandler(e -> MainFrame.getInstance().showAbout());
 
-		application.setPreferencesHandler(e -> MainFrame.getInstance().showPreferences());
+        application.setPreferencesHandler(e -> MainFrame.getInstance().showPreferences());
 
-		application.setQuitHandler((e, r) -> {
-			MainFrame.getInstance().exit();
-			r.cancelQuit();
-		});
+        application.setQuitHandler((e, r) -> {
+            MainFrame.getInstance().exit();
+            r.cancelQuit();
+        });
 
-	}
+    }
 
-	public static void bringToFront() {
-		Application.getApplication().requestForeground(true);
-	}
+    public static void bringToFront() {
+        Application.getApplication().requestForeground(true);
+    }
 
 }

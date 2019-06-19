@@ -59,11 +59,13 @@ class RescaleBuildingDialog extends JDialog {
                     oldX = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in X-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in X-direction: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (oldX <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current length in X-direction must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current length in X-direction must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -74,11 +76,13 @@ class RescaleBuildingDialog extends JDialog {
                     newX = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in X-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in X-direction: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (newX <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New length in X-direction must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New length in X-direction must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -89,11 +93,13 @@ class RescaleBuildingDialog extends JDialog {
                     oldY = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in Y-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in Y-direction: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (oldY <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current length in Y-direction must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current length in Y-direction must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -104,11 +110,13 @@ class RescaleBuildingDialog extends JDialog {
                     newY = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in Y-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in Y-direction: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (newY <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New length in Y-direction must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New length in Y-direction must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -119,11 +127,13 @@ class RescaleBuildingDialog extends JDialog {
                     oldZ = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current height: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current height: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (oldZ <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current height must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Current height must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -134,11 +144,13 @@ class RescaleBuildingDialog extends JDialog {
                     newZ = Double.parseDouble(t);
                 } catch (final NumberFormatException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new height: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new height: " + ex.getMessage(),
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (newZ <= 0) {
-                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New height must be greater than zero!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "New height must be greater than zero!",
+                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }

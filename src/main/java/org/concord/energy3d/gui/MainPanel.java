@@ -535,7 +535,6 @@ public class MainPanel extends JPanel {
                 disableSunAnim();
                 SceneManager.getInstance().getUndoManager().addEdit(c);
                 // Scene.getInstance().setEdited(false); // shadow not saved -- make sense because it doesn't work on some machines
-                // org.concord.energy3d.util.Util.reportError(new RuntimeException("Error from Xie"));
             });
             addMouseOverEffect(shadowButton);
         }
@@ -568,7 +567,10 @@ public class MainPanel extends JPanel {
             heliodonButton.setFocusable(false);
             heliodonButton.addItemListener(e -> {
                 final ShowHeliodonCommand c = new ShowHeliodonCommand();
-                SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
+                    return null;
+                });
                 ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
                 disableSunAnim();
                 Scene.getInstance().setEdited(true);
@@ -601,7 +603,7 @@ public class MainPanel extends JPanel {
                 final AnimateSunCommand c = new AnimateSunCommand();
                 SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
                 if (shadowButton.isSelected()) {
-                    SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+                    SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime()); // already run in Task Manager thread
                 }
                 ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
                 SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -623,7 +625,10 @@ public class MainPanel extends JPanel {
                 MainFrame.getInstance().getPreviewMenuItem().setSelected(previewButton.isSelected());
                 MainFrame.getInstance().getEditMenu().setEnabled(!previewButton.isSelected());
                 defaultTool();
-                PrintController.getInstance().setPrintPreview(previewButton.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    PrintController.getInstance().setPrintPreview(previewButton.isSelected());
+                    return null;
+                });
                 ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
             });
             addMouseOverEffect(previewButton);
@@ -650,7 +655,10 @@ public class MainPanel extends JPanel {
             annotationButton.setFocusable(false);
             annotationButton.addItemListener(e -> {
                 final ShowAnnotationCommand c = new ShowAnnotationCommand();
-                Scene.getInstance().setAnnotationsVisible(annotationButton.isSelected());
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setAnnotationsVisible(annotationButton.isSelected());
+                    return null;
+                });
                 ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
                 Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -698,7 +706,8 @@ public class MainPanel extends JPanel {
         // must be run in the event queue as this method may be called in a custom thread
         EventQueue.invokeLater(() -> {
             for (final Component c : getAppToolbar().getComponents()) {
-                if (c != getNoteButton() && c != getShadowButton() && c != getEnergyButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
+                if (c != getNoteButton() && c != getShadowButton() && c != getEnergyButton() && c != getHeliodonButton() && c != getSelectButton()
+                        && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
                     if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected()) {
                         c.setEnabled(enabled);
                     }
@@ -1015,20 +1024,23 @@ public class MainPanel extends JPanel {
                                 try {
                                     Thread.sleep(200 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
                                 } catch (final InterruptedException e) {
+                                    // ignore
                                 }
                             }
-                            // undo only after the thread ends
-                            if (part == null) {
-                                SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand(null, rotationAngle * count));
-                            } else {
-                                if (part instanceof Foundation) {
-                                    SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) part, rotationAngle * count));
-                                } else if (part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror) {
-                                    if (c != null) {
-                                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                            // undo only after the white loop ends
+                            EventQueue.invokeLater(() -> {
+                                if (part == null) {
+                                    SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand(null, rotationAngle * count));
+                                } else {
+                                    if (part instanceof Foundation) {
+                                        SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) part, rotationAngle * count));
+                                    } else if (part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror) {
+                                        if (c != null) {
+                                            SceneManager.getInstance().getUndoManager().addEdit(c);
+                                        }
                                     }
                                 }
-                            }
+                            });
                         }
                     }.start();
                 }
