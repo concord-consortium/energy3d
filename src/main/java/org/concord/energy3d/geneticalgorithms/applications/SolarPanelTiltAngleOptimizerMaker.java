@@ -33,23 +33,23 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
 
         final JPanel panel = new JPanel(new SpringLayout());
         panel.add(new JLabel("Solution:"));
-        final JComboBox<String> solutionComboBox = new JComboBox<String>(new String[]{"Tilt Angles"});
+        final JComboBox<String> solutionComboBox = new JComboBox<>(new String[]{"Tilt Angles"});
         panel.add(solutionComboBox);
         panel.add(new JLabel());
 
         panel.add(new JLabel("Objective:"));
-        final JComboBox<String> objectiveComboBox = new JComboBox<String>(new String[]{"Daily Output", "Annual Output"});
+        final JComboBox<String> objectiveComboBox = new JComboBox<>(new String[]{"Daily Output", "Annual Output"});
         objectiveComboBox.setSelectedIndex(selectedObjectiveFunction);
         panel.add(objectiveComboBox);
         panel.add(new JLabel());
 
         panel.add(new JLabel("Chromosome type:"));
-        final JComboBox<String> typeComboBox = new JComboBox<String>(new String[]{"Continuous"});
+        final JComboBox<String> typeComboBox = new JComboBox<>(new String[]{"Continuous"});
         panel.add(typeComboBox);
         panel.add(new JLabel());
 
         panel.add(new JLabel("Selection method:"));
-        final JComboBox<String> selectionComboBox = new JComboBox<String>(new String[]{"Roulette Wheel", "Tournament"});
+        final JComboBox<String> selectionComboBox = new JComboBox<>(new String[]{"Roulette Wheel", "Tournament"});
         selectionComboBox.setSelectedIndex(selectedSelectionMethod);
         panel.add(selectionComboBox);
         panel.add(new JLabel());
@@ -71,7 +71,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
         panel.add(new JLabel("<html><font size=2>Not %</font></html>"));
 
         panel.add(new JLabel("Convergence criterion:"));
-        final JComboBox<String> convergenceCriterionComboBox = new JComboBox<String>(new String[]{"Bitwise (Nominal)"});
+        final JComboBox<String> convergenceCriterionComboBox = new JComboBox<>(new String[]{"Bitwise (Nominal)"});
         panel.add(convergenceCriterionComboBox);
         panel.add(new JLabel());
 
@@ -88,7 +88,7 @@ public class SolarPanelTiltAngleOptimizerMaker extends OptimizerMaker {
         localSearchRadiusLabel2.setEnabled(selectedSearchMethod > 0);
 
         panel.add(new JLabel("Search method:"));
-        final JComboBox<String> searchMethodComboBox = new JComboBox<String>(new String[]{"Global Search (Uniform Selection)", "Local Search (Random Optimization)"});
+        final JComboBox<String> searchMethodComboBox = new JComboBox<>(new String[]{"Global Search (Uniform Selection)", "Local Search (Random Optimization)"});
         searchMethodComboBox.setSelectedIndex(selectedSearchMethod);
         searchMethodComboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {

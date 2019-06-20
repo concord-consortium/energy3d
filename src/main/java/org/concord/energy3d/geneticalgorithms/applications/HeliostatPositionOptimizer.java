@@ -21,207 +21,203 @@ import com.ardor3d.math.Vector3;
 
 /**
  * Chromosome of an individual is encoded as follows:
- * 
+ * <p>
  * heliostat[0].x, heliostat[0].y, ..., heliostat[n].x, heliostat[n].y
- * 
- * @author Charles Xie
  *
+ * @author Charles Xie
  */
 public class HeliostatPositionOptimizer extends SolarOutputOptimizer {
 
-	public HeliostatPositionOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
-		super(populationSize, chromosomeLength, discretizationSteps);
-	}
+    HeliostatPositionOptimizer(final int populationSize, final int chromosomeLength, final int discretizationSteps) {
+        super(populationSize, chromosomeLength, discretizationSteps);
+    }
 
-	@Override
-	public void setFoundation(final Foundation foundation) {
-		super.setFoundation(foundation);
-		final List<Mirror> heliostats = foundation.getHeliostats();
-		final Mirror heliostat = heliostats.get(0);
-		final Foundation receiver = heliostat.getReceiver();
-		if (receiver != null) {
-			final Vector3 v0 = receiver.getAbsPoint(0);
-			final Vector3 v1 = receiver.getAbsPoint(1);
-			final Vector3 v2 = receiver.getAbsPoint(2);
-			final Vector3 v3 = receiver.getAbsPoint(3);
-			final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getScale();
-			final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getScale();
-			final double lx = v0.distance(v2) * Scene.getInstance().getScale();
-			final double ly = v0.distance(v1) * Scene.getInstance().getScale();
-			addConstraint(new RectangularBound(cx, cy, lx + heliostat.getApertureWidth(), ly + heliostat.getApertureHeight()));
-		}
-		// initialize the population with the first-born being the current design
-		final Individual firstBorn = population.getIndividual(0);
-		int i = 0;
-		final Random random = new Random();
-		for (final Mirror m : heliostats) {
-			double normalizedValue = m.getPoints().get(0).getX();
-			firstBorn.setGene(i, normalizedValue);
-			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
-				for (int k = 1; k < population.size(); k++) {
-					final Individual individual = population.getIndividual(k);
-					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
-					while (v < 0 || v > 1) {
-						v = random.nextGaussian() * localSearchRadius + normalizedValue;
-					}
-					individual.setGene(i, v);
-				}
-			}
-			setGeneName(i, "Normalized X (" + m.getId() + ")");
-			setGeneMinimum(i, 0);
-			setGeneMaximum(i, 1);
-			setInitialGene(i, normalizedValue);
-			i++;
-			normalizedValue = m.getPoints().get(0).getY();
-			firstBorn.setGene(i, normalizedValue);
-			if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
-				for (int k = 1; k < population.size(); k++) {
-					final Individual individual = population.getIndividual(k);
-					double v = random.nextGaussian() * localSearchRadius + normalizedValue;
-					while (v < 0 || v > 1) {
-						v = random.nextGaussian() * localSearchRadius + normalizedValue;
-					}
-					individual.setGene(i, v);
-				}
-			}
-			setGeneName(i, "Normalized Y (" + m.getId() + ")");
-			setGeneMinimum(i, 0);
-			setGeneMaximum(i, 1);
-			setInitialGene(i, normalizedValue);
-			i++;
-		}
-	}
+    @Override
+    public void setFoundation(final Foundation foundation) {
+        super.setFoundation(foundation);
+        final List<Mirror> heliostats = foundation.getHeliostats();
+        final Mirror heliostat = heliostats.get(0);
+        final Foundation receiver = heliostat.getReceiver();
+        if (receiver != null) {
+            final Vector3 v0 = receiver.getAbsPoint(0);
+            final Vector3 v1 = receiver.getAbsPoint(1);
+            final Vector3 v2 = receiver.getAbsPoint(2);
+            final Vector3 v3 = receiver.getAbsPoint(3);
+            final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX()) * Scene.getInstance().getScale();
+            final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY()) * Scene.getInstance().getScale();
+            final double lx = v0.distance(v2) * Scene.getInstance().getScale();
+            final double ly = v0.distance(v1) * Scene.getInstance().getScale();
+            addConstraint(new RectangularBound(cx, cy, lx + heliostat.getApertureWidth(), ly + heliostat.getApertureHeight()));
+        }
+        // initialize the population with the first-born being the current design
+        final Individual firstBorn = population.getIndividual(0);
+        int i = 0;
+        final Random random = new Random();
+        for (final Mirror m : heliostats) {
+            double normalizedValue = m.getPoints().get(0).getX();
+            firstBorn.setGene(i, normalizedValue);
+            if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+                for (int k = 1; k < population.size(); k++) {
+                    final Individual individual = population.getIndividual(k);
+                    double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+                    while (v < 0 || v > 1) {
+                        v = random.nextGaussian() * localSearchRadius + normalizedValue;
+                    }
+                    individual.setGene(i, v);
+                }
+            }
+            setGeneName(i, "Normalized X (" + m.getId() + ")");
+            setGeneMinimum(i, 0);
+            setGeneMaximum(i, 1);
+            setInitialGene(i, normalizedValue);
+            i++;
+            normalizedValue = m.getPoints().get(0).getY();
+            firstBorn.setGene(i, normalizedValue);
+            if (searchMethod == LOCAL_SEARCH_RANDOM_OPTIMIZATION) {
+                for (int k = 1; k < population.size(); k++) {
+                    final Individual individual = population.getIndividual(k);
+                    double v = random.nextGaussian() * localSearchRadius + normalizedValue;
+                    while (v < 0 || v > 1) {
+                        v = random.nextGaussian() * localSearchRadius + normalizedValue;
+                    }
+                    individual.setGene(i, v);
+                }
+            }
+            setGeneName(i, "Normalized Y (" + m.getId() + ")");
+            setGeneMinimum(i, 0);
+            setGeneMaximum(i, 1);
+            setInitialGene(i, normalizedValue);
+            i++;
+        }
+    }
 
-	@Override
-	void computeIndividualFitness(final Individual individual) {
-		final List<Mirror> heliostats = foundation.getHeliostats();
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			final Mirror m = heliostats.get(j / 2);
-			if (j % 2 == 0) {
-				m.getPoints().get(0).setX(gene);
-			} else {
-				m.getPoints().get(0).setY(gene);
-			}
-		}
-		individual.setFitness(objectiveFunction.compute());
-	}
+    @Override
+    void computeIndividualFitness(final Individual individual) {
+        final List<Mirror> heliostats = foundation.getHeliostats();
+        for (int j = 0; j < individual.getChromosomeLength(); j++) {
+            final double gene = individual.getGene(j);
+            final Mirror m = heliostats.get(j / 2);
+            if (j % 2 == 0) {
+                m.getPoints().get(0).setX(gene);
+            } else {
+                m.getPoints().get(0).setY(gene);
+            }
+        }
+        individual.setFitness(objectiveFunction.compute());
+    }
 
-	@Override
-	public void applyFittest() {
-		final Individual best = population.getFittest();
-		final List<Mirror> heliostats = foundation.getHeliostats();
-		for (int j = 0; j < best.getChromosomeLength(); j++) {
-			final double gene = best.getGene(j);
-			final Mirror m = heliostats.get(j / 2);
-			if (j % 2 == 0) {
-				m.getPoints().get(0).setX(gene);
-			} else {
-				m.getPoints().get(0).setY(gene);
-			}
-			m.draw();
-			setFinalGene(j, gene);
-		}
-		setFinalFitness(best.getFitness());
-		System.out.println("Fittest: " + individualToString(best));
-		displayFittest();
-	}
+    @Override
+    public void applyFittest() {
+        final Individual best = population.getFittest();
+        final List<Mirror> heliostats = foundation.getHeliostats();
+        for (int j = 0; j < best.getChromosomeLength(); j++) {
+            final double gene = best.getGene(j);
+            final Mirror m = heliostats.get(j / 2);
+            if (j % 2 == 0) {
+                m.getPoints().get(0).setX(gene);
+            } else {
+                m.getPoints().get(0).setY(gene);
+            }
+            m.draw();
+            setFinalGene(j, gene);
+        }
+        setFinalFitness(best.getFitness());
+        System.out.println("Fittest: " + individualToString(best));
+        displayFittest();
+    }
 
-	@Override
-	String individualToString(final Individual individual) {
-		String s = "(";
-		for (int j = 0; j < individual.getChromosomeLength(); j++) {
-			final double gene = individual.getGene(j);
-			if (j % 2 == 0) {
-				if (mins != null && maxs != null) {
-					s += (mins[j] + gene * (maxs[j] - mins[j]));
-				} else {
-					s += gene;
-				}
-				s += ", ";
-			} else {
-				if (mins != null && maxs != null) {
-					s += (mins[j] + gene * (maxs[j] - mins[j]));
-				} else {
-					s += gene;
-				}
-				s += " | ";
-			}
-		}
-		return s.substring(0, s.length() - 3) + ") = " + individual.getFitness();
-	}
+    @Override
+    String individualToString(final Individual individual) {
+        String s = "(";
+        for (int j = 0; j < individual.getChromosomeLength(); j++) {
+            final double gene = individual.getGene(j);
+            if (j % 2 == 0) {
+                if (mins != null && maxs != null) {
+                    s += (mins[j] + gene * (maxs[j] - mins[j]));
+                } else {
+                    s += gene;
+                }
+                s += ", ";
+            } else {
+                if (mins != null && maxs != null) {
+                    s += (mins[j] + gene * (maxs[j] - mins[j]));
+                } else {
+                    s += gene;
+                }
+                s += " | ";
+            }
+        }
+        return s.substring(0, s.length() - 3) + ") = " + individual.getFitness();
+    }
 
-	@Override
-	public void displayFittest() {
-		final Individual best = population.getIndividual(0);
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
-		if (receiver != null) {
-			String s = null;
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				s = "Daily Output: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				break;
-			case ObjectiveFunction.ANNUAL:
-				s = "Annual Output: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				break;
-			}
-			receiver.setLabelCustomText(s);
-			receiver.draw();
-		}
-		SceneManager.getInstance().refresh();
-		super.displayFittest();
-	}
+    @Override
+    public void displayFittest() {
+        final Individual best = population.getIndividual(0);
+        final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
+        if (receiver != null) {
+            String s = null;
+            switch (objectiveFunction.getType()) {
+                case ObjectiveFunction.DAILY:
+                    s = "Daily Output: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+                    break;
+                case ObjectiveFunction.ANNUAL:
+                    s = "Annual Output: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+                    break;
+            }
+            receiver.setLabelCustomText(s);
+            receiver.draw();
+        }
+        SceneManager.getInstance().refresh();
+        super.displayFittest();
+    }
 
-	@Override
-	void updateInfo(final Individual individual) {
-		final Individual best = population.getIndividual(0);
-		final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
-		if (receiver != null) {
-			String s = null;
-			switch (objectiveFunction.getType()) {
-			case ObjectiveFunction.DAILY:
-				s = "Daily Output\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
-				break;
-			case ObjectiveFunction.ANNUAL:
-				s = "Annual Output\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
-				break;
-			}
-			receiver.setLabelCustomText(s);
-			receiver.draw();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final Calendar today = Heliodon.getInstance().getCalendar();
-				EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart instanceof Foundation) {
-					final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
-					g.setCalendar(today);
-					EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
-					if (g.hasGraph()) {
-						g.updateGraph();
-					} else {
-						g.addGraph((Foundation) selectedPart);
-					}
-				}
-			}
-		});
-	}
+    @Override
+    void updateInfo(final Individual individual) {
+        final Individual best = population.getIndividual(0);
+        final Foundation receiver = foundation.getHeliostats().get(0).getReceiver();
+        if (receiver != null) {
+            String s = null;
+            switch (objectiveFunction.getType()) {
+                case ObjectiveFunction.DAILY:
+                    s = "Daily Output\nCurrent: " + EnergyPanel.TWO_DECIMALS.format(individual.getFitness()) + ", Top: " + EnergyPanel.TWO_DECIMALS.format(best.getFitness());
+                    break;
+                case ObjectiveFunction.ANNUAL:
+                    s = "Annual Output\nCurrent: " + EnergyPanel.ONE_DECIMAL.format(individual.getFitness() * 365.0 / 12.0) + ", Top: " + EnergyPanel.ONE_DECIMAL.format(best.getFitness() * 365.0 / 12.0);
+                    break;
+            }
+            receiver.setLabelCustomText(s);
+            receiver.draw();
+        }
+        EventQueue.invokeLater(() -> {
+            final Calendar today = Heliodon.getInstance().getCalendar();
+            EnergyPanel.getInstance().getDateSpinner().setValue(today.getTime());
+            final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+            if (selectedPart instanceof Foundation) {
+                final CspProjectDailyEnergyGraph g = EnergyPanel.getInstance().getCspProjectDailyEnergyGraph();
+                g.setCalendar(today);
+                EnergyPanel.getInstance().getCspProjectTabbedPane().setSelectedComponent(g);
+                if (g.hasGraph()) {
+                    g.updateGraph();
+                } else {
+                    g.addGraph((Foundation) selectedPart);
+                }
+            }
+        });
+    }
 
-	private static HeliostatPositionOptimizerMaker maker;
+    private static HeliostatPositionOptimizerMaker maker;
 
-	public static void make(final Foundation foundation) {
-		if (maker == null) {
-			maker = new HeliostatPositionOptimizerMaker();
-		}
-		maker.make(foundation);
-	}
+    public static void make(final Foundation foundation) {
+        if (maker == null) {
+            maker = new HeliostatPositionOptimizerMaker();
+        }
+        maker.make(foundation);
+    }
 
-	public static void stopIt() {
-		if (maker != null) {
-			maker.stop();
-		}
-	}
+    public static void stopIt() {
+        if (maker != null) {
+            maker.stop();
+        }
+    }
 
 }

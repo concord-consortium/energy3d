@@ -84,7 +84,7 @@ public abstract class Optimizer {
         Arrays.fill(isGeneInteger, false);
     }
 
-    public void setInitialGene(final int i, final double g) {
+    void setInitialGene(final int i, final double g) {
         initialGene[i] = g;
     }
 
@@ -323,7 +323,7 @@ public abstract class Optimizer {
     }
 
     // if anyone in the current population doesn't meed the constraints, the entire population dies and the algorithm reverts to the previous generation -- not efficient
-    boolean detectViolations() {
+    private boolean detectViolations() {
         boolean detected = false;
         if (mins != null && maxs != null) {
             final int chromosomeLength = population.getChromosomeLength();
@@ -369,11 +369,11 @@ public abstract class Optimizer {
         return stop;
     }
 
-    boolean shouldTerminate() {
+    private boolean shouldTerminate() {
         return outsideGenerationCounter >= maximumGenerations;
     }
 
-    public void setMinMax(final int i, final double min, final double max) {
+    private void setMinMax(final int i, final double min, final double max) {
         mins[i] = min;
         maxs[i] = max;
     }
@@ -382,7 +382,7 @@ public abstract class Optimizer {
         return population;
     }
 
-    void onCompletion() {
+    private void onCompletion() {
         EnergyPanel.getInstance().progress(0);
         EnergyPanel.getInstance().disableDateSpinner(false);
         SceneManager.setExecuteAllTask(true);
@@ -390,7 +390,7 @@ public abstract class Optimizer {
         TimeSeriesLogger.getInstance().logOptimization(this);
     }
 
-    void onStart() {
+    private void onStart() {
         EnergyPanel.getInstance().disableDateSpinner(true);
         SceneManager.getInstance().setHeatFluxDaily(true);
         Util.selectSilently(MainPanel.getInstance().getEnergyButton(), true);

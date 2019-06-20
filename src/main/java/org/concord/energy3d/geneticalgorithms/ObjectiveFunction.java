@@ -2,25 +2,24 @@ package org.concord.energy3d.geneticalgorithms;
 
 /**
  * @author Charles Xie
- *
  */
 public abstract class ObjectiveFunction {
 
-	public final static int DAILY = 0;
-	public final static int ANNUAL = 1;
+    public final static int DAILY = 0;
+    public final static int ANNUAL = 1;
 
-	protected int type = DAILY;
+    protected int type = DAILY;
 
-	protected volatile boolean cancelled;
+    private volatile boolean cancelled;
 
-	public void cancel() {
-		cancelled = true;
-	}
+    public void cancel() {
+        cancelled = true;
+    }
 
-	public int getType() {
-		return type;
-	}
+    public int getType() {
+        return type;
+    }
 
-	public abstract double compute();
+    public abstract double compute();
 
 }
