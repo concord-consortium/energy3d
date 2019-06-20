@@ -26,8 +26,8 @@ public class ObjectCloner {
             return null;
         } finally {
             try {
-                oos.close();
-                ois.close();
+                if (oos != null) oos.close();
+                if (ois != null) ois.close();
             } catch (Exception e2) {
                 e2.printStackTrace();
             }

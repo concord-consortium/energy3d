@@ -11,16 +11,16 @@ import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
 import com.jogamp.nativewindow.ScalableSurface;
 
-public class JoglFactory extends RendererFactory {
+class JoglFactory extends RendererFactory {
 
-	public JoglFactory(final DisplaySettings settings, final SceneManager sceneManager) {
-		final JoglSwingCanvas canvas = new JoglSwingCanvas(settings, new JoglCanvasRenderer(sceneManager));
-		canvas.setSurfaceScale(new float[] { ScalableSurface.IDENTITY_PIXELSCALE, ScalableSurface.IDENTITY_PIXELSCALE });
-		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
-		mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
-		keyboardWrapper = new AwtKeyboardWrapper(canvas);
-		focusWrapper = new AwtFocusWrapper(canvas);
-		this.canvas = canvas;
-	}
+    JoglFactory(final DisplaySettings settings, final SceneManager sceneManager) {
+        final JoglSwingCanvas canvas = new JoglSwingCanvas(settings, new JoglCanvasRenderer(sceneManager));
+        canvas.setSurfaceScale(new float[]{ScalableSurface.IDENTITY_PIXELSCALE, ScalableSurface.IDENTITY_PIXELSCALE});
+        TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+        mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
+        keyboardWrapper = new AwtKeyboardWrapper(canvas);
+        focusWrapper = new AwtFocusWrapper(canvas);
+        this.canvas = canvas;
+    }
 
 }

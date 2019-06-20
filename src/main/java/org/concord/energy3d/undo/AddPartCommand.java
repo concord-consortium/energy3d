@@ -14,55 +14,55 @@ import org.concord.energy3d.scene.SceneManager;
 
 public class AddPartCommand extends MyAbstractUndoableEdit {
 
-	private static final long serialVersionUID = 1L;
-	private final HousePart part;
+    private static final long serialVersionUID = 1L;
+    private final HousePart part;
 
-	public AddPartCommand(final HousePart part) {
-		this.part = part;
-	}
+    public AddPartCommand(final HousePart part) {
+        this.part = part;
+    }
 
-	public HousePart getPart() {
-		return part;
-	}
+    public HousePart getPart() {
+        return part;
+    }
 
-	@Override
-	public void undo() throws CannotUndoException {
-		super.undo();
-		Scene.getInstance().remove(part, true);
-		if (SceneManager.getInstance().getSolarHeatMap()) {
-			EnergyPanel.getInstance().updateRadiationHeatMap();
-		}
-	}
+    @Override
+    public void undo() throws CannotUndoException {
+        super.undo();
+        Scene.getInstance().remove(part, true);
+        if (SceneManager.getInstance().getSolarHeatMap()) {
+            EnergyPanel.getInstance().updateRadiationHeatMap();
+        }
+    }
 
-	@Override
-	public void redo() throws CannotRedoException {
-		super.redo();
-		Scene.getInstance().add(part, true);
-		if (SceneManager.getInstance().getSolarHeatMap()) {
-			EnergyPanel.getInstance().updateRadiationHeatMap();
-		}
-	}
+    @Override
+    public void redo() throws CannotRedoException {
+        super.redo();
+        Scene.getInstance().add(part, true);
+        if (SceneManager.getInstance().getSolarHeatMap()) {
+            EnergyPanel.getInstance().updateRadiationHeatMap();
+        }
+    }
 
-	@Override
-	public char getOneLetterCode() {
-		if (part instanceof Floor) {
-			return 'F';
-		}
-		if (part instanceof Human) {
-			return 'H';
-		}
-		if (part instanceof Foundation) {
-			return 'N';
-		}
-		if (part instanceof Sensor) {
-			return 'S';
-		}
-		return 'P';
-	}
+    @Override
+    public char getOneLetterCode() {
+        if (part instanceof Floor) {
+            return 'F';
+        }
+        if (part instanceof Human) {
+            return 'H';
+        }
+        if (part instanceof Foundation) {
+            return 'N';
+        }
+        if (part instanceof Sensor) {
+            return 'S';
+        }
+        return 'P';
+    }
 
-	@Override
-	public String getPresentationName() {
-		return "Add " + part.getClass().getSimpleName();
-	}
+    @Override
+    public String getPresentationName() {
+        return "Add " + part.getClass().getSimpleName();
+    }
 
 }

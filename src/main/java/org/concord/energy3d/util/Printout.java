@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -50,11 +49,10 @@ public class Printout implements Printable, Pageable {
     }
 
     @Override
-    public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex) throws PrinterException {
+    public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex) {
         if (pageIndex >= getNumberOfPages()) {
             return NO_SUCH_PAGE;
         }
-
         /* The img is twice as big as the page so need to draw it based on paper size not img size */
         if (lastImagePage != pageIndex) {
             getScreenShot(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printCorners.get(pageIndex));

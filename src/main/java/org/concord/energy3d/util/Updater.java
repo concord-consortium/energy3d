@@ -45,7 +45,8 @@ public class Updater {
                         if (Getdown.isUpdateAvailable()) {
                             if (!messageShown) {
                                 EventQueue.invokeLater(() -> {
-                                    if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
+                                    if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(),
+                                            "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
                                         restartRequested = true;
                                         MainFrame.getInstance().exit();
                                     } else {
@@ -76,9 +77,7 @@ public class Updater {
         System.out.println("Updater.install()");
         try {
             Getdown.install();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        } catch (final InterruptedException e) {
+        } catch (final IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

@@ -18,165 +18,168 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SizeAnnotation extends Annotation {
-	private final Mesh arrows = new Mesh("Arrows");
-	private ReadOnlyVector3 from;
-	private ReadOnlyVector3 to;
-	private ReadOnlyVector3 center;
-	private ReadOnlyVector3 faceDirection;
-	private Align align;
-	private boolean front;
-	private boolean autoFlipOffset;
-	private boolean upsideDownText;
-	private boolean drawInside;
 
-	public SizeAnnotation() {
-		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
-		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		arrows.setModelBound(null);
-		Util.disablePickShadowLight(arrows);
-		setColor(ColorRGBA.BLACK);
-		attachChild(arrows);
-		attachChild(label);
-	}
+    private final Mesh arrows = new Mesh("Arrows");
+    private ReadOnlyVector3 from;
+    private ReadOnlyVector3 to;
+    private ReadOnlyVector3 center;
+    private ReadOnlyVector3 faceDirection;
+    private Align align;
+    private boolean front;
+    private boolean autoFlipOffset;
+    private boolean upsideDownText;
+    private boolean drawInside;
 
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, final boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
-		if (Util.isEqual(from, to))
-			throw new RuntimeException("The 'from' and 'to' vectors are almost the same.");
-		this.from = from;
-		this.to = to;
-		this.center = center;
-		this.faceDirection = faceDirection;
-		this.front = front;
-		this.align = align;
-		this.autoFlipOffset = autoFlipOffset;
-		this.upsideDownText = upsideDownText;
-		this.drawInside = drawInside;
-		draw();
-	}
+    public SizeAnnotation() {
+        super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
+        arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+        arrows.setModelBound(null);
+        Util.disablePickShadowLight(arrows);
+        setColor(ColorRGBA.BLACK);
+        attachChild(arrows);
+        attachChild(label);
+    }
 
-	@Override
-	public void draw() {
-		final double C = 1.0;
-		final Vector3 v = new Vector3();
-		final Vector3 offset = new Vector3();
-		if (front && !drawInside)
-			offset.set(faceDirection).normalizeLocal().multiplyLocal(C).addLocal(0, 0, 0.05);
-		else {
-			offset.set(to).subtractLocal(from).normalizeLocal().crossLocal(faceDirection).multiplyLocal(C);
-			if (autoFlipOffset) {
-				v.set(from).subtractLocal(center).normalizeLocal();
-				if (v.dot(offset) < 0)
-					offset.negateLocal();
-			}
-		}
+    public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection,
+                         final boolean front, final Align align, final boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
+        if (Util.isEqual(from, to))
+            throw new RuntimeException("The 'from' and 'to' vectors are almost the same.");
+        this.from = from;
+        this.to = to;
+        this.center = center;
+        this.faceDirection = faceDirection;
+        this.front = front;
+        this.align = align;
+        this.autoFlipOffset = autoFlipOffset;
+        this.upsideDownText = upsideDownText;
+        this.drawInside = drawInside;
+        draw();
+    }
 
-		if (drawInside)
-			offset.negateLocal();
+    @Override
+    public void draw() {
+        final double C = 1.0;
+        final Vector3 v = new Vector3();
+        final Vector3 offset = new Vector3();
+        if (front && !drawInside)
+            offset.set(faceDirection).normalizeLocal().multiplyLocal(C).addLocal(0, 0, 0.05);
+        else {
+            offset.set(to).subtractLocal(from).normalizeLocal().crossLocal(faceDirection).multiplyLocal(C);
+            if (autoFlipOffset) {
+                v.set(from).subtractLocal(center).normalizeLocal();
+                if (v.dot(offset) < 0)
+                    offset.negateLocal();
+            }
+        }
 
-		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
-		final int scale = upsideDownText ? -1 : 1;
+        if (drawInside)
+            offset.negateLocal();
 
-		final Vector3 xdir = dir.multiply(scale, null);
-		final Vector3 ydir = faceDirection.normalize(null);
-		final Vector3 zdir = ydir.cross(xdir, null).normalizeLocal();
-		zdir.cross(ydir, xdir);
-		if (zdir.dot(Vector3.UNIT_Z) < 0) {
-			zdir.negateLocal();
-			xdir.negateLocal();
-		}
-		final Matrix3 matrix = new Matrix3().fromAxes(xdir, ydir, zdir);
-		label.setRotation(matrix);
+        final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
+        final int scale = upsideDownText ? -1 : 1;
 
-		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
+        final Vector3 xdir = dir.multiply(scale, null);
+        final Vector3 ydir = faceDirection.normalize(null);
+        final Vector3 zdir = ydir.cross(xdir, null).normalizeLocal();
+        zdir.cross(ydir, xdir);
+        if (zdir.dot(Vector3.UNIT_Z) < 0) {
+            zdir.negateLocal();
+            xdir.negateLocal();
+        }
+        final Matrix3 matrix = new Matrix3().fromAxes(xdir, ydir, zdir);
+        label.setRotation(matrix);
 
-		// main line
-		final Vector3 newFrom = new Vector3(from).addLocal(offset);
-		final Vector3 newTo = new Vector3(to).addLocal(offset);
-		final Vector3 middle = new Vector3(newFrom).addLocal(newTo).multiplyLocal(0.5);
-		final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
+        FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+        vertexBuffer.rewind();
 
-		label.setTranslation(middle);
-		final DecimalFormat df = new DecimalFormat("#.##");
-		double length = to.subtract(from, null).length() * Scene.getInstance().getScale();
-		switch (Scene.getInstance().getUnit()) {
-		case InternationalSystemOfUnits:
-			label.setText(df.format(length) + " m");
-			break;
-		case USCustomaryUnits:
-			label.setText(df.format(length * 3.28084) + " ft");
-			break;
-		}
-		label.setAlign(align);
-		label.updateWorldTransform(true);
-		label.updateWorldBound(true);
+        // main line
+        final Vector3 newFrom = new Vector3(from).addLocal(offset);
+        final Vector3 newTo = new Vector3(to).addLocal(offset);
+        final Vector3 middle = new Vector3(newFrom).addLocal(newTo).multiplyLocal(0.5);
+        final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
 
-		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
-		final double bankSpace = label.getWidth() * 0.70;
-		final double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
-		v.set(body).multiplyLocal(blankSpaceFactor).addLocal(newFrom);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(body).multiplyLocal(-blankSpaceFactor).addLocal(newTo);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		vertexBuffer.put(newTo.getXf()).put(newTo.getYf()).put(newTo.getZf());
+        label.setTranslation(middle);
+        final DecimalFormat df = new DecimalFormat("#.##");
+        double length = to.subtract(from, null).length() * Scene.getInstance().getScale();
+        switch (Scene.getInstance().getUnit()) {
+            case InternationalSystemOfUnits:
+                label.setText(df.format(length) + " m");
+                break;
+            case USCustomaryUnits:
+                label.setText(df.format(length * 3.28084) + " ft");
+                break;
+        }
+        label.setAlign(align);
+        label.updateWorldTransform(true);
+        label.updateWorldBound(true);
 
-		offset.multiplyLocal(0.5);
-		// from End
-		v.set(from);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(newFrom).addLocal(offset);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
+        final double bankSpace = label.getWidth() * 0.70;
+        final double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
+        v.set(body).multiplyLocal(blankSpaceFactor).addLocal(newFrom);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.set(body).multiplyLocal(-blankSpaceFactor).addLocal(newTo);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        vertexBuffer.put(newTo.getXf()).put(newTo.getYf()).put(newTo.getZf());
 
-		// to End
-		v.set(to);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(newTo).addLocal(offset);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        offset.multiplyLocal(0.5);
+        // from End
+        v.set(from);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.set(newFrom).addLocal(offset);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
-		// arrow
-		offset.multiplyLocal(0.5);
-		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.5);
+        // to End
+        v.set(to);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.set(newTo).addLocal(offset);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
-		mesh.updateModelBound();
+        // arrow
+        offset.multiplyLocal(0.5);
+        body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.5);
 
-		vertexBuffer = arrows.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
-		// arrow from
-		v.set(newFrom);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.addLocal(offset).addLocal(body);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(newFrom).subtractLocal(offset).addLocal(body);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		// arrow to
-		body.negateLocal();
-		v.set(newTo);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.addLocal(offset).addLocal(body);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(newTo).subtractLocal(offset).addLocal(body);
-		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        mesh.updateModelBound();
 
-		arrows.updateModelBound();
+        vertexBuffer = arrows.getMeshData().getVertexBuffer();
+        vertexBuffer.rewind();
+        // arrow from
+        v.set(newFrom);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.addLocal(offset).addLocal(body);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.set(newFrom).subtractLocal(offset).addLocal(body);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        // arrow to
+        body.negateLocal();
+        v.set(newTo);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.addLocal(offset).addLocal(body);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+        v.set(newTo).subtractLocal(offset).addLocal(body);
+        vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
-		updateWorldTransform(true);
-		updateWorldBound(true);
-	}
+        arrows.updateModelBound();
 
-	@Override
-	public void setColor(final ReadOnlyColorRGBA color) {
-		super.setColor(color);
-		arrows.setDefaultColor(color);
-	}
+        updateWorldTransform(true);
+        updateWorldBound(true);
+    }
 
-	@Override
-	public Node makeCopy(final boolean shareGeometricData) {
-		// get copy of basic spatial info
-		final Node node = super.makeCopy(shareGeometricData);
-		// because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
-		node.detachChildAt(5);
-		node.detachChildAt(4);
-		node.detachChildAt(3);
-		return node;
-	}
+    @Override
+    public void setColor(final ReadOnlyColorRGBA color) {
+        super.setColor(color);
+        arrows.setDefaultColor(color);
+    }
+
+    @Override
+    public Node makeCopy(final boolean shareGeometricData) {
+        // get copy of basic spatial info
+        final Node node = super.makeCopy(shareGeometricData);
+        // because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
+        node.detachChildAt(5);
+        node.detachChildAt(4);
+        node.detachChildAt(3);
+        return node;
+    }
+
 }

@@ -13,7 +13,7 @@ public class PolygonWithHoles extends Polygon {
         super(points);
     }
 
-    public ArrayList<Polygon> getHoles() {
+    ArrayList<Polygon> getHoles() {
         return _holes;
     }
 

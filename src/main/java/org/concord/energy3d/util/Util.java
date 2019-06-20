@@ -18,7 +18,6 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -101,10 +100,7 @@ public class Util {
         if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
             return true;
         }
-        if (Config.isMac() && e.isControlDown()) {
-            return true;
-        }
-        return false;
+        return Config.isMac() && e.isControlDown();
     }
 
     public static double sum(final double[] array) {
@@ -143,13 +139,7 @@ public class Util {
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(final Map<K, V> map, final boolean ascending) {
         final List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(final Map.Entry<K, V> o1, final Map.Entry<K, V> o2) {
-                return (ascending ? 1 : -1) * o1.getValue().compareTo(o2.getValue());
-            }
-        });
-
+        Collections.sort(list, (o1, o2) -> (ascending ? 1 : -1) * o1.getValue().compareTo(o2.getValue()));
         final Map<K, V> result = new LinkedHashMap<K, V>();
         for (final Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
@@ -275,18 +265,14 @@ public class Util {
             p1 = p2;
         }
 
-        if (counter % 2 == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return counter % 2 != 0;
     }
 
-    public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
+    static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
         return makePath2D(polygon).contains(new Point2D.Double(p.getX(), p.getY()));
     }
 
-    public static Path2D makePath2D(final List<? extends Point> polygon) {
+    static Path2D makePath2D(final List<? extends Point> polygon) {
         final Path2D path = new Path2D.Double();
         path.moveTo(polygon.get(0).getX(), polygon.get(0).getY());
         for (int i = 1; i < polygon.size(); i++) {
@@ -357,8 +343,7 @@ public class Util {
         if (l2 == 0.0) {
             return 0.0;
         }
-        final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
-        return t;
+        return point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2;
     }
 
     /**
@@ -535,11 +520,11 @@ public class Util {
         return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
     }
 
-    public final static void openBrowser(final URL url) {
+    public static void openBrowser(final URL url) {
         openBrowser(url.toString());
     }
 
-    public final static void openBrowser(final String url) {
+    public static void openBrowser(final String url) {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
@@ -725,7 +710,7 @@ public class Util {
         });
     }
 
-    public static JButton getButtonSubComponent(final Container container) {
+    private static JButton getButtonSubComponent(final Container container) {
         if (container instanceof JButton) {
             return (JButton) container;
         } else {

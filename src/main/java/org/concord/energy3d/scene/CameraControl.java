@@ -197,12 +197,12 @@ public abstract class CameraControl {
         this.enabled = enabled;
     }
 
-    public void setMouseButtonActions(final ButtonAction leftButtonAction, final ButtonAction rightButtonAction) {
+    void setMouseButtonActions(final ButtonAction leftButtonAction, final ButtonAction rightButtonAction) {
         this.leftButtonAction = leftButtonAction;
         this.rightButtonAction = rightButtonAction;
     }
 
-    public void setMouseEnabled(final boolean enabled) {
+    void setMouseEnabled(final boolean enabled) {
         mouseEnabled = enabled;
     }
 

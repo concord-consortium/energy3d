@@ -246,4 +246,5 @@ public class SelectUtil {
     public static void setCurrentEditPointMesh(final Mesh currentEditPointMesh) {
         SelectUtil.currentEditPointMesh = currentEditPointMesh;
     }
+
 }

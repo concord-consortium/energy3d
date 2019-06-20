@@ -9,11 +9,11 @@ public class ExtensionFileFilter extends FileFilter {
     private String description;
     private final String[] extensions;
 
-    public ExtensionFileFilter(final String description, final String extension) {
+    ExtensionFileFilter(final String description, final String extension) {
         this(description, new String[]{extension});
     }
 
-    public ExtensionFileFilter(final String description, final String extensions[]) {
+    private ExtensionFileFilter(final String description, final String[] extensions) {
         if (description == null) {
             this.description = extensions[0] + "{ " + extensions.length + "} ";
         } else {

@@ -230,7 +230,7 @@ public abstract class Roof extends HousePart implements Thermal {
         ensureEditPointsInside();
         final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
         applySteinerPoint(polygon);
-        MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null, false);
+        MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
         MeshLib.groupByPlanar(mesh, roofPartsRoot);
         hideGableRoofParts();
         int roofPartIndex = 0;

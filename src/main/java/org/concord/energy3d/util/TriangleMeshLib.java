@@ -50,7 +50,7 @@ public class TriangleMeshLib {
         final Vector3 v1 = new Vector3();
         final Vector3 v2 = new Vector3();
         final Vector3 normal = new Vector3();
-        final ArrayList<GroupData> groups = new ArrayList<GroupData>();
+        final ArrayList<GroupData> groups = new ArrayList<>();
         for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
             final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
             final Vector3 p2 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());

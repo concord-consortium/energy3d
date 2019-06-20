@@ -48,9 +48,9 @@ public class MeshLib {
 
     static class GroupData {
         final Vector3 key = new Vector3();
-        final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
-        final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
-        final ArrayList<ReadOnlyVector2> textures = new ArrayList<ReadOnlyVector2>();
+        final ArrayList<ReadOnlyVector3> vertices = new ArrayList<>();
+        final ArrayList<ReadOnlyVector3> normals = new ArrayList<>();
+        final ArrayList<ReadOnlyVector2> textures = new ArrayList<>();
         Image textureImage;
     }
 
@@ -100,7 +100,7 @@ public class MeshLib {
         return groups;
     }
 
-    static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+    private static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
         boolean foundEdgeInCommon = false;
         for (int j = 0; j < group.vertices.size() && !foundEdgeInCommon; j += 3) {
             int numOfShared = 0;
@@ -153,7 +153,7 @@ public class MeshLib {
         return a.dot(b) > 0.999;
     }
 
-    public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
+    private static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
         if (groups.size() != root.getNumberOfChildren()) {
             root.detachAllChildren();
         }
@@ -257,7 +257,7 @@ public class MeshLib {
 
                 final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
                 final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());
-                final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
+                final List<PolygonPoint> points2D = new ArrayList<>();
 
                 final ReadOnlyVector3 firstPoint = points3D.get(0);
                 final double scale = textureType == HousePart.TEXTURE_EDGE ? 0.5 : 0.1;
@@ -338,7 +338,7 @@ public class MeshLib {
 
                 final Mesh meshWithHoles = (Mesh) ((Node) roofPart).getChild(6);
                 try {
-                    fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
+                    fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u);
                 } catch (final RuntimeException e) {
                     e.printStackTrace();
                     final Mesh meshWithoutHoles = (Mesh) ((Node) roofPart).getChild(0);
@@ -371,7 +371,7 @@ public class MeshLib {
             }
         }
 
-        final ArrayList<ReadOnlyVector3> outlinePoints = new ArrayList<ReadOnlyVector3>();
+        final ArrayList<ReadOnlyVector3> outlinePoints = new ArrayList<>();
         for (final LineSegment3 line : visitMap.keySet()) {
             if (visitMap.get(line)) {
                 final Vector3 negativeEnd = line.getNegativeEnd(null);
@@ -380,7 +380,7 @@ public class MeshLib {
             }
         }
 
-        final ArrayList<ReadOnlyVector3> sortedOutlinePoints = new ArrayList<ReadOnlyVector3>(outlinePoints.size() / 2);
+        final ArrayList<ReadOnlyVector3> sortedOutlinePoints = new ArrayList<>(outlinePoints.size() / 2);
         sortedOutlinePoints.add(outlinePoints.get(0));
         ReadOnlyVector3 lastPoint = outlinePoints.get(1);
         sortedOutlinePoints.add(lastPoint);
@@ -427,7 +427,8 @@ public class MeshLib {
     // return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
     // }
 
-    public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v, final boolean isWall) {
+    public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon,
+                                           final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
         /* round all points */
         for (final Point p : polygon.getPoints()) {
             p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
@@ -444,7 +445,7 @@ public class MeshLib {
         if (polygon.getHoles() != null) {
             // ensure polygon doesn't collide with holes
             final Path2D polygonPath = Util.makePath2D(polygon.getPoints());
-            final Map<Polygon, Object> skipHoles = new HashMap<Polygon, Object>();
+            final Map<Polygon, Object> skipHoles = new HashMap<>();
             for (final Polygon hole : polygon.getHoles()) {
                 for (final Point p : hole.getPoints()) {
                     if (!polygonPath.contains(new Point2D.Double(p.getX(), p.getY()))) {

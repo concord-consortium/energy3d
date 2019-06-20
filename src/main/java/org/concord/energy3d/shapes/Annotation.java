@@ -14,52 +14,53 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
 
-	protected final Line mesh;
-	protected final BMText label = makeNewLabel(1);
+    protected final Line mesh;
+    protected final BMText label = makeNewLabel(1);
 
-	public void setFontSize(final double fontSize) {
-		label.setFontScale(fontSize);
-	}
+    public void setFontSize(final double fontSize) {
+        label.setFontScale(fontSize);
+    }
 
-	public static BMText makeNewLabel(final double fontSize) {
-		final BMText label = new BMText("Annotation Label", "", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
-		label.setTextColor(ColorRGBA.BLACK);
-		label.setAutoScale(AutoScale.Off);
-		label.setFontScale(fontSize);
-		label.setAutoRotate(false);
-		label.setAutoFade(AutoFade.Off);
-		label.setModelBound(null);
-		label.updateWorldTransform(true);
-		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
-		return label;
-	}
+    public static BMText makeNewLabel(final double fontSize) {
+        final BMText label = new BMText("Annotation Label", "", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
+        label.setTextColor(ColorRGBA.BLACK);
+        label.setAutoScale(AutoScale.Off);
+        label.setFontScale(fontSize);
+        label.setAutoRotate(false);
+        label.setAutoFade(AutoFade.Off);
+        label.setModelBound(null);
+        label.updateWorldTransform(true);
+        label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
+        return label;
+    }
 
-	public Annotation(final Line mesh) {
-		super();
-		mesh.setDefaultColor(ColorRGBA.BLACK);
-		mesh.setModelBound(null);
-		this.mesh = mesh;
-		Util.disablePickShadowLight(mesh);
-		attachChild(mesh);
-	}
+    Annotation(final Line mesh) {
+        super();
+        mesh.setDefaultColor(ColorRGBA.BLACK);
+        mesh.setModelBound(null);
+        this.mesh = mesh;
+        Util.disablePickShadowLight(mesh);
+        attachChild(mesh);
+    }
 
-	public void setVisible(final boolean visible) {
-		mesh.setVisible(visible);
-		label.setVisible(visible);
-	}
+    public void setVisible(final boolean visible) {
+        mesh.setVisible(visible);
+        label.setVisible(visible);
+    }
 
-	public void setColor(final ReadOnlyColorRGBA color) {
-		mesh.setDefaultColor(color);
-		label.setTextColor(color);
-	}
+    public void setColor(final ReadOnlyColorRGBA color) {
+        mesh.setDefaultColor(color);
+        label.setTextColor(color);
+    }
 
-	public void setLineWidth(final float lineWidth) {
-		mesh.setLineWidth(lineWidth);
-	}
+    public void setLineWidth(final float lineWidth) {
+        mesh.setLineWidth(lineWidth);
+    }
 
-	public void setStipplePattern(final short stipplePattern) {
-		mesh.setStipplePattern(stipplePattern);
-	}
+    public void setStipplePattern(final short stipplePattern) {
+        mesh.setStipplePattern(stipplePattern);
+    }
 
-	public abstract void draw();
+    public abstract void draw();
+
 }

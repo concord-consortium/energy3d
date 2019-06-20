@@ -776,9 +776,9 @@ public class Wall extends HousePart implements Thermal {
             final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
             toXY.transform(o);
             toXY.transform(u);
-            MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v, true);
+            MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v);
         } else {
-            MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null, true);
+            MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null);
         }
     }
 
