@@ -47,24 +47,29 @@ class GlobalMap extends JDialog {
             if (!s.equals("")) {
                 final String[] t = s.split(",");
                 t[0] = t[0].trim();
-                if (t.length == 1) {
-                    final ArrayList<String> list = new ArrayList<>();
-                    list.add(t[0]);
-                    countries.put(t[0], list);
+                if (t[0].equals("Amundsen-Scott Station")) { // special case
+                    final ArrayList<String> list = countries.get("United States");
+                    list.add(s);
                 } else {
-                    t[1] = t[1].trim();
-                    if (t[1].length() == 2) {
-                        if (!countries.keySet().contains("United States")) {
-                            countries.put("United States", new ArrayList<>());
-                        }
-                        final ArrayList<String> list = countries.get("United States");
-                        list.add(s);
-                    } else {
-                        if (!countries.keySet().contains((t[1]))) {
-                            countries.put(t[1], new ArrayList<>());
-                        }
-                        final ArrayList<String> list = countries.get(t[1]);
+                    if (t.length == 1) {
+                        final ArrayList<String> list = new ArrayList<>();
                         list.add(t[0]);
+                        countries.put(t[0], list);
+                    } else {
+                        t[1] = t[1].trim();
+                        if (t[1].length() == 2) {
+                            if (!countries.keySet().contains("United States")) {
+                                countries.put("United States", new ArrayList<>());
+                            }
+                            final ArrayList<String> list = countries.get("United States");
+                            list.add(s);
+                        } else {
+                            if (!countries.keySet().contains((t[1]))) {
+                                countries.put(t[1], new ArrayList<>());
+                            }
+                            final ArrayList<String> list = countries.get(t[1]);
+                            list.add(t[0]);
+                        }
                     }
                 }
             }

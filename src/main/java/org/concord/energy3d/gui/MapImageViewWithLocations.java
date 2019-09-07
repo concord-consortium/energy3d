@@ -50,7 +50,7 @@ class MapImageViewWithLocations extends MapImageView {
             ellipse.width += 1;
             ellipse.height += 1;
             ellipse.x = x - ellipse.width * 0.5;
-            ellipse.y = (s.equals("South Pole") ? height : y) - ellipse.height * 0.5;
+            ellipse.y = (s.equals("Amundsen-Scott Station") ? height - ellipse.height : y) - ellipse.height * 0.5; // special case, lift south pole up a bit
             g2.draw(ellipse);
         }
         final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -62,14 +62,14 @@ class MapImageViewWithLocations extends MapImageView {
             ellipse.width = 5;
             ellipse.height = 5;
             ellipse.x = x - ellipse.width * 0.5;
-            ellipse.y = y - ellipse.height * 0.5;
+            ellipse.y = (current.equals("Amundsen-Scott Station") ? height - ellipse.height : y) - ellipse.height * 0.5; // special case, lift south pole up a bit
             g2.setColor(Color.RED);
             g2.fill(ellipse);
             g2.setColor(Color.BLACK);
             ellipse.width += 1;
             ellipse.height += 1;
             ellipse.x = x - ellipse.width * 0.5;
-            ellipse.y = y - ellipse.height * 0.5;
+            ellipse.y = (current.equals("Amundsen-Scott Station") ? height - ellipse.height : y) - ellipse.height * 0.5; // special case, lift south pole up a bit
             g2.draw(ellipse);
         }
     }
