@@ -327,56 +327,50 @@ class PopupMenuForWindow extends PopupMenuFactory {
             final JCheckBoxMenuItem cbmiRightShutter = new JCheckBoxMenuItem("Right Shutter");
 
             cbmiLeftShutter.addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Window) {
-                        final Window w = (Window) selectedPart;
-                        final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-                        SceneManager.getTaskManager().update(() -> {
-                            w.setLeftShutter(cbmiLeftShutter.isSelected());
-                            w.draw();
-                            return null;
-                        });
-                        Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                    }
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Window) {
+                    final Window w = (Window) selectedPart;
+                    final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+                    SceneManager.getTaskManager().update(() -> {
+                        w.setLeftShutter(cbmiLeftShutter.isSelected());
+                        w.draw();
+                        return null;
+                    });
+                    Scene.getInstance().setEdited(true);
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
             shutterMenu.add(cbmiLeftShutter);
 
             cbmiRightShutter.addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Window) {
-                        final Window w = (Window) selectedPart;
-                        final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-                        SceneManager.getTaskManager().update(() -> {
-                            w.setRightShutter(cbmiRightShutter.isSelected());
-                            w.draw();
-                            return null;
-                        });
-                        Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                    }
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Window) {
+                    final Window w = (Window) selectedPart;
+                    final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+                    SceneManager.getTaskManager().update(() -> {
+                        w.setRightShutter(cbmiRightShutter.isSelected());
+                        w.draw();
+                        return null;
+                    });
+                    Scene.getInstance().setEdited(true);
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
             shutterMenu.add(cbmiRightShutter);
 
             cbmiBothShutters.addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                    if (selectedPart instanceof Window) {
-                        final Window w = (Window) selectedPart;
-                        final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-                        SceneManager.getTaskManager().update(() -> {
-                            w.setLeftShutter(cbmiBothShutters.isSelected());
-                            w.setRightShutter(cbmiBothShutters.isSelected());
-                            w.draw();
-                            return null;
-                        });
-                        Scene.getInstance().setEdited(true);
-                        SceneManager.getInstance().getUndoManager().addEdit(c);
-                    }
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Window) {
+                    final Window w = (Window) selectedPart;
+                    final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+                    SceneManager.getTaskManager().update(() -> {
+                        w.setLeftShutter(cbmiBothShutters.isSelected());
+                        w.setRightShutter(cbmiBothShutters.isSelected());
+                        w.draw();
+                        return null;
+                    });
+                    Scene.getInstance().setEdited(true);
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
                 }
             });
             shutterMenu.add(cbmiBothShutters);
