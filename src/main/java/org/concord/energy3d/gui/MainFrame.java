@@ -1368,6 +1368,7 @@ public class MainFrame extends JFrame {
             addModel(pvSolarMenu, "Solar Facades: Example 1", "templates/example-solar-facade1.ng3");
             addModel(pvSolarMenu, "Solar Facades: Example 2", "templates/example-solar-facade2.ng3");
             addModel(pvSolarMenu, "Solar Facades: Example 3", "templates/example-solar-facade3.ng3");
+            addModel(pvSolarMenu, "Solar Facades: Example 4", "templates/example-solar-facade4.ng3");
             addModel(pvSolarMenu, "Agrivoltaics: Example 1", "templates/example-agrivoltaics-01.ng3");
             examplesMenu.add(pvSolarMenu);
             final JMenu cspSolarMenu = new JMenu("Concentrated Solar Power Systems");
