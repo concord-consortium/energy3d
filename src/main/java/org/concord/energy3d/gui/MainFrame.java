@@ -1136,7 +1136,7 @@ public class MainFrame extends JFrame {
             acknowledge += "Guanhua Chen, Amos Decker, Maya Haigis, Xudong Huang, Shiyan Jiang,<br>";
             acknowledge += "Mark Liao, Shasha Liu, Jeff Lockwood, Joy Massicotte, Ethan McElroy, Scott Ogle,<br>";
             acknowledge += "Cormac Paterson, Allison Pearson, Molla Rahman, Corey Schimpf, Elena Sereiviene,<br>";
-            acknowledge += "Zhenghui Sha, Helen Zhang";
+            acknowledge += "Zhenghui Sha, Shannon Sung, Helen Zhang";
             p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
             final JButton button = new JButton("Close");
             button.addActionListener(e -> aboutDialog.dispose());
