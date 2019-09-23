@@ -55,6 +55,7 @@ public abstract class Graph extends JPanel {
 
     public final static int LINE_CHART = 0;
     public final static int AREA_CHART = 1;
+    public final static int BAR_CHART = 2;
 
     final static DecimalFormat ONE_DECIMAL = new DecimalFormat();
     final static DecimalFormat TWO_DECIMALS = new DecimalFormat();
@@ -125,6 +126,17 @@ public abstract class Graph extends JPanel {
                 final JMenu chartMenu = new JMenu("Chart");
                 final ButtonGroup chartGroup = new ButtonGroup();
                 popupMenu.add(chartMenu);
+
+                final JRadioButtonMenuItem miBar = new JRadioButtonMenuItem("Bar");
+                miBar.addItemListener(e1 -> {
+                    if (e1.getStateChange() == ItemEvent.SELECTED) {
+                        setGraphType(Graph.BAR_CHART);
+                        Graph.this.repaint();
+                    }
+                });
+                chartMenu.add(miBar);
+                chartGroup.add(miBar);
+                miBar.setSelected(graphType == BAR_CHART);
 
                 final JRadioButtonMenuItem miLine = new JRadioButtonMenuItem("Line");
                 miLine.addItemListener(e1 -> {
@@ -706,6 +718,9 @@ public abstract class Graph extends JPanel {
                             g2.draw(path);
                             break;
 
+                        case BAR_CHART:
+                            break;
+
                     }
 
                 }
@@ -799,6 +814,9 @@ public abstract class Graph extends JPanel {
                     }
 
                     switch (graphType) {
+
+                        case BAR_CHART:
+                            break;
 
                         case LINE_CHART:
                             g2.setColor(Color.BLACK);

@@ -344,6 +344,28 @@ class MyEditorPane {
             new EventString().showGui();
         }
 
+        // date commands
+        else if (act.startsWith("date://")) {
+            String s = act.substring(7).trim();
+            try {
+                EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
+                Heliodon.getInstance().setDate((Date) EnergyPanel.getInstance().getDateSpinner().getValue());
+            } catch (final ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // time commands
+        else if (act.startsWith("time://")) {
+            String s = act.substring(7).trim();
+            try {
+                EnergyPanel.getInstance().getTimeSpinner().setValue(new SimpleDateFormat("h:mm a").parse(s));
+                Heliodon.getInstance().setTime((Date) EnergyPanel.getInstance().getTimeSpinner().getValue());
+            } catch (final ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
         // heliodon commands
         else if ("Heliodon".equals(act)) {
             MainPanel.getInstance().getHeliodonButton().setSelected(buttonModel.isSelected());

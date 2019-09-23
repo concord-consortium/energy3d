@@ -55,6 +55,17 @@ abstract class AnnualAnalysis extends Analysis {
         final ButtonGroup chartGroup = new ButtonGroup();
         menu.add(chartMenu);
 
+        final JRadioButtonMenuItem miBar = new JRadioButtonMenuItem("Bar");
+        miBar.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                graph.setGraphType(Graph.BAR_CHART);
+                graph.repaint();
+            }
+        });
+        chartMenu.add(miBar);
+        chartGroup.add(miBar);
+        miBar.setSelected(graph.getGraphType() == Graph.BAR_CHART);
+
         final JRadioButtonMenuItem miLine = new JRadioButtonMenuItem("Line");
         miLine.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {

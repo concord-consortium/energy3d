@@ -1437,7 +1437,7 @@ public class MainFrame extends JFrame {
 
             final JMenu solarBasicsMenu = new JMenu("Solar Science Basics");
             tutorialsMenu.add(solarBasicsMenu);
-            addModel(solarBasicsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
+            addModel(solarBasicsMenu, "Sun Path", "tutorials/sun-path.ng3");
             addModel(solarBasicsMenu, "Solar Box", "tutorials/solar-box.ng3");
             addModel(solarBasicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
             addModel(solarBasicsMenu, "Solar Analysis of Cities", "tutorials/city-block.ng3");
