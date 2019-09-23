@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultButtonModel;
@@ -49,6 +50,7 @@ import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
@@ -102,6 +104,14 @@ class MyEditorPane {
                                     try {
                                         EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
                                         Heliodon.getInstance().setDate((Date) EnergyPanel.getInstance().getDateSpinner().getValue());
+                                    } catch (final ParseException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                } else if (s.startsWith("href=time://")) {
+                                    s = s.substring(12).trim();
+                                    try {
+                                        EnergyPanel.getInstance().getTimeSpinner().setValue(new SimpleDateFormat("h:mm a").parse(s));
+                                        Heliodon.getInstance().setTime((Date) EnergyPanel.getInstance().getTimeSpinner().getValue());
                                     } catch (final ParseException e1) {
                                         e1.printStackTrace();
                                     }
@@ -344,15 +354,32 @@ class MyEditorPane {
             new EventString().showGui();
         }
 
+        // goto commands
+        else if (act.startsWith("goto://")) {
+            String s = act.substring(7).trim();
+            EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s);
+        }
+
         // date commands
         else if (act.startsWith("date://")) {
             String s = act.substring(7).trim();
             try {
                 EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
-                Heliodon.getInstance().setDate((Date) EnergyPanel.getInstance().getDateSpinner().getValue());
             } catch (final ParseException e) {
                 e.printStackTrace();
             }
+            final Date date = (Date) EnergyPanel.getInstance().getDateSpinner().getValue();
+            EnergyPanel.getInstance().updateWeatherData();
+            EnergyPanel.getInstance().updateThermostat();
+            Scene.getInstance().setDate(date);
+            Scene.getInstance().updateTreeLeaves();
+            Scene.getInstance().updateTrackables();
+            Heliodon.getInstance().setDate(date);
+            SceneManager.getTaskManager().update(() -> {
+                SceneManager.getInstance().changeSkyTexture();
+                SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+                return null;
+            });
         }
 
         // time commands

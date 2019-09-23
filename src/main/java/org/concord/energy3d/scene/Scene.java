@@ -406,14 +406,14 @@ public class Scene implements Serializable {
                 JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
             }
             Scene.getInstance().updateTreeLeaves();
+            Heliodon.getInstance().drawSun();
             SceneManager.getInstance().changeSkyTexture();
+            SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
             if (!first) {
                 SceneManager.getInstance().setHeliodonVisible(isHeliodonVisible);
                 Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), isHeliodonVisible);
                 EventQueue.invokeLater(() -> MainPanel.getInstance().getSunAnimationButton().setEnabled(isHeliodonVisible || SceneManager.getInstance().isShadowEnabled()));
             }
-            Heliodon.getInstance().drawSun();
-            SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
         }
 
         // previous versions do not have the following classes

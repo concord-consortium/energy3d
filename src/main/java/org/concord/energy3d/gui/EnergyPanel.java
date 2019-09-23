@@ -245,14 +245,10 @@ public class EnergyPanel extends JPanel {
                     if (SceneManager.getInstance().getSolarHeatMap()) {
                         updateRadiationHeatMap();
                     }
-                    Scene.getInstance().updateTreeLeaves();
-                    Scene.getInstance().updateTrackables();
+                    updateScene();
                     Scene.getInstance().setEdited(true);
-                    updateWeatherData();
-                    updateThermostat();
-                    EnergyPanel.this.validate();
-                    lastDate = d;
                     SceneManager.getInstance().getUndoManager().addEdit(c);
+                    lastDate = d;
                 }
             }
         });
@@ -279,9 +275,6 @@ public class EnergyPanel extends JPanel {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 final String city = (String) regionComboBox.getSelectedItem();
                 if (city.equals("")) {
-                    if (SceneManager.getInstance().getSolarHeatMap()) {
-                        updateRadiationHeatMap();
-                    }
                     JOptionPane.showMessageDialog(MainFrame.getInstance(), "No region is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
                     Scene.getInstance().setCity(city);
                 } else {
@@ -290,17 +283,15 @@ public class EnergyPanel extends JPanel {
                         return;
                     }
                     setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
-                    if (SceneManager.getInstance().getSolarHeatMap()) {
-                        updateRadiationHeatMap();
-                    }
                     Scene.getInstance().setCity(city);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     final LocationData ld = LocationData.getInstance();
                     regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
                 }
-                Scene.getInstance().updateTrackables();
-                Scene.getInstance().updateTreeLeaves();
-                updateWeatherData();
+                if (SceneManager.getInstance().getSolarHeatMap()) {
+                    updateRadiationHeatMap();
+                }
+                updateScene();
                 Scene.getInstance().setEdited(true);
             }
         });
@@ -366,17 +357,9 @@ public class EnergyPanel extends JPanel {
                 }
                 Heliodon.getInstance().setTime(d);
                 Scene.getInstance().setDate(d);
-                updateWeatherData();
-                updateThermostat();
-                Scene.getInstance().setEdited(true);
-                SceneManager.getInstance().changeSkyTexture();
-                SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
-                // if (MainPanel.getInstance().getShadowButton().isSelected()) {
-                // SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
-                // } else {
-                // SceneManager.getInstance().setShading(false);
-                // }
-                if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
+                updateScene();
+                // for now, only heat flow arrows need to call redrawAll
+                if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) {
                     SceneManager.getInstance().setHeatFluxDaily(false);
                     SceneManager.getTaskManager().update(() -> {
                         for (final HousePart part : Scene.getInstance().getParts()) {
@@ -385,9 +368,9 @@ public class EnergyPanel extends JPanel {
                         return null;
                     });
                 }
-                Scene.getInstance().updateTrackables();
-                lastDate = d;
+                Scene.getInstance().setEdited(true);
                 SceneManager.getInstance().getUndoManager().addEdit(c);
+                lastDate = d;
             }
         });
         final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
@@ -411,7 +394,7 @@ public class EnergyPanel extends JPanel {
             if (SceneManager.getInstance().getSolarHeatMap()) {
                 updateRadiationHeatMap();
             }
-            Scene.getInstance().updateTrackables();
+            updateScene();
             Scene.getInstance().setEdited(true);
             SceneManager.getInstance().getUndoManager().addEdit(c);
         });
@@ -829,6 +812,19 @@ public class EnergyPanel extends JPanel {
         progressBar = new JProgressBar();
         add(progressBar, BorderLayout.SOUTH);
 
+    }
+
+    private void updateScene() {
+        updateWeatherData();
+        updateThermostat();
+        SceneManager.getTaskManager().update(() -> {
+            Heliodon.getInstance().drawSun(); // we must call this to update the translation of the mesh so as to know if the sun is above the horizon
+            SceneManager.getInstance().changeSkyTexture();
+            SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+            Scene.getInstance().updateTrackables();
+            Scene.getInstance().updateTreeLeaves();
+            return null;
+        });
     }
 
     public void showInstructionTabHeaders(final boolean b) {
