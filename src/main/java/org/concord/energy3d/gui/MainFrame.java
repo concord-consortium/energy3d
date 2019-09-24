@@ -108,7 +108,10 @@ public class MainFrame extends JFrame {
     private JCheckBoxMenuItem onlySolarComponentsInSolarMapMenuItem;
     private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
     private JCheckBoxMenuItem axesMenuItem;
-    private JCheckBoxMenuItem sunAnglesMenuItem;
+    private JMenu sunAnglesMenu;
+    private JCheckBoxMenuItem zenithAngleMenuItem;
+    private JCheckBoxMenuItem elevationAngleMenuItem;
+    private JCheckBoxMenuItem azimuthAngleMenuItem;
     private JCheckBoxMenuItem lightBeamsMenuItem;
     private JCheckBoxMenuItem shadowMenuItem;
     private JCheckBoxMenuItem roofDashedLineMenuItem;
@@ -1438,6 +1441,7 @@ public class MainFrame extends JFrame {
             final JMenu solarBasicsMenu = new JMenu("Solar Science Basics");
             tutorialsMenu.add(solarBasicsMenu);
             addModel(solarBasicsMenu, "Sun Path", "tutorials/sun-path.ng3");
+            addModel(solarBasicsMenu, "Projection Effect", "tutorials/projection-effect.ng3");
             addModel(solarBasicsMenu, "Solar Box", "tutorials/solar-box.ng3");
             addModel(solarBasicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
             addModel(solarBasicsMenu, "Solar Analysis of Cities", "tutorials/city-block.ng3");
@@ -1539,14 +1543,16 @@ public class MainFrame extends JFrame {
                     Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
                     Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
                     Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
-                    Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
+                    Util.selectSilently(zenithAngleMenuItem, Scene.getInstance().isZenithAngleVisible());
+                    Util.selectSilently(elevationAngleMenuItem, Scene.getInstance().isElevationAngleVisible());
+                    Util.selectSilently(azimuthAngleMenuItem, Scene.getInstance().isAzimuthAngleVisible());
                     Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
                     Util.selectSilently(disableShadowInActionMenuItem, Scene.getInstance().getDisableShadowInAction());
                     Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
                     Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
                     Util.selectSilently(annotationsMenuItem, Scene.getInstance().areAnnotationsVisible());
                     MainPanel.getInstance().defaultTool();
-                    sunAnglesMenuItem.setEnabled(Heliodon.getInstance().isVisible());
+                    sunAnglesMenu.setEnabled(Heliodon.getInstance().isVisible());
                 }
             });
 
@@ -1555,6 +1561,11 @@ public class MainFrame extends JFrame {
             solarHeatMapMenu.add(getSolarAbsorptionHeatMapMenuItem());
             solarHeatMapMenu.add(getOnlyReflectionHeatMapMenuItem());
             solarHeatMapMenu.add(getShowSolarLandMenuItem());
+
+            sunAnglesMenu = new JMenu("Sun Angles");
+            sunAnglesMenu.add(getZenithAngleMenuItem());
+            sunAnglesMenu.add(getElevationAngleMenuItem());
+            sunAnglesMenu.add(getAzimuthAngleMenuItem());
 
             viewMenu.add(getVisualizationSettingsMenuItem());
             viewMenu.addSeparator();
@@ -1572,10 +1583,10 @@ public class MainFrame extends JFrame {
             viewMenu.addSeparator();
             viewMenu.add(getSolarRadiationHeatMapMenuItem());
             viewMenu.add(solarHeatMapMenu);
+            viewMenu.add(sunAnglesMenu);
             viewMenu.add(getHeatFluxMenuItem());
             viewMenu.add(getShadowMenuItem());
             viewMenu.add(getDisableShadowInActionMenuItem());
-            viewMenu.add(getSunAnglesMenuItem());
             viewMenu.add(getLightBeamsMenuItem());
             viewMenu.addSeparator();
             viewMenu.add(getAxesMenuItem());
@@ -1773,13 +1784,13 @@ public class MainFrame extends JFrame {
         return axesMenuItem;
     }
 
-    private JCheckBoxMenuItem getSunAnglesMenuItem() {
-        if (sunAnglesMenuItem == null) {
-            sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles with Heliodon");
-            sunAnglesMenuItem.addItemListener(e -> {
-                final ShowSunAnglesCommand c = new ShowSunAnglesCommand();
+    private JCheckBoxMenuItem getZenithAngleMenuItem() {
+        if (zenithAngleMenuItem == null) {
+            zenithAngleMenuItem = new JCheckBoxMenuItem("Zenith Angle");
+            zenithAngleMenuItem.addItemListener(e -> {
+                final ShowZenithAngleCommand c = new ShowZenithAngleCommand();
                 SceneManager.getTaskManager().update(() -> {
-                    Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
+                    Scene.getInstance().setZenithAngleVisible(zenithAngleMenuItem.isSelected());
                     Heliodon.getInstance().drawSunTriangle();
                     return null;
                 });
@@ -1787,7 +1798,41 @@ public class MainFrame extends JFrame {
                 SceneManager.getInstance().getUndoManager().addEdit(c);
             });
         }
-        return sunAnglesMenuItem;
+        return zenithAngleMenuItem;
+    }
+
+    private JCheckBoxMenuItem getElevationAngleMenuItem() {
+        if (elevationAngleMenuItem == null) {
+            elevationAngleMenuItem = new JCheckBoxMenuItem("Elevation Angle");
+            elevationAngleMenuItem.addItemListener(e -> {
+                final ShowElevationAngleCommand c = new ShowElevationAngleCommand();
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setElevationAngleVisible(elevationAngleMenuItem.isSelected());
+                    Heliodon.getInstance().drawSunTriangle();
+                    return null;
+                });
+                Scene.getInstance().setEdited(true);
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+            });
+        }
+        return elevationAngleMenuItem;
+    }
+
+    private JCheckBoxMenuItem getAzimuthAngleMenuItem() {
+        if (azimuthAngleMenuItem == null) {
+            azimuthAngleMenuItem = new JCheckBoxMenuItem("Azimuth Angle");
+            azimuthAngleMenuItem.addItemListener(e -> {
+                final ShowAzimuthAngleCommand c = new ShowAzimuthAngleCommand();
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().setAzimuthAngleVisible(azimuthAngleMenuItem.isSelected());
+                    Heliodon.getInstance().drawSunTriangle();
+                    return null;
+                });
+                Scene.getInstance().setEdited(true);
+                SceneManager.getInstance().getUndoManager().addEdit(c);
+            });
+        }
+        return azimuthAngleMenuItem;
     }
 
     private JCheckBoxMenuItem getLightBeamsMenuItem() {
@@ -2342,38 +2387,20 @@ public class MainFrame extends JFrame {
         return groupAnnualAnalysisMenuItem;
     }
 
-    private JMenuItem getAnnualSensorMenuItem() {
-        if (annualSensorMenuItem == null) {
-            annualSensorMenuItem = new JMenuItem("Annual Sensor Data...");
-            annualSensorMenuItem.addActionListener(e -> {
-                if (Scene.getInstance().hasSensor()) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    new AnnualSensorData().show("Annual Sensor Data");
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
-                }
-            });
-        }
-        return annualSensorMenuItem;
-    }
-
     private JMenuItem getDailySensorMenuItem() {
         if (dailySensorMenuItem == null) {
             dailySensorMenuItem = new JMenuItem("Daily Sensor Data...");
-            dailySensorMenuItem.addActionListener(e -> {
-                if (Scene.getInstance().hasSensor()) {
-                    if (EnergyPanel.getInstance().adjustCellSize()) {
-                        return;
-                    }
-                    new DailySensorData().show("Daily Sensor Data");
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
-                }
-            });
+            dailySensorMenuItem.addActionListener(e -> TaskFactory.dailySensorData());
         }
         return dailySensorMenuItem;
+    }
+
+    private JMenuItem getAnnualSensorMenuItem() {
+        if (annualSensorMenuItem == null) {
+            annualSensorMenuItem = new JMenuItem("Annual Sensor Data...");
+            annualSensorMenuItem.addActionListener(e -> TaskFactory.annualSensorData());
+        }
+        return annualSensorMenuItem;
     }
 
     private JCheckBoxMenuItem getSolarRadiationHeatMapMenuItem() {

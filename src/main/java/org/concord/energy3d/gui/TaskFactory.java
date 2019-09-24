@@ -13,10 +13,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.GroupAnnualAnalysis;
-import org.concord.energy3d.simulation.GroupDailyAnalysis;
-import org.concord.energy3d.simulation.PvAnnualAnalysis;
-import org.concord.energy3d.simulation.PvDailyAnalysis;
+import org.concord.energy3d.simulation.*;
 
 /**
  * @author Charles Xie
@@ -28,6 +25,10 @@ public final class TaskFactory {
             dailyYieldAnalysisOfSolarPanels();
         } else if (taskName.startsWith("Annual Yield Analysis of Solar Panels")) {
             annualYieldAnalysisOfSolarPanels();
+        } else if (taskName.startsWith("Daily Sensor Data")) {
+            dailySensorData();
+        } else if (taskName.startsWith("Annual Sensor Data")) {
+            annualSensorData();
         } else if (taskName.startsWith("Daily Analysis for Group")) {
             TaskFactory.dailyAnalysisForGroup(taskName);
         } else if (taskName.startsWith("Annual Analysis for Group")) {
@@ -38,6 +39,28 @@ public final class TaskFactory {
             TaskFactory.solarPanelArrayOptimizer(taskName);
         } else if (taskName.startsWith("Solar Panel Array Layout Manager")) {
             TaskFactory.solarPanelArrayLayoutManager(taskName);
+        }
+    }
+
+    static void dailySensorData() {
+        if (Scene.getInstance().hasSensor()) {
+            if (EnergyPanel.getInstance().adjustCellSize()) {
+                return;
+            }
+            new DailySensorData().show("Daily Sensor Data");
+        } else {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    static void annualSensorData() {
+        if (Scene.getInstance().hasSensor()) {
+            if (EnergyPanel.getInstance().adjustCellSize()) {
+                return;
+            }
+            new AnnualSensorData().show("Annual Sensor Data");
+        } else {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
         }
     }
 

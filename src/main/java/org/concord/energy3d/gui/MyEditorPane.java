@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultButtonModel;
@@ -99,22 +98,29 @@ class MyEditorPane {
                                 if (s.startsWith("href=goto://")) {
                                     s = s.substring(12).trim();
                                     EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s);
+                                    EnergyPanel.getInstance().updateScene();
                                 } else if (s.startsWith("href=date://")) {
                                     s = s.substring(12).trim();
                                     try {
                                         EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s));
-                                        Heliodon.getInstance().setDate((Date) EnergyPanel.getInstance().getDateSpinner().getValue());
                                     } catch (final ParseException e1) {
                                         e1.printStackTrace();
                                     }
+                                    final Date date = (Date) EnergyPanel.getInstance().getDateSpinner().getValue();
+                                    Scene.getInstance().setDate(date);
+                                    Heliodon.getInstance().setDate(date);
+                                    EnergyPanel.getInstance().updateScene();
                                 } else if (s.startsWith("href=time://")) {
                                     s = s.substring(12).trim();
                                     try {
                                         EnergyPanel.getInstance().getTimeSpinner().setValue(new SimpleDateFormat("h:mm a").parse(s));
-                                        Heliodon.getInstance().setTime((Date) EnergyPanel.getInstance().getTimeSpinner().getValue());
                                     } catch (final ParseException e1) {
                                         e1.printStackTrace();
                                     }
+                                    final Date date = (Date) EnergyPanel.getInstance().getTimeSpinner().getValue();
+                                    Scene.getInstance().setDate(date);
+                                    Heliodon.getInstance().setDate(date);
+                                    EnergyPanel.getInstance().updateScene();
                                 } else if (s.startsWith("href=menu://")) {
                                     s = s.substring(12).trim();
                                     MainFrame.getInstance().openModel(MainApplication.class.getResource(s));
@@ -369,17 +375,9 @@ class MyEditorPane {
                 e.printStackTrace();
             }
             final Date date = (Date) EnergyPanel.getInstance().getDateSpinner().getValue();
-            EnergyPanel.getInstance().updateWeatherData();
-            EnergyPanel.getInstance().updateThermostat();
             Scene.getInstance().setDate(date);
-            Scene.getInstance().updateTreeLeaves();
-            Scene.getInstance().updateTrackables();
             Heliodon.getInstance().setDate(date);
-            SceneManager.getTaskManager().update(() -> {
-                SceneManager.getInstance().changeSkyTexture();
-                SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
-                return null;
-            });
+            EnergyPanel.getInstance().updateScene();
         }
 
         // time commands
@@ -418,6 +416,13 @@ class MyEditorPane {
             MainPanel.getInstance().getShadowButton().setSelected(true);
         } else if ("Shadow Off".equals(act)) {
             MainPanel.getInstance().getShadowButton().setSelected(false);
+        }
+
+        // sensors
+        else if (act.startsWith("Daily Sensor Data")) {
+            TaskFactory.dailySensorData();
+        } else if (act.startsWith("Annual Sensor Data")) {
+            TaskFactory.annualSensorData();
         }
 
         // solar analysis tools

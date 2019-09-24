@@ -814,7 +814,7 @@ public class EnergyPanel extends JPanel {
 
     }
 
-    private void updateScene() {
+    public void updateScene() {
         updateWeatherData();
         updateThermostat();
         SceneManager.getTaskManager().update(() -> {

@@ -135,6 +135,9 @@ public class Scene implements Serializable {
     private boolean hideAxes;
     private boolean hideLightBeams;
     private boolean showSunAngles;
+    private boolean showZenithAngle;
+    private boolean showElevationAngle;
+    private boolean showAzimuthAngle;
     private boolean noSnapToGrids;
     private boolean cleanup;
     private boolean alwaysComputeHeatFluxVectors;
@@ -4001,12 +4004,28 @@ public class Scene implements Serializable {
         return !hideLightBeams;
     }
 
-    public void setSunAnglesVisible(final boolean showSunAngles) {
-        this.showSunAngles = showSunAngles;
+    public void setZenithAngleVisible(final boolean showZenithAngle) {
+        this.showZenithAngle = showZenithAngle;
     }
 
-    public boolean areSunAnglesVisible() {
-        return showSunAngles;
+    public boolean isZenithAngleVisible() {
+        return showZenithAngle;
+    }
+
+    public void setElevationAngleVisible(final boolean showElevationAngle) {
+        this.showElevationAngle = showElevationAngle;
+    }
+
+    public boolean isElevationAngleVisible() {
+        return showElevationAngle;
+    }
+
+    public void setAzimuthAngleVisible(final boolean showAzimuthAngle) {
+        this.showAzimuthAngle = showAzimuthAngle;
+    }
+
+    public boolean isAzimuthAngleVisible() {
+        return showAzimuthAngle;
     }
 
     public void setSolarPanelNx(final int solarPanelNx) {

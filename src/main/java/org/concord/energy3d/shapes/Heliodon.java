@@ -697,7 +697,8 @@ public class Heliodon {
     }
 
     public void drawSunTriangle() {
-        if (isNightTime() || ((SceneManager.getInstance() != null && !Scene.getInstance().areSunAnglesVisible()))) {
+        if (isNightTime() || ((SceneManager.getInstance() != null
+                && !Scene.getInstance().isZenithAngleVisible() && !Scene.getInstance().isElevationAngleVisible() && !Scene.getInstance().isAzimuthAngleVisible()))) {
             showSunTriangle(false);
             return;
         }
@@ -716,13 +717,22 @@ public class Heliodon {
         sunTriangle.updateModelBound();
         sunTriangle.getSceneHints().setCullHint(CullHint.Inherit);
         AngleAnnotation a = (AngleAnnotation) angles.getChild(0); // draw zenith angle
+        if (SceneManager.getInstance() != null) {
+            a.setVisible(Scene.getInstance().isZenithAngleVisible());
+        }
         final Vector3 n = s.cross(Vector3.UNIT_Z, null);
         final Vector3 p = s.normalize(null);
         a.setRange(o, p, Vector3.UNIT_Z, n);
         a = (AngleAnnotation) angles.getChild(1); // draw elevation angle
+        if (SceneManager.getInstance() != null) {
+            a.setVisible(Scene.getInstance().isElevationAngleVisible());
+        }
         a.setRange(o, p, t, n);
         a = (AngleAnnotation) angles.getChild(2); // draw azimuth angle
         a.setRange(o, Vector3.UNIT_Y, t, Vector3.UNIT_Z);
+        if (SceneManager.getInstance() != null) {
+            a.setVisible(Scene.getInstance().isAzimuthAngleVisible());
+        }
     }
 
     public void drawSun() {
