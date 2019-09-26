@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
@@ -171,12 +172,7 @@ public class Sensor extends HousePart implements SolarCollector {
         outlineMesh.setTranslation(mesh.getTranslation());
         outlineMesh.setRotation(mesh.getRotation());
 
-        final ReadOnlyVector3 translation = mesh.getTranslation();
-        label.setText("" + getId());
-        if (normal != null) {
-            final double labelOffset = 1.0;
-            label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
-        }
+        updateLabel();
 
     }
 
@@ -325,6 +321,31 @@ public class Sensor extends HousePart implements SolarCollector {
     @Override
     public boolean isSunBeamVisible() {
         return false;
+    }
+
+    public boolean isLabelVisible() {
+        return label.isVisible();
+    }
+
+    public void updateLabel() {
+        String text = "";
+        if (labelCustom && labelCustomText != null) {
+            text += labelCustomText;
+        }
+        if (labelId) {
+            text += (text.equals("") ? "" : "\n") + "#" + id;
+        }
+        if (!text.equals("")) {
+            label.setText(text);
+            label.setVisible(true);
+            final ReadOnlyVector3 translation = mesh.getTranslation();
+            if (normal != null) {
+                final double labelOffset = 1.0;
+                label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
+            }
+        } else {
+            label.setVisible(false);
+        }
     }
 
 }
