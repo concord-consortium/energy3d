@@ -49,11 +49,11 @@ import org.concord.energy3d.geneticalgorithms.applications.WindowOptimizer;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Html2Text;
 import org.concord.energy3d.util.Util;
 
@@ -216,6 +216,7 @@ class MyEditorPane {
     }
 
     public void setText(final String text) {
+
         editorPane.setText(text);
 
         if (editorPane.getDocument() instanceof HTMLDocument) {
@@ -416,6 +417,13 @@ class MyEditorPane {
             MainPanel.getInstance().getShadowButton().setSelected(true);
         } else if ("Shadow Off".equals(act)) {
             MainPanel.getInstance().getShadowButton().setSelected(false);
+        }
+
+        // air mass
+        else if ("Air Mass On".equals(act)) {
+            SolarRadiation.getInstance().setAirMassSelection(SolarRadiation.AIR_MASS_SPHERE_MODEL);
+        } else if ("Air Mass Off".equals(act)) {
+            SolarRadiation.getInstance().setAirMassSelection(SolarRadiation.AIR_MASS_NONE);
         }
 
         // sensors

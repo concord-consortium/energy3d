@@ -34,21 +34,26 @@ public class DailySensorData extends EnergyDailyAnalysis {
         for (final HousePart p : parts) {
             if (p instanceof Sensor) {
                 final Sensor sensor = (Sensor) p;
-                String lid = "Light: #" + sensor.getId();
-                String hid = "Heat Flux: #" + sensor.getId();
+                String label = sensor.getLabelText() != null ? sensor.getLabelText() : sensor.getId() + "";
+                String lid = "Light: #" + label;
+                String hid = "Heat Flux: #" + label;
                 graph.hideData(lid, sensor.isLightOff());
                 graph.hideData(hid, sensor.isHeatFluxOff());
                 final double area = sensor.getArea();
                 for (int i = 0; i < 24; i++) {
                     SolarRadiation.getInstance().computeEnergyAtHour(i);
-                    final double solar = sensor.getSolarPotentialNow();
-                    graph.addData(lid, solar / area);
-                    final double[] loss = sensor.getHeatLoss();
-                    int t0 = n * i;
-                    double sum = 0;
-                    for (int k = t0; k < t0 + n; k++)
-                        sum += loss[k];
-                    graph.addData(hid, -sum / area);
+                    if (!sensor.isLightOff()) {
+                        final double solar = sensor.getSolarPotentialNow();
+                        graph.addData(lid, solar / area);
+                    }
+                    if (!sensor.isHeatFluxOff()) {
+                        final double[] loss = sensor.getHeatLoss();
+                        int t0 = n * i;
+                        double sum = 0;
+                        for (int k = t0; k < t0 + n; k++)
+                            sum += loss[k];
+                        graph.addData(hid, -sum / area);
+                    }
                 }
             }
         }
@@ -63,21 +68,26 @@ public class DailySensorData extends EnergyDailyAnalysis {
             if (p instanceof Sensor) {
                 final Sensor sensor = (Sensor) p;
                 final long id = sensor.getId();
-                List<Double> lightData = graph.getData("Light: #" + id);
                 s += "{\"ID\": " + id;
-                s += ", \"Light\": [";
-                for (Double x : lightData) {
-                    s += Graph.FIVE_DECIMALS.format(x) + ",";
+                String label = sensor.getLabelText() != null ? sensor.getLabelText() : id + "";
+                if (!sensor.isLightOff()) {
+                    List<Double> lightData = graph.getData("Light: #" + label);
+                    s += ", \"Light\": [";
+                    for (Double x : lightData) {
+                        s += Graph.FIVE_DECIMALS.format(x) + ",";
+                    }
+                    s = s.substring(0, s.length() - 1);
+                    s += "]\n";
                 }
-                s = s.substring(0, s.length() - 1);
-                s += "]\n";
-                List<Double> heatData = graph.getData("Heat Flux: #" + id);
-                s += ", \"HeatFlux\": [";
-                for (Double x : heatData) {
-                    s += Graph.FIVE_DECIMALS.format(x) + ",";
+                if (!sensor.isHeatFluxOff()) {
+                    List<Double> heatData = graph.getData("Heat Flux: #" + label);
+                    s += ", \"HeatFlux\": [";
+                    for (Double x : heatData) {
+                        s += Graph.FIVE_DECIMALS.format(x) + ",";
+                    }
+                    s = s.substring(0, s.length() - 1);
+                    s += "]";
                 }
-                s = s.substring(0, s.length() - 1);
-                s += "]";
                 s += "},";
             }
         }

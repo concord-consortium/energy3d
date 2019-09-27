@@ -870,7 +870,7 @@ public abstract class Graph extends JPanel {
                                         }
                                     }
                                     final int pound = key.indexOf("#");
-                                    String s = key.substring(pound);
+                                    String s = key.substring(pound + 1);
                                     if (key.startsWith("Light")) {
                                         s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
                                     }

@@ -1,11 +1,9 @@
 package org.concord.energy3d.gui;
 
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.undo.SetFoundationLabelCommand;
 import org.concord.energy3d.undo.SetSensorLabelCommand;
 import org.concord.energy3d.util.Util;
 

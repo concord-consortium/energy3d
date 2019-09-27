@@ -1442,6 +1442,8 @@ public class MainFrame extends JFrame {
             tutorialsMenu.add(solarBasicsMenu);
             addModel(solarBasicsMenu, "Sun Path", "tutorials/sun-path.ng3");
             addModel(solarBasicsMenu, "Projection Effect", "tutorials/projection-effect.ng3");
+            addModel(solarBasicsMenu, "Air Mass", "tutorials/air-mass.ng3");
+            solarBasicsMenu.addSeparator();
             addModel(solarBasicsMenu, "Solar Box", "tutorials/solar-box.ng3");
             addModel(solarBasicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
             addModel(solarBasicsMenu, "Solar Analysis of Cities", "tutorials/city-block.ng3");

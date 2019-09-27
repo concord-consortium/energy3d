@@ -1,8 +1,6 @@
 package org.concord.energy3d.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.StringReader;
@@ -48,10 +46,11 @@ class InstructionSheetDialog extends JDialog {
 
             final ActionListener okListener = e -> {
                 final String type = htmlCheckBox.isSelected() ? "text/html" : "text/plain";
-                final String text = textArea.getText();
+                String text = textArea.getText();
                 sheet.setContentType(type);
                 sheet.setText(text);
                 sheet.repaint();
+                text = sheet.getText(); // store the formatted text
                 Scene.getInstance().setInstructionSheetTextType(i, type);
                 Scene.getInstance().setInstructionSheetText(i, text);
                 Scene.getInstance().setEdited(true);
@@ -77,6 +76,15 @@ class InstructionSheetDialog extends JDialog {
                 }
             });
             buttonPanel.add(htmlCheckBox);
+
+            final JButton formatButton = new JButton("Format");
+            formatButton.addActionListener(e -> {
+                final int caretPostion = textArea.getCaretPosition();
+                sheet.setText(textArea.getText());
+                textArea.setText(sheet.getText());
+                textArea.setCaretPosition(caretPostion);
+            });
+            buttonPanel.add(formatButton);
 
             final JButton okButton = new JButton("OK");
             okButton.addActionListener(okListener);
