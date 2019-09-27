@@ -75,6 +75,8 @@ public class SolarRadiation {
     public final static int AIR_MASS_KASTEN_YOUNG = 0;
     public final static int AIR_MASS_SPHERE_MODEL = 1;
 
+    public boolean skyDiffusion = true;
+
     private static SolarRadiation instance = new SolarRadiation();
     private final Map<Mesh, MeshDataStore> onMesh = new HashMap<>();
     private final List<Spatial> collidables = new ArrayList<Spatial>();
@@ -330,7 +332,7 @@ public class SolarRadiation {
     }
 
     private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(Vector3.UNIT_Z);
         final double totalRadiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + indirectRadiation;
         final double step = Scene.getInstance().getSolarStep() * 4;
         final int rows = (int) (256 / step);
@@ -388,7 +390,7 @@ public class SolarRadiation {
 
         final double dot = normal.dot(directionTowardSun);
         final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(normal);
 
         final int timeStep = Scene.getInstance().getTimeStep();
         final double solarStep = Scene.getInstance().getSolarStep();
@@ -497,7 +499,7 @@ public class SolarRadiation {
 
         final double dot = normal.dot(directionTowardSun);
         final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(normal);
 
         final double solarStep = Scene.getInstance().getSolarStep();
         final double sceneScale = Scene.getInstance().getScale();
@@ -957,7 +959,7 @@ public class SolarRadiation {
         if (dot > 0) {
             directRadiation += calculateDirectRadiation(directionTowardSun, normal);
         }
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(normal);
 
         final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -1034,7 +1036,7 @@ public class SolarRadiation {
         if (dot > 0) {
             directRadiation += calculateDirectRadiation(directionTowardSun, normal);
         }
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(normal);
 
         final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -1250,7 +1252,7 @@ public class SolarRadiation {
         if (dot > 0) {
             directRadiation += calculateDirectRadiation(directionTowardSun, normal);
         }
-        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+        final double indirectRadiation = calculateDiffuseAndReflectedRadiation(normal);
 
         final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -1732,13 +1734,15 @@ public class SolarRadiation {
     }
 
     // see: http://www.physics.arizona.edu/~cronin/Solar/References/Irradiance%20Models%20and%20Data/WOC01.pdf
-    private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
+    private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 normal) {
         final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
         double result = 0;
         final double cos = normal.dot(Vector3.UNIT_Z);
-        final double viewFactorWithSky = 0.5 * (1 + cos);
-        if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-            result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
+        if (skyDiffusion) {
+            final double viewFactorWithSky = 0.5 * (1 + cos);
+            if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
+                result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
+            }
         }
         final double viewFactorWithGround = 0.5 * Math.abs(1 - cos); // if a surface faces down, it should receive ground reflection as well
         if (!Util.isZero(viewFactorWithGround)) { // short-wave reflection from the ground

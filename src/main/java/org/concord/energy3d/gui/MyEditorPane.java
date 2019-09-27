@@ -50,10 +50,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
-import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
-import org.concord.energy3d.simulation.MonthlySunshineHours;
-import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.simulation.*;
 import org.concord.energy3d.util.Html2Text;
 import org.concord.energy3d.util.Util;
 
@@ -424,6 +421,29 @@ class MyEditorPane {
             SolarRadiation.getInstance().setAirMassSelection(SolarRadiation.AIR_MASS_SPHERE_MODEL);
         } else if ("Air Mass Off".equals(act)) {
             SolarRadiation.getInstance().setAirMassSelection(SolarRadiation.AIR_MASS_NONE);
+        }
+
+        // sky diffusion
+        else if ("Sky Diffusion On".equals(act)) {
+            SolarRadiation.getInstance().skyDiffusion = true;
+        } else if ("Sky Diffusion Off".equals(act)) {
+            SolarRadiation.getInstance().skyDiffusion = false;
+        }
+
+        // albedo
+        else if (act.startsWith("Albedo")) {
+            final String s = act.substring("Albedo".length()).trim();
+            double a = 0;
+            try {
+                a = Double.parseDouble(s);
+            } catch (final Exception e) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+            if (a >= 0) {
+                Scene.getInstance().getGround().setAlbedo(a);
+            } else {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Albedo cannot be negative.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         // sensors
