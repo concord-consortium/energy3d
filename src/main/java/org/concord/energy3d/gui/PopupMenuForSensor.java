@@ -22,6 +22,8 @@ class PopupMenuForSensor extends PopupMenuFactory {
             final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
             final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
             final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+            final JCheckBoxMenuItem miLabelLightSensorOutput = new JCheckBoxMenuItem("Light Sensor Output");
+            final JCheckBoxMenuItem miLabelHeatFluxSensorOutput = new JCheckBoxMenuItem("Heat Flux Sensor Output");
 
             popupMenuForSensor = createPopupMenu(false, false, () -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -34,6 +36,8 @@ class PopupMenuForSensor extends PopupMenuFactory {
                 Util.selectSilently(miLabelNone, !s.isLabelVisible());
                 Util.selectSilently(miLabelCustom, s.getLabelCustom());
                 Util.selectSilently(miLabelId, s.getLabelId());
+                Util.selectSilently(miLabelLightSensorOutput, s.getLabelLightOutput());
+                Util.selectSilently(miLabelHeatFluxSensorOutput, s.getLabelHeatFluxOutput());
             });
 
              miLight.addActionListener(e -> {
@@ -83,6 +87,57 @@ class PopupMenuForSensor extends PopupMenuFactory {
             });
             labelMenu.add(miLabelNone);
 
+            miLabelId.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Sensor) {
+                    final Sensor sensor = (Sensor) selectedPart;
+                    final SetSensorLabelCommand c = new SetSensorLabelCommand(sensor);
+                    sensor.setLabelId(miLabelId.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
+                        sensor.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
+                }
+            });
+            labelMenu.add(miLabelId);
+
+            miLabelLightSensorOutput.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Sensor) {
+                    final Sensor sensor = (Sensor) selectedPart;
+                    final SetSensorLabelCommand c = new SetSensorLabelCommand(sensor);
+                    sensor.setLabelLightOutput(miLabelLightSensorOutput.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
+                        sensor.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
+                }
+            });
+            labelMenu.add(miLabelLightSensorOutput);
+
+            miLabelHeatFluxSensorOutput.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Sensor) {
+                    final Sensor sensor = (Sensor) selectedPart;
+                    final SetSensorLabelCommand c = new SetSensorLabelCommand(sensor);
+                    sensor.setLabelHeatFluxOutput(miLabelHeatFluxSensorOutput.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
+                        sensor.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
+                }
+            });
+            labelMenu.add(miLabelHeatFluxSensorOutput);
+
             miLabelCustom.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 if (selectedPart instanceof Sensor) {
@@ -103,24 +158,7 @@ class PopupMenuForSensor extends PopupMenuFactory {
             });
             labelMenu.add(miLabelCustom);
 
-            miLabelId.addActionListener(e -> {
-                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-                if (selectedPart instanceof Sensor) {
-                    final Sensor sensor = (Sensor) selectedPart;
-                    final SetSensorLabelCommand c = new SetSensorLabelCommand(sensor);
-                    sensor.setLabelId(miLabelId.isSelected());
-                    SceneManager.getTaskManager().update(() -> {
-                        sensor.draw();
-                        SceneManager.getInstance().refresh();
-                        return null;
-                    });
-                    SceneManager.getInstance().getUndoManager().addEdit(c);
-                    Scene.getInstance().setEdited(true);
-                }
-            });
-            labelMenu.add(miLabelId);
-
-        }
+         }
 
         return popupMenuForSensor;
 

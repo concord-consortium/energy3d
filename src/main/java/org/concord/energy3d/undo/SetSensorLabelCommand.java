@@ -9,31 +9,38 @@ public class SetSensorLabelCommand extends MyAbstractUndoableEdit {
 
     private static final long serialVersionUID = 1L;
     private final boolean oldLabelId;
+    private final boolean oldLabelCustom;
+    private final boolean oldLabelLigthSensorOutput;
+    private final boolean oldLabelHeatFluxSensorOutput;
     private boolean newLabelId;
+    private boolean newLabelCustom;
+    private boolean newLabelLigthSensorOutput;
+    private boolean newLabelHeatFluxSensorOutput;
     private final Sensor sensor;
 
     public SetSensorLabelCommand(final Sensor sensor) {
         this.sensor = sensor;
-        oldLabelId = this.sensor.getLabelId();
+        oldLabelId = sensor.getLabelId();
+        oldLabelCustom = sensor.getLabelCustom();
+        oldLabelLigthSensorOutput = sensor.getLabelLightOutput();
+        oldLabelHeatFluxSensorOutput = sensor.getLabelHeatFluxOutput();
     }
 
     public Sensor getSensor() {
         return sensor;
     }
 
-    public boolean getOldLabelId() {
-        return oldLabelId;
-    }
-
-    public boolean getNewLabelId() {
-        return newLabelId;
-    }
-
     @Override
     public void undo() throws CannotUndoException {
         super.undo();
         newLabelId = sensor.getLabelId();
+        newLabelCustom = sensor.getLabelCustom();
+        newLabelLigthSensorOutput = sensor.getLabelLightOutput();
+        newLabelHeatFluxSensorOutput = sensor.getLabelHeatFluxOutput();
         sensor.setLabelId(oldLabelId);
+        sensor.setLabelCustom(oldLabelCustom);
+        sensor.setLabelLightOutput(oldLabelLigthSensorOutput);
+        sensor.setLabelHeatFluxOutput(oldLabelHeatFluxSensorOutput);
         sensor.draw();
     }
 
@@ -41,6 +48,9 @@ public class SetSensorLabelCommand extends MyAbstractUndoableEdit {
     public void redo() throws CannotRedoException {
         super.redo();
         sensor.setLabelId(newLabelId);
+        sensor.setLabelCustom(newLabelCustom);
+        sensor.setLabelLightOutput(newLabelLigthSensorOutput);
+        sensor.setLabelHeatFluxOutput(newLabelHeatFluxSensorOutput);
         sensor.draw();
     }
 

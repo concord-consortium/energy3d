@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
@@ -26,7 +27,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Sensor extends HousePart implements SolarCollector {
+public class Sensor extends HousePart implements SolarCollector, Labelable {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,6 +39,8 @@ public class Sensor extends HousePart implements SolarCollector {
     private transient BMText label;
     private boolean lightOff;
     private boolean heatFluxOff;
+    private boolean labelLightOutput;
+    private boolean labelHeatFluxOutput;
 
     public Sensor() {
         super(1, 1, 0.0);
@@ -330,6 +333,7 @@ public class Sensor extends HousePart implements SolarCollector {
         return label.getText();
     }
 
+    @Override
     public void updateLabel() {
         String text = "";
         if (labelCustom && labelCustomText != null) {
@@ -337,6 +341,14 @@ public class Sensor extends HousePart implements SolarCollector {
         }
         if (labelId) {
             text += (text.equals("") ? "" : "\n") + "#" + id;
+        }
+        if (labelLightOutput) {
+            double totalLightToday = getSolarPotentialToday() / getArea();
+            text += (text.equals("") ? "" : "\n") + (Util.isZero(totalLightToday) ? "Light" : EnergyPanel.ONE_DECIMAL.format(totalLightToday) + " kWh/m^2");
+        }
+        if (labelHeatFluxOutput) {
+            double totalHeatFluxToday = -getTotalHeatLoss() / getArea();
+            text += (text.equals("") ? "" : "\n") + (Util.isZero(totalHeatFluxToday) ? "Heat Flux" : EnergyPanel.ONE_DECIMAL.format(totalHeatFluxToday) + " kWh/m^2");
         }
         if (!text.equals("")) {
             label.setText(text);
@@ -349,6 +361,29 @@ public class Sensor extends HousePart implements SolarCollector {
         } else {
             label.setVisible(false);
         }
+    }
+
+    @Override
+    public void clearLabels() {
+        super.clearLabels();
+        labelLightOutput = false;
+        labelHeatFluxOutput = false;
+    }
+
+    public void setLabelLightOutput(final boolean labelLightOutput) {
+        this.labelLightOutput = labelLightOutput;
+    }
+
+    public boolean getLabelLightOutput() {
+        return labelLightOutput;
+    }
+
+    public void setLabelHeatFluxOutput(final boolean labelHeatFluxOutput) {
+        this.labelHeatFluxOutput = labelHeatFluxOutput;
+    }
+
+    public boolean getLabelHeatFluxOutput() {
+        return labelHeatFluxOutput;
     }
 
 }
