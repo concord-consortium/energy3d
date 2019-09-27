@@ -88,8 +88,13 @@ class DataViewer {
                 for (final HousePart p : parts) {
                     if (p instanceof Sensor) {
                         final Sensor sensor = (Sensor) p;
-                        sensorList.add("Light: #" + sensor.getId());
-                        sensorList.add("Heat Flux: #" + sensor.getId());
+                        String label = sensor.getLabelText() != null ? sensor.getLabelText() : sensor.getId() + "";
+                        if (!sensor.isLightOff()) {
+                            sensorList.add("Light: #" + label);
+                        }
+                        if (!sensor.isHeatFluxOff()) {
+                            sensorList.add("Heat Flux: #" + label);
+                        }
                     }
                 }
                 if (!sensorList.isEmpty()) {
@@ -115,8 +120,13 @@ class DataViewer {
                 for (final HousePart p : parts) {
                     if (p instanceof Sensor) {
                         final Sensor sensor = (Sensor) p;
-                        sensorList.add("Light: #" + sensor.getId());
-                        sensorList.add("Heat Flux: #" + sensor.getId());
+                        String label = sensor.getLabelText() != null ? sensor.getLabelText() : sensor.getId() + "";
+                        if (!sensor.isLightOff()) {
+                            sensorList.add("Light: #" + label);
+                        }
+                        if (!sensor.isHeatFluxOff()) {
+                            sensorList.add("Heat Flux: #" + label);
+                        }
                     }
                 }
                 if (!sensorList.isEmpty()) {

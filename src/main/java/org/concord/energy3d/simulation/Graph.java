@@ -852,7 +852,7 @@ public abstract class Graph extends JPanel {
                                 g2.draw(path);
                             }
                             if (!(this instanceof DailyGraph)) {
-                                xLabel = left - 30;
+                                xLabel = left - 24;
                                 yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
                             } else {
                                 yLabel -= 8;
@@ -869,13 +869,21 @@ public abstract class Graph extends JPanel {
                                             drawSquare(g2, (int) Math.round(dataX - symbolSize / 2.0), (int) Math.round(dataY - symbolSize / 2.0), symbolSize, colors.get("Heat Gain"));
                                         }
                                     }
+                                    final FontMetrics fm = g2.getFontMetrics();
                                     final int pound = key.indexOf("#");
                                     String s = key.substring(pound + 1);
-                                    if (key.startsWith("Light")) {
-                                        s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
-                                    }
-                                    final FontMetrics fm = g2.getFontMetrics();
                                     g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
+                                    if (key.startsWith("Light")) {
+                                        double sum = getSum(key);
+                                        if (sum < 1) {
+                                            s = "(" + TWO_DECIMALS.format(sum) + ")";
+                                        } else if (sum < 10) {
+                                            s = "(" + ONE_DECIMAL.format(sum) + ")";
+                                        } else {
+                                            s = "(" + ONE_DECIMAL.format(Math.round(sum)) + ")";
+                                        }
+                                        g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) (yLabel + fm.getAscent() + fm.getDescent()));
+                                    }
                                     break;
                                 default:
                                     for (int i = 0; i < list.size(); i++) {
