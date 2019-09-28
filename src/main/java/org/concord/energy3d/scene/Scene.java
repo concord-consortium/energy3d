@@ -4233,6 +4233,16 @@ public class Scene implements Serializable {
         return isSaving;
     }
 
+    public List<Tree> getAllTrees() {
+        final List<Tree> list = new ArrayList<>();
+        for (final HousePart p : parts) {
+            if (p instanceof Tree) {
+                list.add((Tree) p);
+            }
+        }
+        return list;
+    }
+
     public List<Foundation> getAllFoundations() {
         final List<Foundation> list = new ArrayList<>();
         for (final HousePart p : parts) {

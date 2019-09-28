@@ -756,7 +756,7 @@ public abstract class HousePart implements Serializable {
     protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
         if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
             final TextureState ts = new TextureState();
-            final Texture texture = getTexture(getTextureFileName(), textureType == TEXTURE_EDGE, defaultColor, lockEdit);
+            final Texture texture = getTexture(getTextureFileName(), textureType == TEXTURE_EDGE, defaultColor, false);
             ts.setTexture(texture);
             mesh.setRenderState(ts);
         } else {

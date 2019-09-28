@@ -147,8 +147,10 @@ public class MainFrame extends JFrame {
     private JMenuItem exportImageMenuItem;
     private JMenuItem copyImageMenuItem;
     private JMenuItem exportLogMenuItem;
-    private JMenuItem enableAllEditPointsMenuItem;
-    private JMenuItem disableAllEditPointsMenuItem;
+    private JMenuItem enableAllBaseEditPointsMenuItem;
+    private JMenuItem disableAllBaseEditPointsMenuItem;
+    private JMenuItem enableAllTreeEditPointsMenuItem;
+    private JMenuItem disableAllTreeEditPointsMenuItem;
     private JMenuItem specificationsMenuItem;
     private JMenuItem propertiesMenuItem;
     private JMenuItem customPricesMenuItem;
@@ -1456,6 +1458,7 @@ public class MainFrame extends JFrame {
             addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
             addModel(solarBasicsMenu, "Nominal Operating Cell Temperature", "tutorials/solar-panel-noct.ng3");
             addModel(solarBasicsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
+            addModel(solarBasicsMenu, "Optimize It", "tutorials/optimize-it.ng3");
 
             tutorialsMenu.addSeparator();
 
@@ -2668,6 +2671,13 @@ public class MainFrame extends JFrame {
             rotateMenu.add(getRotate90CwMenuItem());
             rotateMenu.add(getRotate90CcwMenuItem());
 
+            final JMenu enableEditPointsMenu = new JMenu("Enable Edit Points");
+            enableEditPointsMenu.add(getEnableAllBaseEditPointsMenuItem());
+            enableEditPointsMenu.add(getEnableAllTreeEditPointsMenuItem());
+            final JMenu disableEditPointsMenu = new JMenu("Disable Edit Points");
+            disableEditPointsMenu.add(getDisableAllBaseEditPointsMenuItem());
+            disableEditPointsMenu.add(getDisableAllTreeEditPointsMenuItem());
+
             editMenu.add(getUndoMenuItem());
             editMenu.add(getRedoMenuItem());
             editMenu.addSeparator();
@@ -2679,8 +2689,9 @@ public class MainFrame extends JFrame {
             editMenu.add(rotateMenu);
             editMenu.add(clearMenu);
             editMenu.addSeparator();
-            editMenu.add(getEnableAllEditPointsMenuItem());
-            editMenu.add(getDisableAllEditPointsMenuItem());
+            editMenu.add(enableEditPointsMenu);
+            editMenu.add(disableEditPointsMenu);
+            editMenu.addSeparator();
             editMenu.add(getSnapToGridsMenuItem());
             editMenu.add(getSnapMenuItem());
             editMenu.add(getAutoRecomputeEnergyMenuItem());
@@ -3827,11 +3838,11 @@ public class MainFrame extends JFrame {
         return removeAllEditLocksMenuItem;
     }
 
-    private JMenuItem getEnableAllEditPointsMenuItem() {
-        if (enableAllEditPointsMenuItem == null) {
-            enableAllEditPointsMenuItem = new JMenuItem("Enable All Base Edit Points");
-            enableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-            enableAllEditPointsMenuItem.addActionListener(e -> {
+    private JMenuItem getEnableAllBaseEditPointsMenuItem() {
+        if (enableAllBaseEditPointsMenuItem == null) {
+            enableAllBaseEditPointsMenuItem = new JMenuItem("All Bases");
+            enableAllBaseEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
+            enableAllBaseEditPointsMenuItem.addActionListener(e -> {
                 final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
                 SceneManager.getTaskManager().update(() -> {
                     for (final Foundation f : foundations) {
@@ -3842,14 +3853,14 @@ public class MainFrame extends JFrame {
                 Scene.getInstance().setEdited(true);
             });
         }
-        return enableAllEditPointsMenuItem;
+        return enableAllBaseEditPointsMenuItem;
     }
 
-    private JMenuItem getDisableAllEditPointsMenuItem() {
-        if (disableAllEditPointsMenuItem == null) {
-            disableAllEditPointsMenuItem = new JMenuItem("Disable All Base Edit Points");
-            disableAllEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.SHIFT_MASK));
-            disableAllEditPointsMenuItem.addActionListener(e -> {
+    private JMenuItem getDisableAllBaseEditPointsMenuItem() {
+        if (disableAllBaseEditPointsMenuItem == null) {
+            disableAllBaseEditPointsMenuItem = new JMenuItem("All Bases");
+            disableAllBaseEditPointsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.SHIFT_MASK));
+            disableAllBaseEditPointsMenuItem.addActionListener(e -> {
                 final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
                 SceneManager.getTaskManager().update(() -> {
                     for (final Foundation f : foundations) {
@@ -3860,7 +3871,41 @@ public class MainFrame extends JFrame {
                 Scene.getInstance().setEdited(true);
             });
         }
-        return disableAllEditPointsMenuItem;
+        return disableAllBaseEditPointsMenuItem;
+    }
+
+    private JMenuItem getEnableAllTreeEditPointsMenuItem() {
+        if (enableAllTreeEditPointsMenuItem == null) {
+            enableAllTreeEditPointsMenuItem = new JMenuItem("All Trees");
+            enableAllTreeEditPointsMenuItem.addActionListener(e -> {
+                final List<Tree> trees = Scene.getInstance().getAllTrees();
+                SceneManager.getTaskManager().update(() -> {
+                    for (final Tree t : trees) {
+                        t.setLockEdit(false);
+                    }
+                    return null;
+                });
+                Scene.getInstance().setEdited(true);
+            });
+        }
+        return enableAllTreeEditPointsMenuItem;
+    }
+
+    private JMenuItem getDisableAllTreeEditPointsMenuItem() {
+        if (disableAllTreeEditPointsMenuItem == null) {
+            disableAllTreeEditPointsMenuItem = new JMenuItem("All Trees");
+            disableAllTreeEditPointsMenuItem.addActionListener(e -> {
+                final List<Tree> trees = Scene.getInstance().getAllTrees();
+                SceneManager.getTaskManager().update(() -> {
+                    for (final Tree t : trees) {
+                        t.setLockEdit(true);
+                    }
+                    return null;
+                });
+                Scene.getInstance().setEdited(true);
+            });
+        }
+        return disableAllTreeEditPointsMenuItem;
     }
 
     public JColorChooser getColorChooser() {
