@@ -114,10 +114,10 @@ public class CspProjectInfoPanel extends JPanel {
             final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
             for (final ParabolicTrough t : troughs) {
                 troughArea = t.getTroughLength() * t.getApertureWidth();
-                cost += price.getParabolicTroughUnitPrice() * troughArea;
+                cost += price.getParabolicTroughUnitCost() * troughArea;
                 reflectingArea += troughArea;
             }
-            cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+            cost += foundation.getArea() * price.getLandRentalCost() * price.getLifespan();
             costBar.setValue(Math.round(cost));
             final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
             String t = "Total cost over " + price.getLifespan() + " years";
@@ -138,10 +138,10 @@ public class CspProjectInfoPanel extends JPanel {
                 final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
                 for (final ParabolicDish d : dishes) {
                     rimArea = d.getRimRadius() * d.getRimRadius() * Math.PI;
-                    cost += price.getHeliostatUnitPrice() * rimArea;
+                    cost += price.getHeliostatUnitCost() * rimArea;
                     reflectingArea += rimArea;
                 }
-                cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+                cost += foundation.getArea() * price.getLandRentalCost() * price.getLifespan();
                 costBar.setValue(Math.round(cost));
                 final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                 String t = "Total cost over " + price.getLifespan() + " years";
@@ -164,7 +164,7 @@ public class CspProjectInfoPanel extends JPanel {
                     final ArrayList<Foundation> towers = new ArrayList<>();
                     for (final Mirror m : mirrors) {
                         mirrorArea = m.getApertureWidth() * m.getApertureHeight();
-                        cost += price.getHeliostatUnitPrice() * mirrorArea;
+                        cost += price.getHeliostatUnitCost() * mirrorArea;
                         reflectingArea += mirrorArea;
                         if (m.getReceiver() != null) {
                             if (!towers.contains(m.getReceiver())) {
@@ -173,15 +173,15 @@ public class CspProjectInfoPanel extends JPanel {
                         }
                     }
                     if (!mirrors.isEmpty()) {
-                        cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+                        cost += foundation.getArea() * price.getLandRentalCost() * price.getLifespan();
                         if (!towers.isEmpty()) {
                             for (final Foundation tower : towers) {
-                                cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
+                                cost += price.getTowerUnitCost() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
                             }
                         }
                     } else {
                         if (foundation.hasSolarReceiver()) {
-                            cost += price.getTowerUnitPrice() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
+                            cost += price.getTowerUnitCost() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
                         }
                     }
                     costBar.setValue(Math.round(cost));
@@ -206,10 +206,10 @@ public class CspProjectInfoPanel extends JPanel {
                     final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
                     for (final FresnelReflector r : fresnels) {
                         unitArea = r.getLength() * r.getModuleWidth();
-                        cost += price.getFresnelReflectorUnitPrice() * unitArea;
+                        cost += price.getFresnelReflectorUnitCost() * unitArea;
                         reflectingArea += unitArea;
                     }
-                    cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+                    cost += foundation.getArea() * price.getLandRentalCost() * price.getLifespan();
                     costBar.setValue(Math.round(cost));
                     final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                     String t = "Total cost over " + price.getLifespan() + " years";

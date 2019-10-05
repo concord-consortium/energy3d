@@ -47,27 +47,27 @@ public class CspProjectCost extends ProjectCost {
         final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 
         if (part instanceof Mirror) {
-            return price.getHeliostatUnitPrice() * part.getArea();
+            return price.getHeliostatUnitCost() * part.getArea();
         }
 
         if (part instanceof ParabolicTrough) {
-            return price.getParabolicTroughUnitPrice() * part.getArea();
+            return price.getParabolicTroughUnitCost() * part.getArea();
         }
 
         if (part instanceof ParabolicDish) {
-            return price.getParabolicDishUnitPrice() * part.getArea();
+            return price.getParabolicDishUnitCost() * part.getArea();
         }
 
         if (part instanceof FresnelReflector) {
-            return price.getFresnelReflectorUnitPrice() * part.getArea();
+            return price.getFresnelReflectorUnitCost() * part.getArea();
         }
 
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
             if (f.hasSolarReceiver()) { // TODO: solar receiver height may not be accurate while the model is still loading
-                return price.getTowerUnitPrice() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
+                return price.getTowerUnitCost() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
             }
-            return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
+            return f.getArea() * price.getLandRentalCost() * price.getLifespan();
         }
 
         return 0;

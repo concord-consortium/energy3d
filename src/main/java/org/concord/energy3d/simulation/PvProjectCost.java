@@ -50,7 +50,7 @@ public class PvProjectCost extends ProjectCost {
 
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
-            return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
+            return f.getArea() * price.getLandRentalCost() * price.getLifespan();
         }
 
         return 0;

@@ -138,7 +138,7 @@ public class PvProjectInfoPanel extends JPanel {
         } else {
             landArea = (float) foundation.getArea();
         }
-        cost += landArea * price.getLandUnitPrice() * price.getLifespan();
+        cost += landArea * price.getLandRentalCost() * price.getLifespan();
         landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
         costBar.setValue(Math.round(cost));
         costBar.setMaximum(specs.getMaximumBudget());

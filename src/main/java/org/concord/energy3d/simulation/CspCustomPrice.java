@@ -9,36 +9,50 @@ public class CspCustomPrice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private double heliostatUnitPrice = 100;
-    private double towerUnitPrice = 5000;
-    private double parabolicTroughUnitPrice = 100;
-    private double parabolicDishUnitPrice = 100;
-    private double fresnelReflectorUnitPrice = 50;
     private int lifespan = 50;
-    private double landUnitPrice;
+    private double kWhSellingPrice = 0.15;
+
+    private double heliostatUnitCost = 100;
+    private double towerUnitCost = 5000;
+    private double parabolicTroughUnitCost = 100;
+    private double parabolicDishUnitCost = 100;
+    private double fresnelReflectorUnitCost = 50;
+
+    private double landRentalCost;
+    private double cleaningCost = 10;
+    private double maintenanceCost = 1;
 
     public CspCustomPrice() {
         setDefaultValues();
     }
 
     public void setDefaultValues() {
+        if (kWhSellingPrice == 0) {
+            kWhSellingPrice = 0.15;
+        }
         if (lifespan == 0) {
             lifespan = 50;
         }
-        if (heliostatUnitPrice == 0) {
-            heliostatUnitPrice = 100;
+        if (cleaningCost == 0) {
+            cleaningCost = 10;
         }
-        if (towerUnitPrice == 0) {
-            towerUnitPrice = 5000;
+        if (maintenanceCost == 0) {
+            maintenanceCost = 1;
         }
-        if (parabolicTroughUnitPrice == 0) {
-            parabolicTroughUnitPrice = 100;
+        if (heliostatUnitCost == 0) {
+            heliostatUnitCost = 100;
         }
-        if (parabolicDishUnitPrice == 0) {
-            parabolicDishUnitPrice = 100;
+        if (towerUnitCost == 0) {
+            towerUnitCost = 5000;
         }
-        if (fresnelReflectorUnitPrice == 0) {
-            fresnelReflectorUnitPrice = 50;
+        if (parabolicTroughUnitCost == 0) {
+            parabolicTroughUnitCost = 100;
+        }
+        if (parabolicDishUnitCost == 0) {
+            parabolicDishUnitCost = 100;
+        }
+        if (fresnelReflectorUnitCost == 0) {
+            fresnelReflectorUnitCost = 50;
         }
     }
 
@@ -50,52 +64,76 @@ public class CspCustomPrice implements Serializable {
         return lifespan;
     }
 
-    public void setLandUnitPrice(final double landUnitPrice) {
-        this.landUnitPrice = landUnitPrice;
+    public void setkWhSellingPrice(final double kWhSellingPrice) {
+        this.kWhSellingPrice = kWhSellingPrice;
     }
 
-    public double getLandUnitPrice() {
-        return landUnitPrice;
+    public double getkWhSellingPrice() {
+        return kWhSellingPrice;
     }
 
-    public void setParabolicTroughUnitPrice(final double parabolicTroughUnitPrice) {
-        this.parabolicTroughUnitPrice = parabolicTroughUnitPrice;
+    public void setLandRentalCost(final double landRentalCost) {
+        this.landRentalCost = landRentalCost;
     }
 
-    public double getParabolicTroughUnitPrice() {
-        return parabolicTroughUnitPrice;
+    public double getLandRentalCost() {
+        return landRentalCost;
     }
 
-    public void setParabolicDishUnitPrice(final double parabolicDishUnitPrice) {
-        this.parabolicDishUnitPrice = parabolicDishUnitPrice;
+    public void setCleaningCost(final double cleaningCost) {
+        this.cleaningCost = cleaningCost;
     }
 
-    public double getParabolicDishUnitPrice() {
-        return parabolicDishUnitPrice;
+    public double getCleaningCost() {
+        return cleaningCost;
     }
 
-    public void setFresnelReflectorUnitPrice(final double fresnelReflectorUnitPrice) {
-        this.fresnelReflectorUnitPrice = fresnelReflectorUnitPrice;
+    public void setMaintenanceCost(final double maintenanceCost) {
+        this.maintenanceCost = maintenanceCost;
     }
 
-    public double getFresnelReflectorUnitPrice() {
-        return fresnelReflectorUnitPrice;
+    public double getMaintenanceCost() {
+        return maintenanceCost;
     }
 
-    public void setHeliostatUnitPrice(final double heliostatUnitPrice) {
-        this.heliostatUnitPrice = heliostatUnitPrice;
+    public void setParabolicTroughUnitCost(final double parabolicTroughUnitCost) {
+        this.parabolicTroughUnitCost = parabolicTroughUnitCost;
     }
 
-    public double getHeliostatUnitPrice() {
-        return heliostatUnitPrice;
+    public double getParabolicTroughUnitCost() {
+        return parabolicTroughUnitCost;
     }
 
-    public void setTowerUnitPrice(final double towerUnitPrice) {
-        this.towerUnitPrice = towerUnitPrice;
+    public void setParabolicDishUnitCost(final double parabolicDishUnitCost) {
+        this.parabolicDishUnitCost = parabolicDishUnitCost;
     }
 
-    public double getTowerUnitPrice() {
-        return towerUnitPrice;
+    public double getParabolicDishUnitCost() {
+        return parabolicDishUnitCost;
+    }
+
+    public void setFresnelReflectorUnitCost(final double fresnelReflectorUnitCost) {
+        this.fresnelReflectorUnitCost = fresnelReflectorUnitCost;
+    }
+
+    public double getFresnelReflectorUnitCost() {
+        return fresnelReflectorUnitCost;
+    }
+
+    public void setHeliostatUnitCost(final double heliostatUnitCost) {
+        this.heliostatUnitCost = heliostatUnitCost;
+    }
+
+    public double getHeliostatUnitCost() {
+        return heliostatUnitCost;
+    }
+
+    public void setTowerUnitCost(final double towerUnitCost) {
+        this.towerUnitCost = towerUnitCost;
+    }
+
+    public double getTowerUnitCost() {
+        return towerUnitCost;
     }
 
 }

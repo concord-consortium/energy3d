@@ -153,7 +153,7 @@ public class MainFrame extends JFrame {
     private JMenuItem disableAllTreeEditPointsMenuItem;
     private JMenuItem specificationsMenuItem;
     private JMenuItem propertiesMenuItem;
-    private JMenuItem customPricesMenuItem;
+    private JMenuItem financeMenuItem;
     private JMenuItem setRegionMenuItem;
     private JCheckBoxMenuItem noteCheckBoxMenuItem;
     private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
@@ -2696,7 +2696,7 @@ public class MainFrame extends JFrame {
             editMenu.add(getSnapMenuItem());
             editMenu.add(getAutoRecomputeEnergyMenuItem());
             editMenu.addSeparator();
-            editMenu.add(getCustomPricesMenuItem());
+            editMenu.add(getFinanceMenuItem());
             editMenu.add(getSpecificationsMenuItem());
             editMenu.add(getOverallUtilityBillMenuItem());
             editMenu.add(getSetRegionMenuItem());
@@ -3506,7 +3506,20 @@ public class MainFrame extends JFrame {
     private JMenuItem getSpecificationsMenuItem() {
         if (specificationsMenuItem == null) {
             specificationsMenuItem = new JMenuItem("Specifications...");
-            specificationsMenuItem.addActionListener(e -> new SpecsDialog().setVisible(true));
+            specificationsMenuItem.addActionListener(e -> {
+                final SpecsDialog specsDialog = new SpecsDialog();
+                switch (Scene.getInstance().getProjectType()) {
+                    case Foundation.TYPE_PV_PROJECT:
+                        specsDialog.selectPvSpecs();
+                        break;
+                    case Foundation.TYPE_CSP_PROJECT:
+                        specsDialog.selectCspSpecs();
+                        break;
+                    default:
+                        specsDialog.selectBuildingSpecs();
+                }
+                specsDialog.setVisible(true);
+            });
         }
         return specificationsMenuItem;
     }
@@ -3538,12 +3551,23 @@ public class MainFrame extends JFrame {
         return setRegionMenuItem;
     }
 
-    private JMenuItem getCustomPricesMenuItem() {
-        if (customPricesMenuItem == null) {
-            customPricesMenuItem = new JMenuItem("Custom Prices...");
-            customPricesMenuItem.addActionListener(e -> new CustomPricesDialog().setVisible(true));
+    private JMenuItem getFinanceMenuItem() {
+        if (financeMenuItem == null) {
+            financeMenuItem = new JMenuItem("Finance...");
+            financeMenuItem.addActionListener(e -> {
+                FinanceDialog dialog = new FinanceDialog();
+                switch (Scene.getInstance().getProjectType()) {
+                    case Foundation.TYPE_PV_PROJECT:
+                        dialog.selectPvPrices();
+                        break;
+                    case Foundation.TYPE_CSP_PROJECT:
+                        dialog.selectCspPrices();
+                        break;
+                }
+                dialog.setVisible(true);
+            });
         }
-        return customPricesMenuItem;
+        return financeMenuItem;
     }
 
     private JMenuItem getPropertiesMenuItem() {

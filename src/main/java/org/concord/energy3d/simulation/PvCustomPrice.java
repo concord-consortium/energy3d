@@ -18,47 +18,62 @@ public class PvCustomPrice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private double solarPanelPrice = 1000;
-    private double solarPanelRackBasePrice = 50;
-    private double solarPanelRackHeightPrice = 100;
-    private double solarPanelHsatPrice = 100;
-    private double solarPanelVsatPrice = 100;
-    private double solarPanelAadatPrice = 100;
     private int lifespan = 20;
-    private double landUnitPrice;
-    private HashMap<String, Double> pvModelPrices;
+    private double kWhSellingPrice = 0.1;
+
+    private double solarPanelCost = 1000;
+    private double solarPanelRackBaseCost = 50;
+    private double solarPanelRackHeightCost = 100;
+    private double solarPanelHsatCost = 100;
+    private double solarPanelVsatCost = 100;
+    private double solarPanelAadatCost = 100;
+
+    private double landRentalCost;
+    private double cleaningCost = 5;
+    private double maintenanceCost = 1;
+
+    private HashMap<String, Double> pvModelCosts;
 
     public PvCustomPrice() {
         setDefaultValues();
     }
 
     public void setDefaultValues() {
+        if (kWhSellingPrice == 0) {
+            kWhSellingPrice = 0.1;
+        }
         if (lifespan == 0) {
             lifespan = 20;
         }
-        if (solarPanelPrice == 0) {
-            solarPanelPrice = 1000;
+        if (solarPanelCost == 0) {
+            solarPanelCost = 1000;
         }
-        if (solarPanelRackBasePrice == 0) {
-            solarPanelRackBasePrice = 50;
+        if (cleaningCost == 0) {
+            cleaningCost = 5;
         }
-        if (solarPanelRackHeightPrice == 0) {
-            solarPanelRackHeightPrice = 100;
+        if (maintenanceCost == 0) {
+            maintenanceCost = 1;
         }
-        if (solarPanelHsatPrice == 0) {
-            solarPanelHsatPrice = 1000;
+        if (solarPanelRackBaseCost == 0) {
+            solarPanelRackBaseCost = 50;
         }
-        if (solarPanelVsatPrice == 0) {
-            solarPanelVsatPrice = 1000;
+        if (solarPanelRackHeightCost == 0) {
+            solarPanelRackHeightCost = 100;
         }
-        if (solarPanelAadatPrice == 0) {
-            solarPanelAadatPrice = 1000;
+        if (solarPanelHsatCost == 0) {
+            solarPanelHsatCost = 1000;
         }
-        if (pvModelPrices == null) {
-            pvModelPrices = new HashMap<>();
+        if (solarPanelVsatCost == 0) {
+            solarPanelVsatCost = 1000;
+        }
+        if (solarPanelAadatCost == 0) {
+            solarPanelAadatCost = 1000;
+        }
+        if (pvModelCosts == null) {
+            pvModelCosts = new HashMap<>();
             final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
             for (final String key : modules.keySet()) {
-                pvModelPrices.put(key, modules.get(key).getPrice());
+                pvModelCosts.put(key, modules.get(key).getPrice());
             }
         }
     }
@@ -67,14 +82,14 @@ public class PvCustomPrice implements Serializable {
         final String modelName = r.getSolarPanel().getModelName();
         double cost = 0;
         if ("Custom".equals(modelName)) {
-            cost = solarPanelPrice;
+            cost = solarPanelCost;
         } else {
-            final Double d = pvModelPrices.get(modelName);
+            final Double d = pvModelCosts.get(modelName);
             if (d != null) {
                 cost = d;
             }
         }
-        cost += solarPanelRackBasePrice;
+        cost += solarPanelRackBaseCost;
         boolean flat;
         final HousePart container = r.getContainer();
         if (container instanceof Roof) {
@@ -86,17 +101,17 @@ public class PvCustomPrice implements Serializable {
         if (flat) {
             final double baseHeight = r.getPoleHeight() * Scene.getInstance().getScale();
             if (baseHeight > 1) {
-                cost += solarPanelRackHeightPrice * (baseHeight - 1);
+                cost += solarPanelRackHeightCost * (baseHeight - 1);
             }
             switch (r.getTracker()) {
                 case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                    cost += solarPanelHsatPrice;
+                    cost += solarPanelHsatCost;
                     break;
                 case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                    cost += solarPanelVsatPrice;
+                    cost += solarPanelVsatCost;
                     break;
                 case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                    cost += solarPanelAadatPrice;
+                    cost += solarPanelAadatCost;
                     break;
             }
         }
@@ -107,27 +122,27 @@ public class PvCustomPrice implements Serializable {
         final String modelName = s.getModelName();
         double cost = 0;
         if ("Custom".equals(modelName)) {
-            cost = solarPanelPrice;
+            cost = solarPanelCost;
         } else {
-            final Double d = pvModelPrices.get(modelName);
+            final Double d = pvModelCosts.get(modelName);
             if (d != null) {
                 cost = d;
             }
         }
-        cost += solarPanelRackBasePrice;
+        cost += solarPanelRackBaseCost;
         final double baseHeight = s.getPoleHeight() * Scene.getInstance().getScale();
         if (baseHeight > 1) {
-            cost += solarPanelRackHeightPrice * (baseHeight - 1);
+            cost += solarPanelRackHeightCost * (baseHeight - 1);
         }
         switch (s.getTracker()) {
             case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                cost += solarPanelHsatPrice;
+                cost += solarPanelHsatCost;
                 break;
             case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                cost += solarPanelVsatPrice;
+                cost += solarPanelVsatCost;
                 break;
             case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                cost += solarPanelAadatPrice;
+                cost += solarPanelAadatCost;
                 break;
         }
         return cost;
@@ -141,74 +156,98 @@ public class PvCustomPrice implements Serializable {
         return lifespan;
     }
 
-    public void setLandUnitPrice(final double landUnitPrice) {
-        this.landUnitPrice = landUnitPrice;
+    public void setkWhSellingPrice(final double kWhSellPrice) {
+        this.kWhSellingPrice = kWhSellPrice;
     }
 
-    public double getLandUnitPrice() {
-        return landUnitPrice;
+    public double getkWhSellingPrice() {
+        return kWhSellingPrice;
     }
 
-    public void setSolarPanelPrice(final double solarPanelPrice) {
-        this.solarPanelPrice = solarPanelPrice;
+    public void setLandRentalCost(final double landRentalCost) {
+        this.landRentalCost = landRentalCost;
     }
 
-    public double getSolarPanelPrice() {
-        return solarPanelPrice;
+    public double getLandRentalCost() {
+        return landRentalCost;
     }
 
-    public void setSolarPanelHsatPrice(final double solarPanelHsatPrice) {
-        this.solarPanelHsatPrice = solarPanelHsatPrice;
+    public void setCleaningCost(final double cleaningCost) {
+        this.cleaningCost = cleaningCost;
     }
 
-    public double getSolarPanelHsatPrice() {
-        return solarPanelHsatPrice;
+    public double getCleaningCost() {
+        return cleaningCost;
     }
 
-    public void setSolarPanelVsatPrice(final double solarPanelVsatPrice) {
-        this.solarPanelVsatPrice = solarPanelVsatPrice;
+    public void setMaintenanceCost(final double maintenanceCost) {
+        this.maintenanceCost = maintenanceCost;
     }
 
-    public double getSolarPanelVsatPrice() {
-        return solarPanelVsatPrice;
+    public double getMaintenanceCost() {
+        return maintenanceCost;
     }
 
-    public void setSolarPanelAadatPrice(final double solarPanelAadatPrice) {
-        this.solarPanelAadatPrice = solarPanelAadatPrice;
+    public void setSolarPanelCost(final double solarPanelCost) {
+        this.solarPanelCost = solarPanelCost;
     }
 
-    public double getSolarPanelAadatPrice() {
-        return solarPanelAadatPrice;
+    public double getSolarPanelCost() {
+        return solarPanelCost;
     }
 
-    public void setSolarPanelRackBasePrice(final double solarPanelRackBasePrice) {
-        this.solarPanelRackBasePrice = solarPanelRackBasePrice;
+    public void setSolarPanelHsatCost(final double solarPanelHsatCost) {
+        this.solarPanelHsatCost = solarPanelHsatCost;
     }
 
-    public double getSolarPanelRackBasePrice() {
-        return solarPanelRackBasePrice;
+    public double getSolarPanelHsatCost() {
+        return solarPanelHsatCost;
     }
 
-    public void setSolarPanelRackHeightPrice(final double solarPanelRackHeightPrice) {
-        this.solarPanelRackHeightPrice = solarPanelRackHeightPrice;
+    public void setSolarPanelVsatCost(final double solarPanelVsatCost) {
+        this.solarPanelVsatCost = solarPanelVsatCost;
     }
 
-    public double getSolarPanelRackHeightPrice() {
-        return solarPanelRackHeightPrice;
+    public double getSolarPanelVsatCost() {
+        return solarPanelVsatCost;
     }
 
-    public void setPvModelPrice(final String model, final double price) {
-        pvModelPrices.put(model, price);
+    public void setSolarPanelAadatCost(final double solarPanelAadatCost) {
+        this.solarPanelAadatCost = solarPanelAadatCost;
     }
 
-    public double getPvModelPrice(final String model) {
-        final Double a = pvModelPrices.get(model);
+    public double getSolarPanelAadatCost() {
+        return solarPanelAadatCost;
+    }
+
+    public void setSolarPanelRackBaseCost(final double solarPanelRackBaseCost) {
+        this.solarPanelRackBaseCost = solarPanelRackBaseCost;
+    }
+
+    public double getSolarPanelRackBaseCost() {
+        return solarPanelRackBaseCost;
+    }
+
+    public void setSolarPanelRackHeightCost(final double solarPanelRackHeightCost) {
+        this.solarPanelRackHeightCost = solarPanelRackHeightCost;
+    }
+
+    public double getSolarPanelRackHeightCost() {
+        return solarPanelRackHeightCost;
+    }
+
+    public void setPvModelCost(final String model, final double cost) {
+        pvModelCosts.put(model, cost);
+    }
+
+    public double getPvModelCost(final String model) {
+        final Double a = pvModelCosts.get(model);
         if (a != null) {
             return a;
         }
         // model is new, not present in the stored prices, so we must add it here
         final double x = PvModulesData.getInstance().getModules().get(model).getPrice();
-        pvModelPrices.put(model, x);
+        pvModelCosts.put(model, x);
         return x;
     }
 

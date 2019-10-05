@@ -361,25 +361,30 @@ class SpecsDialog extends JDialog {
 
     }
 
+    private BuildingSpecsPanel buildingSpecsPanel;
+    private PvSpecsPanel pvSpecsPanel;
+    private CspSpecsPanel cspSpecsPanel;
+    private JTabbedPane tabbedPane;
+
     SpecsDialog() {
 
         super(MainFrame.getInstance(), true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setTitle("Specifications");
 
-        final JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-        final BuildingSpecsPanel buildingSpecsPanel = new BuildingSpecsPanel();
+        buildingSpecsPanel = new BuildingSpecsPanel();
         buildingSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         tabbedPane.addTab("Building", buildingSpecsPanel);
 
-        final PvSpecsPanel pvSpecsPanel = new PvSpecsPanel();
+        pvSpecsPanel = new PvSpecsPanel();
         pvSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         tabbedPane.addTab("PV", pvSpecsPanel);
 
-        final CspSpecsPanel cspSpecsPanel = new CspSpecsPanel();
+        cspSpecsPanel = new CspSpecsPanel();
         cspSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         tabbedPane.addTab("CSP", cspSpecsPanel);
 
@@ -605,6 +610,18 @@ class SpecsDialog extends JDialog {
         pack();
         setLocationRelativeTo(MainFrame.getInstance());
 
+    }
+
+    void selectBuildingSpecs() {
+        tabbedPane.setSelectedComponent(buildingSpecsPanel);
+    }
+
+    void selectPvSpecs() {
+        tabbedPane.setSelectedComponent(pvSpecsPanel);
+    }
+
+    void selectCspSpecs() {
+        tabbedPane.setSelectedComponent(cspSpecsPanel);
     }
 
 }
