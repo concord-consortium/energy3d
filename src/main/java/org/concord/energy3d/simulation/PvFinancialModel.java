@@ -14,7 +14,7 @@ import org.concord.energy3d.scene.Scene;
 /**
  * @author Charles Xie
  */
-public class PvCustomPrice implements Serializable {
+public class PvFinancialModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,7 @@ public class PvCustomPrice implements Serializable {
 
     private HashMap<String, Double> pvModelCosts;
 
-    public PvCustomPrice() {
+    public PvFinancialModel() {
         setDefaultValues();
     }
 

@@ -15,8 +15,8 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.CspCustomPrice;
-import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.CspFinancialModel;
+import org.concord.energy3d.simulation.PvFinancialModel;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.util.SpringUtilities;
@@ -40,7 +40,7 @@ class FinanceDialog extends JDialog {
 
             super(new SpringLayout());
 
-            final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+            final PvFinancialModel price = Scene.getInstance().getPvFinancialModel();
             final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
             priceFields = new JTextField[modules.size()];
             int i = 0;
@@ -79,7 +79,7 @@ class FinanceDialog extends JDialog {
             super();
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-            final PvCustomPrice finance = Scene.getInstance().getPvCustomPrice();
+            final PvFinancialModel finance = Scene.getInstance().getPvFinancialModel();
 
             JPanel container = new JPanel(new SpringLayout());
             container.setBorder(BorderFactory.createTitledBorder("Target Goals"));
@@ -189,7 +189,7 @@ class FinanceDialog extends JDialog {
             super();
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-            final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+            final CspFinancialModel price = Scene.getInstance().getCspFinancialModel();
 
             JPanel container = new JPanel(new SpringLayout());
             container.setBorder(BorderFactory.createTitledBorder("Target Goals"));
@@ -481,7 +481,7 @@ class FinanceDialog extends JDialog {
                 return;
             }
 
-            final PvCustomPrice pvFinance = Scene.getInstance().getPvCustomPrice();
+            final PvFinancialModel pvFinance = Scene.getInstance().getPvFinancialModel();
             pvFinance.setLifespan(pvLifespan);
             pvFinance.setkWhSellingPrice(pvKWhSellPrice);
             pvFinance.setLandRentalCost(pvLandUnitCost);
@@ -501,7 +501,7 @@ class FinanceDialog extends JDialog {
                 i++;
             }
 
-            final CspCustomPrice cspFinance = Scene.getInstance().getCspCustomPrice();
+            final CspFinancialModel cspFinance = Scene.getInstance().getCspFinancialModel();
             cspFinance.setLifespan(cspLifespan);
             cspFinance.setkWhSellingPrice(cspKWhSellPrice);
             cspFinance.setLandRentalCost(cspLandUnitCost);

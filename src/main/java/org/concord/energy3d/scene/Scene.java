@@ -31,12 +31,12 @@ import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
-import org.concord.energy3d.simulation.CspCustomPrice;
+import org.concord.energy3d.simulation.CspFinancialModel;
 import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.LocationData;
-import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.PvFinancialModel;
 import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
@@ -106,8 +106,8 @@ public class Scene implements Serializable {
     private Unit unit = Unit.InternationalSystemOfUnits;
     private Ground ground = new Ground();
     private Atmosphere atmosphere = new Atmosphere();
-    private PvCustomPrice pvCustomPrice = new PvCustomPrice();
-    private CspCustomPrice cspCustomPrice = new CspCustomPrice();
+    private PvFinancialModel pvFinancialModel = new PvFinancialModel();
+    private CspFinancialModel cspFinancialModel = new CspFinancialModel();
     private DesignSpecs designSpecs = new DesignSpecs();
     private PvDesignSpecs pvDesignSpecs = new PvDesignSpecs();
     private CspDesignSpecs cspDesignSpecs = new CspDesignSpecs();
@@ -134,7 +134,6 @@ public class Scene implements Serializable {
     private boolean isHeliodonVisible;
     private boolean hideAxes;
     private boolean hideLightBeams;
-    private boolean showSunAngles;
     private boolean showZenithAngle;
     private boolean showElevationAngle;
     private boolean showAzimuthAngle;
@@ -435,15 +434,15 @@ public class Scene implements Serializable {
         } else {
             cspDesignSpecs.setDefaultValues();
         }
-        if (pvCustomPrice == null) {
-            pvCustomPrice = new PvCustomPrice();
+        if (pvFinancialModel == null) {
+            pvFinancialModel = new PvFinancialModel();
         } else {
-            pvCustomPrice.setDefaultValues();
+            pvFinancialModel.setDefaultValues();
         }
-        if (cspCustomPrice == null) {
-            cspCustomPrice = new CspCustomPrice();
+        if (cspFinancialModel == null) {
+            cspFinancialModel = new CspFinancialModel();
         } else {
-            cspCustomPrice.setDefaultValues();
+            cspFinancialModel.setDefaultValues();
         }
         if (ground == null) {
             ground = new Ground();
@@ -3936,12 +3935,12 @@ public class Scene implements Serializable {
         return cspDesignSpecs;
     }
 
-    public PvCustomPrice getPvCustomPrice() {
-        return pvCustomPrice;
+    public PvFinancialModel getPvFinancialModel() {
+        return pvFinancialModel;
     }
 
-    public CspCustomPrice getCspCustomPrice() {
-        return cspCustomPrice;
+    public CspFinancialModel getCspFinancialModel() {
+        return cspFinancialModel;
     }
 
     public void setDashedLinesOnRoofShown(final boolean dashedLineOnRoofs) {

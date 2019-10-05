@@ -141,7 +141,7 @@ public class PvProjectCostGraph extends JPanel {
         add(budgetPanel, BorderLayout.NORTH);
 
         final double[] data = new double[]{landSum, solarPanelSum};
-        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvCustomPrice().getLifespan() + " years)", "Solar Panels"};
+        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvFinancialModel().getLifespan() + " years)", "Solar Panels"};
 
         PieChart pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
         pie.setBackground(Color.WHITE);

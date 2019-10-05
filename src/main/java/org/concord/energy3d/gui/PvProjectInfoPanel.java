@@ -14,7 +14,7 @@ import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.PvFinancialModel;
 import org.concord.energy3d.simulation.PvDesignSpecs;
 
 /**
@@ -105,8 +105,8 @@ public class PvProjectInfoPanel extends JPanel {
         if (specs == null) {
             return;
         }
-        final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
-        if (price == null) {
+        final PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
+        if (model == null) {
             return;
         }
         int countSolarPanels = 0;
@@ -116,7 +116,7 @@ public class PvProjectInfoPanel extends JPanel {
         if (!panels.isEmpty()) {
             countSolarPanels += panels.size();
             for (final SolarPanel s : panels) {
-                cost += price.getTotalCost(s);
+                cost += model.getTotalCost(s);
                 panelArea += s.getPanelWidth() * s.getPanelHeight();
             }
         }
@@ -124,7 +124,7 @@ public class PvProjectInfoPanel extends JPanel {
         if (!racks.isEmpty()) {
             for (final Rack r : racks) {
                 countSolarPanels += r.getNumberOfSolarPanels();
-                cost += price.getTotalCost(r);
+                cost += model.getTotalCost(r);
                 panelArea += r.getArea();
             }
         }
@@ -138,12 +138,12 @@ public class PvProjectInfoPanel extends JPanel {
         } else {
             landArea = (float) foundation.getArea();
         }
-        cost += landArea * price.getLandRentalCost() * price.getLifespan();
+        cost += landArea * model.getLandRentalCost() * model.getLifespan();
         landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
         costBar.setValue(Math.round(cost));
         costBar.setMaximum(specs.getMaximumBudget());
         costBar.setEnabled(specs.isBudgetEnabled());
-        String t = "Total cost over " + price.getLifespan() + " years";
+        String t = "Total cost over " + model.getLifespan() + " years";
         if (specs.isBudgetEnabled()) {
             t += " (" + "<$" + specs.getMaximumBudget() + ")";
         }
@@ -154,15 +154,15 @@ public class PvProjectInfoPanel extends JPanel {
     }
 
     public void updateBudgetMaximum() {
-        final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
-        if (price == null) {
+        final PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
+        if (model == null) {
             return;
         }
         final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
         if (specs == null) {
             return;
         }
-        String t = "Total cost over " + price.getLifespan() + " years";
+        String t = "Total cost over " + model.getLifespan() + " years";
         if (specs.isBudgetEnabled()) {
             t += " (" + "<$" + specs.getMaximumBudget() + ")";
         }

@@ -186,10 +186,10 @@ public class CspProjectCostGraph extends JPanel {
         String[] legends;
         if (Util.isZero(receiverSum)) {
             data = new double[]{landSum, collectorSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors"};
+            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors"};
         } else {
             data = new double[]{landSum, collectorSum, receiverSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers"};
+            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors", "Receivers"};
         }
 
         PieChart pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);

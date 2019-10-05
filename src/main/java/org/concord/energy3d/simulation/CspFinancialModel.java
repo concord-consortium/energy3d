@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author Charles Xie
  */
-public class CspCustomPrice implements Serializable {
+public class CspFinancialModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class CspCustomPrice implements Serializable {
     private double cleaningCost = 10;
     private double maintenanceCost = 1;
 
-    public CspCustomPrice() {
+    public CspFinancialModel() {
         setDefaultValues();
     }
 

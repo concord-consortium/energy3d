@@ -38,19 +38,19 @@ public class PvProjectCost extends ProjectCost {
 
     public static double getPartCost(final HousePart part) {
 
-        final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+        final PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
 
         if (part instanceof SolarPanel) {
-            return price.getTotalCost((SolarPanel) part);
+            return model.getTotalCost((SolarPanel) part);
         }
 
         if (part instanceof Rack) {
-            return price.getTotalCost((Rack) part);
+            return model.getTotalCost((Rack) part);
         }
 
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
-            return f.getArea() * price.getLandRentalCost() * price.getLifespan();
+            return f.getArea() * model.getLandRentalCost() * model.getLifespan();
         }
 
         return 0;
@@ -130,7 +130,7 @@ public class PvProjectCost extends ProjectCost {
         }
 
         final double[] data = new double[]{landSum, solarPanelSum};
-        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvCustomPrice().getLifespan() + " years)", "Solar Panels"};
+        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvFinancialModel().getLifespan() + " years)", "Solar Panels"};
 
         // show them in a popup window
         final PieChart pie = new PieChart(data, PvProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);

@@ -116,11 +116,11 @@ public class BuildingCost extends ProjectCost {
         }
 
         if (part instanceof SolarPanel) {
-            return Scene.getInstance().getPvCustomPrice().getTotalCost((SolarPanel) part);
+            return Scene.getInstance().getPvFinancialModel().getTotalCost((SolarPanel) part);
         }
 
         if (part instanceof Rack) {
-            return Scene.getInstance().getPvCustomPrice().getTotalCost((Rack) part);
+            return Scene.getInstance().getPvFinancialModel().getTotalCost((Rack) part);
         }
 
         if (part instanceof Tree) {

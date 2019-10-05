@@ -44,30 +44,30 @@ public class CspProjectCost extends ProjectCost {
 
     public static double getPartCost(final HousePart part) {
 
-        final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+        final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
 
         if (part instanceof Mirror) {
-            return price.getHeliostatUnitCost() * part.getArea();
+            return model.getHeliostatUnitCost() * part.getArea();
         }
 
         if (part instanceof ParabolicTrough) {
-            return price.getParabolicTroughUnitCost() * part.getArea();
+            return model.getParabolicTroughUnitCost() * part.getArea();
         }
 
         if (part instanceof ParabolicDish) {
-            return price.getParabolicDishUnitCost() * part.getArea();
+            return model.getParabolicDishUnitCost() * part.getArea();
         }
 
         if (part instanceof FresnelReflector) {
-            return price.getFresnelReflectorUnitCost() * part.getArea();
+            return model.getFresnelReflectorUnitCost() * part.getArea();
         }
 
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
             if (f.hasSolarReceiver()) { // TODO: solar receiver height may not be accurate while the model is still loading
-                return price.getTowerUnitCost() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
+                return model.getTowerUnitCost() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
             }
-            return f.getArea() * price.getLandRentalCost() * price.getLifespan();
+            return f.getArea() * model.getLandRentalCost() * model.getLifespan();
         }
 
         return 0;
@@ -232,10 +232,10 @@ public class CspProjectCost extends ProjectCost {
         String[] legends;
         if (Util.isZero(receiverSum)) {
             data = new double[]{landSum, collectorSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors"};
+            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors"};
         } else {
             data = new double[]{landSum, collectorSum, receiverSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers"};
+            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors", "Receivers"};
         }
 
         // show them in a popup window
