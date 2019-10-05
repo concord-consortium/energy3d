@@ -1293,6 +1293,7 @@ public class MainFrame extends JFrame {
 
             analysisMenu.addSeparator();
 
+            analysisMenu.add(getFinanceMenuItem());
             analysisMenu.add(getCostAnalysisMenuItem());
 
         }
@@ -2497,6 +2498,25 @@ public class MainFrame extends JFrame {
         return showHeatFluxVectorsMenuItem;
     }
 
+    private JMenuItem getFinanceMenuItem() {
+        if (financeMenuItem == null) {
+            financeMenuItem = new JMenuItem("Financing...");
+            financeMenuItem.addActionListener(e -> {
+                FinanceDialog dialog = new FinanceDialog();
+                switch (Scene.getInstance().getProjectType()) {
+                    case Foundation.TYPE_PV_PROJECT:
+                        dialog.selectPvPrices();
+                        break;
+                    case Foundation.TYPE_CSP_PROJECT:
+                        dialog.selectCspPrices();
+                        break;
+                }
+                dialog.setVisible(true);
+            });
+        }
+        return financeMenuItem;
+    }
+
     private JMenuItem getCostAnalysisMenuItem() {
         if (costAnalysisMenuItem == null) {
             costAnalysisMenuItem = new JMenuItem("Show Costs...");
@@ -2696,7 +2716,6 @@ public class MainFrame extends JFrame {
             editMenu.add(getSnapMenuItem());
             editMenu.add(getAutoRecomputeEnergyMenuItem());
             editMenu.addSeparator();
-            editMenu.add(getFinanceMenuItem());
             editMenu.add(getSpecificationsMenuItem());
             editMenu.add(getOverallUtilityBillMenuItem());
             editMenu.add(getSetRegionMenuItem());
@@ -3549,25 +3568,6 @@ public class MainFrame extends JFrame {
             setRegionMenuItem.addActionListener(e -> new GlobalMap(MainFrame.this).setVisible(true));
         }
         return setRegionMenuItem;
-    }
-
-    private JMenuItem getFinanceMenuItem() {
-        if (financeMenuItem == null) {
-            financeMenuItem = new JMenuItem("Finance...");
-            financeMenuItem.addActionListener(e -> {
-                FinanceDialog dialog = new FinanceDialog();
-                switch (Scene.getInstance().getProjectType()) {
-                    case Foundation.TYPE_PV_PROJECT:
-                        dialog.selectPvPrices();
-                        break;
-                    case Foundation.TYPE_CSP_PROJECT:
-                        dialog.selectCspPrices();
-                        break;
-                }
-                dialog.setVisible(true);
-            });
-        }
-        return financeMenuItem;
     }
 
     private JMenuItem getPropertiesMenuItem() {

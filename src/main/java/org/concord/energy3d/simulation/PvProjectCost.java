@@ -105,16 +105,26 @@ public class PvProjectCost extends ProjectCost {
             }
         }
 
-        double landSum = 0;
-        double solarPanelSum = 0;
+        PvFinancialModel financialModel = Scene.getInstance().getPvFinancialModel();
+
+        double landRentalCostSum = 0;
+        double solarPanelCostSum = 0;
+        double cleaningCostSum = 0;
+        double maintenanceCostSum = 0;
         String info;
         if (selectedFoundation != null) {
             info = "Zone #" + selectedFoundation.getId();
-            landSum = getPartCost(selectedFoundation);
+            landRentalCostSum = getPartCost(selectedFoundation);
             for (final HousePart p : Scene.getInstance().getParts()) {
                 if (p.getTopContainer() == selectedFoundation) {
-                    if (p instanceof SolarPanel || p instanceof Rack) {
-                        solarPanelSum += getPartCost(p);
+                    if (p instanceof SolarPanel) {
+                        solarPanelCostSum += getPartCost(p);
+                        cleaningCostSum += financialModel.getCleaningCost();
+                        maintenanceCostSum += financialModel.getMaintenanceCost();
+                    } else if (p instanceof Rack) {
+                        solarPanelCostSum += getPartCost(p);
+                        cleaningCostSum += financialModel.getCleaningCost() * ((Rack) p).getNumberOfSolarPanels();
+                        maintenanceCostSum += financialModel.getMaintenanceCost() * ((Rack) p).getNumberOfSolarPanels();
                     }
                 }
             }
@@ -122,15 +132,24 @@ public class PvProjectCost extends ProjectCost {
             info = count + " zones";
             for (final HousePart p : Scene.getInstance().getParts()) {
                 if (p instanceof Foundation) {
-                    landSum += getPartCost(p);
-                } else if (p instanceof SolarPanel || p instanceof Rack) {
-                    solarPanelSum += getPartCost(p);
+                    landRentalCostSum += getPartCost(p);
+                } else if (p instanceof SolarPanel) {
+                    solarPanelCostSum += getPartCost(p);
+                    cleaningCostSum += financialModel.getCleaningCost();
+                    maintenanceCostSum += financialModel.getMaintenanceCost();
+                } else if (p instanceof Rack) {
+                    solarPanelCostSum += getPartCost(p);
+                    cleaningCostSum += financialModel.getCleaningCost() * ((Rack) p).getNumberOfSolarPanels();
+                    maintenanceCostSum += financialModel.getMaintenanceCost() * ((Rack) p).getNumberOfSolarPanels();
                 }
             }
         }
+        cleaningCostSum *= financialModel.getLifespan();
+        maintenanceCostSum *= financialModel.getLifespan();
 
-        final double[] data = new double[]{landSum, solarPanelSum};
-        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvFinancialModel().getLifespan() + " years)", "Solar Panels"};
+        final double[] data = new double[]{landRentalCostSum, cleaningCostSum, maintenanceCostSum, solarPanelCostSum};
+        final String years = "(" + financialModel.getLifespan() + " years)";
+        final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Solar Panels (One-Time)"};
 
         // show them in a popup window
         final PieChart pie = new PieChart(data, PvProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);

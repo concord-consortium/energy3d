@@ -34,7 +34,7 @@ import org.concord.energy3d.util.Util;
  */
 public class PvProjectCostGraph extends JPanel {
 
-    public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250)};
+    public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250), new Color(50, 205, 50), new Color(255, 215, 0)};
     private static final long serialVersionUID = 1L;
 
     private final Box buttonPanel;
