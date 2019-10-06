@@ -33,7 +33,7 @@ import org.concord.energy3d.util.Util;
 /**
  * @author Charles Xie
  */
-public class PvProjectCostGraphForZone extends JPanel {
+public class PvProjectZoneCostGraph extends JPanel {
 
     public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250),
             new Color(50, 205, 50), new Color(218, 165, 32), new Color(225, 105, 155)};
@@ -43,7 +43,7 @@ public class PvProjectCostGraphForZone extends JPanel {
     private final JPanel budgetPanel;
     private final ColorBar budgetBar;
     private final JPopupMenu popupMenu;
-    private final DecimalFormat noDecimals = new DecimalFormat();
+    private final DecimalFormat noDecimal = new DecimalFormat();
     private Foundation foundation;
 
     // the following costs are only for the selected zone, represented by the foundation
@@ -54,11 +54,11 @@ public class PvProjectCostGraphForZone extends JPanel {
     private double loanInterest;
     private double totalCost;
 
-    PvProjectCostGraphForZone() {
+    PvProjectZoneCostGraph() {
 
         super(new BorderLayout());
 
-        noDecimals.setMaximumFractionDigits(0);
+        noDecimal.setMaximumFractionDigits(0);
         budgetPanel = new JPanel(new BorderLayout());
         budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
         budgetBar.setPreferredSize(new Dimension(100, 16));
@@ -98,7 +98,7 @@ public class PvProjectCostGraphForZone extends JPanel {
 
         });
         final JMenuItem mi = new JMenuItem("Copy Image");
-        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(PvProjectCostGraphForZone.this));
+        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(this));
         popupMenu.add(mi);
     }
 
@@ -143,7 +143,7 @@ public class PvProjectCostGraphForZone extends JPanel {
             final PvDesignSpecs pvSpecs = Scene.getInstance().getPvDesignSpecs();
             budgetBar.setEnabled(pvSpecs.isBudgetEnabled());
             budgetBar.setMaximum(pvSpecs.getMaximumBudget());
-            final String t = "Total (" + (pvSpecs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(pvSpecs.getMaximumBudget()) : "$") + ")";
+            final String t = "Total (" + (pvSpecs.isBudgetEnabled() ? "\u2264 $" + noDecimal.format(pvSpecs.getMaximumBudget()) : "$") + ")";
             budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
             budgetBar.setValue((float) totalCost);
             budgetBar.repaint();
@@ -177,7 +177,7 @@ public class PvProjectCostGraphForZone extends JPanel {
                     PvProjectCost.getInstance().showGraph();
                 } else {
                     if (Util.isRightClick(e)) {
-                        popupMenu.show(PvProjectCostGraphForZone.this, e.getX(), e.getY());
+                        popupMenu.show(PvProjectZoneCostGraph.this, e.getX(), e.getY());
                     }
                 }
             }

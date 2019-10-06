@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.gui.PvProjectCostGraphForZone;
+import org.concord.energy3d.gui.PvProjectZoneCostGraph;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -85,8 +85,7 @@ public class PvProjectCost extends ProjectCost {
             }
         }
         double cost = solarPanelCost + landRentalCost;
-        int numberOfSolarPanels = Scene.getInstance().countSolarPanels();
-        cost += numberOfSolarPanels * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
+        cost += Scene.getInstance().countSolarPanels() * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
         cost += solarPanelCost * model.getLoanInterestRate() * model.getLifespan();
         return cost;
     }
@@ -95,15 +94,31 @@ public class PvProjectCost extends ProjectCost {
         if (foundation == null || foundation.getProjectType() != Foundation.TYPE_PV_PROJECT) {
             return 0;
         }
-        double sum = getPartCost(foundation);
+        PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
+        double solarPanelCost = 0;
+        double cleaningCost = 0;
+        double maintenanceCost = 0;
+        double loanInterest = 0;
+        double landRentalCost = getPartCost(foundation);
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p.getTopContainer() == foundation) {
-                if (p instanceof SolarPanel || p instanceof Rack) {
-                    sum += getPartCost(p);
+                if (p instanceof SolarPanel) {
+                    solarPanelCost += getPartCost(p);
+                    cleaningCost += model.getCleaningCost();
+                    maintenanceCost += model.getMaintenanceCost();
+                }
+                if (p instanceof Rack) {
+                    solarPanelCost += getPartCost(p);
+                    int n = ((Rack) p).getNumberOfSolarPanels();
+                    cleaningCost += model.getCleaningCost() * n;
+                    maintenanceCost += model.getMaintenanceCost() * n;
                 }
             }
         }
-        return sum;
+        cleaningCost *= model.getLifespan();
+        maintenanceCost *= model.getLifespan();
+        loanInterest = solarPanelCost * model.getLoanInterestRate() * model.getLifespan();
+        return landRentalCost + cleaningCost + maintenanceCost + loanInterest + solarPanelCost;
     }
 
     @Override
@@ -128,13 +143,13 @@ public class PvProjectCost extends ProjectCost {
                 count++;
                 if (selectedFoundation == null) {
                     final Foundation foundation = (Foundation) p;
-                    details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+                    details += "Zone #" + foundation.getId() + ": $" + Graph.TWO_DECIMALS.format(getCostByFoundation(foundation)) + " | ";
                 }
             }
         }
         if (selectedFoundation == null) {
             if (count > 0) {
-                details = details.substring(0, details.length() - 2);
+                details = details.substring(0, details.length() - 3);
             }
         }
 
@@ -187,7 +202,7 @@ public class PvProjectCost extends ProjectCost {
         final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Solar Panels (One-Time)"};
 
         // show them in a popup window
-        final PieChart pie = new PieChart(data, PvProjectCostGraphForZone.colors, legends, "$", info, count > 1 ? details : null, true);
+        final PieChart pie = new PieChart(data, PvProjectZoneCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);
         pie.setBackground(Color.WHITE);
         pie.setBorder(BorderFactory.createEtchedBorder());
         final JDialog dialog = new JDialog(MainFrame.getInstance(), "Cost Breakdown", true);

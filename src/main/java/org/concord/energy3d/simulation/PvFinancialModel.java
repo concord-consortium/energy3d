@@ -18,9 +18,12 @@ public class PvFinancialModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // revenue goals
     private int lifespan = 20;
     private double kWhSellingPrice = 0.1;
 
+    // upfront costs
+    private HashMap<String, Double> pvModelCosts;
     private double customSolarPanelCost = 1000;
     private double solarPanelRackBaseCost = 20;
     private double solarPanelRackHeightCost = 20;
@@ -28,12 +31,11 @@ public class PvFinancialModel implements Serializable {
     private double solarPanelVsatCost = 10;
     private double solarPanelAadatCost = 15;
 
+    // operational costs
     private double landRentalCost;
     private double cleaningCost = 2;
     private double maintenanceCost = 1;
     private double loanInterestRate = 0.05; // not percentage
-
-    private HashMap<String, Double> pvModelCosts;
 
     public PvFinancialModel() {
         setDefaultValues();
@@ -82,7 +84,7 @@ public class PvFinancialModel implements Serializable {
         }
     }
 
-    public double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
+    double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
         double upfrontCost = PvProjectCost.getTotalSolarPanelCost();
         double roi = annualOutput * lifespan * kWhSellingPrice;
         roi -= landRentalCost * lifespan * landArea;
@@ -92,72 +94,64 @@ public class PvFinancialModel implements Serializable {
         return roi * 100; // convert to percentage
     }
 
-    public double getCost(final Rack r) {
-        final String modelName = r.getSolarPanel().getModelName();
-        double cost = 0;
+    private double getSolarPanelCost(SolarPanel s) {
+        final String modelName = s.getModelName();
         if ("Custom".equals(modelName)) {
-            cost = customSolarPanelCost;
-        } else {
-            final Double d = pvModelCosts.get(modelName);
-            if (d != null) {
-                cost = d;
-            }
+            return customSolarPanelCost;
         }
-        cost += solarPanelRackBaseCost;
-        boolean flat;
-        final HousePart container = r.getContainer();
+        final Double d = pvModelCosts.get(modelName);
+        if (d != null) {
+            return d;
+        }
+        return 0;
+    }
+
+    private double getTrackerCost(Trackable t) {
+        double cost = 0;
+        switch (t.getTracker()) {
+            case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+                cost = solarPanelHsatCost;
+                break;
+            case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+                cost = solarPanelVsatCost;
+                break;
+            case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+                cost = solarPanelAadatCost;
+                break;
+        }
+        return cost;
+    }
+
+    private boolean onFlatSurface(HousePart p) {
+        boolean flat = true;
+        final HousePart container = p.getContainer();
         if (container instanceof Roof) {
             final Roof roof = (Roof) container;
             flat = roof.getHeight() < 0.1;
-        } else {
-            flat = true;
         }
-        if (flat) {
+        return flat;
+    }
+
+    public double getCost(final Rack r) {
+        double cost = getSolarPanelCost(r.getSolarPanel()) + solarPanelRackBaseCost;
+        if (onFlatSurface(r)) {
             final double baseHeight = r.getPoleHeight() * Scene.getInstance().getScale();
             if (baseHeight > 1) {
                 cost += solarPanelRackHeightCost * (baseHeight - 1);
             }
-            switch (r.getTracker()) {
-                case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                    cost += solarPanelHsatCost;
-                    break;
-                case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                    cost += solarPanelVsatCost;
-                    break;
-                case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                    cost += solarPanelAadatCost;
-                    break;
-            }
+            cost += getTrackerCost(r);
         }
         return cost * r.getNumberOfSolarPanels();
     }
 
     public double getCost(final SolarPanel s) {
-        final String modelName = s.getModelName();
-        double cost = 0;
-        if ("Custom".equals(modelName)) {
-            cost = customSolarPanelCost;
-        } else {
-            final Double d = pvModelCosts.get(modelName);
-            if (d != null) {
-                cost = d;
+        double cost = getSolarPanelCost(s) + solarPanelRackBaseCost;
+        if (onFlatSurface(s)) {
+            final double baseHeight = s.getPoleHeight() * Scene.getInstance().getScale();
+            if (baseHeight > 1) {
+                cost += solarPanelRackHeightCost * (baseHeight - 1);
             }
-        }
-        cost += solarPanelRackBaseCost;
-        final double baseHeight = s.getPoleHeight() * Scene.getInstance().getScale();
-        if (baseHeight > 1) {
-            cost += solarPanelRackHeightCost * (baseHeight - 1);
-        }
-        switch (s.getTracker()) {
-            case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-                cost += solarPanelHsatCost;
-                break;
-            case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-                cost += solarPanelVsatCost;
-                break;
-            case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-                cost += solarPanelAadatCost;
-                break;
+            cost += getTrackerCost(s);
         }
         return cost;
     }

@@ -112,11 +112,11 @@ class PvModelsDialog extends JDialog {
             final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
             if (selectedPart != null) {
                 if (selectedPart instanceof Foundation) {
-                    EnergyPanel.getInstance().getPvProjectInfoForZone().update((Foundation) selectedPart);
+                    EnergyPanel.getInstance().getPvProjectZoneInfoPanel().update((Foundation) selectedPart);
                 } else {
                     final Foundation foundation = selectedPart.getTopContainer();
                     if (foundation != null) {
-                        EnergyPanel.getInstance().getPvProjectInfoForZone().update(foundation);
+                        EnergyPanel.getInstance().getPvProjectZoneInfoPanel().update(foundation);
                     }
                 }
             }

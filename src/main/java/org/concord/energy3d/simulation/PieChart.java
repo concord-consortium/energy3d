@@ -68,14 +68,17 @@ public class PieChart extends JComponent {
                     if (arcs[i].contains(e.getX(), e.getY())) {
                         selectedIndex = i;
                         repaint();
-                        setToolTipText(legends[i] + ": " + unit + Math.round(data[i]));
+                        setToolTipText(legends[i] + ": " + unit + Graph.TWO_DECIMALS.format(data[i]));
                         return;
                     }
                 }
                 String toolTipText = "<html><h4>Data:</h4><hr>";
+                double total = 0;
                 for (int i = 0; i < data.length; i++) {
-                    toolTipText += legends[i] + ": " + unit + Math.round(data[i]) + "<br>";
+                    toolTipText += legends[i] + ": " + unit + Graph.TWO_DECIMALS.format(data[i]) + "<br>";
+                    total += data[i];
                 }
+                toolTipText += "Total: " + unit + Graph.TWO_DECIMALS.format(total) + "<br>";
                 toolTipText += "<hr>Hover mouse over the pie chart to view the numbers.";
                 setToolTipText(toolTipText + (popup ? "" : "<br>Double-click to enlarge this chart.") + "</html>");
                 repaint();
