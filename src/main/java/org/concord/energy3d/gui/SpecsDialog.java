@@ -587,7 +587,7 @@ class SpecsDialog extends JDialog {
                         EnergyPanel.getInstance().getPvProjectZoneInfoPanel().update(foundation);
                         break;
                     case Foundation.TYPE_CSP_PROJECT:
-                        EnergyPanel.getInstance().getCspProjectInfoPanel().update(foundation);
+                        EnergyPanel.getInstance().getCspProjectZoneInfoPanel().update(foundation);
                         break;
                 }
             }

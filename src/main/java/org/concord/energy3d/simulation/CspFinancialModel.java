@@ -1,30 +1,21 @@
 package org.concord.energy3d.simulation;
 
-import java.io.Serializable;
-
 /**
  * @author Charles Xie
  */
-public class CspFinancialModel implements Serializable {
+public class CspFinancialModel extends FinancialModel {
 
     private static final long serialVersionUID = 1L;
 
-    private int lifespan = 50;
-    private double kWhSellingPrice = 0.15;
-
+    // upfront costs
     private double heliostatUnitCost = 100;
     private double towerUnitCost = 5000;
     private double parabolicTroughUnitCost = 100;
     private double parabolicDishUnitCost = 100;
     private double fresnelReflectorUnitCost = 50;
 
-    private double landRentalCost;
-    private double cleaningCost = 10;
-    private double maintenanceCost = 1;
-    private double loanInterestRate = 0.05; // not percentage
-
     public CspFinancialModel() {
-        setDefaultValues();
+        super();
     }
 
     public void setDefaultValues() {
@@ -58,54 +49,6 @@ public class CspFinancialModel implements Serializable {
         if (fresnelReflectorUnitCost == 0) {
             fresnelReflectorUnitCost = 50;
         }
-    }
-
-    public void setLifespan(final int lifespan) {
-        this.lifespan = lifespan;
-    }
-
-    public int getLifespan() {
-        return lifespan;
-    }
-
-    public void setkWhSellingPrice(final double kWhSellingPrice) {
-        this.kWhSellingPrice = kWhSellingPrice;
-    }
-
-    public double getkWhSellingPrice() {
-        return kWhSellingPrice;
-    }
-
-    public void setLoanInterestRate(double loanInterestRate) {
-        this.loanInterestRate = loanInterestRate;
-    }
-
-    public double getLoanInterestRate() {
-        return loanInterestRate;
-    }
-
-    public void setLandRentalCost(final double landRentalCost) {
-        this.landRentalCost = landRentalCost;
-    }
-
-    public double getLandRentalCost() {
-        return landRentalCost;
-    }
-
-    public void setCleaningCost(final double cleaningCost) {
-        this.cleaningCost = cleaningCost;
-    }
-
-    public double getCleaningCost() {
-        return cleaningCost;
-    }
-
-    public void setMaintenanceCost(final double maintenanceCost) {
-        this.maintenanceCost = maintenanceCost;
-    }
-
-    public double getMaintenanceCost() {
-        return maintenanceCost;
     }
 
     public void setParabolicTroughUnitCost(final double parabolicTroughUnitCost) {

@@ -484,12 +484,12 @@ class FinancialSettingsDialog extends JDialog {
             if (selectedPart != null) {
                 if (selectedPart instanceof Foundation) {
                     EnergyPanel.getInstance().getPvProjectZoneInfoPanel().update((Foundation) selectedPart);
-                    EnergyPanel.getInstance().getCspProjectInfoPanel().update((Foundation) selectedPart);
+                    EnergyPanel.getInstance().getCspProjectZoneInfoPanel().update((Foundation) selectedPart);
                 } else {
                     final Foundation foundation = selectedPart.getTopContainer();
                     if (foundation != null) {
                         EnergyPanel.getInstance().getPvProjectZoneInfoPanel().update(foundation);
-                        EnergyPanel.getInstance().getCspProjectInfoPanel().update(foundation);
+                        EnergyPanel.getInstance().getCspProjectZoneInfoPanel().update(foundation);
                     }
                 }
             }

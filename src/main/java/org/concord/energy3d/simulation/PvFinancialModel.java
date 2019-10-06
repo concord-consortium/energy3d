@@ -1,6 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,13 +13,9 @@ import org.concord.energy3d.scene.Scene;
 /**
  * @author Charles Xie
  */
-public class PvFinancialModel implements Serializable {
+public class PvFinancialModel extends FinancialModel {
 
     private static final long serialVersionUID = 1L;
-
-    // revenue goals
-    private int lifespan = 20;
-    private double kWhSellingPrice = 0.1;
 
     // upfront costs
     private HashMap<String, Double> pvModelCosts;
@@ -31,14 +26,8 @@ public class PvFinancialModel implements Serializable {
     private double solarPanelVsatCost = 10;
     private double solarPanelAadatCost = 15;
 
-    // operational costs
-    private double landRentalCost;
-    private double cleaningCost = 2;
-    private double maintenanceCost = 1;
-    private double loanInterestRate = 0.05; // not percentage
-
     public PvFinancialModel() {
-        setDefaultValues();
+        super();
     }
 
     public void setDefaultValues() {
@@ -154,54 +143,6 @@ public class PvFinancialModel implements Serializable {
             cost += getTrackerCost(s);
         }
         return cost;
-    }
-
-    public void setLifespan(final int lifespan) {
-        this.lifespan = lifespan;
-    }
-
-    public int getLifespan() {
-        return lifespan;
-    }
-
-    public void setkWhSellingPrice(final double kWhSellPrice) {
-        this.kWhSellingPrice = kWhSellPrice;
-    }
-
-    public double getkWhSellingPrice() {
-        return kWhSellingPrice;
-    }
-
-    public void setLoanInterestRate(double loanInterestRate) {
-        this.loanInterestRate = loanInterestRate;
-    }
-
-    public double getLoanInterestRate() {
-        return loanInterestRate;
-    }
-
-    public void setLandRentalCost(final double landRentalCost) {
-        this.landRentalCost = landRentalCost;
-    }
-
-    public double getLandRentalCost() {
-        return landRentalCost;
-    }
-
-    public void setCleaningCost(final double cleaningCost) {
-        this.cleaningCost = cleaningCost;
-    }
-
-    public double getCleaningCost() {
-        return cleaningCost;
-    }
-
-    public void setMaintenanceCost(final double maintenanceCost) {
-        this.maintenanceCost = maintenanceCost;
-    }
-
-    public double getMaintenanceCost() {
-        return maintenanceCost;
     }
 
     public void setCustomSolarPanelCost(final double customSolarPanelCost) {

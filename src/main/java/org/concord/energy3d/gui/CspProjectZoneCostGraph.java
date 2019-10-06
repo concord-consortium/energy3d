@@ -19,13 +19,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.FresnelReflector;
-import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.model.SolarCollector;
+import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.CspFinancialModel;
 import org.concord.energy3d.simulation.CspProjectCost;
 import org.concord.energy3d.simulation.PieChart;
 import org.concord.energy3d.simulation.PvDesignSpecs;
@@ -35,9 +32,10 @@ import org.concord.energy3d.util.Util;
 /**
  * @author Charles Xie
  */
-public class CspProjectCostGraph extends JPanel {
+public class CspProjectZoneCostGraph extends JPanel {
 
-    public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169)};
+    public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250),
+            new Color(50, 205, 50), new Color(218, 165, 32), new Color(225, 105, 155), new Color(155, 105, 225)};
     private static final long serialVersionUID = 1L;
 
     private final Box buttonPanel;
@@ -46,12 +44,17 @@ public class CspProjectCostGraph extends JPanel {
     private final JPopupMenu popupMenu;
     private final DecimalFormat noDecimals = new DecimalFormat();
     private Foundation foundation;
-    private double landSum;
-    private double collectorSum;
-    private double receiverSum;
+
+    private double collectorCost;
+    private double receiverCost;
+    private double landRentalCost;
+    private double cleaningCost;
+    private double maintenanceCost;
+    private double loanInterest;
     private double totalCost;
 
-    CspProjectCostGraph() {
+    CspProjectZoneCostGraph() {
+
         super(new BorderLayout());
 
         noDecimals.setMaximumFractionDigits(0);
@@ -94,60 +97,77 @@ public class CspProjectCostGraph extends JPanel {
 
         });
         final JMenuItem mi = new JMenuItem("Copy Image");
-        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(CspProjectCostGraph.this));
+        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(this));
         popupMenu.add(mi);
     }
 
     private void calculateCost() {
-        landSum = 0;
-        collectorSum = 0;
-        receiverSum = 0;
-        if (foundation.hasSolarReceiver()) {
-            receiverSum = CspProjectCost.getPartCost(foundation);
-        } else {
-            landSum = CspProjectCost.getPartCost(foundation);
-            final List<Mirror> mirrors = foundation.getHeliostats();
-            if (!mirrors.isEmpty()) {
-                final ArrayList<Foundation> towers = new ArrayList<>();
-                for (final Mirror m : mirrors) {
-                    if (m.getReceiver() != null) {
-                        if (!towers.contains(m.getReceiver())) {
-                            towers.add(m.getReceiver());
-                        }
-                    }
-                }
-                if (!towers.isEmpty()) {
-                    for (final Foundation tower : towers) {
-                        receiverSum += CspProjectCost.getPartCost(tower);
-                    }
-                }
-            } else {
-                final List<FresnelReflector> reflectors = foundation.getFresnelReflectors();
-                if (!reflectors.isEmpty()) {
-                    final ArrayList<Foundation> absorbers = new ArrayList<>();
-                    for (final FresnelReflector r : reflectors) {
-                        if (r.getReceiver() != null) {
-                            if (!absorbers.contains(r.getReceiver())) {
-                                absorbers.add(r.getReceiver());
-                            }
-                        }
-                    }
-                    if (!absorbers.isEmpty()) {
-                        for (final Foundation absorber : absorbers) {
-                            receiverSum += CspProjectCost.getPartCost(absorber);
-                        }
+
+        cleaningCost = 0;
+        maintenanceCost = 0;
+        loanInterest = 0;
+        collectorCost = 0;
+        receiverCost = 0;
+
+        CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
+
+        // get costs for receivers or absorbers
+        final List<Mirror> mirrors = foundation.getHeliostats();
+        if (!mirrors.isEmpty()) {
+            final ArrayList<Foundation> towers = new ArrayList<>();
+            for (final Mirror m : mirrors) {
+                if (m.getReceiver() != null) {
+                    if (!towers.contains(m.getReceiver())) {
+                        towers.add(m.getReceiver());
                     }
                 }
             }
+            if (!towers.isEmpty()) {
+                for (final Foundation tower : towers) {
+                    receiverCost += CspProjectCost.getPartCost(tower);
+                }
+            }
         }
+        final List<FresnelReflector> reflectors = foundation.getFresnelReflectors();
+        if (!reflectors.isEmpty()) {
+            final ArrayList<Foundation> absorbers = new ArrayList<>();
+            for (final FresnelReflector r : reflectors) {
+                if (r.getReceiver() != null) {
+                    if (!absorbers.contains(r.getReceiver())) {
+                        absorbers.add(r.getReceiver());
+                    }
+                }
+            }
+            if (!absorbers.isEmpty()) {
+                for (final Foundation absorber : absorbers) {
+                    receiverCost += CspProjectCost.getPartCost(absorber);
+                }
+            }
+        }
+
+        // get costs for collectors
+        int countModules = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p.getTopContainer() == foundation) {
                 if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
-                    collectorSum += CspProjectCost.getPartCost(p);
+                    collectorCost += CspProjectCost.getPartCost(p);
+                    if (p instanceof Mirror || p instanceof ParabolicDish) {
+                        countModules++;
+                    } else if (p instanceof ParabolicTrough) {
+                        countModules += ((ParabolicTrough) p).getNumberOfModules();
+                    } else if (p instanceof FresnelReflector) {
+                        countModules += ((FresnelReflector) p).getNumberOfModules();
+                    }
                 }
             }
         }
-        totalCost = landSum + collectorSum + receiverSum;
+
+        landRentalCost = CspProjectCost.getPartCost(foundation);
+        cleaningCost = model.getCleaningCost() * countModules * model.getLifespan();
+        maintenanceCost = model.getMaintenanceCost() * countModules * model.getLifespan();
+        loanInterest = (collectorCost + receiverCost) * model.getLoanInterestRate() * model.getLifespan();
+        totalCost = landRentalCost + cleaningCost + maintenanceCost + loanInterest + collectorCost + receiverCost;
+
     }
 
     void removeGraph() {
@@ -184,12 +204,14 @@ public class CspProjectCostGraph extends JPanel {
 
         double[] data;
         String[] legends;
-        if (Util.isZero(receiverSum)) {
-            data = new double[]{landSum, collectorSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors"};
+        CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
+        String years = "(" + model.getLifespan() + " years)";
+        if (Util.isZero(receiverCost)) {
+            data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, collectorCost};
+            legends = new String[]{"Land " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)"};
         } else {
-            data = new double[]{landSum, collectorSum, receiverSum};
-            legends = new String[]{"Land (" + Scene.getInstance().getCspFinancialModel().getLifespan() + " years)", "Collectors", "Receivers"};
+            data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, collectorCost, receiverCost};
+            legends = new String[]{"Land " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)", "Receivers (One-Time)"};
         }
 
         PieChart pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
@@ -203,7 +225,7 @@ public class CspProjectCostGraph extends JPanel {
                     CspProjectCost.getInstance().showGraph();
                 } else {
                     if (Util.isRightClick(e)) {
-                        popupMenu.show(CspProjectCostGraph.this, e.getX(), e.getY());
+                        popupMenu.show(CspProjectZoneCostGraph.this, e.getX(), e.getY());
                     }
                 }
             }

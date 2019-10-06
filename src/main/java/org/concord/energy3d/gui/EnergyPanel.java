@@ -165,13 +165,13 @@ public class EnergyPanel extends JPanel {
     private JTextField partProperty3TextField;
     private BuildingCostGraph buildingCostGraph;
     private PvProjectZoneCostGraph pvProjectZoneCostGraph;
-    private CspProjectCostGraph cspProjectCostGraph;
+    private CspProjectZoneCostGraph cspProjectZoneCostGraph;
     private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
     private PvProjectDailyEnergyGraph pvProjectDailyEnergyGraph;
     private CspProjectDailyEnergyGraph cspProjectDailyEnergyGraph;
     private BuildingInfoPanel buildingInfoPanel;
     private PvProjectZoneInfoPanel pvProjectZoneInfoPanel;
-    private CspProjectInfoPanel cspProjectInfoPanel;
+    private CspProjectZoneInfoPanel cspProjectZoneInfoPanel;
     private JTabbedPane buildingTabbedPane, pvProjectTabbedPane, cspProjectTabbedPane, instructionTabbedPane;
     private TabbedPaneUI instructionTabbedPaneUI;
     private JPanel buildingPanel, pvProjectPanel, cspProjectPanel, instructionPanel;
@@ -609,11 +609,11 @@ public class EnergyPanel extends JPanel {
         cspProjectTabbedPane.setFont(new Font(cspProjectTabbedPane.getFont().getName(), Font.PLAIN, cspProjectTabbedPane.getFont().getSize() - 1));
         cspProjectPanel.add(cspProjectTabbedPane);
 
-        cspProjectInfoPanel = new CspProjectInfoPanel();
-        cspProjectTabbedPane.add("Info", cspProjectInfoPanel);
+        cspProjectZoneInfoPanel = new CspProjectZoneInfoPanel();
+        cspProjectTabbedPane.add("Info", cspProjectZoneInfoPanel);
 
-        cspProjectCostGraph = new CspProjectCostGraph(); // cost graph
-        cspProjectTabbedPane.add("Cost", cspProjectCostGraph);
+        cspProjectZoneCostGraph = new CspProjectZoneCostGraph(); // cost graph
+        cspProjectTabbedPane.add("Cost", cspProjectZoneCostGraph);
 
         cspProjectDailyEnergyGraph = new CspProjectDailyEnergyGraph();
         cspProjectTabbedPane.add("Output", cspProjectDailyEnergyGraph);
@@ -1055,8 +1055,8 @@ public class EnergyPanel extends JPanel {
         return pvProjectZoneInfoPanel;
     }
 
-    public CspProjectInfoPanel getCspProjectInfoPanel() {
-        return cspProjectInfoPanel;
+    public CspProjectZoneInfoPanel getCspProjectZoneInfoPanel() {
+        return cspProjectZoneInfoPanel;
     }
 
     public BuildingCostGraph getBuildingCostGraph() {
@@ -1067,8 +1067,8 @@ public class EnergyPanel extends JPanel {
         return pvProjectZoneCostGraph;
     }
 
-    public CspProjectCostGraph getCspProjectCostGraph() {
-        return cspProjectCostGraph;
+    public CspProjectZoneCostGraph getCspProjectZoneCostGraph() {
+        return cspProjectZoneCostGraph;
     }
 
     public BuildingDailyEnergyGraph getBuildingDailyEnergyGraph() {
@@ -1089,7 +1089,7 @@ public class EnergyPanel extends JPanel {
     public void clearAllGraphs() {
         buildingCostGraph.removeGraph();
         pvProjectZoneCostGraph.removeGraph();
-        cspProjectCostGraph.removeGraph();
+        cspProjectZoneCostGraph.removeGraph();
         buildingDailyEnergyGraph.removeGraph();
         pvProjectDailyEnergyGraph.removeGraph();
         cspProjectDailyEnergyGraph.removeGraph();
@@ -1935,7 +1935,7 @@ public class EnergyPanel extends JPanel {
                         dataPanel.remove(buildingPanel);
                         dataPanel.remove(pvProjectPanel);
                         dataPanel.add(cspProjectPanel, 2);
-                        cspProjectInfoPanel.update(selectedFoundation);
+                        cspProjectZoneInfoPanel.update(selectedFoundation);
                         break;
                     case -1:
                         dataPanel.remove(instructionPanel);
@@ -2022,9 +2022,9 @@ public class EnergyPanel extends JPanel {
             buildingInfoPanel.updateWallNumberBounds();
             pvProjectZoneInfoPanel.updateSolarPanelNumberMaximum();
             pvProjectZoneInfoPanel.updateBudgetMaximum();
-            cspProjectInfoPanel.updateHeliostatNumberMaximum();
-            cspProjectInfoPanel.updateParabolicTroughNumberMaximum();
-            cspProjectInfoPanel.updateBudgetMaximum();
+            cspProjectZoneInfoPanel.updateHeliostatNumberMaximum();
+            cspProjectZoneInfoPanel.updateParabolicTroughNumberMaximum();
+            cspProjectZoneInfoPanel.updateBudgetMaximum();
             SceneManager.getTaskManager().update(() -> {
                 updateProperties();
                 return null;
@@ -2079,14 +2079,14 @@ public class EnergyPanel extends JPanel {
                         pvProjectDailyEnergyGraph.addGraph(f);
                         break;
                     case Foundation.TYPE_CSP_PROJECT:
-                        cspProjectCostGraph.addGraph(f);
+                        cspProjectZoneCostGraph.addGraph(f);
                         cspProjectDailyEnergyGraph.addGraph(f);
                         break;
                 }
             } else {
                 buildingCostGraph.removeGraph();
                 pvProjectZoneCostGraph.removeGraph();
-                cspProjectCostGraph.removeGraph();
+                cspProjectZoneCostGraph.removeGraph();
                 buildingDailyEnergyGraph.removeGraph();
                 pvProjectDailyEnergyGraph.removeGraph();
                 cspProjectDailyEnergyGraph.removeGraph();

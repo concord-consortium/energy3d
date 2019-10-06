@@ -45,8 +45,8 @@ public class CspDesignSpecs implements Serializable {
     public void setBudgetEnabled(final boolean budgetEnabled) {
         this.budgetEnabled = budgetEnabled;
         EventQueue.invokeLater(() -> {
-            EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
-            EnergyPanel.getInstance().getCspProjectInfoPanel().updateBudgetMaximum();
+            EnergyPanel.getInstance().getCspProjectZoneCostGraph().updateBudget();
+            EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateBudgetMaximum();
         });
     }
 
@@ -57,8 +57,8 @@ public class CspDesignSpecs implements Serializable {
     public void setMaximumBudget(final int maximumBudget) {
         this.maximumBudget = maximumBudget;
         EventQueue.invokeLater(() -> {
-            EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
-            EnergyPanel.getInstance().getCspProjectInfoPanel().updateBudgetMaximum();
+            EnergyPanel.getInstance().getCspProjectZoneCostGraph().updateBudget();
+            EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateBudgetMaximum();
         });
     }
 
@@ -68,7 +68,7 @@ public class CspDesignSpecs implements Serializable {
 
     public void setNumberOfMirrorsEnabled(final boolean numberOfMirrorsEnabled) {
         this.numberOfMirrorsEnabled = numberOfMirrorsEnabled;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectInfoPanel().updateHeliostatNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateHeliostatNumberMaximum());
     }
 
     public boolean isNumberOfMirrorsEnabled() {
@@ -77,7 +77,7 @@ public class CspDesignSpecs implements Serializable {
 
     public void setMaximumNumberOfMirrors(final int maximumNumberOfMirrors) {
         this.maximumNumberOfMirrors = maximumNumberOfMirrors;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectInfoPanel().updateHeliostatNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateHeliostatNumberMaximum());
     }
 
     public int getMaximumNumberOfMirrors() {
@@ -86,7 +86,7 @@ public class CspDesignSpecs implements Serializable {
 
     public void setNumberOfParabolicTroughsEnabled(final boolean numberOfParabolicTroughsEnabled) {
         this.numberOfParabolicTroughsEnabled = numberOfParabolicTroughsEnabled;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectInfoPanel().updateParabolicTroughNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateParabolicTroughNumberMaximum());
     }
 
     public boolean isNumberOfParabolicTroughsEnabled() {
@@ -95,7 +95,7 @@ public class CspDesignSpecs implements Serializable {
 
     public void setMaximumNumberOfParabolicTroughs(final int maximumNumberOfParabolicTroughs) {
         this.maximumNumberOfParabolicTroughs = maximumNumberOfParabolicTroughs;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectInfoPanel().updateParabolicTroughNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getCspProjectZoneInfoPanel().updateParabolicTroughNumberMaximum());
     }
 
     public int getMaximumNumberOfParabolicTroughs() {

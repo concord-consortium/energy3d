@@ -259,7 +259,7 @@ public class Scene implements Serializable {
                         e.validate();
                         break;
                     case Foundation.TYPE_CSP_PROJECT:
-                        e.getCspProjectCostGraph().addGraph(f);
+                        e.getCspProjectZoneCostGraph().addGraph(f);
                         e.getCspProjectDailyEnergyGraph().clearData();
                         e.getCspProjectDailyEnergyGraph().addGraph(f);
                         e.validate();
