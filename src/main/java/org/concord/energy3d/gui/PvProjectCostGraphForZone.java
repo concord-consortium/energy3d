@@ -25,6 +25,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.PieChart;
 import org.concord.energy3d.simulation.PvDesignSpecs;
+import org.concord.energy3d.simulation.PvFinancialModel;
 import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
@@ -32,10 +33,10 @@ import org.concord.energy3d.util.Util;
 /**
  * @author Charles Xie
  */
-public class PvProjectCostGraph extends JPanel {
+public class PvProjectCostGraphForZone extends JPanel {
 
     public final static Color[] colors = new Color[]{new Color(250, 128, 114), new Color(135, 206, 250),
-            new Color(50, 205, 50), new Color(218, 165, 32), new Color(105, 105, 105)};
+            new Color(50, 205, 50), new Color(218, 165, 32), new Color(225, 105, 155)};
     private static final long serialVersionUID = 1L;
 
     private final Box buttonPanel;
@@ -44,11 +45,17 @@ public class PvProjectCostGraph extends JPanel {
     private final JPopupMenu popupMenu;
     private final DecimalFormat noDecimals = new DecimalFormat();
     private Foundation foundation;
-    private double landSum;
-    private double solarPanelSum;
+
+    // the following costs are only for the selected zone, represented by the foundation
+    private double landRentalCost;
+    private double solarPanelCost;
+    private double cleaningCost;
+    private double maintenanceCost;
+    private double loanInterest;
     private double totalCost;
 
-    PvProjectCostGraph() {
+    PvProjectCostGraphForZone() {
+
         super(new BorderLayout());
 
         noDecimals.setMaximumFractionDigits(0);
@@ -91,22 +98,35 @@ public class PvProjectCostGraph extends JPanel {
 
         });
         final JMenuItem mi = new JMenuItem("Copy Image");
-        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(PvProjectCostGraph.this));
+        mi.addActionListener(e -> new ClipImage().copyImageToClipboard(PvProjectCostGraphForZone.this));
         popupMenu.add(mi);
     }
 
     private void calculateCost() {
-        landSum = 0;
-        solarPanelSum = 0;
-        landSum = PvProjectCost.getPartCost(foundation);
+        PvFinancialModel financialModel = Scene.getInstance().getPvFinancialModel();
+        solarPanelCost = 0;
+        cleaningCost = 0;
+        maintenanceCost = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p.getTopContainer() == foundation) {
-                if (p instanceof SolarPanel || p instanceof Rack) {
-                    solarPanelSum += PvProjectCost.getPartCost(p);
+                if (p instanceof SolarPanel) {
+                    solarPanelCost += PvProjectCost.getPartCost(p);
+                    cleaningCost += financialModel.getCleaningCost();
+                    maintenanceCost += financialModel.getMaintenanceCost();
+                }
+                if (p instanceof Rack) {
+                    solarPanelCost += PvProjectCost.getPartCost(p);
+                    int n = ((Rack) p).getNumberOfSolarPanels();
+                    cleaningCost += financialModel.getCleaningCost() * n;
+                    maintenanceCost += financialModel.getMaintenanceCost() * n;
                 }
             }
         }
-        totalCost = landSum + solarPanelSum;
+        cleaningCost *= financialModel.getLifespan();
+        maintenanceCost *= financialModel.getLifespan();
+        landRentalCost = PvProjectCost.getPartCost(foundation);
+        loanInterest = solarPanelCost * financialModel.getLoanInterestRate() * financialModel.getLifespan();
+        totalCost = landRentalCost + cleaningCost + maintenanceCost + loanInterest + solarPanelCost;
     }
 
     void removeGraph() {
@@ -141,8 +161,10 @@ public class PvProjectCostGraph extends JPanel {
 
         add(budgetPanel, BorderLayout.NORTH);
 
-        final double[] data = new double[]{landSum, solarPanelSum};
-        final String[] legends = new String[]{"Land (" + Scene.getInstance().getPvFinancialModel().getLifespan() + " years)", "Solar Panels"};
+        final double[] data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, solarPanelCost};
+        PvFinancialModel financialModel = Scene.getInstance().getPvFinancialModel();
+        final String years = "(" + financialModel.getLifespan() + " years)";
+        final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Solar Panels (One-Time)"};
 
         PieChart pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
         pie.setBackground(Color.WHITE);
@@ -155,7 +177,7 @@ public class PvProjectCostGraph extends JPanel {
                     PvProjectCost.getInstance().showGraph();
                 } else {
                     if (Util.isRightClick(e)) {
-                        popupMenu.show(PvProjectCostGraph.this, e.getX(), e.getY());
+                        popupMenu.show(PvProjectCostGraphForZone.this, e.getX(), e.getY());
                     }
                 }
             }

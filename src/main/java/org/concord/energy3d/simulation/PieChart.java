@@ -142,7 +142,7 @@ public class PieChart extends JComponent {
 
         g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
         if (info != null) {
-            final String total = info + ", Total: " + unit + (int) sum;
+            final String total = info + ", Total: " + unit + Graph.TWO_DECIMALS.format(sum);
             g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 30);
         }
         if (details != null) {

@@ -20,7 +20,7 @@ import org.concord.energy3d.simulation.PvDesignSpecs;
 /**
  * @author Charles Xie
  */
-public class PvProjectInfoPanel extends JPanel {
+public class PvProjectInfoForZone extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +28,7 @@ public class PvProjectInfoPanel extends JPanel {
     private final JPanel countPanel, costPanel, landAreaPanel, panelAreaPanel;
     private final ColorBar countBar, costBar, landAreaBar, panelAreaBar;
 
-    PvProjectInfoPanel() {
+    PvProjectInfoForZone() {
 
         super(new BorderLayout());
 
@@ -110,13 +110,13 @@ public class PvProjectInfoPanel extends JPanel {
             return;
         }
         int countSolarPanels = 0;
-        double cost = 0;
+        double solarPanelCost = 0;
         double panelArea = 0;
         final List<SolarPanel> panels = foundation.getSolarPanels();
         if (!panels.isEmpty()) {
             countSolarPanels += panels.size();
             for (final SolarPanel s : panels) {
-                cost += model.getCost(s);
+                solarPanelCost += model.getCost(s);
                 panelArea += s.getPanelWidth() * s.getPanelHeight();
             }
         }
@@ -124,13 +124,18 @@ public class PvProjectInfoPanel extends JPanel {
         if (!racks.isEmpty()) {
             for (final Rack r : racks) {
                 countSolarPanels += r.getNumberOfSolarPanels();
-                cost += model.getCost(r);
+                solarPanelCost += model.getCost(r);
                 panelArea += r.getArea();
             }
         }
+
         countBar.setValue(countSolarPanels);
         countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
         countBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());
+
+        panelAreaBar.setValue((float) panelArea);
+        panelAreaBar.setMaximum(foundation.getArea());
+
         float landArea;
         final FoundationPolygon polygon = foundation.getPolygon();
         if (polygon != null && polygon.isVisible()) {
@@ -138,9 +143,12 @@ public class PvProjectInfoPanel extends JPanel {
         } else {
             landArea = (float) foundation.getArea();
         }
+        landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
+
+        double cost = solarPanelCost;
         cost += landArea * model.getLandRentalCost() * model.getLifespan();
         cost += countSolarPanels * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-        landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
+        cost += solarPanelCost * model.getLoanInterestRate() * model.getLifespan();
         costBar.setValue(Math.round(cost));
         costBar.setMaximum(specs.getMaximumBudget());
         costBar.setEnabled(specs.isBudgetEnabled());
@@ -149,9 +157,8 @@ public class PvProjectInfoPanel extends JPanel {
             t += " (" + "<$" + specs.getMaximumBudget() + ")";
         }
         costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-        panelAreaBar.setValue((float) panelArea);
-        panelAreaBar.setMaximum(foundation.getArea());
         repaint();
+
     }
 
     public void updateBudgetMaximum() {

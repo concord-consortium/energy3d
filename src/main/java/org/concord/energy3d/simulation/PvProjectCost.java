@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.gui.PvProjectCostGraph;
+import org.concord.energy3d.gui.PvProjectCostGraphForZone;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -37,38 +37,19 @@ public class PvProjectCost extends ProjectCost {
         return instance;
     }
 
-    public double getTotalCost() {
-        double cost = 0;
-        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-        if (!foundations.isEmpty()) {
-            for (final Foundation f : foundations) {
-                cost += getCostByFoundation(f);
-            }
-        }
-        PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
-        cost += Scene.getInstance().countSolarPanels() * (fm.getCleaningCost() + fm.getMaintenanceCost()) * fm.getLifespan();
-        return cost;
-    }
-
     public static double getPartCost(final HousePart part) {
-
         final PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
-
         if (part instanceof SolarPanel) {
             return model.getCost((SolarPanel) part);
         }
-
         if (part instanceof Rack) {
             return model.getCost((Rack) part);
         }
-
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
             return f.getArea() * model.getLandRentalCost() * model.getLifespan();
         }
-
         return 0;
-
     }
 
     public static double getTotalSolarPanelCost() {
@@ -79,6 +60,35 @@ public class PvProjectCost extends ProjectCost {
             }
         }
         return total;
+    }
+
+    public double getTotalCost() {
+        double solarPanelCost = 0;
+        double landRentalCost = 0;
+        PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
+        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+        if (!foundations.isEmpty()) {
+            for (final Foundation f : foundations) {
+                final List<SolarPanel> panels = f.getSolarPanels();
+                if (!panels.isEmpty()) {
+                    for (final SolarPanel s : panels) {
+                        solarPanelCost += model.getCost(s);
+                    }
+                }
+                final List<Rack> racks = f.getRacks();
+                if (!racks.isEmpty()) {
+                    for (final Rack r : racks) {
+                        solarPanelCost += model.getCost(r);
+                    }
+                }
+                landRentalCost += f.getArea() * model.getLandRentalCost() * model.getLifespan();
+            }
+        }
+        double cost = solarPanelCost + landRentalCost;
+        int numberOfSolarPanels = Scene.getInstance().countSolarPanels();
+        cost += numberOfSolarPanels * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
+        cost += solarPanelCost * model.getLoanInterestRate() * model.getLifespan();
+        return cost;
     }
 
     public double getCostByFoundation(final Foundation foundation) {
@@ -130,25 +140,25 @@ public class PvProjectCost extends ProjectCost {
 
         PvFinancialModel financialModel = Scene.getInstance().getPvFinancialModel();
 
-        double landRentalCostSum = 0;
-        double solarPanelCostSum = 0;
-        double cleaningCostSum = 0;
-        double maintenanceCostSum = 0;
+        double landRentalCost = 0;
+        double solarPanelCost = 0;
+        double cleaningCost = 0;
+        double maintenanceCost = 0;
         String info;
         if (selectedFoundation != null) {
             info = "Zone #" + selectedFoundation.getId();
-            landRentalCostSum = getPartCost(selectedFoundation);
+            landRentalCost = getPartCost(selectedFoundation);
             for (final HousePart p : Scene.getInstance().getParts()) {
                 if (p.getTopContainer() == selectedFoundation) {
                     if (p instanceof SolarPanel) {
-                        solarPanelCostSum += getPartCost(p);
-                        cleaningCostSum += financialModel.getCleaningCost();
-                        maintenanceCostSum += financialModel.getMaintenanceCost();
+                        solarPanelCost += getPartCost(p);
+                        cleaningCost += financialModel.getCleaningCost();
+                        maintenanceCost += financialModel.getMaintenanceCost();
                     } else if (p instanceof Rack) {
-                        solarPanelCostSum += getPartCost(p);
+                        solarPanelCost += getPartCost(p);
                         int n = ((Rack) p).getNumberOfSolarPanels();
-                        cleaningCostSum += financialModel.getCleaningCost() * n;
-                        maintenanceCostSum += financialModel.getMaintenanceCost() * n;
+                        cleaningCost += financialModel.getCleaningCost() * n;
+                        maintenanceCost += financialModel.getMaintenanceCost() * n;
                     }
                 }
             }
@@ -156,31 +166,31 @@ public class PvProjectCost extends ProjectCost {
             info = count > 1 ? count + " zones" : count + " zone";
             for (final HousePart p : Scene.getInstance().getParts()) {
                 if (p instanceof Foundation) {
-                    landRentalCostSum += getPartCost(p);
+                    landRentalCost += getPartCost(p);
                 } else if (p instanceof SolarPanel) {
-                    solarPanelCostSum += getPartCost(p);
-                    cleaningCostSum += financialModel.getCleaningCost();
-                    maintenanceCostSum += financialModel.getMaintenanceCost();
+                    solarPanelCost += getPartCost(p);
+                    cleaningCost += financialModel.getCleaningCost();
+                    maintenanceCost += financialModel.getMaintenanceCost();
                 } else if (p instanceof Rack) {
-                    solarPanelCostSum += getPartCost(p);
-                    cleaningCostSum += financialModel.getCleaningCost() * ((Rack) p).getNumberOfSolarPanels();
-                    maintenanceCostSum += financialModel.getMaintenanceCost() * ((Rack) p).getNumberOfSolarPanels();
+                    solarPanelCost += getPartCost(p);
+                    cleaningCost += financialModel.getCleaningCost() * ((Rack) p).getNumberOfSolarPanels();
+                    maintenanceCost += financialModel.getMaintenanceCost() * ((Rack) p).getNumberOfSolarPanels();
                 }
             }
         }
-        cleaningCostSum *= financialModel.getLifespan();
-        maintenanceCostSum *= financialModel.getLifespan();
-        double loanInterestSum = solarPanelCostSum * financialModel.getLoanInterestRate() * financialModel.getLifespan();
+        cleaningCost *= financialModel.getLifespan();
+        maintenanceCost *= financialModel.getLifespan();
+        double loanInterest = solarPanelCost * financialModel.getLoanInterestRate() * financialModel.getLifespan();
 
-        final double[] data = new double[]{landRentalCostSum, cleaningCostSum, maintenanceCostSum, loanInterestSum, solarPanelCostSum};
+        final double[] data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, solarPanelCost};
         final String years = "(" + financialModel.getLifespan() + " years)";
         final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Solar Panels (One-Time)"};
 
         // show them in a popup window
-        final PieChart pie = new PieChart(data, PvProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);
+        final PieChart pie = new PieChart(data, PvProjectCostGraphForZone.colors, legends, "$", info, count > 1 ? details : null, true);
         pie.setBackground(Color.WHITE);
         pie.setBorder(BorderFactory.createEtchedBorder());
-        final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);
+        final JDialog dialog = new JDialog(MainFrame.getInstance(), "Cost Breakdown", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.getContentPane().add(pie, BorderLayout.CENTER);
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

@@ -253,7 +253,7 @@ public class Scene implements Serializable {
                         e.validate();
                         break;
                     case Foundation.TYPE_PV_PROJECT:
-                        e.getPvProjectCostGraph().addGraph(f);
+                        e.getPvProjectCostGraphForZone().addGraph(f);
                         e.getPvProjectDailyEnergyGraph().clearData();
                         e.getPvProjectDailyEnergyGraph().addGraph(f);
                         e.validate();

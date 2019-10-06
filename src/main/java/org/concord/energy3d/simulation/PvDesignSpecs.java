@@ -42,8 +42,8 @@ public class PvDesignSpecs implements Serializable {
     public void setBudgetEnabled(final boolean budgetEnabled) {
         this.budgetEnabled = budgetEnabled;
         EventQueue.invokeLater(() -> {
-            EnergyPanel.getInstance().getPvProjectCostGraph().updateBudget();
-            EnergyPanel.getInstance().getPvProjectInfoPanel().updateBudgetMaximum();
+            EnergyPanel.getInstance().getPvProjectCostGraphForZone().updateBudget();
+            EnergyPanel.getInstance().getPvProjectInfoForZone().updateBudgetMaximum();
         });
     }
 
@@ -54,8 +54,8 @@ public class PvDesignSpecs implements Serializable {
     public void setMaximumBudget(final int maximumBudget) {
         this.maximumBudget = maximumBudget;
         EventQueue.invokeLater(() -> {
-            EnergyPanel.getInstance().getPvProjectCostGraph().updateBudget();
-            EnergyPanel.getInstance().getPvProjectInfoPanel().updateBudgetMaximum();
+            EnergyPanel.getInstance().getPvProjectCostGraphForZone().updateBudget();
+            EnergyPanel.getInstance().getPvProjectInfoForZone().updateBudgetMaximum();
         });
     }
 
@@ -65,7 +65,7 @@ public class PvDesignSpecs implements Serializable {
 
     public void setNumberOfSolarPanelsEnabled(final boolean numberOfSolarPanelsEnabled) {
         this.numberOfSolarPanelsEnabled = numberOfSolarPanelsEnabled;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getPvProjectInfoPanel().updateSolarPanelNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getPvProjectInfoForZone().updateSolarPanelNumberMaximum());
     }
 
     public boolean isNumberOfSolarPanelsEnabled() {
@@ -74,7 +74,7 @@ public class PvDesignSpecs implements Serializable {
 
     public void setMaximumNumberOfSolarPanels(final int maximumNumberOfSolarPanels) {
         this.maximumNumberOfSolarPanels = maximumNumberOfSolarPanels;
-        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getPvProjectInfoPanel().updateSolarPanelNumberMaximum());
+        EventQueue.invokeLater(() -> EnergyPanel.getInstance().getPvProjectInfoForZone().updateSolarPanelNumberMaximum());
     }
 
     public int getMaximumNumberOfSolarPanels() {

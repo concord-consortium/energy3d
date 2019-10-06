@@ -164,13 +164,13 @@ public class EnergyPanel extends JPanel {
     private JTextField partProperty2TextField;
     private JTextField partProperty3TextField;
     private BuildingCostGraph buildingCostGraph;
-    private PvProjectCostGraph pvProjectCostGraph;
+    private PvProjectCostGraphForZone pvProjectCostGraphForZone;
     private CspProjectCostGraph cspProjectCostGraph;
     private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
     private PvProjectDailyEnergyGraph pvProjectDailyEnergyGraph;
     private CspProjectDailyEnergyGraph cspProjectDailyEnergyGraph;
     private BuildingInfoPanel buildingInfoPanel;
-    private PvProjectInfoPanel pvProjectInfoPanel;
+    private PvProjectInfoForZone pvProjectInfoForZone;
     private CspProjectInfoPanel cspProjectInfoPanel;
     private JTabbedPane buildingTabbedPane, pvProjectTabbedPane, cspProjectTabbedPane, instructionTabbedPane;
     private TabbedPaneUI instructionTabbedPaneUI;
@@ -576,11 +576,11 @@ public class EnergyPanel extends JPanel {
         pvProjectTabbedPane.setFont(new Font(pvProjectTabbedPane.getFont().getName(), Font.PLAIN, pvProjectTabbedPane.getFont().getSize() - 1));
         pvProjectPanel.add(pvProjectTabbedPane);
 
-        pvProjectInfoPanel = new PvProjectInfoPanel();
-        pvProjectTabbedPane.add("Info", pvProjectInfoPanel);
+        pvProjectInfoForZone = new PvProjectInfoForZone();
+        pvProjectTabbedPane.add("Info", pvProjectInfoForZone);
 
-        pvProjectCostGraph = new PvProjectCostGraph(); // cost graph
-        pvProjectTabbedPane.add("Cost", pvProjectCostGraph);
+        pvProjectCostGraphForZone = new PvProjectCostGraphForZone(); // cost graph
+        pvProjectTabbedPane.add("Cost", pvProjectCostGraphForZone);
 
         pvProjectDailyEnergyGraph = new PvProjectDailyEnergyGraph();
         pvProjectTabbedPane.add("Output", pvProjectDailyEnergyGraph);
@@ -1051,8 +1051,8 @@ public class EnergyPanel extends JPanel {
         return buildingInfoPanel;
     }
 
-    public PvProjectInfoPanel getPvProjectInfoPanel() {
-        return pvProjectInfoPanel;
+    public PvProjectInfoForZone getPvProjectInfoForZone() {
+        return pvProjectInfoForZone;
     }
 
     public CspProjectInfoPanel getCspProjectInfoPanel() {
@@ -1063,8 +1063,8 @@ public class EnergyPanel extends JPanel {
         return buildingCostGraph;
     }
 
-    public PvProjectCostGraph getPvProjectCostGraph() {
-        return pvProjectCostGraph;
+    public PvProjectCostGraphForZone getPvProjectCostGraphForZone() {
+        return pvProjectCostGraphForZone;
     }
 
     public CspProjectCostGraph getCspProjectCostGraph() {
@@ -1088,7 +1088,7 @@ public class EnergyPanel extends JPanel {
      */
     public void clearAllGraphs() {
         buildingCostGraph.removeGraph();
-        pvProjectCostGraph.removeGraph();
+        pvProjectCostGraphForZone.removeGraph();
         cspProjectCostGraph.removeGraph();
         buildingDailyEnergyGraph.removeGraph();
         pvProjectDailyEnergyGraph.removeGraph();
@@ -1809,7 +1809,7 @@ public class EnergyPanel extends JPanel {
                         partProperty1TextField.putClientProperty("tooltip", "Total number of heliostats");
                         partProperty2Label.setText("  Total Cost:");
                         partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                        partProperty2TextField.putClientProperty("tooltip", "Total cost of heliostats");
+                        partProperty2TextField.putClientProperty("tooltip", "Total project cost");
                         partProperty3Label.setText("  -");
                         partProperty3TextField.setText("");
                         partProperty3TextField.putClientProperty("tooltip", null);
@@ -1822,7 +1822,7 @@ public class EnergyPanel extends JPanel {
                             partProperty1TextField.putClientProperty("tooltip", "Total number of parabolic troughs");
                             partProperty2Label.setText("  Total Cost:");
                             partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                            partProperty2TextField.putClientProperty("tooltip", "Total cost of parabolic troughs");
+                            partProperty2TextField.putClientProperty("tooltip", "Total project cost");
                             partProperty3Label.setText("  -");
                             partProperty3TextField.setText("");
                             partProperty3TextField.putClientProperty("tooltip", null);
@@ -1835,7 +1835,7 @@ public class EnergyPanel extends JPanel {
                                 partProperty1TextField.putClientProperty("tooltip", "Total number of parabolic dishes");
                                 partProperty2Label.setText("  Total Cost:");
                                 partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                                partProperty2TextField.putClientProperty("tooltip", "Total cost of parabolic dishes");
+                                partProperty2TextField.putClientProperty("tooltip", "Total project cost");
                                 partProperty3Label.setText("  -");
                                 partProperty3TextField.setText("");
                                 partProperty3TextField.putClientProperty("tooltip", null);
@@ -1848,7 +1848,7 @@ public class EnergyPanel extends JPanel {
                                     partProperty1TextField.putClientProperty("tooltip", "Total number of Fresnel reflectors");
                                     partProperty2Label.setText("  Total Cost:");
                                     partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                                    partProperty2TextField.putClientProperty("tooltip", "Total cost of Fresnel reflectors");
+                                    partProperty2TextField.putClientProperty("tooltip", "Total project cost");
                                     partProperty3Label.setText("  -");
                                     partProperty3TextField.setText("");
                                     partProperty3TextField.putClientProperty("tooltip", null);
@@ -1927,7 +1927,8 @@ public class EnergyPanel extends JPanel {
                         dataPanel.remove(buildingPanel);
                         dataPanel.remove(cspProjectPanel);
                         dataPanel.add(pvProjectPanel, 2);
-                        pvProjectInfoPanel.update(selectedFoundation);
+                        pvProjectInfoForZone.update(selectedFoundation);
+                        pvProjectPanel.setBorder(createTitledBorder("Photovoltaic Solar Power System (Zone #" + selectedFoundation.getId() + ")", true));
                         break;
                     case Foundation.TYPE_CSP_PROJECT:
                         dataPanel.remove(instructionPanel);
@@ -2019,8 +2020,8 @@ public class EnergyPanel extends JPanel {
             buildingInfoPanel.updateSolarPanelNumberBounds();
             buildingInfoPanel.updateWindowNumberBounds();
             buildingInfoPanel.updateWallNumberBounds();
-            pvProjectInfoPanel.updateSolarPanelNumberMaximum();
-            pvProjectInfoPanel.updateBudgetMaximum();
+            pvProjectInfoForZone.updateSolarPanelNumberMaximum();
+            pvProjectInfoForZone.updateBudgetMaximum();
             cspProjectInfoPanel.updateHeliostatNumberMaximum();
             cspProjectInfoPanel.updateParabolicTroughNumberMaximum();
             cspProjectInfoPanel.updateBudgetMaximum();
@@ -2074,7 +2075,7 @@ public class EnergyPanel extends JPanel {
                         buildingDailyEnergyGraph.addGraph(f);
                         break;
                     case Foundation.TYPE_PV_PROJECT:
-                        pvProjectCostGraph.addGraph(f);
+                        pvProjectCostGraphForZone.addGraph(f);
                         pvProjectDailyEnergyGraph.addGraph(f);
                         break;
                     case Foundation.TYPE_CSP_PROJECT:
@@ -2084,7 +2085,7 @@ public class EnergyPanel extends JPanel {
                 }
             } else {
                 buildingCostGraph.removeGraph();
-                pvProjectCostGraph.removeGraph();
+                pvProjectCostGraphForZone.removeGraph();
                 cspProjectCostGraph.removeGraph();
                 buildingDailyEnergyGraph.removeGraph();
                 pvProjectDailyEnergyGraph.removeGraph();
