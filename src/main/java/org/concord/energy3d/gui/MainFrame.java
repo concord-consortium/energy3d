@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
     private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
     private JMenuItem annualSensorMenuItem;
     private JMenuItem dailySensorMenuItem;
-    private JMenuItem costAnalysisMenuItem;
+    private JMenuItem costBreakdownMenuItem;
     private JMenuItem monthlySunshineHoursMenuItem;
     private JMenuItem annualEnvironmentalTemperatureMenuItem;
     private JMenuItem dailyEnvironmentalTemperatureMenuItem;
@@ -153,7 +153,7 @@ public class MainFrame extends JFrame {
     private JMenuItem disableAllTreeEditPointsMenuItem;
     private JMenuItem specificationsMenuItem;
     private JMenuItem propertiesMenuItem;
-    private JMenuItem financeMenuItem;
+    private JMenuItem financialSettingsMenuItem;
     private JMenuItem setRegionMenuItem;
     private JCheckBoxMenuItem noteCheckBoxMenuItem;
     private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
@@ -1293,8 +1293,8 @@ public class MainFrame extends JFrame {
 
             analysisMenu.addSeparator();
 
-            analysisMenu.add(getFinanceMenuItem());
-            analysisMenu.add(getCostAnalysisMenuItem());
+            analysisMenu.add(getFinancialSettingsMenuItem());
+            analysisMenu.add(getCostBreakdownMenuItem());
 
         }
         return analysisMenu;
@@ -2498,11 +2498,11 @@ public class MainFrame extends JFrame {
         return showHeatFluxVectorsMenuItem;
     }
 
-    private JMenuItem getFinanceMenuItem() {
-        if (financeMenuItem == null) {
-            financeMenuItem = new JMenuItem("Financing...");
-            financeMenuItem.addActionListener(e -> {
-                FinanceDialog dialog = new FinanceDialog();
+    private JMenuItem getFinancialSettingsMenuItem() {
+        if (financialSettingsMenuItem == null) {
+            financialSettingsMenuItem = new JMenuItem("Financial Settings...");
+            financialSettingsMenuItem.addActionListener(e -> {
+                FinancialSettingsDialog dialog = new FinancialSettingsDialog();
                 switch (Scene.getInstance().getProjectType()) {
                     case Foundation.TYPE_PV_PROJECT:
                         dialog.selectPvPrices();
@@ -2514,14 +2514,14 @@ public class MainFrame extends JFrame {
                 dialog.setVisible(true);
             });
         }
-        return financeMenuItem;
+        return financialSettingsMenuItem;
     }
 
-    private JMenuItem getCostAnalysisMenuItem() {
-        if (costAnalysisMenuItem == null) {
-            costAnalysisMenuItem = new JMenuItem("Cost Breakdown...");
-            costAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
-            costAnalysisMenuItem.addActionListener(e -> {
+    private JMenuItem getCostBreakdownMenuItem() {
+        if (costBreakdownMenuItem == null) {
+            costBreakdownMenuItem = new JMenuItem("Cost Breakdown...");
+            costBreakdownMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+            costBreakdownMenuItem.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 int i;
                 if (selectedPart == null) {
@@ -2542,7 +2542,7 @@ public class MainFrame extends JFrame {
                 }
             });
         }
-        return costAnalysisMenuItem;
+        return costBreakdownMenuItem;
     }
 
     private JMenuItem getMonthlySunshineHoursMenuItem() {

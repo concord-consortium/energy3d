@@ -170,10 +170,11 @@ public class PvProjectCost extends ProjectCost {
         }
         cleaningCostSum *= financialModel.getLifespan();
         maintenanceCostSum *= financialModel.getLifespan();
+        double loanInterestSum = solarPanelCostSum * financialModel.getLoanInterestRate() * financialModel.getLifespan();
 
-        final double[] data = new double[]{landRentalCostSum, cleaningCostSum, maintenanceCostSum, solarPanelCostSum};
+        final double[] data = new double[]{landRentalCostSum, cleaningCostSum, maintenanceCostSum, loanInterestSum, solarPanelCostSum};
         final String years = "(" + financialModel.getLifespan() + " years)";
-        final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Solar Panels (One-Time)"};
+        final String[] legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Solar Panels (One-Time)"};
 
         // show them in a popup window
         final PieChart pie = new PieChart(data, PvProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);

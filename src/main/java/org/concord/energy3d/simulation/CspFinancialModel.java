@@ -21,6 +21,7 @@ public class CspFinancialModel implements Serializable {
     private double landRentalCost;
     private double cleaningCost = 10;
     private double maintenanceCost = 1;
+    private double loanInterestRate = 0.05; // not percentage
 
     public CspFinancialModel() {
         setDefaultValues();
@@ -33,8 +34,11 @@ public class CspFinancialModel implements Serializable {
         if (lifespan == 0) {
             lifespan = 50;
         }
+        if (loanInterestRate == 0) {
+            loanInterestRate = 0.05;
+        }
         if (cleaningCost == 0) {
-            cleaningCost = 10;
+            cleaningCost = 5;
         }
         if (maintenanceCost == 0) {
             maintenanceCost = 1;
@@ -70,6 +74,14 @@ public class CspFinancialModel implements Serializable {
 
     public double getkWhSellingPrice() {
         return kWhSellingPrice;
+    }
+
+    public void setLoanInterestRate(double loanInterestRate) {
+        this.loanInterestRate = loanInterestRate;
+    }
+
+    public double getLoanInterestRate() {
+        return loanInterestRate;
     }
 
     public void setLandRentalCost(final double landRentalCost) {

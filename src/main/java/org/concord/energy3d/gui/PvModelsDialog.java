@@ -51,7 +51,7 @@ class PvModelsDialog extends JDialog {
 
         List<String> selectedSolarPanelBrands = Scene.getInstance().getSolarPanelBrandNames();
 
-        JLabel label = FinanceDialog.createPvLabel("Custom: ");
+        JLabel label = FinancialSettingsDialog.createPvLabel("Custom: ");
         if (selectedSolarPanelBrands.contains("Custom")) {
             label.setBackground(Color.YELLOW);
         }
@@ -62,7 +62,7 @@ class PvModelsDialog extends JDialog {
         pvModelPanel.add(new JLabel("Custom"));
         int i = 0;
         for (final String key : modules.keySet()) {
-            label = FinanceDialog.createPvLabel(key + ": ");
+            label = FinancialSettingsDialog.createPvLabel(key + ": ");
             pvModelPanel.add(label);
             if (selectedSolarPanelBrands.contains(key)) {
                 label.setBackground(Color.YELLOW);

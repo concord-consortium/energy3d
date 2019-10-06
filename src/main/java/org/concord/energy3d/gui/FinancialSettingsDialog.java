@@ -20,7 +20,7 @@ import org.concord.energy3d.util.SpringUtilities;
 /**
  * @author Charles Xie
  */
-class FinanceDialog extends JDialog {
+class FinancialSettingsDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
@@ -41,6 +41,7 @@ class FinanceDialog extends JDialog {
         JTextField landCostField;
         JTextField cleaningCostField;
         JTextField maintenanceCostField;
+        JTextField loanInterestRateField;
 
         PvSystemFinancePanel() {
 
@@ -50,7 +51,7 @@ class FinanceDialog extends JDialog {
             final PvFinancialModel finance = Scene.getInstance().getPvFinancialModel();
 
             JPanel container = new JPanel(new SpringLayout());
-            container.setBorder(BorderFactory.createTitledBorder("Target Goals"));
+            container.setBorder(BorderFactory.createTitledBorder("Revenue Goals"));
             add(container);
 
             container.add(createPvLabel("Life Span: "));
@@ -89,7 +90,13 @@ class FinanceDialog extends JDialog {
             container.add(maintenanceCostField);
             container.add(new JLabel("<html>Per year per panel</html>"));
 
-            SpringUtilities.makeCompactGrid(container, 3, 4, 6, 6, 6, 3);
+            container.add(createPvLabel("Loan Interest Rate: "));
+            container.add(new JLabel("%"));
+            loanInterestRateField = new JTextField(FORMAT.format(finance.getLoanInterestRate() * 100), 6);
+            container.add(loanInterestRateField);
+            container.add(new JLabel("<html>For upfront costs</html>"));
+
+            SpringUtilities.makeCompactGrid(container, 4, 4, 6, 6, 6, 3);
 
             container = new JPanel(new SpringLayout());
             container.setBorder(BorderFactory.createTitledBorder("Upfront Costs (Labor Included)"));
@@ -145,9 +152,9 @@ class FinanceDialog extends JDialog {
 
         private static final long serialVersionUID = 1L;
 
-        final JTextField heliostatField;
-        final JTextField towerField;
-        final JTextField parabolicTroughField;
+        private JTextField heliostatField;
+        private JTextField towerField;
+        private JTextField parabolicTroughField;
         final JTextField parabolicDishField;
         final JTextField fresnelReflectorField;
         JTextField lifespanField;
@@ -155,27 +162,28 @@ class FinanceDialog extends JDialog {
         JTextField kWhSellingPriceField;
         JTextField cleaningCostField;
         JTextField maintenanceCostField;
+        JTextField loanInterestRateField;
 
         CspSystemFinancePanel() {
 
             super();
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-            final CspFinancialModel price = Scene.getInstance().getCspFinancialModel();
+            final CspFinancialModel finance = Scene.getInstance().getCspFinancialModel();
 
             JPanel container = new JPanel(new SpringLayout());
-            container.setBorder(BorderFactory.createTitledBorder("Target Goals"));
+            container.setBorder(BorderFactory.createTitledBorder("Revenue Goals"));
             add(container);
 
             container.add(createCspLabel("Life Span: "));
             container.add(new JLabel());
-            lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
+            lifespanField = new JTextField(FORMAT.format(finance.getLifespan()), 6);
             container.add(lifespanField);
             container.add(new JLabel("<html>Years</html>"));
 
             container.add(createCspLabel("Electricity Selling Price: "));
             container.add(new JLabel("$"));
-            kWhSellingPriceField = new JTextField(FORMAT.format(price.getkWhSellingPrice()), 6);
+            kWhSellingPriceField = new JTextField(FORMAT.format(finance.getkWhSellingPrice()), 6);
             container.add(kWhSellingPriceField);
             container.add(new JLabel("<html>Per kWh</html>"));
 
@@ -187,23 +195,29 @@ class FinanceDialog extends JDialog {
 
             container.add(createCspLabel("Land Rental: "));
             container.add(new JLabel("$"));
-            landCostField = new JTextField(FORMAT.format(price.getLandRentalCost()), 6);
+            landCostField = new JTextField(FORMAT.format(finance.getLandRentalCost()), 6);
             container.add(landCostField);
             container.add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
             container.add(createCspLabel("Cleaning Cost: "));
             container.add(new JLabel("$"));
-            cleaningCostField = new JTextField(FORMAT.format(price.getCleaningCost()), 6);
+            cleaningCostField = new JTextField(FORMAT.format(finance.getCleaningCost()), 6);
             container.add(cleaningCostField);
             container.add(new JLabel("<html>Per year per unit</html>"));
 
             container.add(createCspLabel("Maintenance Cost: "));
             container.add(new JLabel("$"));
-            maintenanceCostField = new JTextField(FORMAT.format(price.getMaintenanceCost()), 6);
+            maintenanceCostField = new JTextField(FORMAT.format(finance.getMaintenanceCost()), 6);
             container.add(maintenanceCostField);
             container.add(new JLabel("<html>Per year per unit</html>"));
 
-            SpringUtilities.makeCompactGrid(container, 3, 4, 6, 6, 6, 3);
+            container.add(createCspLabel("Loan Interest Rate: "));
+            container.add(new JLabel("%"));
+            loanInterestRateField = new JTextField(FORMAT.format(finance.getLoanInterestRate() * 100), 6);
+            container.add(loanInterestRateField);
+            container.add(new JLabel("<html>For upfront costs</html>"));
+
+            SpringUtilities.makeCompactGrid(container, 4, 4, 6, 6, 6, 3);
 
             container = new JPanel(new SpringLayout());
             container.setBorder(BorderFactory.createTitledBorder("Upfront Costs (Labor Included)"));
@@ -211,31 +225,31 @@ class FinanceDialog extends JDialog {
 
             container.add(createCspLabel("Heliostat Cost: "));
             container.add(new JLabel("$"));
-            heliostatField = new JTextField(FORMAT.format(price.getHeliostatUnitCost()), 6);
+            heliostatField = new JTextField(FORMAT.format(finance.getHeliostatUnitCost()), 6);
             container.add(heliostatField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
             container.add(createCspLabel("Tower: "));
             container.add(new JLabel("$"));
-            towerField = new JTextField(FORMAT.format(price.getTowerUnitCost()), 6);
+            towerField = new JTextField(FORMAT.format(finance.getTowerUnitCost()), 6);
             container.add(towerField);
             container.add(new JLabel("<html>Per meter height</html>"));
 
             container.add(createCspLabel("Parabolic Trough Cost: "));
             container.add(new JLabel("$"));
-            parabolicTroughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitCost()), 6);
+            parabolicTroughField = new JTextField(FORMAT.format(finance.getParabolicTroughUnitCost()), 6);
             container.add(parabolicTroughField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
             container.add(createCspLabel("Parabolic Dish: "));
             container.add(new JLabel("$"));
-            parabolicDishField = new JTextField(FORMAT.format(price.getParabolicDishUnitCost()), 6);
+            parabolicDishField = new JTextField(FORMAT.format(finance.getParabolicDishUnitCost()), 6);
             container.add(parabolicDishField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
             container.add(createCspLabel("Fresnel Reflector Cost: "));
             container.add(new JLabel("$"));
-            fresnelReflectorField = new JTextField(FORMAT.format(price.getFresnelReflectorUnitCost()), 6);
+            fresnelReflectorField = new JTextField(FORMAT.format(finance.getFresnelReflectorUnitCost()), 6);
             container.add(fresnelReflectorField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
@@ -249,6 +263,7 @@ class FinanceDialog extends JDialog {
         final JLabel l = new JLabel(text);
         l.setOpaque(true);
         l.setBackground(pvBackgroundColor);
+        l.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 2));
         return l;
     }
 
@@ -256,6 +271,7 @@ class FinanceDialog extends JDialog {
         final JLabel l = new JLabel(text);
         l.setOpaque(true);
         l.setBackground(cspBackgroundColor);
+        l.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 2));
         return l;
     }
 
@@ -263,11 +279,11 @@ class FinanceDialog extends JDialog {
     private JPanel pvSystemPanel;
     private JPanel cspSystemPanel;
 
-    FinanceDialog() {
+    FinancialSettingsDialog() {
 
         super(MainFrame.getInstance(), true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setTitle("Financing the Project");
+        setTitle("Cost & Revenue Settings");
 
         tabbedPane = new JTabbedPane();
         getContentPane().setLayout(new BorderLayout());
@@ -296,6 +312,7 @@ class FinanceDialog extends JDialog {
             double pvLandUnitCost;
             double pvCleaningCost;
             double pvMaintenanceCost;
+            double pvLoanInterestCost;
             double solarPanelRackBaseCost;
             double solarPanelRackHeightCost;
             double solarPanelHsatCost;
@@ -307,6 +324,7 @@ class FinanceDialog extends JDialog {
             double cspLandUnitCost;
             double cspCleaningCost;
             double cspMaintenanceCost;
+            double cspLoanInterestCost;
             double heliostatUnitCost;
             double towerHeightUnitCost;
             double parabolicTroughUnitCost;
@@ -318,6 +336,7 @@ class FinanceDialog extends JDialog {
                 pvLandUnitCost = Double.parseDouble(pvSystemFinancePanel.landCostField.getText());
                 pvCleaningCost = Double.parseDouble(pvSystemFinancePanel.cleaningCostField.getText());
                 pvMaintenanceCost = Double.parseDouble(pvSystemFinancePanel.maintenanceCostField.getText());
+                pvLoanInterestCost = Double.parseDouble(pvSystemFinancePanel.loanInterestRateField.getText());
                 solarPanelRackBaseCost = Double.parseDouble(pvSystemFinancePanel.rackBaseField.getText());
                 solarPanelRackHeightCost = Double.parseDouble(pvSystemFinancePanel.rackHeightField.getText());
                 solarPanelHsatCost = Double.parseDouble(pvSystemFinancePanel.hsatField.getText());
@@ -329,6 +348,7 @@ class FinanceDialog extends JDialog {
                 cspLandUnitCost = Double.parseDouble(cspSystemFinancePanel.landCostField.getText());
                 cspCleaningCost = Double.parseDouble(cspSystemFinancePanel.cleaningCostField.getText());
                 cspMaintenanceCost = Double.parseDouble(cspSystemFinancePanel.maintenanceCostField.getText());
+                cspLoanInterestCost = Double.parseDouble(cspSystemFinancePanel.loanInterestRateField.getText());
                 heliostatUnitCost = Double.parseDouble(cspSystemFinancePanel.heliostatField.getText());
                 towerHeightUnitCost = Double.parseDouble(cspSystemFinancePanel.towerField.getText());
                 parabolicTroughUnitCost = Double.parseDouble(cspSystemFinancePanel.parabolicTroughField.getText());
@@ -336,93 +356,101 @@ class FinanceDialog extends JDialog {
                 fresnelReflectorUnitCost = Double.parseDouble(cspSystemFinancePanel.fresnelReflectorField.getText());
             } catch (final NumberFormatException err) {
                 err.printStackTrace();
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // PV system
 
             if (pvLifespan < 5 || pvLifespan > 30) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your PV lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your PV lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (pvKWhSellPrice <= 0 || pvKWhSellPrice > 1) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your sell price per kWh is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your sell price per kWh is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (pvLandUnitCost < 0 || pvLandUnitCost > 1000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (pvCleaningCost < 0 || pvCleaningCost > 100) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your cleaning price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your cleaning price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (pvMaintenanceCost < 0 || pvMaintenanceCost > 100) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your maintenance price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your maintenance price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (pvLoanInterestCost < 0 || pvLoanInterestCost > 100) {
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your loan interest is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelRackBaseCost < 0 || solarPanelRackBaseCost > 1000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your price for solar panel rack base is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your price for solar panel rack base is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelRackHeightCost < 0 || solarPanelRackHeightCost > 1000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your price for solar panel rack height is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your price for solar panel rack height is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelHsatCost < 0 || solarPanelHsatCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your HSAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your HSAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelVsatCost < 0 || solarPanelVsatCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your VSAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your VSAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelAadatCost < 0 || solarPanelAadatCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your AADAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your AADAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // CSP system
 
             if (cspLifespan < 5 || cspLifespan > 50) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your CSP lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your CSP lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (cspKWhSellPrice <= 0 || cspKWhSellPrice > 1) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your sell price per kWh is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your sell price per kWh is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (cspLandUnitCost < 0 || cspLandUnitCost > 1000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (cspCleaningCost < 0 || cspCleaningCost > 100) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your cleaning price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your cleaning price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (cspMaintenanceCost < 0 || cspMaintenanceCost > 100) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your maintenance price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your maintenance price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (cspLoanInterestCost < 0 || cspLoanInterestCost > 100) {
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your loan interest is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (heliostatUnitCost < 0 || heliostatUnitCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your mirror unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your mirror unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (towerHeightUnitCost < 0 || towerHeightUnitCost > 100000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your tower height unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your tower height unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (parabolicTroughUnitCost < 0 || parabolicTroughUnitCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (parabolicDishUnitCost < 0 || parabolicDishUnitCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (fresnelReflectorUnitCost < 0 || fresnelReflectorUnitCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your Fresnel reflector unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your Fresnel reflector unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -432,6 +460,7 @@ class FinanceDialog extends JDialog {
             pvFinance.setLandRentalCost(pvLandUnitCost);
             pvFinance.setCleaningCost(pvCleaningCost);
             pvFinance.setMaintenanceCost(pvMaintenanceCost);
+            pvFinance.setLoanInterestRate(pvLoanInterestCost * 0.01);
             pvFinance.setSolarPanelRackBaseCost(solarPanelRackBaseCost);
             pvFinance.setSolarPanelRackHeightCost(solarPanelRackHeightCost);
             pvFinance.setSolarPanelHsatCost(solarPanelHsatCost);
@@ -444,6 +473,7 @@ class FinanceDialog extends JDialog {
             cspFinance.setLandRentalCost(cspLandUnitCost);
             cspFinance.setCleaningCost(cspCleaningCost);
             cspFinance.setMaintenanceCost(cspMaintenanceCost);
+            cspFinance.setLoanInterestRate(cspLoanInterestCost * 0.01);
             cspFinance.setHeliostatUnitCost(heliostatUnitCost);
             cspFinance.setTowerUnitCost(towerHeightUnitCost);
             cspFinance.setParabolicTroughUnitCost(parabolicTroughUnitCost);
@@ -464,7 +494,7 @@ class FinanceDialog extends JDialog {
                 }
             }
 
-            FinanceDialog.this.dispose();
+            FinancialSettingsDialog.this.dispose();
 
         });
         okButton.setActionCommand("OK");
@@ -472,7 +502,7 @@ class FinanceDialog extends JDialog {
         getRootPane().setDefaultButton(okButton);
 
         final JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> FinanceDialog.this.dispose());
+        cancelButton.addActionListener(e -> FinancialSettingsDialog.this.dispose());
         cancelButton.setActionCommand("Cancel");
         buttonPanel.add(cancelButton);
 

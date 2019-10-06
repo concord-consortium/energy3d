@@ -22,15 +22,16 @@ public class PvFinancialModel implements Serializable {
     private double kWhSellingPrice = 0.1;
 
     private double customSolarPanelCost = 1000;
-    private double solarPanelRackBaseCost = 50;
-    private double solarPanelRackHeightCost = 100;
-    private double solarPanelHsatCost = 100;
-    private double solarPanelVsatCost = 100;
-    private double solarPanelAadatCost = 100;
+    private double solarPanelRackBaseCost = 20;
+    private double solarPanelRackHeightCost = 20;
+    private double solarPanelHsatCost = 10;
+    private double solarPanelVsatCost = 10;
+    private double solarPanelAadatCost = 15;
 
     private double landRentalCost;
-    private double cleaningCost = 5;
+    private double cleaningCost = 2;
     private double maintenanceCost = 1;
+    private double loanInterestRate = 0.05; // not percentage
 
     private HashMap<String, Double> pvModelCosts;
 
@@ -45,29 +46,32 @@ public class PvFinancialModel implements Serializable {
         if (lifespan == 0) {
             lifespan = 20;
         }
+        if (loanInterestRate == 0) {
+            loanInterestRate = 0.05;
+        }
         if (customSolarPanelCost == 0) {
             customSolarPanelCost = 1000;
         }
         if (cleaningCost == 0) {
-            cleaningCost = 5;
+            cleaningCost = 2;
         }
         if (maintenanceCost == 0) {
             maintenanceCost = 1;
         }
         if (solarPanelRackBaseCost == 0) {
-            solarPanelRackBaseCost = 50;
+            solarPanelRackBaseCost = 20;
         }
         if (solarPanelRackHeightCost == 0) {
-            solarPanelRackHeightCost = 100;
+            solarPanelRackHeightCost = 20;
         }
         if (solarPanelHsatCost == 0) {
-            solarPanelHsatCost = 1000;
+            solarPanelHsatCost = 10;
         }
         if (solarPanelVsatCost == 0) {
-            solarPanelVsatCost = 1000;
+            solarPanelVsatCost = 10;
         }
         if (solarPanelAadatCost == 0) {
-            solarPanelAadatCost = 1000;
+            solarPanelAadatCost = 15;
         }
         if (pvModelCosts == null) {
             pvModelCosts = new HashMap<>();
@@ -79,10 +83,12 @@ public class PvFinancialModel implements Serializable {
     }
 
     public double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
+        double upfrontCost = PvProjectCost.getTotalSolarPanelCost();
         double roi = annualOutput * lifespan * kWhSellingPrice;
         roi -= landRentalCost * lifespan * landArea;
         roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfSolarPanels;
-        roi /= PvProjectCost.getTotalSolarPanelCost();
+        roi -= loanInterestRate * lifespan * upfrontCost;
+        roi /= upfrontCost;
         return roi * 100; // convert to percentage
     }
 
@@ -170,6 +176,14 @@ public class PvFinancialModel implements Serializable {
 
     public double getkWhSellingPrice() {
         return kWhSellingPrice;
+    }
+
+    public void setLoanInterestRate(double loanInterestRate) {
+        this.loanInterestRate = loanInterestRate;
+    }
+
+    public double getLoanInterestRate() {
+        return loanInterestRate;
     }
 
     public void setLandRentalCost(final double landRentalCost) {
