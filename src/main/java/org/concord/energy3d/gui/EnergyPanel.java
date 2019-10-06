@@ -1796,7 +1796,7 @@ public class EnergyPanel extends JPanel {
                     partProperty1TextField.putClientProperty("tooltip", "Total number of solar panels");
                     partProperty2Label.setText("  Total Cost:");
                     partProperty2TextField.setText("$" + TWO_DECIMALS.format(PvProjectCost.getInstance().getTotalCost()));
-                    partProperty2TextField.putClientProperty("tooltip", "Total cost of solar panels");
+                    partProperty2TextField.putClientProperty("tooltip", "Total project cost");
                     partProperty3Label.setText("  -");
                     partProperty3TextField.setText("");
                     partProperty3TextField.putClientProperty("tooltip", null);

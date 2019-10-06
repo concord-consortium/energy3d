@@ -41,7 +41,7 @@ public class PieChart extends JComponent {
 
     public PieChart(final double[] data, final Color[] colors, final String[] legends, final String unit, final String info, final String details, final boolean popup) {
         if (popup) {
-            setPreferredSize(new Dimension(450, 300));
+            setPreferredSize(new Dimension(600, 400));
         }
         this.popup = popup;
         format = NumberFormat.getNumberInstance();

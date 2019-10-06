@@ -17,17 +17,6 @@ public abstract class ProjectCost {
 
     public abstract double getCostByFoundation(final Foundation foundation);
 
-    public double getTotalCost() {
-        double cost = 0;
-        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-        if (!foundations.isEmpty()) {
-            for (final Foundation f : foundations) {
-                cost += getCostByFoundation(f);
-            }
-        }
-        return cost;
-    }
-
     public void showGraph() {
         showPieChart();
         TimeSeriesLogger.getInstance().logAnalysis(this);

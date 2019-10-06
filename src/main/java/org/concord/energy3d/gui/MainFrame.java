@@ -2519,7 +2519,7 @@ public class MainFrame extends JFrame {
 
     private JMenuItem getCostAnalysisMenuItem() {
         if (costAnalysisMenuItem == null) {
-            costAnalysisMenuItem = new JMenuItem("Show Costs...");
+            costAnalysisMenuItem = new JMenuItem("Cost Breakdown...");
             costAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
             costAnalysisMenuItem.addActionListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

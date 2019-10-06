@@ -42,6 +42,17 @@ public class CspProjectCost extends ProjectCost {
         return instance;
     }
 
+    public double getTotalCost() {
+        double cost = 0;
+        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+        if (!foundations.isEmpty()) {
+            for (final Foundation f : foundations) {
+                cost += getCostByFoundation(f);
+            }
+        }
+        return cost;
+    }
+
     public static double getPartCost(final HousePart part) {
 
         final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();

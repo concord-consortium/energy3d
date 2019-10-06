@@ -2,12 +2,10 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
-import java.util.Map;
 
 import javax.swing.*;
 
@@ -17,8 +15,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.CspFinancialModel;
 import org.concord.energy3d.simulation.PvFinancialModel;
-import org.concord.energy3d.simulation.PvModuleSpecs;
-import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.util.SpringUtilities;
 
 /**
@@ -31,38 +27,10 @@ class FinanceDialog extends JDialog {
     private final static Color pvBackgroundColor = new Color(169, 223, 191);
     private final static Color cspBackgroundColor = new Color(252, 243, 207);
 
-    class PvModuleCostsPanel extends JPanel {
-
-        private static final long serialVersionUID = 1L;
-        JTextField[] priceFields;
-
-        PvModuleCostsPanel() {
-
-            super(new SpringLayout());
-
-            final PvFinancialModel price = Scene.getInstance().getPvFinancialModel();
-            final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
-            priceFields = new JTextField[modules.size()];
-            int i = 0;
-            for (final String key : modules.keySet()) {
-                add(createPvLabel(key + ": "));
-                add(new JLabel("$"));
-                priceFields[i] = new JTextField(FORMAT.format(price.getPvModelCost(key)), 6);
-                add(priceFields[i]);
-                add(new JLabel(modules.get(key).getBrand()));
-                i++;
-            }
-            SpringUtilities.makeCompactGrid(this, i, 4, 6, 6, 6, 3);
-
-        }
-
-    }
-
     class PvSystemFinancePanel extends JPanel {
 
         private static final long serialVersionUID = 1L;
 
-        final JTextField solarPanelField;
         final JTextField rackBaseField;
         final JTextField rackHeightField;
         final JTextField hsatField;
@@ -124,13 +92,17 @@ class FinanceDialog extends JDialog {
             SpringUtilities.makeCompactGrid(container, 3, 4, 6, 6, 6, 3);
 
             container = new JPanel(new SpringLayout());
-            container.setBorder(BorderFactory.createTitledBorder("Upfront Costs"));
+            container.setBorder(BorderFactory.createTitledBorder("Upfront Costs (Labor Included)"));
             add(container);
 
-            container.add(createPvLabel("Custom Solar Panel: "));
+            container.add(createPvLabel("Photovoltaic Solar Panel: "));
             container.add(new JLabel("$"));
-            solarPanelField = new JTextField(FORMAT.format(finance.getSolarPanelCost()), 6);
-            container.add(solarPanelField);
+            final JButton solarPanelMarketplace = new JButton("Set Price");
+            solarPanelMarketplace.addActionListener(e -> {
+                PvModelsDialog dialog = new PvModelsDialog();
+                dialog.setVisible(true);
+            });
+            container.add(solarPanelMarketplace);
             container.add(new JLabel("<html>Per panel</html>"));
 
             container.add(createPvLabel("Rack Base (Below 1m): "));
@@ -149,19 +121,19 @@ class FinanceDialog extends JDialog {
             container.add(new JLabel("$"));
             hsatField = new JTextField(FORMAT.format(finance.getSolarPanelHsatCost()), 6);
             container.add(hsatField);
-            container.add(new JLabel("<html>Per panel</html>"));
+            container.add(new JLabel("<html>Per panel, if used</html>"));
 
             container.add(createPvLabel("Vertical Single-Axis Tracker: "));
             container.add(new JLabel("$"));
             vsatField = new JTextField(FORMAT.format(finance.getSolarPanelVsatCost()), 6);
             container.add(vsatField);
-            container.add(new JLabel("<html>Per panel</html>"));
+            container.add(new JLabel("<html>Per panel, if used</html>"));
 
             container.add(createPvLabel("Azimuth–Altitude Dual-Axis Tracker: "));
             container.add(new JLabel("$"));
             aadatField = new JTextField(FORMAT.format(finance.getSolarPanelAadatCost()), 6);
             container.add(aadatField);
-            container.add(new JLabel("<html>Per panel</html>"));
+            container.add(new JLabel("<html>Per panel, if used</html>"));
 
             SpringUtilities.makeCompactGrid(container, 6, 4, 6, 6, 6, 3);
 
@@ -234,7 +206,7 @@ class FinanceDialog extends JDialog {
             SpringUtilities.makeCompactGrid(container, 3, 4, 6, 6, 6, 3);
 
             container = new JPanel(new SpringLayout());
-            container.setBorder(BorderFactory.createTitledBorder("Upfront Costs"));
+            container.setBorder(BorderFactory.createTitledBorder("Upfront Costs (Labor Included)"));
             add(container);
 
             container.add(createCspLabel("Heliostat Cost: "));
@@ -273,14 +245,14 @@ class FinanceDialog extends JDialog {
 
     }
 
-    private JLabel createPvLabel(final String text) {
+    static JLabel createPvLabel(final String text) {
         final JLabel l = new JLabel(text);
         l.setOpaque(true);
         l.setBackground(pvBackgroundColor);
         return l;
     }
 
-    private JLabel createCspLabel(final String text) {
+    static JLabel createCspLabel(final String text) {
         final JLabel l = new JLabel(text);
         l.setOpaque(true);
         l.setBackground(cspBackgroundColor);
@@ -307,14 +279,6 @@ class FinanceDialog extends JDialog {
         pvSystemPanel.add(pvSystemFinancePanel, BorderLayout.NORTH);
         tabbedPane.addTab("PV System", pvSystemPanel);
 
-        final PvModuleCostsPanel pvModuleCostsPanel = new PvModuleCostsPanel();
-        pvModuleCostsPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        final JPanel pvModulePanel = new JPanel(new BorderLayout());
-        final JScrollPane scrollPane = new JScrollPane(pvModuleCostsPanel);
-        scrollPane.setPreferredSize(new Dimension(100, 300));
-        pvModulePanel.add(scrollPane, BorderLayout.NORTH);
-        tabbedPane.addTab("PV Models", pvModulePanel);
-
         final CspSystemFinancePanel cspSystemFinancePanel = new CspSystemFinancePanel();
         cspSystemFinancePanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         cspSystemPanel = new JPanel(new BorderLayout());
@@ -332,14 +296,11 @@ class FinanceDialog extends JDialog {
             double pvLandUnitCost;
             double pvCleaningCost;
             double pvMaintenanceCost;
-            double solarPanelCost;
             double solarPanelRackBaseCost;
             double solarPanelRackHeightCost;
             double solarPanelHsatCost;
             double solarPanelVsatCost;
             double solarPanelAadatCost;
-
-            final double[] pvModelCosts = new double[pvModuleCostsPanel.priceFields.length];
 
             int cspLifespan;
             double cspKWhSellPrice;
@@ -357,16 +318,11 @@ class FinanceDialog extends JDialog {
                 pvLandUnitCost = Double.parseDouble(pvSystemFinancePanel.landCostField.getText());
                 pvCleaningCost = Double.parseDouble(pvSystemFinancePanel.cleaningCostField.getText());
                 pvMaintenanceCost = Double.parseDouble(pvSystemFinancePanel.maintenanceCostField.getText());
-                solarPanelCost = Double.parseDouble(pvSystemFinancePanel.solarPanelField.getText());
                 solarPanelRackBaseCost = Double.parseDouble(pvSystemFinancePanel.rackBaseField.getText());
                 solarPanelRackHeightCost = Double.parseDouble(pvSystemFinancePanel.rackHeightField.getText());
                 solarPanelHsatCost = Double.parseDouble(pvSystemFinancePanel.hsatField.getText());
                 solarPanelVsatCost = Double.parseDouble(pvSystemFinancePanel.vsatField.getText());
                 solarPanelAadatCost = Double.parseDouble(pvSystemFinancePanel.aadatField.getText());
-
-                for (int i = 0; i < pvModelCosts.length; i++) {
-                    pvModelCosts[i] = Double.parseDouble(pvModuleCostsPanel.priceFields[i].getText());
-                }
 
                 cspLifespan = Integer.parseInt(cspSystemFinancePanel.lifespanField.getText());
                 cspKWhSellPrice = Double.parseDouble(cspSystemFinancePanel.kWhSellingPriceField.getText());
@@ -406,10 +362,6 @@ class FinanceDialog extends JDialog {
                 JOptionPane.showMessageDialog(FinanceDialog.this, "Your maintenance price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (solarPanelCost < 0 || solarPanelCost > 10000) {
-                JOptionPane.showMessageDialog(FinanceDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
             if (solarPanelRackBaseCost < 0 || solarPanelRackBaseCost > 1000) {
                 JOptionPane.showMessageDialog(FinanceDialog.this, "Your price for solar panel rack base is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -429,13 +381,6 @@ class FinanceDialog extends JDialog {
             if (solarPanelAadatCost < 0 || solarPanelAadatCost > 10000) {
                 JOptionPane.showMessageDialog(FinanceDialog.this, "Your AADAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-
-            for (double pvModelPrice : pvModelCosts) {
-                if (pvModelPrice < 0 || pvModelPrice > 10000) {
-                    JOptionPane.showMessageDialog(FinanceDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
             }
 
             // CSP system
@@ -487,19 +432,11 @@ class FinanceDialog extends JDialog {
             pvFinance.setLandRentalCost(pvLandUnitCost);
             pvFinance.setCleaningCost(pvCleaningCost);
             pvFinance.setMaintenanceCost(pvMaintenanceCost);
-            pvFinance.setSolarPanelCost(solarPanelCost);
             pvFinance.setSolarPanelRackBaseCost(solarPanelRackBaseCost);
             pvFinance.setSolarPanelRackHeightCost(solarPanelRackHeightCost);
             pvFinance.setSolarPanelHsatCost(solarPanelHsatCost);
             pvFinance.setSolarPanelVsatCost(solarPanelVsatCost);
             pvFinance.setSolarPanelAadatCost(solarPanelAadatCost);
-
-            final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
-            int i = 0;
-            for (final String key : modules.keySet()) {
-                pvFinance.setPvModelCost(key, pvModelCosts[i]);
-                i++;
-            }
 
             final CspFinancialModel cspFinance = Scene.getInstance().getCspFinancialModel();
             cspFinance.setLifespan(cspLifespan);

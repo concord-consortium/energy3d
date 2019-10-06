@@ -121,7 +121,14 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
                         JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(parent, "<html>The calculated annual output is <b>" + current + " kWh</b>.</html>", "Annual Photovoltaic Output", JOptionPane.INFORMATION_MESSAGE);
+                    double annualOutput = getResult("Solar");
+                    PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
+                    double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
+                    StringBuilder report = new StringBuilder("<html>");
+                    report.append("The calculated annual output is <b>" + current + " kWh</b>.");
+                    report.append("<br>Based on this prediction, the ROI over " + fm.getLifespan() + " years is <b>" + Graph.ONE_DECIMAL.format(roi) + "%</b>.");
+                    report.append("</html>");
+                    JOptionPane.showMessageDialog(parent, report.toString(), "Annual Photovoltaic Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             return null;

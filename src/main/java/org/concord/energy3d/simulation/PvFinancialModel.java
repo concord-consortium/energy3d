@@ -21,7 +21,7 @@ public class PvFinancialModel implements Serializable {
     private int lifespan = 20;
     private double kWhSellingPrice = 0.1;
 
-    private double solarPanelCost = 1000;
+    private double customSolarPanelCost = 1000;
     private double solarPanelRackBaseCost = 50;
     private double solarPanelRackHeightCost = 100;
     private double solarPanelHsatCost = 100;
@@ -45,8 +45,8 @@ public class PvFinancialModel implements Serializable {
         if (lifespan == 0) {
             lifespan = 20;
         }
-        if (solarPanelCost == 0) {
-            solarPanelCost = 1000;
+        if (customSolarPanelCost == 0) {
+            customSolarPanelCost = 1000;
         }
         if (cleaningCost == 0) {
             cleaningCost = 5;
@@ -78,11 +78,19 @@ public class PvFinancialModel implements Serializable {
         }
     }
 
-    public double getTotalCost(final Rack r) {
+    public double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
+        double roi = annualOutput * lifespan * kWhSellingPrice;
+        roi -= landRentalCost * lifespan * landArea;
+        roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfSolarPanels;
+        roi /= PvProjectCost.getTotalSolarPanelCost();
+        return roi * 100; // convert to percentage
+    }
+
+    public double getCost(final Rack r) {
         final String modelName = r.getSolarPanel().getModelName();
         double cost = 0;
         if ("Custom".equals(modelName)) {
-            cost = solarPanelCost;
+            cost = customSolarPanelCost;
         } else {
             final Double d = pvModelCosts.get(modelName);
             if (d != null) {
@@ -118,11 +126,11 @@ public class PvFinancialModel implements Serializable {
         return cost * r.getNumberOfSolarPanels();
     }
 
-    public double getTotalCost(final SolarPanel s) {
+    public double getCost(final SolarPanel s) {
         final String modelName = s.getModelName();
         double cost = 0;
         if ("Custom".equals(modelName)) {
-            cost = solarPanelCost;
+            cost = customSolarPanelCost;
         } else {
             final Double d = pvModelCosts.get(modelName);
             if (d != null) {
@@ -188,12 +196,12 @@ public class PvFinancialModel implements Serializable {
         return maintenanceCost;
     }
 
-    public void setSolarPanelCost(final double solarPanelCost) {
-        this.solarPanelCost = solarPanelCost;
+    public void setCustomSolarPanelCost(final double customSolarPanelCost) {
+        this.customSolarPanelCost = customSolarPanelCost;
     }
 
-    public double getSolarPanelCost() {
-        return solarPanelCost;
+    public double getCustomSolarPanelCost() {
+        return customSolarPanelCost;
     }
 
     public void setSolarPanelHsatCost(final double solarPanelHsatCost) {

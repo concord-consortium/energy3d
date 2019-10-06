@@ -48,6 +48,17 @@ public class BuildingCost extends ProjectCost {
         return instance;
     }
 
+    public double getTotalCost() {
+        double cost = 0;
+        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+        if (!foundations.isEmpty()) {
+            for (final Foundation f : foundations) {
+                cost += getCostByFoundation(f);
+            }
+        }
+        return cost;
+    }
+
     /* The material and installation costs are partly based on http://www.homewyse.com, but should be considered as largely fictitious. */
     public static double getPartCost(final HousePart part) {
 
@@ -116,11 +127,11 @@ public class BuildingCost extends ProjectCost {
         }
 
         if (part instanceof SolarPanel) {
-            return Scene.getInstance().getPvFinancialModel().getTotalCost((SolarPanel) part);
+            return Scene.getInstance().getPvFinancialModel().getCost((SolarPanel) part);
         }
 
         if (part instanceof Rack) {
-            return Scene.getInstance().getPvFinancialModel().getTotalCost((Rack) part);
+            return Scene.getInstance().getPvFinancialModel().getCost((Rack) part);
         }
 
         if (part instanceof Tree) {

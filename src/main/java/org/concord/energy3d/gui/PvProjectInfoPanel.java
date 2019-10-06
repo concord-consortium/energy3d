@@ -116,7 +116,7 @@ public class PvProjectInfoPanel extends JPanel {
         if (!panels.isEmpty()) {
             countSolarPanels += panels.size();
             for (final SolarPanel s : panels) {
-                cost += model.getTotalCost(s);
+                cost += model.getCost(s);
                 panelArea += s.getPanelWidth() * s.getPanelHeight();
             }
         }
@@ -124,7 +124,7 @@ public class PvProjectInfoPanel extends JPanel {
         if (!racks.isEmpty()) {
             for (final Rack r : racks) {
                 countSolarPanels += r.getNumberOfSolarPanels();
-                cost += model.getTotalCost(r);
+                cost += model.getCost(r);
                 panelArea += r.getArea();
             }
         }
@@ -139,6 +139,7 @@ public class PvProjectInfoPanel extends JPanel {
             landArea = (float) foundation.getArea();
         }
         cost += landArea * model.getLandRentalCost() * model.getLifespan();
+        cost += countSolarPanels * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
         landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
         costBar.setValue(Math.round(cost));
         costBar.setMaximum(specs.getMaximumBudget());

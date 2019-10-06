@@ -118,6 +118,7 @@ public class CspProjectInfoPanel extends JPanel {
                 reflectingArea += troughArea;
             }
             cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
+            cost += totalModules * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
             costBar.setValue(Math.round(cost));
             final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
             String t = "Total cost over " + model.getLifespan() + " years";
@@ -142,6 +143,7 @@ public class CspProjectInfoPanel extends JPanel {
                     reflectingArea += rimArea;
                 }
                 cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
+                cost += dishes.size() * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
                 costBar.setValue(Math.round(cost));
                 final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                 String t = "Total cost over " + model.getLifespan() + " years";
@@ -184,6 +186,7 @@ public class CspProjectInfoPanel extends JPanel {
                             cost += model.getTowerUnitCost() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
                         }
                     }
+                    cost += mirrors.size() * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
                     costBar.setValue(Math.round(cost));
                     final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                     String t = "Total cost over " + model.getLifespan() + " years";
@@ -210,6 +213,7 @@ public class CspProjectInfoPanel extends JPanel {
                         reflectingArea += unitArea;
                     }
                     cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
+                    cost += totalModules * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
                     costBar.setValue(Math.round(cost));
                     final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                     String t = "Total cost over " + model.getLifespan() + " years";

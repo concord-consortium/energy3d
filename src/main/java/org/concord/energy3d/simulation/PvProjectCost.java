@@ -3,6 +3,7 @@ package org.concord.energy3d.simulation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -36,16 +37,29 @@ public class PvProjectCost extends ProjectCost {
         return instance;
     }
 
+    public double getTotalCost() {
+        double cost = 0;
+        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+        if (!foundations.isEmpty()) {
+            for (final Foundation f : foundations) {
+                cost += getCostByFoundation(f);
+            }
+        }
+        PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
+        cost += Scene.getInstance().countSolarPanels() * (fm.getCleaningCost() + fm.getMaintenanceCost()) * fm.getLifespan();
+        return cost;
+    }
+
     public static double getPartCost(final HousePart part) {
 
         final PvFinancialModel model = Scene.getInstance().getPvFinancialModel();
 
         if (part instanceof SolarPanel) {
-            return model.getTotalCost((SolarPanel) part);
+            return model.getCost((SolarPanel) part);
         }
 
         if (part instanceof Rack) {
-            return model.getTotalCost((Rack) part);
+            return model.getCost((Rack) part);
         }
 
         if (part instanceof Foundation) {
@@ -57,7 +71,16 @@ public class PvProjectCost extends ProjectCost {
 
     }
 
-    @Override
+    public static double getTotalSolarPanelCost() {
+        double total = 0;
+        for (final HousePart p : Scene.getInstance().getParts()) {
+            if (p instanceof SolarPanel || p instanceof Rack) {
+                total += getPartCost(p);
+            }
+        }
+        return total;
+    }
+
     public double getCostByFoundation(final Foundation foundation) {
         if (foundation == null || foundation.getProjectType() != Foundation.TYPE_PV_PROJECT) {
             return 0;
@@ -123,13 +146,14 @@ public class PvProjectCost extends ProjectCost {
                         maintenanceCostSum += financialModel.getMaintenanceCost();
                     } else if (p instanceof Rack) {
                         solarPanelCostSum += getPartCost(p);
-                        cleaningCostSum += financialModel.getCleaningCost() * ((Rack) p).getNumberOfSolarPanels();
-                        maintenanceCostSum += financialModel.getMaintenanceCost() * ((Rack) p).getNumberOfSolarPanels();
+                        int n = ((Rack) p).getNumberOfSolarPanels();
+                        cleaningCostSum += financialModel.getCleaningCost() * n;
+                        maintenanceCostSum += financialModel.getMaintenanceCost() * n;
                     }
                 }
             }
         } else {
-            info = count + " zones";
+            info = count > 1 ? count + " zones" : count + " zone";
             for (final HousePart p : Scene.getInstance().getParts()) {
                 if (p instanceof Foundation) {
                     landRentalCostSum += getPartCost(p);

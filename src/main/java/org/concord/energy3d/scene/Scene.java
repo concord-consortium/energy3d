@@ -3823,6 +3823,24 @@ public class Scene implements Serializable {
         return count;
     }
 
+    public List<String> getSolarPanelBrandNames() {
+        List<String> names = new ArrayList<>();
+        for (final HousePart p : parts) {
+            if (p instanceof SolarPanel) {
+                String s = ((SolarPanel) p).getModelName();
+                if (!names.contains(s)) {
+                    names.add(s);
+                }
+            } else if (p instanceof Rack) {
+                String s = ((Rack) p).getSolarPanel().getModelName();
+                if (!names.contains(s)) {
+                    names.add(s);
+                }
+            }
+        }
+        return names;
+    }
+
     public int countNodes() {
         int count = 0;
         final List<Foundation> foundations = getAllFoundations();
