@@ -29,7 +29,7 @@ abstract class AnnualAnalysis extends Analysis {
 
     JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll, final boolean exportStoredResults) {
 
-        final JMenuItem miClear = new JMenuItem("Clear Previous Results");
+        final JMenuItem miClear = new JMenuItem("Clear Previous Results in Graph");
         final JMenuItem miView = new JMenuItem("View Raw Data...");
         final JMenuItem miExportStoredResults = new JMenuItem("Export Stored Hourly Results");
 

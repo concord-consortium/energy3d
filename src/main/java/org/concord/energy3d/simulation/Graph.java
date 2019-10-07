@@ -178,10 +178,10 @@ public abstract class Graph extends JPanel {
                 popupMenu.add(mi);
                 popupMenu.addSeparator();
                 if (!popup) {
-                    mi = new JMenuItem("Keep Current Results");
+                    mi = new JMenuItem("Keep Current Results in Graph");
                     mi.addActionListener(e1 -> keepResults());
                     popupMenu.add(mi);
-                    mi = new JMenuItem("Clear Previous Results");
+                    mi = new JMenuItem("Clear Previous Results in Graph");
                     mi.addActionListener(e1 -> {
                         final int i = JOptionPane.showConfirmDialog(JOptionPane.getFrameForComponent(Graph.this),
                                 "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);

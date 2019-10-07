@@ -6,13 +6,12 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
@@ -36,12 +35,16 @@ import org.concord.energy3d.util.BugReporter;
 public class PvAnnualAnalysis extends AnnualAnalysis {
 
     private UtilityBill utilityBill;
+    private static List<double[]> storedResults;
 
     public PvAnnualAnalysis() {
         super();
         graph = new PartEnergyAnnualGraph();
         graph.setPreferredSize(new Dimension(600, 400));
         graph.setBackground(Color.WHITE);
+        if (storedResults == null) {
+            storedResults = new ArrayList<>();
+        }
     }
 
     @Override
@@ -95,44 +98,106 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
                 if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER) {
                     return; // annual calculation aborted
                 }
-                final String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
-                final Map<String, Double> recordedResults = getRecordedResults("Solar");
-                final int n = recordedResults.size();
+                final double annualOutput = getResult("Solar");
+                final PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
+                final int lifespan = fm.getLifespan();
+                final double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
+                final int n = storedResults.size();
                 if (n > 0) {
-                    String previousRuns = "";
-                    final Object[] keys = recordedResults.keySet().toArray();
-                    for (int i = n - 1; i >= 0; i--) {
-                        previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
+                    String previousResults = "<table border=1>";
+                    previousResults += "<tr bgcolor=#cccccc><td><b>Run</b></td><td><b>Annual Electricity (kWh)</b></td><td><b>Life Span (Year)</b></td><td><b>ROI (%)</b></td></tr>";
+                    int m = n < 5 ? 0 : n - 5;
+                    for (int i = n - 1; i >= m; i--) {
+                        previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td>#" + (i + 1) + "</td>";
+                        double[] results = storedResults.get(i);
+                        for (int j = 0; j < results.length; j++) {
+                            previousResults += "<td>" + Graph.TWO_DECIMALS.format(results[j]) + "</td>";
+                        }
+                        previousResults += "</tr>";
                     }
+                    previousResults += "</table>";
                     final Object[] options = new Object[]{"OK", "Copy Data"};
-                    final String msg = "<html>The calculated annual output is <b>" + current + " kWh</b>.<br><hr>Results from previously recorded tests:<br>" + previousRuns + "</html>";
+                    String msg = "<html>The calculated annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.";
+                    msg += "<br>Based on this prediction, the ROI over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.";
+                    msg += "<br><hr>Compare with the results from last " + (n - m) + " runs:<br>" + previousResults + "</html>";
                     final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
-                    final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Annual Photovoltaic Output");
+                    final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Annual Electricity Output and Return on Investment");
                     dialog.setVisible(true);
                     final Object choice = optionPane.getValue();
                     if (choice == options[1]) {
                         String output = "";
                         for (int i = 0; i < n; i++) {
-                            output += Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + "\n";
+                            double[] results = storedResults.get(i);
+                            for (int j = 0; j < results.length; j++) {
+                                output += results[j];
+                                if (j < results.length - 1) {
+                                    output += ", ";
+                                }
+                            }
+                            output += "\n";
                         }
-                        output += current;
+                        output += annualOutput + ", " + (double) lifespan + ", " + roi;
                         final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
                         clpbrd.setContents(new StringSelection(output), null);
-                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.", "Confirmation", JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else {
-                    double annualOutput = getResult("Solar");
-                    PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
-                    double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
                     StringBuilder report = new StringBuilder("<html>");
-                    report.append("The calculated annual output is <b>" + current + " kWh</b>.");
-                    report.append("<br>Based on this prediction, the ROI over " + fm.getLifespan() + " years is <b>" + Graph.ONE_DECIMAL.format(roi) + "%</b>.");
+                    report.append("The calculated annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.");
+                    report.append("<br>Based on this prediction, the ROI over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.");
                     report.append("</html>");
-                    JOptionPane.showMessageDialog(parent, report.toString(), "Annual Photovoltaic Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, report.toString(), "Annual Electricity Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
                 }
+                storedResults.add(new double[]{annualOutput, lifespan, roi});
             });
             return null;
         });
+    }
+
+    @Override
+    void viewFullHistory() {
+        final int n = storedResults.size();
+        if (n <= 0) {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>No previous run.</html>", "Full History", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            String previousResults = "<table width=100% border=1><tr bgcolor=#cccccc><td><b><font size=3>Run</b></td><td><b><font size=3>Annual Electricity (kWh)</b></td><td><b><font size=3>Life Span (year)</b></td><td><b><font size=3>ROI (%)</b></td></tr>";
+            for (int i = n - 1; i >= 0; i--) {
+                previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td><font size=3>#" + (i + 1) + "</td>";
+                double[] results = storedResults.get(i);
+                for (int j = 0; j < results.length; j++) {
+                    previousResults += "<td><font size=3>" + Graph.TWO_DECIMALS.format(results[j]) + "</td>";
+                }
+                previousResults += "</tr>";
+            }
+            previousResults += "</table>";
+            final Object[] options = new Object[]{"OK", "Copy Data"};
+            final JEditorPane htmlPane = new JEditorPane();
+            htmlPane.setContentType("text/html");
+            htmlPane.setText("<html>" + previousResults + "</html>");
+            htmlPane.setEditable(false);
+            final JScrollPane scrollPane = new JScrollPane(htmlPane);
+            scrollPane.setPreferredSize(new Dimension(400, 400));
+            final JOptionPane optionPane = new JOptionPane(scrollPane, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
+            final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Results from All Previous Runs");
+            dialog.setVisible(true);
+            final Object choice = optionPane.getValue();
+            if (choice == options[1]) {
+                String output = "";
+                for (int i = 0; i < n; i++) {
+                    double[] results = storedResults.get(i);
+                    for (int j = 0; j < results.length; j++) {
+                        output += results[j];
+                        if (j < results.length - 1) {
+                            output += ", ";
+                        }
+                    }
+                    output += "\n";
+                }
+                final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clpbrd.setContents(new StringSelection(output), null);
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + n + " data points copied to system clipboard.</html>", "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 
     @Override

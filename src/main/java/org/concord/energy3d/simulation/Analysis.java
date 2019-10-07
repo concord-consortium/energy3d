@@ -89,6 +89,10 @@ public abstract class Analysis {
         EnergyPanel.getInstance().cancel();
     }
 
+    void viewFullHistory() {
+        JOptionPane.showMessageDialog(MainFrame.getInstance(), "Under construction...", "Full History", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     // return the exception if unsuccessful
     Throwable compute() {
         EventQueue.invokeLater(() -> graph.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)));
@@ -164,12 +168,12 @@ public abstract class Analysis {
         });
         buttonPanel.add(runButton);
 
-        final JButton button = new JButton("Close");
+        JButton button = new JButton("Close");
         button.addActionListener(e -> {
             stopAnalysis();
             if (graph.hasData()) {
                 final Object[] options = {"Yes", "No", "Cancel"};
-                final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+                final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run in the graph?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
                 if (i == JOptionPane.CANCEL_OPTION) {
                     return;
                 }
@@ -179,6 +183,12 @@ public abstract class Analysis {
             }
             windowLocation.setLocation(dialog.getLocationOnScreen());
             dialog.dispose();
+        });
+        buttonPanel.add(button);
+
+        button = new JButton("View Full History");
+        button.addActionListener(e -> {
+            viewFullHistory();
         });
         buttonPanel.add(button);
 

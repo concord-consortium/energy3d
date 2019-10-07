@@ -25,7 +25,7 @@ abstract class DailyAnalysis extends Analysis {
 
     JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll) {
 
-        final JMenuItem miClear = new JMenuItem("Clear Previous Results");
+        final JMenuItem miClear = new JMenuItem("Clear Previous Results in Graph");
         final JMenuItem miView = new JMenuItem("View Raw Data...");
 
         final JMenu menu = new JMenu("Options");
