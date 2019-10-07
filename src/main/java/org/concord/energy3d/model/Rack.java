@@ -311,20 +311,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
                     return true;
                 }
             }
-        } else if (container instanceof Roof) {
-            final Roof roof = (Roof) container;
-            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
-            boolean init = true;
-            for (int i = 0; i < n; i++) {
-                final Vector3 a = getVertex(i);
-                if (!roof.insideWalls(a.getX(), a.getY(), init)) {
-                    return true;
-                }
-                if (init) {
-                    init = false;
-                }
-            }
-
         }
         return false;
     }
