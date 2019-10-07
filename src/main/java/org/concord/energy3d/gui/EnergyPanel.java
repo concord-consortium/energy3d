@@ -1936,6 +1936,7 @@ public class EnergyPanel extends JPanel {
                         dataPanel.remove(pvProjectPanel);
                         dataPanel.add(cspProjectPanel, 2);
                         cspProjectZoneInfoPanel.update(selectedFoundation);
+                        cspProjectPanel.setBorder(createTitledBorder("Concentrated Solar Power System (Zone #" + selectedFoundation.getId() + ")", true));
                         break;
                     case -1:
                         dataPanel.remove(instructionPanel);

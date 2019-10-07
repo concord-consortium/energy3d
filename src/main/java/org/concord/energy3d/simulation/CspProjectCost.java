@@ -13,15 +13,7 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.CspProjectZoneCostGraph;
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.FresnelReflector;
-import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
-import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.model.ParabolicDish;
-import org.concord.energy3d.model.ParabolicTrough;
-import org.concord.energy3d.model.SolarCollector;
-import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
@@ -70,7 +62,7 @@ public class CspProjectCost extends ProjectCost {
         if (part instanceof Foundation) {
             final Foundation f = (Foundation) part;
             if (f.hasSolarReceiver()) { // TODO: solar receiver height may not be accurate while the model is still loading
-                return model.getTowerUnitCost() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
+                return model.getReceiverUnitCost() * f.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
             }
             return f.getArea() * model.getLandRentalCost() * model.getLifespan();
         }
@@ -82,18 +74,33 @@ public class CspProjectCost extends ProjectCost {
         if (foundation == null || foundation.getProjectType() != Foundation.TYPE_CSP_PROJECT) {
             return 0;
         }
-        double sum = getPartCost(foundation);
+        final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
         if (foundation.hasSolarReceiver()) {
-            return sum;
+            double receiverCost = getPartCost(foundation);
+            double loanInterest = receiverCost * model.getLoanInterestRate() * model.getLifespan();
+            return receiverCost + loanInterest;
         }
+        double collectorCost = 0;
+        int countModules = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p.getTopContainer() == foundation) {
                 if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
-                    sum += getPartCost(p);
+                    collectorCost += getPartCost(p);
+                    if (p instanceof Mirror || p instanceof ParabolicDish) {
+                        countModules++;
+                    } else if (p instanceof ParabolicTrough) {
+                        countModules += ((ParabolicTrough) p).getNumberOfModules();
+                    } else if (p instanceof FresnelReflector) {
+                        countModules += ((FresnelReflector) p).getNumberOfModules();
+                    }
                 }
             }
         }
-        return sum;
+        double landRentalCost = getPartCost(foundation);
+        double cleaningCost = model.getCleaningCost() * countModules * model.getLifespan();
+        double maintenanceCost = model.getMaintenanceCost() * countModules * model.getLifespan();
+        double loanInterest = collectorCost * model.getLoanInterestRate() * model.getLifespan();
+        return landRentalCost + cleaningCost + maintenanceCost + loanInterest + collectorCost;
     }
 
     @Override
@@ -111,58 +118,23 @@ public class CspProjectCost extends ProjectCost {
             SceneManager.getInstance().setSelectedPart(selectedFoundation);
         }
 
-        CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
+        final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
 
         String details = "";
         int count = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof Foundation) {
                 final Foundation foundation = (Foundation) p;
-                if (!foundation.hasSolarReceiver()) {
-                    count++;
-                    if (selectedFoundation == null) {
-                        double receiverSum = 0;
-                        final List<Mirror> mirrors = foundation.getHeliostats();
-                        if (!mirrors.isEmpty()) {
-                            final ArrayList<Foundation> towers = new ArrayList<Foundation>();
-                            for (final Mirror m : mirrors) {
-                                if (m.getReceiver() != null) {
-                                    if (!towers.contains(m.getReceiver())) {
-                                        towers.add(m.getReceiver());
-                                    }
-                                }
-                            }
-                            if (!towers.isEmpty()) {
-                                for (final Foundation tower : towers) {
-                                    receiverSum += getPartCost(tower);
-                                }
-                            }
-                        } else {
-                            final List<FresnelReflector> reflectors = foundation.getFresnelReflectors();
-                            if (!reflectors.isEmpty()) {
-                                final ArrayList<Foundation> absorbers = new ArrayList<Foundation>();
-                                for (final FresnelReflector r : reflectors) {
-                                    if (r.getReceiver() != null) {
-                                        if (!absorbers.contains(r.getReceiver())) {
-                                            absorbers.add(r.getReceiver());
-                                        }
-                                    }
-                                }
-                                if (!absorbers.isEmpty()) {
-                                    for (final Foundation absorber : absorbers) {
-                                        receiverSum += getPartCost(absorber);
-                                    }
-                                }
-                            }
-                        }
-                        details += "$" + (int) (getCostByFoundation(foundation) + receiverSum) + " (" + foundation.getId() + ") | ";
-                    }
+                if (selectedFoundation == null) {
+                    String type = foundation.hasSolarReceiver() ? "Receiver" : "Field";
+                    details += type + " #" + foundation.getId() + ": $" + Graph.TWO_DECIMALS.format(getCostByFoundation(foundation)) + " | ";
                 }
+                count++;
             }
         }
         if (selectedFoundation == null) {
             if (count > 0) {
-                details = details.substring(0, details.length() - 2);
+                details = details.substring(0, details.length() - 3);
             }
         }
 
@@ -174,60 +146,34 @@ public class CspProjectCost extends ProjectCost {
         double loanInterest = 0;
         String info;
         if (selectedFoundation != null) {
-            info = "Zone #" + selectedFoundation.getId();
-            landRentalCost = getPartCost(selectedFoundation);
-            final List<Mirror> heliostats = selectedFoundation.getHeliostats();
-            if (!heliostats.isEmpty()) {
-                final List<Foundation> towers = new ArrayList<>();
-                for (final Mirror m : heliostats) {
-                    if (m.getReceiver() != null) {
-                        if (!towers.contains(m.getReceiver())) {
-                            towers.add(m.getReceiver());
+            if (selectedFoundation.hasSolarReceiver()) {
+                info = "Receiver #" + selectedFoundation.getId();
+                receiverCost = getPartCost(selectedFoundation);
+                loanInterest = receiverCost * model.getLoanInterestRate() * model.getLifespan();
+            } else {
+                info = "Field #" + selectedFoundation.getId();
+                int countModules = 0;
+                for (final HousePart p : Scene.getInstance().getParts()) {
+                    if (p.getTopContainer() == selectedFoundation) {
+                        if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
+                            collectorCost += getPartCost(p);
+                            if (p instanceof Mirror || p instanceof ParabolicDish) {
+                                countModules++;
+                            } else if (p instanceof ParabolicTrough) {
+                                countModules += ((ParabolicTrough) p).getNumberOfModules();
+                            } else if (p instanceof FresnelReflector) {
+                                countModules += ((FresnelReflector) p).getNumberOfModules();
+                            }
                         }
                     }
                 }
-                if (!towers.isEmpty()) {
-                    for (final Foundation tower : towers) {
-                        receiverCost += getPartCost(tower);
-                    }
-                }
+                loanInterest = collectorCost * model.getLoanInterestRate() * model.getLifespan();
+                cleaningCost = model.getCleaningCost() * countModules * model.getLifespan();
+                maintenanceCost = model.getMaintenanceCost() * countModules * model.getLifespan();
+                landRentalCost = getPartCost(selectedFoundation);
             }
-            final List<FresnelReflector> reflectors = selectedFoundation.getFresnelReflectors();
-            if (!reflectors.isEmpty()) {
-                final List<Foundation> absorbers = new ArrayList<>();
-                for (final FresnelReflector r : reflectors) {
-                    if (r.getReceiver() != null) {
-                        if (!absorbers.contains(r.getReceiver())) {
-                            absorbers.add(r.getReceiver());
-                        }
-                    }
-                }
-                if (!absorbers.isEmpty()) {
-                    for (final Foundation absorber : absorbers) {
-                        receiverCost += getPartCost(absorber);
-                    }
-                }
-            }
-            int countModules = 0;
-            for (final HousePart p : Scene.getInstance().getParts()) {
-                if (p.getTopContainer() == selectedFoundation) {
-                    if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
-                        collectorCost += getPartCost(p);
-                        if (p instanceof Mirror || p instanceof ParabolicDish) {
-                            countModules++;
-                        } else if (p instanceof ParabolicTrough) {
-                            countModules += ((ParabolicTrough) p).getNumberOfModules();
-                        } else if (p instanceof FresnelReflector) {
-                            countModules += ((FresnelReflector) p).getNumberOfModules();
-                        }
-                    }
-                }
-            }
-            cleaningCost = model.getCleaningCost() * countModules * model.getLifespan();
-            maintenanceCost = model.getMaintenanceCost() * countModules * model.getLifespan();
-            loanInterest = (collectorCost + receiverCost) * model.getLoanInterestRate() * model.getLifespan();
         } else {
-            info = count + " zones";
+            info = count > 1 ? count + " zones" : count + " zone";
             List<Mirror> heliostats = Scene.getInstance().getAllHeliostats();
             if (!heliostats.isEmpty()) {
                 final List<Foundation> towers = new ArrayList<>();

@@ -9,10 +9,10 @@ public class CspFinancialModel extends FinancialModel {
 
     // upfront costs
     private double heliostatUnitCost = 100;
-    private double towerUnitCost = 5000;
+    private double fresnelReflectorUnitCost = 50;
+    private double receiverUnitCost = 5000;
     private double parabolicTroughUnitCost = 100;
     private double parabolicDishUnitCost = 100;
-    private double fresnelReflectorUnitCost = 50;
 
     public CspFinancialModel() {
         super();
@@ -37,8 +37,8 @@ public class CspFinancialModel extends FinancialModel {
         if (heliostatUnitCost == 0) {
             heliostatUnitCost = 100;
         }
-        if (towerUnitCost == 0) {
-            towerUnitCost = 5000;
+        if (receiverUnitCost == 0) {
+            receiverUnitCost = 5000;
         }
         if (parabolicTroughUnitCost == 0) {
             parabolicTroughUnitCost = 100;
@@ -83,12 +83,12 @@ public class CspFinancialModel extends FinancialModel {
         return heliostatUnitCost;
     }
 
-    public void setTowerUnitCost(final double towerUnitCost) {
-        this.towerUnitCost = towerUnitCost;
+    public void setReceiverUnitCost(final double receiverUnitCost) {
+        this.receiverUnitCost = receiverUnitCost;
     }
 
-    public double getTowerUnitCost() {
-        return towerUnitCost;
+    public double getReceiverUnitCost() {
+        return receiverUnitCost;
     }
 
 }

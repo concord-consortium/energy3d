@@ -229,11 +229,17 @@ class FinancialSettingsDialog extends JDialog {
             container.add(heliostatField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-            container.add(createCspLabel("Tower: "));
+            container.add(createCspLabel("Fresnel Reflector Cost: "));
             container.add(new JLabel("$"));
-            towerField = new JTextField(FORMAT.format(finance.getTowerUnitCost()), 6);
+            fresnelReflectorField = new JTextField(FORMAT.format(finance.getFresnelReflectorUnitCost()), 6);
+            container.add(fresnelReflectorField);
+            container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
+
+            container.add(createCspLabel("Receiver Cost: "));
+            container.add(new JLabel("$"));
+            towerField = new JTextField(FORMAT.format(finance.getReceiverUnitCost()), 6);
             container.add(towerField);
-            container.add(new JLabel("<html>Per meter height</html>"));
+            container.add(new JLabel("<html>Per meter in height</html>"));
 
             container.add(createCspLabel("Parabolic Trough Cost: "));
             container.add(new JLabel("$"));
@@ -245,12 +251,6 @@ class FinancialSettingsDialog extends JDialog {
             container.add(new JLabel("$"));
             parabolicDishField = new JTextField(FORMAT.format(finance.getParabolicDishUnitCost()), 6);
             container.add(parabolicDishField);
-            container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
-
-            container.add(createCspLabel("Fresnel Reflector Cost: "));
-            container.add(new JLabel("$"));
-            fresnelReflectorField = new JTextField(FORMAT.format(finance.getFresnelReflectorUnitCost()), 6);
-            container.add(fresnelReflectorField);
             container.add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
             SpringUtilities.makeCompactGrid(container, 5, 4, 6, 6, 6, 3);
@@ -475,7 +475,7 @@ class FinancialSettingsDialog extends JDialog {
             cspFinance.setMaintenanceCost(cspMaintenanceCost);
             cspFinance.setLoanInterestRate(cspLoanInterestCost * 0.01);
             cspFinance.setHeliostatUnitCost(heliostatUnitCost);
-            cspFinance.setTowerUnitCost(towerHeightUnitCost);
+            cspFinance.setReceiverUnitCost(towerHeightUnitCost);
             cspFinance.setParabolicTroughUnitCost(parabolicTroughUnitCost);
             cspFinance.setParabolicDishUnitCost(parabolicDishUnitCost);
             cspFinance.setFresnelReflectorUnitCost(fresnelReflectorUnitCost);

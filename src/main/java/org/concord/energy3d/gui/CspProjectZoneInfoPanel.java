@@ -3,7 +3,6 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -17,6 +16,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.CspFinancialModel;
 import org.concord.energy3d.simulation.CspDesignSpecs;
+import org.concord.energy3d.simulation.CspProjectCost;
 
 /**
  * @author Charles Xie
@@ -99,6 +99,7 @@ public class CspProjectZoneInfoPanel extends JPanel {
 
     void update(final Foundation foundation) {
 
+        final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
         final List<ParabolicTrough> troughs = foundation.getParabolicTroughs();
         if (!troughs.isEmpty()) {
             countBar.setValue(troughs.size());
@@ -108,93 +109,61 @@ public class CspProjectZoneInfoPanel extends JPanel {
             }
             moduleCountBar.setValue(totalModules);
             countPanel.setBorder(EnergyPanel.createTitledBorder("Number of parabolic troughs", true));
-            double cost = 0;
             double reflectingArea = 0;
             double troughArea;
-            final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
             for (final ParabolicTrough t : troughs) {
                 troughArea = t.getTroughLength() * t.getApertureWidth();
-                cost += model.getParabolicTroughUnitCost() * troughArea;
                 reflectingArea += troughArea;
             }
-            cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
-            cost += totalModules * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-            costBar.setValue(Math.round(cost));
+            packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+            costBar.setValue(Math.round(CspProjectCost.getInstance().getCostByFoundation(foundation)));
             final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
             String t = "Total cost over " + model.getLifespan() + " years";
             if (specs.isBudgetEnabled()) {
                 t += " (" + "<$" + specs.getMaximumBudget() + ")";
             }
             costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-            packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
         } else {
             final List<ParabolicDish> dishes = foundation.getParabolicDishes();
             if (!dishes.isEmpty()) {
                 countBar.setValue(dishes.size());
                 moduleCountBar.setValue(dishes.size());
                 countPanel.setBorder(EnergyPanel.createTitledBorder("Number of parabolic dishes", true));
-                double cost = 0;
                 double reflectingArea = 0;
                 double rimArea;
-                final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
                 for (final ParabolicDish d : dishes) {
                     rimArea = d.getRimRadius() * d.getRimRadius() * Math.PI;
-                    cost += model.getHeliostatUnitCost() * rimArea;
                     reflectingArea += rimArea;
                 }
-                cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
-                cost += dishes.size() * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-                costBar.setValue(Math.round(cost));
+                packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+                costBar.setValue(Math.round(CspProjectCost.getInstance().getCostByFoundation(foundation)));
                 final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                 String t = "Total cost over " + model.getLifespan() + " years";
                 if (specs.isBudgetEnabled()) {
                     t += " (" + "<$" + specs.getMaximumBudget() + ")";
                 }
                 costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-                packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
             } else {
                 final List<FresnelReflector> fresnels = foundation.getFresnelReflectors();
                 if (fresnels.isEmpty()) {
-                    final List<Mirror> mirrors = foundation.getHeliostats();
-                    countBar.setValue(mirrors.size());
-                    moduleCountBar.setValue(mirrors.size());
-                    countPanel.setBorder(EnergyPanel.createTitledBorder("Number of heliostats", true));
-                    double cost = 0;
+                    final List<Mirror> heliostats = foundation.getHeliostats();
+                    countBar.setValue(heliostats.size());
+                    moduleCountBar.setValue(heliostats.size());
+                    countPanel.setBorder(EnergyPanel.createTitledBorder(heliostats.size() > 0 ? "Number of heliostats" : "------", true));
                     double reflectingArea = 0;
-                    double mirrorArea;
-                    final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
-                    final ArrayList<Foundation> towers = new ArrayList<>();
-                    for (final Mirror m : mirrors) {
-                        mirrorArea = m.getApertureWidth() * m.getApertureHeight();
-                        cost += model.getHeliostatUnitCost() * mirrorArea;
-                        reflectingArea += mirrorArea;
-                        if (m.getReceiver() != null) {
-                            if (!towers.contains(m.getReceiver())) {
-                                towers.add(m.getReceiver());
-                            }
-                        }
+                    double apertureArea;
+                    for (final Mirror m : heliostats) {
+                        apertureArea = m.getApertureWidth() * m.getApertureHeight();
+                        reflectingArea += apertureArea;
                     }
-                    if (!mirrors.isEmpty()) {
-                        cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
-                        if (!towers.isEmpty()) {
-                            for (final Foundation tower : towers) {
-                                cost += model.getTowerUnitCost() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
-                            }
-                        }
-                    } else {
-                        if (foundation.hasSolarReceiver()) {
-                            cost += model.getTowerUnitCost() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getScale();
-                        }
-                    }
-                    cost += mirrors.size() * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-                    costBar.setValue(Math.round(cost));
+                    packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+                    costBar.setValue(Math.round(CspProjectCost.getInstance().getCostByFoundation(foundation)));
                     final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                     String t = "Total cost over " + model.getLifespan() + " years";
                     if (specs.isBudgetEnabled()) {
                         t += " (" + "<$" + specs.getMaximumBudget() + ")";
                     }
                     costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-                    packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
                 } else {
                     countBar.setValue(fresnels.size());
                     int totalModules = 0;
@@ -203,29 +172,24 @@ public class CspProjectZoneInfoPanel extends JPanel {
                     }
                     moduleCountBar.setValue(totalModules);
                     countPanel.setBorder(EnergyPanel.createTitledBorder("Number of Fresnel reflectors", true));
-                    double cost = 0;
                     double reflectingArea = 0;
                     double unitArea;
-                    final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
                     for (final FresnelReflector r : fresnels) {
                         unitArea = r.getLength() * r.getModuleWidth();
-                        cost += model.getFresnelReflectorUnitCost() * unitArea;
                         reflectingArea += unitArea;
                     }
-                    cost += foundation.getArea() * model.getLandRentalCost() * model.getLifespan();
-                    cost += totalModules * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-                    costBar.setValue(Math.round(cost));
+                    packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+                    costBar.setValue(Math.round(CspProjectCost.getInstance().getCostByFoundation(foundation)));
                     final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
                     String t = "Total cost over " + model.getLifespan() + " years";
                     if (specs.isBudgetEnabled()) {
                         t += " (" + "<$" + specs.getMaximumBudget() + ")";
                     }
                     costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-                    packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
-
                 }
             }
         }
+
     }
 
     public void updateBudgetMaximum() {

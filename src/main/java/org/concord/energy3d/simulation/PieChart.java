@@ -1,5 +1,7 @@
 package org.concord.energy3d.simulation;
 
+import org.concord.energy3d.util.Util;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -54,22 +56,26 @@ public class PieChart extends JComponent {
         for (final double x : data) {
             sum += x;
         }
-        percents = new double[data.length];
-        arcs = new Arc2D.Double[data.length];
-        for (int i = 0; i < percents.length; i++) {
-            percents[i] = data[i] / sum;
-            arcs[i] = new Arc2D.Double();
+        if (!Util.isZero(sum)) {
+            percents = new double[data.length];
+            arcs = new Arc2D.Double[data.length];
+            for (int i = 0; i < percents.length; i++) {
+                percents[i] = data[i] / sum;
+                arcs[i] = new Arc2D.Double();
+            }
         }
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(final MouseEvent e) {
                 selectedIndex = -1;
-                for (int i = 0; i < arcs.length; i++) {
-                    if (arcs[i].contains(e.getX(), e.getY())) {
-                        selectedIndex = i;
-                        repaint();
-                        setToolTipText(legends[i] + ": " + unit + Graph.TWO_DECIMALS.format(data[i]));
-                        return;
+                if (arcs != null) {
+                    for (int i = 0; i < arcs.length; i++) {
+                        if (arcs[i].contains(e.getX(), e.getY())) {
+                            selectedIndex = i;
+                            repaint();
+                            setToolTipText(legends[i] + ": " + unit + Graph.TWO_DECIMALS.format(data[i]));
+                            return;
+                        }
                     }
                 }
                 String toolTipText = "<html><h4>Data:</h4><hr>";
@@ -113,7 +119,6 @@ public class PieChart extends JComponent {
         final int s = bound.y + (popup ? 10 : 0);
 
         float t = 0.0f;
-        final int n = percents.length;
         final FontMetrics fm = g.getFontMetrics();
         for (final String l : legends) {
             final int len = fm.stringWidth(l);
@@ -123,24 +128,33 @@ public class PieChart extends JComponent {
         }
         legendX2 += legendX1 + 8;
 
-        for (int i = 0; i < n; i++) {
-            g2.setColor(colors[i]);
-            arcs[i].setArc(bound, t, percents[i] * 360.0f, Arc2D.PIE);
-            g2.fill(arcs[i]);
-            g2.fillRect(r, s + i * 20, 10, 10);
-            if (i == selectedIndex) {
-                g2.setColor(highlightColor);
-                g2.setStroke(thickStroke);
-            } else {
-                g2.setColor(normalColor);
-                g2.setStroke(thinStroke);
+        if (percents != null) {
+            final int n = percents.length;
+            for (int i = 0; i < n; i++) {
+                g2.setColor(colors[i]);
+                arcs[i].setArc(bound, t, percents[i] * 360.0f, Arc2D.PIE);
+                g2.fill(arcs[i]);
+                g2.fillRect(r, s + i * 20, 10, 10);
+                if (i == selectedIndex) {
+                    g2.setColor(highlightColor);
+                    g2.setStroke(thickStroke);
+                } else {
+                    g2.setColor(normalColor);
+                    g2.setStroke(thinStroke);
+                }
+                g2.draw(arcs[i]);
+                g2.setColor(Color.BLACK);
+                g2.drawRect(r, s + i * 20, 10, 10);
+                g2.drawString(legends[i], r + legendX1, s + 10 + i * 20);
+                g2.drawString(format.format(percents[i] * 100.0) + "%", r + legendX2, s + 10 + i * 20);
+                t += percents[i] * 360.0f;
             }
-            g2.draw(arcs[i]);
-            g2.setColor(Color.BLACK);
-            g2.drawRect(r, s + i * 20, 10, 10);
-            g2.drawString(legends[i], r + legendX1, s + 10 + i * 20);
-            g2.drawString(format.format(percents[i] * 100.0) + "%", r + legendX2, s + 10 + i * 20);
-            t += percents[i] * 360.0f;
+        } else {
+            g2.setColor(Color.GRAY);
+            g2.drawOval(bound.x, bound.y, bound.width, bound.height);
+            String text = "N.A.";
+            g2.setFont(new Font("Arial", Font.PLAIN, 16));
+            g2.drawString(text, bound.x + (bound.width - fm.stringWidth(text)) / 2, bound.y + bound.height / 2);
         }
 
         g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
