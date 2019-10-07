@@ -3,20 +3,14 @@ package org.concord.energy3d.simulation;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.JDialog;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -34,11 +28,16 @@ import org.concord.energy3d.util.BugReporter;
  */
 public class HeliostatAnnualAnalysis extends AnnualAnalysis {
 
+    static List<double[]> storedResults;
+
     public HeliostatAnnualAnalysis() {
         super();
         graph = new PartEnergyAnnualGraph();
         graph.setPreferredSize(new Dimension(600, 400));
         graph.setBackground(Color.WHITE);
+        if (storedResults == null) {
+            storedResults = new ArrayList<>();
+        }
     }
 
     @Override
@@ -93,47 +92,12 @@ public class HeliostatAnnualAnalysis extends AnnualAnalysis {
                 if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER) {
                     return; // annual calculation aborted
                 }
-                final String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
-                final Map<String, Double> recordedResults = getRecordedResults("Solar");
-                final int n = recordedResults.size();
-                if (n > 0) {
-                    String previousRuns = "";
-                    final Object[] keys = recordedResults.keySet().toArray();
-                    for (int i = n - 1; i >= 0; i--) {
-                        previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
-                    }
-                    final Object[] options = new Object[]{"OK", "Copy Data"};
-                    final String msg = "<html>The calculated annual output is <b>" + current + " kWh</b>.<br><hr>Results from previously recorded tests:<br>" + previousRuns + "</html>";
-                    final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
-                    final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Annual Output");
-                    dialog.setVisible(true);
-                    final Object choice = optionPane.getValue();
-                    if (choice == options[1]) {
-                        String output = "";
-                        for (int i = 0; i < n; i++) {
-                            output += Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + "\n";
-                        }
-                        output += current;
-                        final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-                        clpbrd.setContents(new StringSelection(output), null);
-                        JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    double annualOutput = getResult("Solar");
-                    CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
-                    double totalLandArea = 0;
-                    for (Foundation f : Scene.getInstance().getAllFoundations()) {
-                        if (!f.hasSolarReceiver()) {
-                            totalLandArea += f.getArea();
-                        }
-                    }
-                    double roi = fm.calculateROI(totalLandArea, Scene.getInstance().countParts(Mirror.class), annualOutput);
-                    StringBuilder report = new StringBuilder("<html>");
-                    report.append("The calculated annual output is <b>" + current + " kWh</b>.");
-                    report.append("<br>Based on this prediction, the ROI over " + fm.getLifespan() + " years is <b>" + Graph.ONE_DECIMAL.format(roi) + "%</b>.");
-                    report.append("</html>");
-                    JOptionPane.showMessageDialog(parent, report.toString(), "Annual Electric Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
-                }
+                final double annualOutput = getResult("Solar");
+                final CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
+                final int lifespan = fm.getLifespan();
+                final double roi = fm.calculateROI(CspProjectCost.getInstance().getTotalArea(), Scene.getInstance().countParts(Mirror.class), annualOutput);
+                reportResults(storedResults, annualOutput, lifespan, roi, parent);
+                storedResults.add(new double[]{annualOutput, lifespan, roi});
             });
             return null;
         });

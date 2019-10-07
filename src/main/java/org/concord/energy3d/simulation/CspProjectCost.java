@@ -45,6 +45,19 @@ public class CspProjectCost extends ProjectCost {
         return cost;
     }
 
+    public double getTotalArea() {
+        double area = 0;
+        final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+        if (!foundations.isEmpty()) {
+            for (final Foundation f : foundations) {
+                if (!f.hasSolarReceiver()) {
+                    area += f.getArea();
+                }
+            }
+        }
+        return area;
+    }
+
     public static double getTotalUpFrontCost() {
         double total = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
