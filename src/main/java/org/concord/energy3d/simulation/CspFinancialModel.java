@@ -51,6 +51,16 @@ public class CspFinancialModel extends FinancialModel {
         }
     }
 
+    double calculateROI(double landArea, double numberOfModules, double annualOutput) {
+        double upfrontCost = CspProjectCost.getTotalUpFrontCost();
+        double roi = annualOutput * lifespan * kWhSellingPrice;
+        roi -= landRentalCost * lifespan * landArea;
+        roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfModules;
+        roi -= loanInterestRate * lifespan * upfrontCost;
+        roi /= upfrontCost;
+        return roi * 100; // convert to percentage
+    }
+
     public void setParabolicTroughUnitCost(final double parabolicTroughUnitCost) {
         this.parabolicTroughUnitCost = parabolicTroughUnitCost;
     }

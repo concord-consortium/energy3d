@@ -52,7 +52,7 @@ public class PvProjectCost extends ProjectCost {
         return 0;
     }
 
-    public static double getTotalSolarPanelCost() {
+    public static double getTotalUpFrontCost() {
         double total = 0;
         for (final HousePart p : Scene.getInstance().getParts()) {
             if (p instanceof SolarPanel || p instanceof Rack) {

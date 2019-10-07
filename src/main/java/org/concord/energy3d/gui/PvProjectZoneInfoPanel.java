@@ -16,6 +16,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.PvFinancialModel;
 import org.concord.energy3d.simulation.PvDesignSpecs;
+import org.concord.energy3d.simulation.PvProjectCost;
 
 /**
  * @author Charles Xie
@@ -110,13 +111,11 @@ public class PvProjectZoneInfoPanel extends JPanel {
             return;
         }
         int countSolarPanels = 0;
-        double solarPanelCost = 0;
         double solarPanelArea = 0;
         final List<SolarPanel> panels = foundation.getSolarPanels();
         if (!panels.isEmpty()) {
             countSolarPanels += panels.size();
             for (final SolarPanel s : panels) {
-                solarPanelCost += model.getCost(s);
                 solarPanelArea += s.getPanelWidth() * s.getPanelHeight();
             }
         }
@@ -124,7 +123,6 @@ public class PvProjectZoneInfoPanel extends JPanel {
         if (!racks.isEmpty()) {
             for (final Rack r : racks) {
                 countSolarPanels += r.getNumberOfSolarPanels();
-                solarPanelCost += model.getCost(r);
                 solarPanelArea += r.getArea();
             }
         }
@@ -145,11 +143,7 @@ public class PvProjectZoneInfoPanel extends JPanel {
         }
         landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
 
-        double cost = solarPanelCost;
-        cost += landArea * model.getLandRentalCost() * model.getLifespan();
-        cost += countSolarPanels * (model.getCleaningCost() + model.getMaintenanceCost()) * model.getLifespan();
-        cost += solarPanelCost * model.getLoanInterestRate() * model.getLifespan();
-        costBar.setValue(Math.round(cost));
+        costBar.setValue(Math.round(PvProjectCost.getInstance().getCostByFoundation(foundation)));
         costBar.setMaximum(specs.getMaximumBudget());
         costBar.setEnabled(specs.isBudgetEnabled());
         String t = "Total cost over " + model.getLifespan() + " years";

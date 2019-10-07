@@ -74,7 +74,7 @@ public class PvFinancialModel extends FinancialModel {
     }
 
     double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
-        double upfrontCost = PvProjectCost.getTotalSolarPanelCost();
+        double upfrontCost = PvProjectCost.getTotalUpFrontCost();
         double roi = annualOutput * lifespan * kWhSellingPrice;
         roi -= landRentalCost * lifespan * landArea;
         roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfSolarPanels;

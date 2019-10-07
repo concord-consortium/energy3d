@@ -119,7 +119,20 @@ public class HeliostatAnnualAnalysis extends AnnualAnalysis {
                         JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(parent, "<html>The calculated annual output is <b>" + current + " kWh</b>.</html>", "Annual Output", JOptionPane.INFORMATION_MESSAGE);
+                    double annualOutput = getResult("Solar");
+                    CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
+                    double totalLandArea = 0;
+                    for (Foundation f : Scene.getInstance().getAllFoundations()) {
+                        if (!f.hasSolarReceiver()) {
+                            totalLandArea += f.getArea();
+                        }
+                    }
+                    double roi = fm.calculateROI(totalLandArea, Scene.getInstance().countParts(Mirror.class), annualOutput);
+                    StringBuilder report = new StringBuilder("<html>");
+                    report.append("The calculated annual output is <b>" + current + " kWh</b>.");
+                    report.append("<br>Based on this prediction, the ROI over " + fm.getLifespan() + " years is <b>" + Graph.ONE_DECIMAL.format(roi) + "%</b>.");
+                    report.append("</html>");
+                    JOptionPane.showMessageDialog(parent, report.toString(), "Annual Electric Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             return null;

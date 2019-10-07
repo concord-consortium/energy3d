@@ -45,6 +45,21 @@ public class CspProjectCost extends ProjectCost {
         return cost;
     }
 
+    public static double getTotalUpFrontCost() {
+        double total = 0;
+        for (final HousePart p : Scene.getInstance().getParts()) {
+            if (p instanceof SolarCollector) {
+                total += getPartCost(p);
+            } else if (p instanceof Foundation) {
+                Foundation f = (Foundation) p;
+                if (f.hasSolarReceiver()) {
+                    total += getPartCost(f);
+                }
+            }
+        }
+        return total;
+    }
+
     public static double getPartCost(final HousePart part) {
         final CspFinancialModel model = Scene.getInstance().getCspFinancialModel();
         if (part instanceof Mirror) {
@@ -237,10 +252,10 @@ public class CspProjectCost extends ProjectCost {
         String years = "(" + model.getLifespan() + " years)";
         if (Util.isZero(receiverCost)) {
             data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, collectorCost};
-            legends = new String[]{"Land " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)"};
+            legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)"};
         } else {
             data = new double[]{landRentalCost, cleaningCost, maintenanceCost, loanInterest, collectorCost, receiverCost};
-            legends = new String[]{"Land " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)", "Receivers (One-Time)"};
+            legends = new String[]{"Land Rental " + years, "Cleaning " + years, "Maintenance " + years, "Loan Interest " + years, "Collectors (One-Time)", "Receivers (One-Time)"};
         }
 
         // show them in a popup window
