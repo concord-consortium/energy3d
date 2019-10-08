@@ -297,7 +297,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
         }
     }
 
-    private boolean outOfBound() {
+    public boolean outOfBound() {
         drawMesh();
         if (container instanceof Foundation) {
             final Foundation foundation = (Foundation) container;
@@ -309,6 +309,19 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
                 }
                 if (!foundation.containsPoint(a.getX(), a.getY())) {
                     return true;
+                }
+            }
+        } else if (container instanceof Roof) {
+            final Roof roof = (Roof) container;
+            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+            boolean init = true;
+            for (int i = 0; i < n; i++) {
+                final Vector3 a = getVertex(i);
+                if (!roof.insideWalls(a.getX(), a.getY(), init)) {
+                    return true;
+                }
+                if (init) {
+                    init = false;
                 }
             }
         }
