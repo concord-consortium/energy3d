@@ -93,8 +93,9 @@ public class ParabolicDishAnnualAnalysis extends AnnualAnalysis {
                 final CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
                 final int lifespan = fm.getLifespan();
                 final double roi = fm.calculateROI(CspProjectCost.getInstance().getTotalArea(), Scene.getInstance().countParts(ParabolicDish.class), annualOutput);
-                reportResults(storedResults, annualOutput, lifespan, roi, parent);
-                storedResults.add(new double[]{annualOutput, lifespan, roi});
+                double paybackPeriod = 100.0 / roi * lifespan;
+                reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
+                storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
             });
             return null;
         });

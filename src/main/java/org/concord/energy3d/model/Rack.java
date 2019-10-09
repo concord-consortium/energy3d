@@ -431,6 +431,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
         if (onFlatSurface && host == null) {
             points.get(0).setZ(baseZ + baseHeight);
         }
+        if (container instanceof Wall) { // TODO: Support tilt angle of a solar panel on a wall
+//            Wall wall = (Wall) container;
+//            ReadOnlyVector3 wallCenter = wall.getCenter();
+//            ReadOnlyVector3 wallNormal = wall.getNormal().normalize(null);
+//            points.get(0).setX(wallCenter.getX() + baseHeight * wallNormal.getX());
+//            points.get(0).setY(wallCenter.getY() + baseHeight * wallNormal.getY());
+        }
 
         final double sceneScale = Scene.getInstance().getScale();
         surround.setData(new Vector3(0, 0, 0), 0.5 * rackWidth / sceneScale, 0.5 * rackHeight / sceneScale, 0.15);

@@ -80,11 +80,12 @@ public abstract class Analysis {
         EnergyPanel.getInstance().cancel();
     }
 
-    void reportResults(List<double[]> storedResults, double annualOutput, int lifespan, double roi, JDialog parent) {
+    void reportResults(List<double[]> storedResults, double annualOutput, int lifespan, double roi, double paybackPeriod, JDialog parent) {
         final int n = storedResults.size();
         if (n > 0) {
             String previousResults = "<table border=1>";
-            previousResults += "<tr bgcolor=#cccccc><td><b>Run</b></td><td><b>Annual Electricity (kWh)</b></td><td><b>Life Span (Year)</b></td><td><b>ROI (%)</b></td></tr>";
+            previousResults += "<tr bgcolor=#cccccc><td><b>Run</b></td><td><b>Annual Electricity (kWh)</b></td><td><b>Life Span (Year)</b></td>";
+            previousResults += "<td><b>ROI (%)</b></td><td><b>Payback Period (Year)</b></td></tr>";
             int m = n < 5 ? 0 : n - 5;
             for (int i = n - 1; i >= m; i--) {
                 previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td>#" + (i + 1) + "</td>";
@@ -96,8 +97,9 @@ public abstract class Analysis {
             }
             previousResults += "</table>";
             final Object[] options = new Object[]{"OK", "Copy Data"};
-            String msg = "<html>The calculated annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.";
-            msg += "<br>Based on this prediction, the ROI over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.";
+            String msg = "<html>The annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.";
+            msg += "<br>The payback period is <b>" + Graph.TWO_DECIMALS.format(paybackPeriod) + " years.</b>.";
+            msg += "<br>The return on investment over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.";
             msg += "<br><hr>Compare with the results from last " + (n - m) + " runs:<br>" + previousResults + "</html>";
             final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
             final JDialog dialog = optionPane.createDialog(parent, "Annual Electricity Output and Return on Investment");
@@ -115,15 +117,16 @@ public abstract class Analysis {
                     }
                     output += "\n";
                 }
-                output += annualOutput + ", " + (double) lifespan + ", " + roi;
+                output += annualOutput + ", " + (double) lifespan + ", " + roi + ", " + paybackPeriod;
                 final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clpbrd.setContents(new StringSelection(output), null);
                 JOptionPane.showMessageDialog(parent, "<html>" + (n + 1) + " data points copied to system clipboard.", "Confirmation", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             StringBuilder report = new StringBuilder("<html>");
-            report.append("The calculated annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.");
-            report.append("<br>Based on this prediction, the ROI over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.");
+            report.append("The annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.");
+            report.append("<br>The payback period is <b>" + Graph.TWO_DECIMALS.format(paybackPeriod) + " years.</b>.");
+            report.append("<br>The return on investment over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.");
             report.append("</html>");
             JOptionPane.showMessageDialog(parent, report.toString(), "Annual Electricity Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -134,7 +137,8 @@ public abstract class Analysis {
         if (n <= 0) {
             JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>No previous run.</html>", "Full History", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            String previousResults = "<table width=100% border=1><tr bgcolor=#cccccc><td><b><font size=3>Run</b></td><td><b><font size=3>Annual Electricity (kWh)</b></td><td><b><font size=3>Life Span (year)</b></td><td><b><font size=3>ROI (%)</b></td></tr>";
+            String previousResults = "<table width=100% border=1><tr bgcolor=#cccccc><td><b><font size=3>Run</b></td><td><b><font size=3>Annual Electricity (kWh)</b></td>";
+            previousResults += "<td><b><font size=3>Life Span (year)</b></td><td><b><font size=3>ROI (%)</b></td><td><b><font size=3>Payback Period (Year)</b></td></tr>";
             for (int i = n - 1; i >= 0; i--) {
                 previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td><font size=3>#" + (i + 1) + "</td>";
                 double[] results = storedResults.get(i);

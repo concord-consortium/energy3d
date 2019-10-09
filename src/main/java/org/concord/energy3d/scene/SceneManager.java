@@ -1372,6 +1372,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         }
 
         Scene.getInstance().add(drawn, false);
+        Scene.getInstance().setEdited(true);
         addPartCommand = new AddPartCommand(drawn);
         return drawn;
 
