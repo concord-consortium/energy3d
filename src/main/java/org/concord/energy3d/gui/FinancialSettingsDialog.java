@@ -20,7 +20,7 @@ import org.concord.energy3d.util.SpringUtilities;
 /**
  * @author Charles Xie
  */
-class FinancialSettingsDialog extends JDialog {
+public class FinancialSettingsDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
@@ -54,7 +54,7 @@ class FinancialSettingsDialog extends JDialog {
             container.setBorder(BorderFactory.createTitledBorder("Revenue Goals"));
             add(container);
 
-            container.add(createPvLabel("Life Span: "));
+            container.add(createPvLabel("Project Lifespan: "));
             container.add(new JLabel());
             lifespanField = new JTextField(FORMAT.format(finance.getLifespan()), 6);
             container.add(lifespanField);
@@ -175,7 +175,7 @@ class FinancialSettingsDialog extends JDialog {
             container.setBorder(BorderFactory.createTitledBorder("Revenue Goals"));
             add(container);
 
-            container.add(createCspLabel("Life Span: "));
+            container.add(createCspLabel("Project Lifespan: "));
             container.add(new JLabel());
             lifespanField = new JTextField(FORMAT.format(finance.getLifespan()), 6);
             container.add(lifespanField);
@@ -279,7 +279,7 @@ class FinancialSettingsDialog extends JDialog {
     private JPanel pvSystemPanel;
     private JPanel cspSystemPanel;
 
-    FinancialSettingsDialog() {
+    public FinancialSettingsDialog() {
 
         super(MainFrame.getInstance(), true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -362,8 +362,8 @@ class FinancialSettingsDialog extends JDialog {
 
             // PV system
 
-            if (pvLifespan < 5 || pvLifespan > 30) {
-                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your PV lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+            if (pvLifespan < 10 || pvLifespan > 30) {
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your PV project lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (pvKWhSellPrice <= 0 || pvKWhSellPrice > 1) {
@@ -409,8 +409,8 @@ class FinancialSettingsDialog extends JDialog {
 
             // CSP system
 
-            if (cspLifespan < 5 || cspLifespan > 50) {
-                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your CSP lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+            if (cspLifespan < 20 || cspLifespan > 50) {
+                JOptionPane.showMessageDialog(FinancialSettingsDialog.this, "Your CSP project lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (cspKWhSellPrice <= 0 || cspKWhSellPrice > 1) {
@@ -525,11 +525,11 @@ class FinancialSettingsDialog extends JDialog {
 
     }
 
-    void selectPvPrices() {
+    public void selectPvPrices() {
         tabbedPane.setSelectedComponent(pvSystemPanel);
     }
 
-    void selectCspPrices() {
+    public void selectCspPrices() {
         tabbedPane.setSelectedComponent(cspSystemPanel);
     }
 

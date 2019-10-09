@@ -84,14 +84,14 @@ public abstract class Analysis {
         final int n = storedResults.size();
         if (n > 0) {
             String previousResults = "<table border=1>";
-            previousResults += "<tr bgcolor=#cccccc><td><b>Run</b></td><td><b>Annual Electricity (kWh)</b></td><td><b>Life Span (Year)</b></td>";
+            previousResults += "<tr bgcolor=#cccccc><td><b>Run</b></td><td><b>Annual Electricity (kWh)</b></td><td><b>Lifespan (Year)</b></td>";
             previousResults += "<td><b>ROI (%)</b></td><td><b>Payback Period (Year)</b></td></tr>";
             int m = n < 5 ? 0 : n - 5;
             for (int i = n - 1; i >= m; i--) {
                 previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td>#" + (i + 1) + "</td>";
                 double[] results = storedResults.get(i);
                 for (int j = 0; j < results.length; j++) {
-                    previousResults += "<td>" + Graph.TWO_DECIMALS.format(results[j]) + "</td>";
+                    previousResults += "<td>" + (results[j] > 0 ? "<font color=black>" : "<font color=red><b>") + Graph.TWO_DECIMALS.format(results[j]) + "</font></td>";
                 }
                 previousResults += "</tr>";
             }
@@ -99,7 +99,7 @@ public abstract class Analysis {
             final Object[] options = new Object[]{"OK", "Copy Data"};
             String msg = "<html>The annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.";
             msg += "<br>The payback period is <b>" + Graph.TWO_DECIMALS.format(paybackPeriod) + " years.</b>.";
-            msg += "<br>The return on investment over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.";
+            msg += "<br>The return on investment over " + lifespan + " years is <b>" + (roi > 0 ? "<font color=black>" : "<font color=red>") + Graph.TWO_DECIMALS.format(roi) + "%</font></b>.";
             msg += "<br><hr>Compare with the results from last " + (n - m) + " runs:<br>" + previousResults + "</html>";
             final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
             final JDialog dialog = optionPane.createDialog(parent, "Annual Electricity Output and Return on Investment");
@@ -126,7 +126,8 @@ public abstract class Analysis {
             StringBuilder report = new StringBuilder("<html>");
             report.append("The annual output is <b>" + Graph.TWO_DECIMALS.format(annualOutput) + " kWh</b>.");
             report.append("<br>The payback period is <b>" + Graph.TWO_DECIMALS.format(paybackPeriod) + " years.</b>.");
-            report.append("<br>The return on investment over " + lifespan + " years is <b>" + Graph.TWO_DECIMALS.format(roi) + "%</b>.");
+            report.append("<br>The return on investment over " + lifespan + " years is <b>");
+            report.append((roi > 0 ? "<font color=black>" : "<font color=red>") + Graph.TWO_DECIMALS.format(roi) + "%</font></b>.");
             report.append("</html>");
             JOptionPane.showMessageDialog(parent, report.toString(), "Annual Electricity Output and Return on Investment", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -138,12 +139,12 @@ public abstract class Analysis {
             JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>No previous run.</html>", "Full History", JOptionPane.INFORMATION_MESSAGE);
         } else {
             String previousResults = "<table width=100% border=1><tr bgcolor=#cccccc><td><b><font size=3>Run</b></td><td><b><font size=3>Annual Electricity (kWh)</b></td>";
-            previousResults += "<td><b><font size=3>Life Span (year)</b></td><td><b><font size=3>ROI (%)</b></td><td><b><font size=3>Payback Period (Year)</b></td></tr>";
+            previousResults += "<td><b><font size=3>Lifespan (year)</b></td><td><b><font size=3>ROI (%)</b></td><td><b><font size=3>Payback Period (Year)</b></td></tr>";
             for (int i = n - 1; i >= 0; i--) {
                 previousResults += (i % 2 == 0 ? "<tr bgcolor=#cceecc>" : "<tr bgcolor=#eeccee>") + "<td><font size=3>#" + (i + 1) + "</td>";
                 double[] results = storedResults.get(i);
                 for (int j = 0; j < results.length; j++) {
-                    previousResults += "<td><font size=3>" + Graph.TWO_DECIMALS.format(results[j]) + "</td>";
+                    previousResults += "<td><font size=3>" + (results[j] > 0 ? "<font color=black>" : "<font color=red><b>") + Graph.TWO_DECIMALS.format(results[j]) + "</font></td>";
                 }
                 previousResults += "</tr>";
             }

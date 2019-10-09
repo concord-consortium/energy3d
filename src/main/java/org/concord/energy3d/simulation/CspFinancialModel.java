@@ -53,7 +53,7 @@ public class CspFinancialModel extends FinancialModel {
 
     double calculateROI(double landArea, double numberOfModules, double annualOutput) {
         double upfrontCost = CspProjectCost.getTotalUpFrontCost();
-        double roi = annualOutput * lifespan * kWhSellingPrice;
+        double roi = annualOutput * lifespan * kWhSellingPrice - upfrontCost;
         roi -= landRentalCost * lifespan * landArea;
         roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfModules;
         roi -= loanInterestRate * lifespan * upfrontCost;

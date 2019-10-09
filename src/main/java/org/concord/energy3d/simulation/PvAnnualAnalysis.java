@@ -97,7 +97,7 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
                 final PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
                 final int lifespan = fm.getLifespan();
                 final double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
-                double paybackPeriod = 100.0 / roi * lifespan;
+                double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
                 reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
                 storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
             });

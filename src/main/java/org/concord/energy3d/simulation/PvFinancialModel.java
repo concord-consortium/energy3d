@@ -35,7 +35,7 @@ public class PvFinancialModel extends FinancialModel {
             kWhSellingPrice = 0.1;
         }
         if (lifespan == 0) {
-            lifespan = 20;
+            lifespan = 25;
         }
         if (loanInterestRate == 0) {
             loanInterestRate = 0.05;
@@ -75,7 +75,7 @@ public class PvFinancialModel extends FinancialModel {
 
     double calculateROI(double landArea, double numberOfSolarPanels, double annualOutput) {
         double upfrontCost = PvProjectCost.getTotalUpFrontCost();
-        double roi = annualOutput * lifespan * kWhSellingPrice;
+        double roi = annualOutput * lifespan * kWhSellingPrice - upfrontCost;
         roi -= landRentalCost * lifespan * landArea;
         roi -= (cleaningCost + maintenanceCost) * lifespan * numberOfSolarPanels;
         roi -= loanInterestRate * lifespan * upfrontCost;

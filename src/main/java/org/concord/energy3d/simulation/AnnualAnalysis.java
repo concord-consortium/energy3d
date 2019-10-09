@@ -17,7 +17,9 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.FinancialSettingsDialog;
 import org.concord.energy3d.logger.TimeSeriesLogger;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.ClipImage;
@@ -50,6 +52,24 @@ abstract class AnnualAnalysis extends Analysis {
             public void menuCanceled(final MenuEvent e) {
             }
         });
+
+        if (!(this instanceof EnergyAnnualAnalysis)) {
+            final JMenuItem miFinance = new JMenuItem("Financial Settings...");
+            miFinance.addActionListener(e -> {
+                FinancialSettingsDialog fsd = new FinancialSettingsDialog();
+                switch (Scene.getInstance().getProjectType()) {
+                    case Foundation.TYPE_PV_PROJECT:
+                        fsd.selectPvPrices();
+                        break;
+                    case Foundation.TYPE_CSP_PROJECT:
+                        fsd.selectCspPrices();
+                        break;
+                }
+                fsd.setVisible(true);
+            });
+            menu.add(miFinance);
+            menu.addSeparator();
+        }
 
         final JMenu chartMenu = new JMenu("Chart");
         final ButtonGroup chartGroup = new ButtonGroup();

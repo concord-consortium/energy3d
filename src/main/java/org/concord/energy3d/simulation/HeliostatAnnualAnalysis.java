@@ -96,7 +96,7 @@ public class HeliostatAnnualAnalysis extends AnnualAnalysis {
                 final CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
                 final int lifespan = fm.getLifespan();
                 final double roi = fm.calculateROI(CspProjectCost.getInstance().getTotalArea(), Scene.getInstance().countParts(Mirror.class), annualOutput);
-                double paybackPeriod = 100.0 / roi * lifespan;
+                double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
                 reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
                 storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
             });
