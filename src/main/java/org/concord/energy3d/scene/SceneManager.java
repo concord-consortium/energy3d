@@ -2111,11 +2111,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
                             if (selectedPart.isDrawable()) {
                                 selectedPart.setDrawCompleted(drawCompletedOrg);
                                 if (addPartCommand != null) {
+                                    boolean addSuccess = true;
                                     if (isTooFar(selectedPart)) { // prevent an object to be placed at a very far position
                                         Scene.getInstance().remove(selectedPart, true);
                                         final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
                                         EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
                                                 "Adding " + name + " was not allowed because it was placed too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                                        addSuccess = false;
                                     } else if (selectedPart instanceof Rack) {
                                         Rack rack = (Rack) selectedPart;
                                         if (rack.outOfBound()) {
@@ -2123,8 +2125,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
                                             final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
                                             EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
                                                     "Adding " + name + " was not allowed because it was larger than the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                                            addSuccess = false;
                                         }
-                                    } else {
+                                    }
+                                    if (addSuccess) {
                                         undoManager.addEdit(addPartCommand);
                                         // only when we add a new foundation do we ensure the order of its points (later a foundation can be rotated, altering the order)
                                         if (selectedPart instanceof Foundation) {
