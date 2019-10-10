@@ -54,6 +54,9 @@ class SimulationSettingsDialog extends JDialog {
         });
         rackModelComboBox.setSelectedIndex(s.isRackModelExact() ? 1 : 0);
 
+        final JComboBox<String> calculateRoiComboBox = new JComboBox<>(new String[]{"No", "Yes"});
+        calculateRoiComboBox.setSelectedIndex(s.getCalculateRoi() ? 1 : 0);
+
         final ActionListener okListener = e -> {
             int mirrorNx;
             int mirrorNy;
@@ -97,6 +100,7 @@ class SimulationSettingsDialog extends JDialog {
             s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
             s.setRackCellSize(rackCellSize);
             s.setTimeStep(timeStep);
+            s.setCalculateRoi(calculateRoiComboBox.getSelectedIndex() == 1);
             s.setEdited(true);
             SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
             if (SceneManager.getInstance().getSolarHeatMap()) {
@@ -138,9 +142,14 @@ class SimulationSettingsDialog extends JDialog {
         // choose air mass
         panel.add(new JLabel("Air mass: "));
         panel.add(airMassComboBox);
-        panel.add(new JLabel("Dimensionless"));
+        panel.add(new JLabel());
 
-        SpringUtilities.makeCompactGrid(panel, 6, 3, 8, 8, 8, 8);
+        // choose to calculate ROI or not
+        panel.add(new JLabel("Financial analysis: "));
+        panel.add(calculateRoiComboBox);
+        panel.add(new JLabel());
+
+        SpringUtilities.makeCompactGrid(panel, 7, 3, 8, 8, 8, 8);
 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

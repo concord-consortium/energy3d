@@ -110,6 +110,13 @@ public final class TaskFactory {
             if (EnergyPanel.getInstance().adjustCellSize()) {
                 return;
             }
+            if (Scene.getInstance().getCalculateRoi()) {
+                SceneManager.getInstance().setSelectedPart(null);
+                SceneManager.getTaskManager().update(() -> {
+                    SceneManager.getInstance().refresh();
+                    return null;
+                });
+            }
             final PvAnnualAnalysis a = new PvAnnualAnalysis();
             final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
             if (selectedPart != null) {

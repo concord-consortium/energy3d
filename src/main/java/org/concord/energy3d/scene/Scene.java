@@ -160,6 +160,7 @@ public class Scene implements Serializable {
     private boolean dateFixed;
     private boolean locationFixed;
     private boolean noSnapshotLogging;
+    private boolean calculateRoi;
     private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
 
     /* the following parameters specify the resolution of discretization for a simulation */
@@ -4123,6 +4124,14 @@ public class Scene implements Serializable {
 
     public double getSolarStep() {
         return solarStep;
+    }
+
+    public void setCalculateRoi(boolean calculateRoi) {
+        this.calculateRoi = calculateRoi;
+    }
+
+    public boolean getCalculateRoi() {
+        return calculateRoi;
     }
 
     public void setTimeStep(final int timeStep) {
