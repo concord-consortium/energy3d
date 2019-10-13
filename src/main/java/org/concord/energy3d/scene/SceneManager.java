@@ -2126,6 +2126,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
                                             EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
                                                     "Adding " + name + " was not allowed because it was larger than the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
                                             addSuccess = false;
+                                        } else {
+                                            if (rack.getContainer() instanceof Roof || rack.getContainer() instanceof Wall) {
+                                                rack.setPoleHeight(0.5 / Scene.getInstance().getScale());
+                                                rack.draw();
+                                            }
                                         }
                                     }
                                     if (addSuccess) {
