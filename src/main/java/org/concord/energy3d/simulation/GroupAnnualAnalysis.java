@@ -104,6 +104,11 @@ public class GroupAnnualAnalysis extends AnnualAnalysis {
     }
 
     @Override
+    void runFinancialAnalysis(JDialog parent) {
+
+    }
+
+    @Override
     public void updateGraph() {
         for (final HousePart p : selectedParts) {
             final String customText = p.getLabelCustomText();

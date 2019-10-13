@@ -94,15 +94,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
-import org.concord.energy3d.simulation.CspProjectCost;
-import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
-import org.concord.energy3d.simulation.HeatLoad;
-import org.concord.energy3d.simulation.LocationData;
-import org.concord.energy3d.simulation.MonthlySunshineHours;
-import org.concord.energy3d.simulation.PvProjectCost;
-import org.concord.energy3d.simulation.SolarRadiation;
-import org.concord.energy3d.simulation.Weather;
+import org.concord.energy3d.simulation.*;
 import org.concord.energy3d.speech.Talker;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
@@ -1794,12 +1786,12 @@ public class EnergyPanel extends JPanel {
                     partProperty1Label.setText("  Total Number:");
                     partProperty1TextField.setText("" + numberOfSolarPanels);
                     partProperty1TextField.putClientProperty("tooltip", "Total number of solar panels");
-                    partProperty2Label.setText("  Total Cost:");
-                    partProperty2TextField.setText("$" + TWO_DECIMALS.format(PvProjectCost.getInstance().getTotalCost()));
-                    partProperty2TextField.putClientProperty("tooltip", "Total project cost");
-                    partProperty3Label.setText("  -");
-                    partProperty3TextField.setText("");
-                    partProperty3TextField.putClientProperty("tooltip", null);
+                    partProperty2Label.setText("  Upfront Cost:");
+                    partProperty2TextField.setText("$" + TWO_DECIMALS.format(PvProjectCost.getInstance().getTotalUpFrontCost()));
+                    partProperty2TextField.putClientProperty("tooltip", "Upfront cost of solar panels");
+                    partProperty3Label.setText("  Total Cost over " + Scene.getInstance().getPvFinancialModel().getLifespan() + " Years:");
+                    partProperty3TextField.setText("$" + TWO_DECIMALS.format(PvProjectCost.getInstance().getTotalCost()));
+                    partProperty3TextField.putClientProperty("tooltip", "Total project cost");
                 } else {
                     final int numberOfHeliostats = Scene.getInstance().countParts(Mirror.class);
                     if (numberOfHeliostats > 0) {
@@ -1807,12 +1799,12 @@ public class EnergyPanel extends JPanel {
                         partProperty1Label.setText("  Total Number:");
                         partProperty1TextField.setText("" + numberOfHeliostats);
                         partProperty1TextField.putClientProperty("tooltip", "Total number of heliostats");
-                        partProperty2Label.setText("  Total Cost:");
-                        partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                        partProperty2TextField.putClientProperty("tooltip", "Total project cost");
-                        partProperty3Label.setText("  -");
-                        partProperty3TextField.setText("");
-                        partProperty3TextField.putClientProperty("tooltip", null);
+                        partProperty2Label.setText("  Upfront Cost:");
+                        partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalUpFrontCost()));
+                        partProperty2TextField.putClientProperty("tooltip", "Upfront cost of heliostats");
+                        partProperty3Label.setText("  Total Cost over " + Scene.getInstance().getCspFinancialModel().getLifespan() + " Years:");
+                        partProperty3TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+                        partProperty3TextField.putClientProperty("tooltip", "Total project cost");
                     } else {
                         final int numberOfParabolicTroughs = Scene.getInstance().countParts(ParabolicTrough.class);
                         if (numberOfParabolicTroughs > 0) {
@@ -1820,12 +1812,12 @@ public class EnergyPanel extends JPanel {
                             partProperty1Label.setText("  Total Number:");
                             partProperty1TextField.setText("" + numberOfParabolicTroughs);
                             partProperty1TextField.putClientProperty("tooltip", "Total number of parabolic troughs");
-                            partProperty2Label.setText("  Total Cost:");
-                            partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                            partProperty2TextField.putClientProperty("tooltip", "Total project cost");
-                            partProperty3Label.setText("  -");
-                            partProperty3TextField.setText("");
-                            partProperty3TextField.putClientProperty("tooltip", null);
+                            partProperty2Label.setText("  Upfront Cost:");
+                            partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalUpFrontCost()));
+                            partProperty2TextField.putClientProperty("tooltip", "Upfront cost of parabolic troughs");
+                            partProperty3Label.setText("  Total Cost over " + Scene.getInstance().getCspFinancialModel().getLifespan() + " Years:");
+                            partProperty3TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+                            partProperty3TextField.putClientProperty("tooltip", "Total project cost");
                         } else {
                             final int numberOfParabolicDishes = Scene.getInstance().countParts(ParabolicDish.class);
                             if (numberOfParabolicDishes > 0) {
@@ -1833,12 +1825,12 @@ public class EnergyPanel extends JPanel {
                                 partProperty1Label.setText("  Total Number:");
                                 partProperty1TextField.setText("" + numberOfParabolicDishes);
                                 partProperty1TextField.putClientProperty("tooltip", "Total number of parabolic dishes");
-                                partProperty2Label.setText("  Total Cost:");
-                                partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                                partProperty2TextField.putClientProperty("tooltip", "Total project cost");
-                                partProperty3Label.setText("  -");
-                                partProperty3TextField.setText("");
-                                partProperty3TextField.putClientProperty("tooltip", null);
+                                partProperty2Label.setText("  Upfront Cost:");
+                                partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalUpFrontCost()));
+                                partProperty2TextField.putClientProperty("tooltip", "Upfront cost of parabolic dishes");
+                                partProperty3Label.setText("  Total Cost over " + Scene.getInstance().getCspFinancialModel().getLifespan() + " Years:");
+                                partProperty3TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+                                partProperty3TextField.putClientProperty("tooltip", "Total project cost");
                             } else {
                                 final int numberOfFresnelReflectors = Scene.getInstance().countParts(FresnelReflector.class);
                                 if (numberOfFresnelReflectors > 0) {
@@ -1846,12 +1838,12 @@ public class EnergyPanel extends JPanel {
                                     partProperty1Label.setText("  Total Number:");
                                     partProperty1TextField.setText("" + numberOfFresnelReflectors);
                                     partProperty1TextField.putClientProperty("tooltip", "Total number of Fresnel reflectors");
-                                    partProperty2Label.setText("  Total Cost:");
-                                    partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-                                    partProperty2TextField.putClientProperty("tooltip", "Total project cost");
-                                    partProperty3Label.setText("  -");
-                                    partProperty3TextField.setText("");
-                                    partProperty3TextField.putClientProperty("tooltip", null);
+                                    partProperty2Label.setText("  Upfront Cost:");
+                                    partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalUpFrontCost()));
+                                    partProperty2TextField.putClientProperty("tooltip", "Upfront cost of Fresnel reflectors");
+                                    partProperty3Label.setText("  Total Cost over " + Scene.getInstance().getCspFinancialModel().getLifespan() + " Years:");
+                                    partProperty3TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+                                    partProperty3TextField.putClientProperty("tooltip", "Total project cost");
                                 } else {
                                     final int numberOfNodes = Scene.getInstance().countNodes();
                                     if (numberOfNodes > 0) {

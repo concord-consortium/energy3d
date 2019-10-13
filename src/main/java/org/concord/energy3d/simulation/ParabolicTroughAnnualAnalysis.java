@@ -89,17 +89,22 @@ public class ParabolicTroughAnnualAnalysis extends AnnualAnalysis {
                 if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER) {
                     return; // annual calculation aborted
                 }
-                final double annualOutput = getResult("Solar");
-                final CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
-                final int lifespan = fm.getLifespan();
-                final double roi = fm.calculateROI(CspProjectCost.getInstance().getTotalArea(), Scene.getInstance().countParts(ParabolicTrough.class), annualOutput);
-                double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
-                reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
-                storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
+                runFinancialAnalysis(parent);
             });
             return null;
         });
 
+    }
+
+    @Override
+    void runFinancialAnalysis(JDialog parent) {
+        final double annualOutput = getResult("Solar");
+        final CspFinancialModel fm = Scene.getInstance().getCspFinancialModel();
+        final int lifespan = fm.getLifespan();
+        final double roi = fm.calculateROI(CspProjectCost.getInstance().getTotalArea(), Scene.getInstance().countParts(ParabolicTrough.class), annualOutput);
+        double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
+        reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
+        storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
     }
 
     @Override

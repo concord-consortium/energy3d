@@ -23,9 +23,14 @@ import org.concord.energy3d.util.SpringUtilities;
 public class FinancialSettingsDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
+    private final static DecimalFormat FORMAT = new DecimalFormat("#0.###");
     private final static Color pvBackgroundColor = new Color(169, 223, 191);
     private final static Color cspBackgroundColor = new Color(252, 243, 207);
+
+    private JTabbedPane tabbedPane;
+    private JPanel pvSystemPanel;
+    private JPanel cspSystemPanel;
+    private Runnable runAfterOK;
 
     class PvSystemFinancePanel extends JPanel {
 
@@ -275,10 +280,6 @@ public class FinancialSettingsDialog extends JDialog {
         return l;
     }
 
-    private JTabbedPane tabbedPane;
-    private JPanel pvSystemPanel;
-    private JPanel cspSystemPanel;
-
     public FinancialSettingsDialog() {
 
         super(MainFrame.getInstance(), true);
@@ -495,6 +496,9 @@ public class FinancialSettingsDialog extends JDialog {
             }
 
             FinancialSettingsDialog.this.dispose();
+            if (runAfterOK != null) {
+                runAfterOK.run();
+            }
 
         });
         okButton.setActionCommand("OK");
@@ -531,6 +535,10 @@ public class FinancialSettingsDialog extends JDialog {
 
     public void selectCspPrices() {
         tabbedPane.setSelectedComponent(cspSystemPanel);
+    }
+
+    public void setRunAfterOK(Runnable runAfterOK) {
+        this.runAfterOK = runAfterOK;
     }
 
 }

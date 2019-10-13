@@ -93,16 +93,21 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
                 if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER) {
                     return; // annual calculation aborted
                 }
-                final double annualOutput = getResult("Solar");
-                final PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
-                final int lifespan = fm.getLifespan();
-                final double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
-                double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
-                reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
-                storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
+                runFinancialAnalysis(parent);
             });
             return null;
         });
+    }
+
+    @Override
+    void runFinancialAnalysis(JDialog parent) {
+        final double annualOutput = getResult("Solar");
+        final PvFinancialModel fm = Scene.getInstance().getPvFinancialModel();
+        final int lifespan = fm.getLifespan();
+        final double roi = fm.calculateROI(Scene.getInstance().getTotalFoundationAreas(), Scene.getInstance().countSolarPanels(), annualOutput);
+        double paybackPeriod = roi > -100 ? 100.0 / (roi + 100.0) * lifespan : Double.POSITIVE_INFINITY;
+        reportResults(storedResults, annualOutput, lifespan, roi, paybackPeriod, parent);
+        storedResults.add(new double[]{annualOutput, lifespan, roi, paybackPeriod});
     }
 
     @Override

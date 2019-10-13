@@ -127,6 +127,11 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
     }
 
     @Override
+    void runFinancialAnalysis(JDialog parent) {
+
+    }
+
+    @Override
     public void updateGraph() {
         final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
         if (selectedPart instanceof Foundation) {

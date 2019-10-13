@@ -29,6 +29,8 @@ import org.concord.energy3d.util.ClipImage;
  */
 abstract class AnnualAnalysis extends Analysis {
 
+    abstract void runFinancialAnalysis(JDialog parent);
+
     JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll, final boolean exportStoredResults) {
 
         final JMenuItem miClear = new JMenuItem("Clear Previous Results in Graph");
@@ -64,6 +66,11 @@ abstract class AnnualAnalysis extends Analysis {
                     case Foundation.TYPE_CSP_PROJECT:
                         fsd.selectCspPrices();
                         break;
+                }
+                if (Scene.getInstance().getCalculateRoi() && getResult("Solar") > 0) {
+                    fsd.setRunAfterOK(() -> {
+                        runFinancialAnalysis(dialog);
+                    });
                 }
                 fsd.setVisible(true);
             });
