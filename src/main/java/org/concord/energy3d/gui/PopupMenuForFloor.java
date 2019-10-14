@@ -27,9 +27,9 @@ class PopupMenuForFloor extends PopupMenuFactory {
         if (mouseEvent.isShiftDown()) {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnFloor();
-                Scene.getInstance().setEdited(true);
                 return null;
             });
+            Scene.getInstance().setEdited(true);
             return null;
         }
 
@@ -43,18 +43,22 @@ class PopupMenuForFloor extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().pasteToPickedLocationOnFloor();
+            miPaste.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().pasteToPickedLocationOnFloor();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miClear = new JMenuItem("Clear");
-            miClear.addActionListener(event -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+            miClear.addActionListener(event -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenu typeMenu = new JMenu("Type");
             final ButtonGroup typeGroup = new ButtonGroup();

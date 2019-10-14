@@ -26,9 +26,9 @@ class PopupMenuForRoof extends PopupMenuFactory {
         if (mouseEvent.isShiftDown()) {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnRoof();
-                Scene.getInstance().setEdited(true);
                 return null;
             });
+            Scene.getInstance().setEdited(true);
             return null;
         }
 
@@ -36,18 +36,22 @@ class PopupMenuForRoof extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().pasteToPickedLocationOnRoof();
+            miPaste.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().pasteToPickedLocationOnRoof();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miClear = new JMenuItem("Clear");
-            miClear.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+            miClear.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miOverhang = new JMenuItem("Overhang Length...");
             miOverhang.addActionListener(e -> {

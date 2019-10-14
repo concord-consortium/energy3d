@@ -2861,8 +2861,8 @@ public class MainFrame extends JFrame {
         } else {
             Scene.save(url, true);
         }
-        Scene.getInstance().setEdited(false);
         EventQueue.invokeLater(() -> {
+            Scene.getInstance().setEdited(false);
             updateTitleBar();
             FileChooser.getInstance().rememberFile(file.getAbsolutePath());
         });

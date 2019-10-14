@@ -1016,8 +1016,10 @@ public class MainPanel extends JPanel {
                                         }
                                     }
                                     count++;
-                                    Scene.getInstance().setEdited(true);
-                                    EventQueue.invokeLater(() -> EnergyPanel.getInstance().updateProperties());
+                                    EventQueue.invokeLater(() -> {
+                                        Scene.getInstance().setEdited(true);
+                                        EnergyPanel.getInstance().updateProperties();
+                                    });
                                     return null;
                                 });
                                 final int partCount = Scene.getInstance().getParts().size();

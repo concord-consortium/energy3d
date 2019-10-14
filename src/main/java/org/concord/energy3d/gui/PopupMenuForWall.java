@@ -27,11 +27,13 @@ class PopupMenuForWall extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().pasteToPickedLocationOnWall();
+            miPaste.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().pasteToPickedLocationOnWall();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miClear = new JMenuItem("Clear");
             miClear.addActionListener(e -> {

@@ -1128,7 +1128,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         }
         undoManager.addEdit(c);
         SceneManager.getInstance().refresh();
-        Scene.getInstance().setEdited(true);
+        EventQueue.invokeLater(() -> Scene.getInstance().setEdited(true));
     }
 
     public void setCameraControl(final CameraMode type) {
@@ -1372,7 +1372,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         }
 
         Scene.getInstance().add(drawn, false);
-        Scene.getInstance().setEdited(true);
+        EventQueue.invokeLater(() -> Scene.getInstance().setEdited(true));
         addPartCommand = new AddPartCommand(drawn);
         return drawn;
 
@@ -2124,12 +2124,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
                                             Scene.getInstance().remove(selectedPart, true);
                                             final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
                                             EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                                                    "Adding " + name + " was not allowed because it was larger than the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                                                    "Adding " + name + " was not allowed because it would not be completely inside the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
                                             addSuccess = false;
                                         } else {
                                             if (rack.getContainer() instanceof Roof || rack.getContainer() instanceof Wall) {
                                                 rack.setPoleHeight(0.5 / Scene.getInstance().getScale());
                                                 rack.draw();
+                                            }
+                                        }
+                                    } else if (selectedPart instanceof SolarPanel) {
+                                        SolarPanel panel = (SolarPanel) selectedPart;
+                                        if (panel.outOfBound()) {
+                                            Scene.getInstance().remove(selectedPart, true);
+                                            final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
+                                            EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                                                    "Adding " + name + " was not allowed because it would not be completely inside the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                                            addSuccess = false;
+                                        } else {
+                                            if (panel.getContainer() instanceof Roof || panel.getContainer() instanceof Wall) {
+                                                panel.setPoleHeight(0.5 / Scene.getInstance().getScale());
+                                                panel.draw();
                                             }
                                         }
                                     }

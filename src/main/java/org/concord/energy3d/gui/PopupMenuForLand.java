@@ -36,9 +36,9 @@ class PopupMenuForLand extends PopupMenuFactory {
         if (mouseEvent.isShiftDown()) {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnLand();
-                Scene.getInstance().setEdited(true);
                 return null;
             });
+            Scene.getInstance().setEdited(true);
             return null;
         }
 

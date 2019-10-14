@@ -350,9 +350,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
         if (mouseEvent.isShiftDown()) {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().pasteToPickedLocationOnFoundation();
-                Scene.getInstance().setEdited(true);
                 return null;
             });
+            Scene.getInstance().setEdited(true);
             return null;
         }
 
@@ -385,11 +385,13 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().pasteToPickedLocationOnFoundation();
+            miPaste.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().pasteToPickedLocationOnFoundation();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miCopy = new JMenuItem("Copy");
             miCopy.addActionListener(e -> {
@@ -609,7 +611,6 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 if (selectedPart instanceof Foundation) {
                     ((Foundation) selectedPart).resetPolygon(); // already run in Task Manager thread
-                    EventQueue.invokeLater(() -> Scene.getInstance().setEdited(true));
                     Scene.getInstance().setEdited(true);
                 }
             });

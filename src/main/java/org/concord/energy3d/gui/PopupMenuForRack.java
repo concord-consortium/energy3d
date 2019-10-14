@@ -118,11 +118,13 @@ class PopupMenuForRack extends PopupMenuFactory {
 
             final JMenuItem miPaste = new JMenuItem("Paste");
             miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-            miPaste.addActionListener(e -> SceneManager.getTaskManager().update(() -> {
-                Scene.getInstance().pasteToPickedLocationOnRack();
+            miPaste.addActionListener(e -> {
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().pasteToPickedLocationOnRack();
+                    return null;
+                });
                 Scene.getInstance().setEdited(true);
-                return null;
-            }));
+            });
 
             final JMenuItem miClear = new JMenuItem("Clear");
             miClear.addActionListener(e -> {

@@ -326,6 +326,43 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
         return p4.getZ() < z0;
     }
 
+    private Vector3 getVertex(final int i) {
+        final Vector3 v = new Vector3();
+        BufferUtils.populateFromBuffer(v, mesh.getMeshData().getVertexBuffer(), i);
+        return mesh.getWorldTransform().applyForward(v);
+    }
+
+    public boolean outOfBound() {
+        drawMesh();
+        if (container instanceof Foundation) {
+            final Foundation foundation = (Foundation) container;
+            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3f);
+            for (int i = 0; i < n; i++) {
+                final Vector3 a = getVertex(i);
+                if (a.getZ() < foundation.getHeight() * 1.1) { // left a 10% margin above the foundation
+                    return true;
+                }
+                if (!foundation.containsPoint(a.getX(), a.getY())) {
+                    return true;
+                }
+            }
+        } else if (container instanceof Roof) {
+            final Roof roof = (Roof) container;
+            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3f);
+            boolean init = true;
+            for (int i = 0; i < n; i++) {
+                final Vector3 a = getVertex(i);
+                if (!roof.insideWalls(a.getX(), a.getY(), init)) {
+                    return true;
+                }
+                if (init) {
+                    init = false;
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean onFlatSurface() {
         if (meshLocator != null) { // if this solar panel rests on an imported mesh, treat it differently
             return false;

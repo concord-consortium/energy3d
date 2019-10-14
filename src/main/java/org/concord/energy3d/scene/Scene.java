@@ -512,7 +512,7 @@ public class Scene implements Serializable {
             }
         }
 
-        setEdited(false);
+        EventQueue.invokeLater(() -> setEdited(false));
         setCopyBuffer(null);
 
         Util.setSilently(energyPanel.getColorMapSlider(), solarContrast);
@@ -603,8 +603,10 @@ public class Scene implements Serializable {
             }
 
             root.updateWorldBound(true);
-            EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
-            setEdited(true);
+            EventQueue.invokeLater(() -> {
+                MainPanel.getInstance().getEnergyButton().setSelected(false);
+                setEdited(true);
+            });
         } else {
             JOptionPane.showMessageDialog(MainFrame.getInstance(), "URL doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -634,7 +636,7 @@ public class Scene implements Serializable {
         if (success) {
             SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand(foundation));
         }
-        setEdited(true);
+        EventQueue.invokeLater(() -> setEdited(true));
     }
 
     public void exportObj(final File file) {
@@ -1227,9 +1229,31 @@ public class Scene implements Serializable {
             }
         }
         add(c, true);
-        copyBuffer = c;
-        SceneManager.getInstance().setSelectedPart(c);
-        EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
+        boolean addSuccess = true;
+        if (c instanceof Rack) {
+            Rack rack = (Rack) c;
+            if (rack.outOfBound()) {
+                final String name = rack.getClass().getSimpleName() + " (" + rack.getId() + ")";
+                EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        "Pasting " + name + " was not allowed because it would not be completely inside the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                addSuccess = false;
+            }
+        } else if (c instanceof SolarPanel) {
+            SolarPanel panel = (SolarPanel) c;
+            if (panel.outOfBound()) {
+                final String name = panel.getClass().getSimpleName() + " (" + panel.getId() + ")";
+                EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        "Pasting " + name + " was not allowed because it would not be completely inside the underlying surface.", "Illegal position", JOptionPane.WARNING_MESSAGE));
+                addSuccess = false;
+            }
+        }
+        if (addSuccess) {
+            copyBuffer = c;
+            SceneManager.getInstance().setSelectedPart(c);
+            EventQueue.invokeLater(() -> SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c)));
+        } else {
+            Scene.getInstance().remove(c, true);
+        }
     }
 
     public void pasteToPickedLocationOnFloor() {

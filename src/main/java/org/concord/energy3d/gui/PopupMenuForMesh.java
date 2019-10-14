@@ -158,7 +158,10 @@ class PopupMenuForMesh extends PopupMenuFactory {
                     final Foundation f = (Foundation) selectedPart;
                     final Mesh m = f.getSelectedMesh();
                     if (m != null) {
-                        Scene.getInstance().pasteToPickedLocationOnMesh(m);
+                        SceneManager.getTaskManager().update(() -> {
+                            Scene.getInstance().pasteToPickedLocationOnMesh(m);
+                            return null;
+                        });
                         Scene.getInstance().setEdited(true);
                         updateAfterEdit();
                     }

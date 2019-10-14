@@ -301,7 +301,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
         drawMesh();
         if (container instanceof Foundation) {
             final Foundation foundation = (Foundation) container;
-            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3f);
             for (int i = 0; i < n; i++) {
                 final Vector3 a = getVertex(i);
                 if (a.getZ() < foundation.getHeight() * 1.1) { // left a 10% margin above the foundation
@@ -313,7 +313,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
             }
         } else if (container instanceof Roof) {
             final Roof roof = (Roof) container;
-            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+            final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3f);
             boolean init = true;
             for (int i = 0; i < n; i++) {
                 final Vector3 a = getVertex(i);

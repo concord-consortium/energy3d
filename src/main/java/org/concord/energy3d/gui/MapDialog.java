@@ -299,9 +299,9 @@ class MapDialog extends JDialog {
             SceneManager.getTaskManager().update(() -> {
                 Scene.getInstance().setGroundImage(mapImage, getScale() * (2 * extent + 1));
                 Scene.getInstance().setGroundImageEarthView(true);
-                Scene.getInstance().setEdited(true);
                 return null;
             });
+            Scene.getInstance().setEdited(true);
             final String closestCity = LocationData.getInstance().getClosestCity(lng, lat);
             if (closestCity != null) {
                 EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
