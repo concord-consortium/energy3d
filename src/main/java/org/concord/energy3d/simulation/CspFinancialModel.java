@@ -25,15 +25,6 @@ public class CspFinancialModel extends FinancialModel {
         if (lifespan == 0) {
             lifespan = 50;
         }
-        if (loanInterestRate == 0) {
-            loanInterestRate = 0.05;
-        }
-        if (cleaningCost == 0) {
-            cleaningCost = 5;
-        }
-        if (maintenanceCost == 0) {
-            maintenanceCost = 1;
-        }
         if (heliostatUnitCost == 0) {
             heliostatUnitCost = 100;
         }

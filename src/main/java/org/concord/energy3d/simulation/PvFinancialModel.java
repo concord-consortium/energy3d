@@ -37,23 +37,14 @@ public class PvFinancialModel extends FinancialModel {
         if (lifespan == 0) {
             lifespan = 25;
         }
-        if (loanInterestRate == 0) {
-            loanInterestRate = 0.05;
-        }
         if (customSolarPanelCost == 0) {
-            customSolarPanelCost = 1000;
-        }
-        if (cleaningCost == 0) {
-            cleaningCost = 2;
-        }
-        if (maintenanceCost == 0) {
-            maintenanceCost = 1;
+            customSolarPanelCost = 500;
         }
         if (solarPanelRackBaseCost == 0) {
             solarPanelRackBaseCost = 20;
         }
         if (solarPanelRackHeightCost == 0) {
-            solarPanelRackHeightCost = 20;
+            solarPanelRackHeightCost = 10;
         }
         if (solarPanelHsatCost == 0) {
             solarPanelHsatCost = 10;

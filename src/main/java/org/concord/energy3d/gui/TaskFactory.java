@@ -18,6 +18,7 @@ import org.concord.energy3d.simulation.*;
 /**
  * @author Charles Xie
  */
+
 public final class TaskFactory {
 
     public static void run(final String taskName) {
@@ -30,15 +31,15 @@ public final class TaskFactory {
         } else if (taskName.startsWith("Annual Sensor Data")) {
             annualSensorData();
         } else if (taskName.startsWith("Daily Analysis for Group")) {
-            TaskFactory.dailyAnalysisForGroup(taskName);
+            dailyAnalysisForGroup(taskName);
         } else if (taskName.startsWith("Annual Analysis for Group")) {
-            TaskFactory.annualAnalysisForGroup(taskName);
+            annualAnalysisForGroup(taskName);
         } else if (taskName.startsWith("Solar Panel Tilt Angle Optimizer")) {
-            TaskFactory.solarPanelTiltAngleOptimizer(taskName);
+            solarPanelTiltAngleOptimizer(taskName);
         } else if (taskName.startsWith("Solar Panel Array Optimizer")) {
-            TaskFactory.solarPanelArrayOptimizer(taskName);
+            solarPanelArrayOptimizer(taskName);
         } else if (taskName.startsWith("Solar Panel Array Layout Manager")) {
-            TaskFactory.solarPanelArrayLayoutManager(taskName);
+            solarPanelArrayLayoutManager(taskName);
         }
     }
 
