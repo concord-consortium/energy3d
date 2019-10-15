@@ -1359,6 +1359,7 @@ public class MainFrame extends JFrame {
             addModel(complexMenu, "Colonial with Front Porch", "templates/example-colonial-front-porch.ng3");
             addModel(complexMenu, "L-Shaped Colonial", "templates/example-colonial-l-shaped.ng3");
             addModel(complexMenu, "Dutch Colonial with Front Porch", "templates/example-dutch-colonial.ng3");
+            addModel(complexMenu, "German Pub", "templates/example-german.ng3");
             addModel(complexMenu, "Federal", "templates/example-federal.ng3");
             addModel(complexMenu, "Victorian", "templates/example-victorian.ng3");
             addModel(complexMenu, "Shingle", "templates/example-shingle.ng3");
@@ -1397,6 +1398,7 @@ public class MainFrame extends JFrame {
             examplesMenu.add(cspSolarMenu);
             final JMenu miscMenu = new JMenu("Miscellaneous");
             examplesMenu.add(miscMenu);
+            addModel(miscMenu, "Mosque", "templates/mosque-template.ng3");
             addModel(miscMenu, "Temple", "templates/temple-template.ng3");
             addModel(miscMenu, "Tibetan Temple", "templates/tibetan-temple-template.ng3");
             addModel(miscMenu, "Church 1", "templates/church-template-1.ng3");
