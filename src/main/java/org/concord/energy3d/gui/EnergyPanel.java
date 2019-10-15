@@ -522,18 +522,34 @@ public class EnergyPanel extends JPanel {
                         popupMenu.show(e.getComponent(), 0, 0);
                     }
                 } else {
-                    if (Util.isRightClick(e) && e.getComponent() == partProperty1TextField) { // convenience tool for copying data for virtual solar grid
+                    if (Util.isRightClick(e)) {
                         switch (Scene.getInstance().getProjectType()) {
                             case Foundation.TYPE_PV_PROJECT:
-                                final JPopupMenu popupMenu = new JPopupMenu();
-                                final JMenuItem mi = new JMenuItem("\"module_number\": " + Scene.getInstance().countSolarPanels());
-                                mi.addActionListener(event -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(mi.getText()), null));
-                                popupMenu.add(mi);
-                                popupMenu.pack();
-                                popupMenu.show(e.getComponent(), 0, 0);
+                                if (e.getComponent() == partProperty1TextField) { // convenience tool for copying data for virtual solar grid
+                                    final JPopupMenu popupMenu = new JPopupMenu();
+                                    final JMenuItem mi = new JMenuItem("\"module_number\": " + Scene.getInstance().countSolarPanels());
+                                    mi.addActionListener(event -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(mi.getText()), null));
+                                    popupMenu.add(mi);
+                                    popupMenu.pack();
+                                    popupMenu.show(e.getComponent(), 0, 0);
+                                } else if (e.getComponent() == partProperty3TextField) { // open up cost breakdown
+                                    final JPopupMenu popupMenu = new JPopupMenu();
+                                    final JMenuItem mi = new JMenuItem("Cost Breakdown...");
+                                    mi.addActionListener(event -> PvProjectCost.getInstance().showGraph());
+                                    popupMenu.add(mi);
+                                    popupMenu.pack();
+                                    popupMenu.show(e.getComponent(), 0, 0);
+                                }
                                 break;
                             case Foundation.TYPE_CSP_PROJECT:
-                                // TODO
+                                if (e.getComponent() == partProperty3TextField) { // open up cost breakdown
+                                    final JPopupMenu popupMenu = new JPopupMenu();
+                                    final JMenuItem mi = new JMenuItem("Cost Breakdown...");
+                                    mi.addActionListener(event -> CspProjectCost.getInstance().showGraph());
+                                    popupMenu.add(mi);
+                                    popupMenu.pack();
+                                    popupMenu.show(e.getComponent(), 0, 0);
+                                }
                                 break;
                         }
                     }

@@ -1570,10 +1570,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
                             ok = false;
                         }
                         if (ok) {
-                            if (lx1 < 1 || lx1 > 1000) {
-                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be witin 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
-                            } else if (ly1 < 1 || ly1 > 1000) {
-                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be within 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                            if (lx1 < 0.1 || lx1 > 1000) {
+                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be witin 0.1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                            } else if (ly1 < 0.1 || ly1 > 1000) {
+                                JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be within 0.1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                             } else if (lz1 < 0.01 || lz1 > 100) {
                                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be within 0.01 and 100 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                             } else {

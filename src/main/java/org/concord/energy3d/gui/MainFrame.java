@@ -1349,6 +1349,7 @@ public class MainFrame extends JFrame {
             addModel(simpleMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
             addModel(simpleMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
             addModel(simpleMenu, "Shed Roof", "templates/shed-roof-template.ng3");
+            addModel(simpleMenu, "Square Tower", "templates/example-square-tower.ng3");
             final JMenu complexMenu = new JMenu("Complex Buildings");
             examplesMenu.add(complexMenu);
             addModel(complexMenu, "Cape Cod with Front Porch", "templates/example-cape-cod-front-porch.ng3");
@@ -1364,6 +1365,20 @@ public class MainFrame extends JFrame {
             addModel(complexMenu, "Sunroom", "templates/example-sunroom.ng3");
             addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
             addModel(complexMenu, "Santa Fe Style House", "templates/example-santa-fe.ng3");
+            addModel(complexMenu, "Courtyard House", "templates/example-courtyard-house.ng3");
+            addModel(complexMenu, "Hotel Building", "templates/example-hotel.ng3");
+            addModel(complexMenu, "Hospital Building", "templates/example-hospital.ng3");
+            addModel(complexMenu, "Modern House 1", "templates/example-modern-house-1.ng3");
+            addModel(complexMenu, "Modern House 2", "templates/example-modern-house-2.ng3");
+            addModel(complexMenu, "Campus 1", "templates/example-campus-1.ng3");
+            addModel(complexMenu, "Mansion 1", "templates/example-mansion-1.ng3");
+            final JMenu famousMenu = new JMenu("Famous Buildings");
+            examplesMenu.add(famousMenu);
+            addModel(famousMenu, "White House", "templates/white-house.ng3");
+            addModel(famousMenu, "Library of Congress", "templates/library-of-congress.ng3");
+            addModel(famousMenu, "Empire State Building", "templates/empire-state-building.ng3");
+            addModel(famousMenu, "One World Trade Center", "templates/one-world-trade-center.ng3");
+            addModel(famousMenu, "Willis Tower", "templates/willis-tower.ng3");
             final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
             addModel(pvSolarMenu, "Solar Canopy: Wavy Top", "templates/example-solar-canopy-wavy-top.ng3");
             addModel(pvSolarMenu, "Solar Canopy: Curvy Top", "templates/example-solar-canopy-curvy-top.ng3");
@@ -1386,13 +1401,15 @@ public class MainFrame extends JFrame {
             addModel(miscMenu, "Tibetan Temple", "templates/tibetan-temple-template.ng3");
             addModel(miscMenu, "Church 1", "templates/church-template-1.ng3");
             addModel(miscMenu, "Church 2", "templates/church-template-2.ng3");
-            addModel(miscMenu, "Church 3", "templates/cathedral-template.ng3");
+            addModel(miscMenu, "Church 3", "templates/church-template-3.ng3");
+            addModel(miscMenu, "Cathedral Church", "templates/cathedral-template.ng3");
             addModel(miscMenu, "Mexican Church", "templates/mexican-church-template.ng3");
             addModel(miscMenu, "Chinese Tower", "templates/chinese-tower-template.ng3");
             addModel(miscMenu, "Dome", "templates/dome-template.ng3");
             addModel(miscMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
             addModel(miscMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
             addModel(miscMenu, "Stadium", "templates/stadium-template.ng3");
+            addModel(miscMenu, "Amphitheatre", "templates/amphitheatre-template.ng3");
         }
         return examplesMenu;
     }

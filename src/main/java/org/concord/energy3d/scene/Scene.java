@@ -512,7 +512,6 @@ public class Scene implements Serializable {
             }
         }
 
-        EventQueue.invokeLater(() -> setEdited(false));
         setCopyBuffer(null);
 
         Util.setSilently(energyPanel.getColorMapSlider(), solarContrast);
@@ -524,6 +523,7 @@ public class Scene implements Serializable {
             MainPanel.getInstance().getEnergyButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
             SceneManager.getInstance().getUndoManager().discardAllEdits();
             MainApplication.getEventLog().clear();
+            setEdited(false);
         });
 
     }
