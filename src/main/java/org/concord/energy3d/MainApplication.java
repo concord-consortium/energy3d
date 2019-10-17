@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-    public static final String VERSION = "8.7.0";
+    public static final String VERSION = "8.7.2";
     private static Thread sceneManagerThread;
     public static boolean appDirectoryWritable = true;
     public static boolean isMacOpeningFile;

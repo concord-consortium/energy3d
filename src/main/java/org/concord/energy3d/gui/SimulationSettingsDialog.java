@@ -19,6 +19,7 @@ class SimulationSettingsDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final static DecimalFormat FORMAT2 = new DecimalFormat("##.##");
+    private JTextField cellSizeTextField;
 
     SimulationSettingsDialog() {
 
@@ -35,11 +36,12 @@ class SimulationSettingsDialog extends JDialog {
         final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
         final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
         final JTextField parabolicDishNTextField = new JTextField(s.getParabolicDishN() + "", 6);
-        final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
-        final JLabel rackCellSizeLabelLeft = new JLabel("Rack grid cell: ");
+        final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(s.getRackCellSize()));
+        final JLabel rackCellSizeLabelLeft = new JLabel("Rack cell size: ");
         final JLabel rackCellSizeLabelRight = new JLabel("Meters");
         final JLabel rackModelLabelRight = new JLabel("Fast but inaccurate");
-        final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
+        final JTextField timeStepTextField = new JTextField(FORMAT2.format(s.getTimeStep()));
+        cellSizeTextField = new JTextField(FORMAT2.format(s.getSolarStep() * s.getScale()));
 
         final JComboBox<String> airMassComboBox = new JComboBox<>(new String[]{"None", "Kasten-Young", "Sphere Model"});
         airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
@@ -62,36 +64,43 @@ class SimulationSettingsDialog extends JDialog {
             int mirrorNy;
             int parabolicDishN;
             double rackCellSize;
+            double cellSize;
             int timeStep;
             try {
                 mirrorNx = Integer.parseInt(mirrorNxTextField.getText());
                 mirrorNy = Integer.parseInt(mirrorNyTextField.getText());
                 parabolicDishN = Integer.parseInt(parabolicDishNTextField.getText());
                 rackCellSize = Double.parseDouble(rackCellSizeTextField.getText());
+                cellSize = Double.parseDouble(cellSizeTextField.getText());
                 timeStep = (int) Double.parseDouble(timeStepTextField.getText());
             } catch (final NumberFormatException err) {
                 err.printStackTrace();
-                JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // range check
+            if (cellSize < 0.01 || cellSize > 100) {
+                JOptionPane.showMessageDialog(this, "Cell size must be in 0.01-100 meters (with larger sizes for larger areas).",
+                        "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // power of two check
             if (!Util.isPowerOfTwo(mirrorNx) || !Util.isPowerOfTwo(mirrorNy)) {
-                JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be power of two.",
+                JOptionPane.showMessageDialog(this, "Number of mirror grid cells in x or y direction must be power of two.",
                         "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // range check
             if (timeStep < 5 || timeStep > 60) {
-                JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (rackCellSize < 0.5 || rackCellSize > 50) {
-                JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "The grid cell size of a rack must be in 0.5-50 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "The grid cell size of a rack must be in 0.5-50 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (mirrorNx < 2 || mirrorNy < 2 || parabolicDishN < 2) {
-                JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be at least two.",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Number of mirror grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             s.setMirrorNx(mirrorNx);
@@ -100,6 +109,7 @@ class SimulationSettingsDialog extends JDialog {
             s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
             s.setRackCellSize(rackCellSize);
             s.setTimeStep(timeStep);
+            s.setSolarStep(cellSize / s.getScale());
             s.setCalculateRoi(calculateRoiComboBox.getSelectedIndex() == 1);
             s.setEdited(true);
             SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
@@ -108,6 +118,27 @@ class SimulationSettingsDialog extends JDialog {
             }
             SimulationSettingsDialog.this.dispose();
         };
+
+        // set the grid size ("solar step")
+        panel.add(new JLabel("Cell size: "));
+        panel.add(cellSizeTextField);
+        panel.add(new JLabel("Meter"));
+
+        // set the time step
+        panel.add(new JLabel("Time step: "));
+        panel.add(timeStepTextField);
+        timeStepTextField.setColumns(6);
+        panel.add(new JLabel("Minutes"));
+
+        // select the model for racks
+        panel.add(new JLabel("Solar panel rack model:"));
+        panel.add(rackModelComboBox);
+        panel.add(rackModelLabelRight);
+
+        // set number of grid points for a solar rack, used in both heat map generation and energy calculation
+        panel.add(rackCellSizeLabelLeft);
+        panel.add(rackCellSizeTextField);
+        panel.add(rackCellSizeLabelRight);
 
         // set number of grid points for a mirror, used in both heat map generation and energy calculation
         panel.add(new JLabel("Heliostat mirror mesh: "));
@@ -123,22 +154,6 @@ class SimulationSettingsDialog extends JDialog {
         panel.add(parabolicDishNTextField);
         panel.add(new JLabel("Must be power of 2"));
 
-        // select the model for racks
-        panel.add(new JLabel("Solar panel rack model:"));
-        panel.add(rackModelComboBox);
-        panel.add(rackModelLabelRight);
-
-        // set number of grid points for a solar rack, used in both heat map generation and energy calculation
-        panel.add(rackCellSizeLabelLeft);
-        panel.add(rackCellSizeTextField);
-        panel.add(rackCellSizeLabelRight);
-
-        // set the time step
-        panel.add(new JLabel("Time step: "));
-        panel.add(timeStepTextField);
-        timeStepTextField.setColumns(6);
-        panel.add(new JLabel("Minutes"));
-
         // choose air mass
         panel.add(new JLabel("Air mass: "));
         panel.add(airMassComboBox);
@@ -149,7 +164,7 @@ class SimulationSettingsDialog extends JDialog {
         panel.add(calculateRoiComboBox);
         panel.add(new JLabel());
 
-        SpringUtilities.makeCompactGrid(panel, 7, 3, 8, 8, 8, 8);
+        SpringUtilities.makeCompactGrid(panel, 8, 3, 8, 8, 8, 8);
 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -169,6 +184,10 @@ class SimulationSettingsDialog extends JDialog {
         pack();
         setLocationRelativeTo(MainFrame.getInstance());
 
+    }
+
+    JTextField getCellSizeField() {
+        return cellSizeTextField;
     }
 
 }

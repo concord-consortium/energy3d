@@ -932,12 +932,14 @@ public class EnergyPanel extends JPanel {
         final int maxCells = 100000; // should we make this dependent of project type?
         if (cellCount > maxCells) {
             final Object[] options = new Object[]{"OK, adjust it!", "No, just go with it!"};
-            final int x = JOptionPane.showOptionDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            final int x = JOptionPane.showOptionDialog(MainFrame.getInstance(),
+                    "<html>The cell size (" + cellSize + "m) of the computational grid is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>",
+                    "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
             if (x == JOptionPane.YES_OPTION) {
-                final VisualizationSettingsDialog v = new VisualizationSettingsDialog();
-                v.getCellSizeField().selectAll();
-                v.getCellSizeField().requestFocusInWindow();
-                v.setVisible(true);
+                final SimulationSettingsDialog simulationSettingsDialog = new SimulationSettingsDialog();
+                simulationSettingsDialog.getCellSizeField().selectAll();
+                simulationSettingsDialog.getCellSizeField().requestFocusInWindow();
+                simulationSettingsDialog.setVisible(true);
                 return true;
             } else if (x == -1) {
                 return true;

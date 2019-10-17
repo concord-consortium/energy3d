@@ -26,7 +26,6 @@ class VisualizationSettingsDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
-    private JTextField cellSizeTextField;
 
     VisualizationSettingsDialog() {
 
@@ -44,12 +43,10 @@ class VisualizationSettingsDialog extends JDialog {
         final JTextField solarPanelNyTextField = new JTextField(s.getSolarPanelNy() + "", 6);
         final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
         final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
-        cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getScale()));
-        final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
-        final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getScale()));
+        final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(s.getHeatVectorLength()));
+        final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(s.getHeatVectorGridSize() * s.getScale()));
 
         final ActionListener okListener = e -> {
-            double cellSize;
             double heatVectorLength;
             double heatVectorGridSize;
             int solarPanelNx;
@@ -57,7 +54,6 @@ class VisualizationSettingsDialog extends JDialog {
             int rackNx;
             int rackNy;
             try {
-                cellSize = Double.parseDouble(cellSizeTextField.getText());
                 heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
                 heatVectorGridSize = Double.parseDouble(heatVectorGridSizeTextField.getText());
                 solarPanelNx = Integer.parseInt(solarPanelNxTextField.getText());
@@ -66,63 +62,50 @@ class VisualizationSettingsDialog extends JDialog {
                 rackNy = Integer.parseInt(rackNyTextField.getText());
             } catch (final NumberFormatException err) {
                 err.printStackTrace();
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Invalid input: " + err.getMessage(),
+                JOptionPane.showMessageDialog(this, "Invalid input: " + err.getMessage(),
                         "Invalid Input", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            // range check
-            if (cellSize < 0.01 || cellSize > 100) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.01-100 meters (with larger sizes for larger areas).",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (heatVectorLength < 100) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Heat arrow length must be greater than 100.",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Heat arrow length must be greater than 100.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (heatVectorGridSize < 0.4) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Heat arrow grid size must not be less than 0.4 m.",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Heat arrow grid size must not be less than 0.4 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (solarPanelNx < 2 || solarPanelNy < 2) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar panel grid cells in x or y direction must be at least two.",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Number of solar panel grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (!Util.isPowerOfTwo(solarPanelNx) || !Util.isPowerOfTwo(solarPanelNy)) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar panel grid cells in x or y direction must be power of two.",
-                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Number of solar panel grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (rackNx < 2 || rackNy < 2) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be at least two.",
-                        "Range Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Number of solar rack grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (!Util.isPowerOfTwo(rackNx) || !Util.isPowerOfTwo(rackNy)) {
-                JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be power of two.",
-                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Number of solar rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            s.setSolarStep(cellSize / Scene.getInstance().getScale());
             s.setSolarPanelNx(solarPanelNx);
             s.setSolarPanelNy(solarPanelNy);
             s.setRackNx(rackNx);
             s.setRackNy(rackNy);
             s.setHeatVectorLength(heatVectorLength);
-            s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getScale());
+            s.setHeatFluxGridSize(heatVectorGridSize / s.getScale());
             s.setEdited(true);
             if (SceneManager.getInstance().getSolarHeatMap()) {
                 EnergyPanel.getInstance().updateRadiationHeatMap();
             }
-            VisualizationSettingsDialog.this.dispose();
+            dispose();
         };
 
         /* Solar radiation heat maps */
 
-        JPanel panel = new JPanel(new GridLayout(3, 3, 8, 8));
+        JPanel panel = new JPanel(new GridLayout(2, 3, 8, 8));
         panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8),
                 BorderFactory.createTitledBorder("<html><font size=2><b>Solar Radiation Heat Maps")));
         box.add(panel);
@@ -144,11 +127,6 @@ class VisualizationSettingsDialog extends JDialog {
         p1.add(rackNyTextField);
         panel.add(p1);
         panel.add(new JLabel("Must be power of 2"));
-
-        // set the grid size ("solar step")
-        panel.add(new JLabel(" Cell size for others: "));
-        panel.add(cellSizeTextField);
-        panel.add(new JLabel("Meter"));
 
         /* Heat flux arrows */
 
@@ -185,10 +163,6 @@ class VisualizationSettingsDialog extends JDialog {
         pack();
         setLocationRelativeTo(MainFrame.getInstance());
 
-    }
-
-    JTextField getCellSizeField() {
-        return cellSizeTextField;
     }
 
 }
