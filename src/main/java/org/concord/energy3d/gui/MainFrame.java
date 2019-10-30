@@ -1482,6 +1482,7 @@ public class MainFrame extends JFrame {
             addModel(solarBasicsMenu, "Air Mass", "tutorials/air-mass.ng3");
             addModel(solarBasicsMenu, "Weather Effect", "tutorials/weather-effect.ng3");
             addModel(solarBasicsMenu, "Solar Radiation Pathways", "tutorials/solar-radiation-pathways.ng3");
+            addModel(solarBasicsMenu, "Optimize It", "tutorials/optimize-it.ng3");
             solarBasicsMenu.addSeparator();
             addModel(solarBasicsMenu, "Solar Box", "tutorials/solar-box.ng3");
             addModel(solarBasicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
@@ -1493,7 +1494,6 @@ public class MainFrame extends JFrame {
             addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
             addModel(solarBasicsMenu, "Nominal Operating Cell Temperature", "tutorials/solar-panel-noct.ng3");
             addModel(solarBasicsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
-            addModel(solarBasicsMenu, "Optimize It", "tutorials/optimize-it.ng3");
 
             tutorialsMenu.addSeparator();
 

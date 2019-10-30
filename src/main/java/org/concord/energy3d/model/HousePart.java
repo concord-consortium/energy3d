@@ -359,7 +359,7 @@ public abstract class HousePart implements Serializable {
         final HousePart previousContainer = container;
         final PickedHousePart picked;
         if (!firstPointInserted || container == null) {
-            picked = SelectUtil.pickPart(x, y, typesOfHousePart);
+            picked = SelectUtil.pickPart(x, y, typesOfHousePart, this instanceof SolarCollector);
         } else {
             picked = SelectUtil.pickPart(x, y, container);
         }
