@@ -153,7 +153,7 @@ public class Tree extends HousePart {
         if (lockEdit) {
             return;
         }
-        final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[]{Foundation.class, Roof.class, Floor.class, null}, false);
+        final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[]{Foundation.class, Roof.class, Floor.class, null}, true);
         if (pick != null) {
             final Vector3 p = pick.getPoint().clone();
             snapToGrid(p, getAbsPoint(0), getGridSize(), false);

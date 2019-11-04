@@ -92,7 +92,7 @@ public class Human extends HousePart {
 
     @Override
     public void setPreviewPoint(final int x, final int y) {
-        final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[]{Foundation.class, Floor.class, Roof.class, null}, false);
+        final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[]{Foundation.class, Floor.class, Roof.class, null}, true);
         if (pick != null) {
             final Vector3 p = pick.getPoint().clone();
             snapToGrid(p, getAbsPoint(0), getGridSize(), false);

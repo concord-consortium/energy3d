@@ -518,10 +518,7 @@ public abstract class HousePart implements Serializable {
         setPreviewPoint(x, y);
         if (container != null || !mustHaveContainer()) {
             firstPointInserted = true;
-            if (drawCompleted) {
-                throw new RuntimeException("Drawing of this object is already completed");
-            }
-
+            // if (drawCompleted) throw new RuntimeException("Drawing of this object is already completed");
             if (points.size() >= numOfEditPoints) {
                 complete();
             } else {
