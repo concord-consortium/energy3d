@@ -552,7 +552,7 @@ public abstract class Graph extends JPanel {
 
         drawLegends(g2);
 
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         if (!"".equals(city)) {
             g2.setColor(Color.BLACK);
             g2.setFont(new Font("Arial", Font.BOLD, popup ? 14 : 8));

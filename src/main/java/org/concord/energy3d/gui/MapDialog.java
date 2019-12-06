@@ -304,7 +304,7 @@ class MapDialog extends JDialog {
             Scene.getInstance().setEdited(true);
             final String closestCity = LocationData.getInstance().getClosestCity(lng, lat);
             if (closestCity != null) {
-                EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
+                EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(closestCity);
             }
             dispose();
         });

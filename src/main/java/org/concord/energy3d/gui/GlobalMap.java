@@ -90,12 +90,12 @@ class GlobalMap extends JDialog {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 if (regionsComboBox.getSelectedItem() != null) {
                     if ("United States".equals(countriesComboBox.getSelectedItem())) {
-                        EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
+                        EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
                     } else {
                         if (regionsComboBox.getSelectedItem().equals(countriesComboBox.getSelectedItem())) {
-                            EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
+                            EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
                         } else {
-                            EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem() + ", " + countriesComboBox.getSelectedItem());
+                            EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(regionsComboBox.getSelectedItem() + ", " + countriesComboBox.getSelectedItem());
                         }
                     }
                 }
@@ -152,7 +152,7 @@ class GlobalMap extends JDialog {
         topPanel.add(regionsLabel);
         topPanel.add(regionsComboBox);
 
-        final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String current = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         if (current != null) {
             if ("".equals(current)) {
                 final ArrayList<String> regionsInCountries = countries.get(countriesComboBox.getSelectedItem());

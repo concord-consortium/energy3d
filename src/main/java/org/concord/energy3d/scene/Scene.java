@@ -401,10 +401,10 @@ public class Scene implements Serializable {
                 latitude = 42;
             }
             energyPanel.setLatitude(latitude); // already silent
-            Util.selectSilently(energyPanel.getCityComboBox(), city);
+            Util.selectSilently(energyPanel.getRegionComboBox(), city);
             final LocationData ld = LocationData.getInstance();
             if (ld.getLatitudes().get(city) != null) {
-                energyPanel.getCityComboBox().setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
+                energyPanel.getRegionComboBox().setToolTipText("<html>Weather data from (" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
             } else {
                 JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
             }
@@ -848,7 +848,7 @@ public class Scene implements Serializable {
         // instance.showFloatingLabels = SceneManager.getInstance().areFloatingLabelsVisible();
         instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
         instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
-        instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        instance.city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
         instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
         instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();

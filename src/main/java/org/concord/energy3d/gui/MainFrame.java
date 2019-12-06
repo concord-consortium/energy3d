@@ -1972,7 +1972,7 @@ public class MainFrame extends JFrame {
             annualEnergyAnalysisMenuItem = new JMenuItem("Annual Energy Analysis for Selected Building...");
             annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F3"));
             annualEnergyAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -1989,7 +1989,7 @@ public class MainFrame extends JFrame {
         if (annualEnergyAnalysisForSelectionMenuItem == null) {
             annualEnergyAnalysisForSelectionMenuItem = new JMenuItem("Annual Energy Analysis for Selected Part...");
             annualEnergyAnalysisForSelectionMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -2015,7 +2015,7 @@ public class MainFrame extends JFrame {
         if (dailyEnergyAnalysisMenuItem == null) {
             dailyEnergyAnalysisMenuItem = new JMenuItem("Daily Energy Analysis for Selected Building...");
             dailyEnergyAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -2036,7 +2036,7 @@ public class MainFrame extends JFrame {
         if (dailyEnergyAnalysisForSelectionMenuItem == null) {
             dailyEnergyAnalysisForSelectionMenuItem = new JMenuItem("Daily Energy Analysis for Selected Part...");
             dailyEnergyAnalysisForSelectionMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -2079,7 +2079,7 @@ public class MainFrame extends JFrame {
         if (dailyHeliostatAnalysisMenuItem == null) {
             dailyHeliostatAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Heliostats...");
             dailyHeliostatAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(Mirror.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
@@ -2119,7 +2119,7 @@ public class MainFrame extends JFrame {
         if (annualHeliostatAnalysisMenuItem == null) {
             annualHeliostatAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Heliostats...");
             annualHeliostatAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(Mirror.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
@@ -2156,7 +2156,7 @@ public class MainFrame extends JFrame {
         if (dailyParabolicTroughAnalysisMenuItem == null) {
             dailyParabolicTroughAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Parabolic Troughs...");
             dailyParabolicTroughAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(ParabolicTrough.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
@@ -2197,7 +2197,7 @@ public class MainFrame extends JFrame {
         if (annualParabolicTroughAnalysisMenuItem == null) {
             annualParabolicTroughAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Parabolic Troughs...");
             annualParabolicTroughAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(ParabolicTrough.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
@@ -2235,7 +2235,7 @@ public class MainFrame extends JFrame {
         if (dailyParabolicDishAnalysisMenuItem == null) {
             dailyParabolicDishAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Parabolic Dishes...");
             dailyParabolicDishAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(ParabolicDish.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
@@ -2276,7 +2276,7 @@ public class MainFrame extends JFrame {
         if (annualParabolicDishAnalysisMenuItem == null) {
             annualParabolicDishAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Parabolic Dishes...");
             annualParabolicDishAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(ParabolicDish.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
@@ -2314,7 +2314,7 @@ public class MainFrame extends JFrame {
         if (dailyFresnelReflectorAnalysisMenuItem == null) {
             dailyFresnelReflectorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Fresnel Reflectors...");
             dailyFresnelReflectorAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(FresnelReflector.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
@@ -2355,7 +2355,7 @@ public class MainFrame extends JFrame {
         if (annualFresnelReflectorAnalysisMenuItem == null) {
             annualFresnelReflectorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Fresnel Reflectors...");
             annualFresnelReflectorAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     int n = Scene.getInstance().countParts(FresnelReflector.class);
                     if (n <= 0) {
                         JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
@@ -2393,7 +2393,7 @@ public class MainFrame extends JFrame {
         if (groupDailyAnalysisMenuItem == null) {
             groupDailyAnalysisMenuItem = new JMenuItem("Daily Analysis for Group...");
             groupDailyAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -2413,7 +2413,7 @@ public class MainFrame extends JFrame {
         if (groupAnnualAnalysisMenuItem == null) {
             groupAnnualAnalysisMenuItem = new JMenuItem("Annual Analysis for Group...");
             groupAnnualAnalysisMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     if (EnergyPanel.getInstance().adjustCellSize()) {
                         return;
                     }
@@ -2583,7 +2583,7 @@ public class MainFrame extends JFrame {
         if (monthlySunshineHoursMenuItem == null) {
             monthlySunshineHoursMenuItem = new JMenuItem("Monthly Sunshine Hours...");
             monthlySunshineHoursMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new MonthlySunshineHours().showDialog();
                 }
             });
@@ -2595,7 +2595,7 @@ public class MainFrame extends JFrame {
         if (annualEnvironmentalTemperatureMenuItem == null) {
             annualEnvironmentalTemperatureMenuItem = new JMenuItem("Annual Environmental Temperature...");
             annualEnvironmentalTemperatureMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new AnnualEnvironmentalTemperature().showDialog();
                 }
             });
@@ -2607,7 +2607,7 @@ public class MainFrame extends JFrame {
         if (dailyEnvironmentalTemperatureMenuItem == null) {
             dailyEnvironmentalTemperatureMenuItem = new JMenuItem("Daily Environmental Temperature...");
             dailyEnvironmentalTemperatureMenuItem.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new DailyEnvironmentalTemperature().showDialog();
                 }
             });

@@ -278,7 +278,7 @@ public class EnergyPanel extends JPanel {
                     Scene.getInstance().setCity(city);
                     SceneManager.getInstance().getUndoManager().addEdit(c);
                     final LocationData ld = LocationData.getInstance();
-                    regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
+                    regionComboBox.setToolTipText("<html>Weather data from (" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
                 }
                 if (SceneManager.getInstance().getSolarHeatMap()) {
                     updateRadiationHeatMap();
@@ -429,14 +429,14 @@ public class EnergyPanel extends JPanel {
                 final JPopupMenu popupMenu = new JPopupMenu();
                 JMenuItem mi = new JMenuItem("Daily Environmental Temperature...");
                 mi.addActionListener(e1 -> {
-                    if (checkCity()) {
+                    if (checkRegion()) {
                         new DailyEnvironmentalTemperature().showDialog();
                     }
                 });
                 popupMenu.add(mi);
                 mi = new JMenuItem("Annual Environmental Temperature...");
                 mi.addActionListener(e2 -> {
-                    if (checkCity()) {
+                    if (checkRegion()) {
                         new AnnualEnvironmentalTemperature().showDialog();
                     }
                 });
@@ -469,7 +469,7 @@ public class EnergyPanel extends JPanel {
                 final JPopupMenu popupMenu = new JPopupMenu();
                 final JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
                 mi.addActionListener(event -> {
-                    if (checkCity()) {
+                    if (checkRegion()) {
                         new MonthlySunshineHours().showDialog();
                     }
                 });
@@ -2052,7 +2052,7 @@ public class EnergyPanel extends JPanel {
         EventQueue.invokeLater(() -> MainPanel.getInstance().getEnergyButton().setSelected(false));
     }
 
-    public JComboBox<String> getCityComboBox() {
+    public JComboBox<String> getRegionComboBox() {
         return regionComboBox;
     }
 
@@ -2150,10 +2150,10 @@ public class EnergyPanel extends JPanel {
         computingStartMillis = t;
     }
 
-    boolean checkCity() {
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-        if ("".equals(city)) {
-            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+    boolean checkRegion() {
+        final String region = (String) regionComboBox.getSelectedItem();
+        if ("".equals(region)) {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a region.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

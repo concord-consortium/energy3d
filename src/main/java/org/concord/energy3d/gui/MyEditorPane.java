@@ -94,7 +94,7 @@ class MyEditorPane {
                             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) { // ad hoc protocols
                                 if (s.startsWith("href=goto://")) {
                                     s = s.substring(12).trim();
-                                    EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s);
+                                    EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(s);
                                     EnergyPanel.getInstance().updateScene();
                                 } else if (s.startsWith("href=date://")) {
                                     s = s.substring(12).trim();
@@ -361,7 +361,7 @@ class MyEditorPane {
         // goto commands
         else if (act.startsWith("goto://")) {
             String s = act.substring(7).trim();
-            EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s);
+            EnergyPanel.getInstance().getRegionComboBox().setSelectedItem(s);
         }
 
         // date commands
@@ -581,15 +581,15 @@ class MyEditorPane {
 
         // environmental temperature graph
         else if ("Daily Environmental Temperature".equals(act)) {
-            if (EnergyPanel.getInstance().checkCity()) {
+            if (EnergyPanel.getInstance().checkRegion()) {
                 new DailyEnvironmentalTemperature().showDialog();
             }
         } else if ("Annual Environmental Temperature".equals(act)) {
-            if (EnergyPanel.getInstance().checkCity()) {
+            if (EnergyPanel.getInstance().checkRegion()) {
                 new AnnualEnvironmentalTemperature().showDialog();
             }
         } else if ("Monthly Sunshine Hours".equals(act)) {
-            if (EnergyPanel.getInstance().checkCity()) {
+            if (EnergyPanel.getInstance().checkRegion()) {
                 new MonthlySunshineHours().showDialog();
             }
         } else {

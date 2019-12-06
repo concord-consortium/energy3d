@@ -55,20 +55,6 @@ public class MainApplication {
         System.exit(0);
     }
 
-    static void testSocket() {
-        final Thread socketThread = new Thread(() -> {
-            try {
-                final MyServerSocket s = new MyServerSocket(null);
-                System.out.println("\r\nRunning Server: " + "Host=" + s.getSocketAddress().getHostAddress() + " Port=" + s.getPort());
-                s.listen();
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-        });
-        socketThread.setPriority(Thread.MIN_PRIORITY);
-        socketThread.start();
-    }
-
     public static void main(final String[] args) {
 
         // testSocket();

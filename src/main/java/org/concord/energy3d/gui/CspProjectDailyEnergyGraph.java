@@ -69,7 +69,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
         graph.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() >= 2 && EnergyPanel.getInstance().checkCity()) {
+                if (e.getClickCount() >= 2 && EnergyPanel.getInstance().checkRegion()) {
                     final Foundation f = SceneManager.getInstance().autoSelectBuilding(true);
                     if (f != null) {
                         if (f.countParts(ParabolicTrough.class) > 0) {

@@ -97,7 +97,7 @@ public class Ground implements Serializable {
 
     // calculate the average floor temperature of a given day using the Kusuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf
     private double getTemperatureOnDay(final int day, final double depth) {
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         final int[] loTemp = LocationData.getInstance().getLowTemperatures().get(city);
         final int[] hiTemp = LocationData.getInstance().getHighTemperatures().get(city);
         final int n = loTemp.length;

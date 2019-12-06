@@ -69,12 +69,12 @@ public class HeatLoad {
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.HOUR_OF_DAY, 0);
 
-        if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals("")) {
+        if (EnergyPanel.getInstance().getRegionComboBox().getSelectedItem().equals("")) {
             return;
         }
 
         final int timeStep = Scene.getInstance().getTimeStep();
-        final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+        final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem());
         // System.out.println(today.get(Calendar.DAY_OF_YEAR) + ", " + outsideTemperatureRange[0] + ", " + outsideTemperatureRange[1]);
         int iMinute;
         for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {

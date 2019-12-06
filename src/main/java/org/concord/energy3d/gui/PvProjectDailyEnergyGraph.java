@@ -64,7 +64,7 @@ public class PvProjectDailyEnergyGraph extends JPanel {
         graph.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() >= 2 && EnergyPanel.getInstance().checkCity()) {
+                if (e.getClickCount() >= 2 && EnergyPanel.getInstance().checkRegion()) {
                     if (SceneManager.getInstance().autoSelectBuilding(true) != null) {
                         final PvDailyAnalysis analysis = new PvDailyAnalysis();
                         analysis.updateGraph();

@@ -40,7 +40,7 @@ class PopupMenuForSky extends PopupMenuFactory {
             final JMenu weatherMenu = new JMenu("Weather");
             JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
             mi.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new MonthlySunshineHours().showDialog();
                 }
             });
@@ -48,7 +48,7 @@ class PopupMenuForSky extends PopupMenuFactory {
 
             mi = new JMenuItem("Annual Environmental Temperature...");
             mi.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new AnnualEnvironmentalTemperature().showDialog();
                 }
             });
@@ -56,7 +56,7 @@ class PopupMenuForSky extends PopupMenuFactory {
 
             mi = new JMenuItem("Daily Environmental Temperature...");
             mi.addActionListener(e -> {
-                if (EnergyPanel.getInstance().checkCity()) {
+                if (EnergyPanel.getInstance().checkRegion()) {
                     new DailyEnvironmentalTemperature().showDialog();
                 }
             });

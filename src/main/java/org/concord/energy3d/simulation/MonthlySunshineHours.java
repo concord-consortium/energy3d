@@ -59,7 +59,7 @@ public class MonthlySunshineHours extends JPanel {
         super();
         setPreferredSize(new Dimension(600, 400));
         setBackground(Color.WHITE);
-        city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         sunshineHours = LocationData.getInstance().getSunshineHours().get(city);
         final Calendar today = (Calendar) Heliodon.getInstance().getCalendar().clone();
         xToday = today.get(Calendar.MONTH) + ((double) (today.get(Calendar.DAY_OF_MONTH) - 1) / (double) today.getActualMaximum(Calendar.DAY_OF_MONTH));

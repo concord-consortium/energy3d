@@ -53,7 +53,7 @@ class MapImageViewWithLocations extends MapImageView {
             ellipse.y = (s.equals("Amundsen-Scott Station") ? height - ellipse.height : y) - ellipse.height * 0.5; // special case, lift south pole up a bit
             g2.draw(ellipse);
         }
-        final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String current = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         if (!current.equals("")) {
             latitude = LocationData.getInstance().getLatitudes().get(current);
             longitude = LocationData.getInstance().getLongitudes().get(current);

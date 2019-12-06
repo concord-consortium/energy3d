@@ -67,7 +67,7 @@ public final class TaskFactory {
 
     static void dailyYieldAnalysisOfSolarPanels() {
 
-        if (EnergyPanel.getInstance().checkCity()) {
+        if (EnergyPanel.getInstance().checkRegion()) {
             int n = Scene.getInstance().countParts(new Class[]{SolarPanel.class, Rack.class});
             if (n <= 0) {
                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
@@ -102,7 +102,7 @@ public final class TaskFactory {
     }
 
     static void annualYieldAnalysisOfSolarPanels() {
-        if (EnergyPanel.getInstance().checkCity()) {
+        if (EnergyPanel.getInstance().checkRegion()) {
             int n = Scene.getInstance().countParts(new Class[]{SolarPanel.class, Rack.class});
             if (n <= 0) {
                 JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
@@ -143,7 +143,7 @@ public final class TaskFactory {
     }
 
     static void dailyAnalysisForGroup(final String taskName) {
-        if (EnergyPanel.getInstance().checkCity()) {
+        if (EnergyPanel.getInstance().checkRegion()) {
             PartGroup g = null;
             final GroupSelector selector = new GroupSelector();
             for (final String s : GroupSelector.types) {
@@ -182,7 +182,7 @@ public final class TaskFactory {
     }
 
     static void annualAnalysisForGroup(final String taskName) {
-        if (EnergyPanel.getInstance().checkCity()) {
+        if (EnergyPanel.getInstance().checkRegion()) {
             PartGroup g = null;
             final GroupSelector selector = new GroupSelector();
             for (final String s : GroupSelector.types) {

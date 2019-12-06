@@ -209,7 +209,7 @@ public class SolarRadiation {
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.HOUR_OF_DAY, 0);
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         dailyAirTemperatures = Weather.computeOutsideTemperature(today, city);
 
         final int timeStep = Scene.getInstance().getTimeStep();
@@ -1696,7 +1696,7 @@ public class SolarRadiation {
                 zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
                 final double cos = Math.cos(zenithAngle);
                 final double r = 708;
-                final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+                final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
                 if (!"".equals(city)) {
                     final double c = LocationData.getInstance().getAltitudes().get(city) / 9000.0;
                     return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
@@ -1717,7 +1717,7 @@ public class SolarRadiation {
     // Reused peak solar radiation value. Must be called once and only once before calling calculateDirectRadiation and calculateDiffusionAndReflection
     private void calculatePeakRadiation(final ReadOnlyVector3 directionTowardSun, final double dayLength) {
         double sunshinePercentage = 1.0;
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         if (!"".equals(city)) {
             final int[] sunshineHours = LocationData.getInstance().getSunshineHours().get(city);
             if (sunshineHours != null) {
@@ -1760,7 +1760,7 @@ public class SolarRadiation {
         }
 
         final Calendar today = Heliodon.getInstance().getCalendar();
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
 
         for (final HousePart part : Scene.getInstance().getParts()) {
@@ -1878,7 +1878,7 @@ public class SolarRadiation {
 
     public void computeEnergyAtHour(final int hour) {
         final Calendar today = Heliodon.getInstance().getCalendar();
-        final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+        final String city = (String) EnergyPanel.getInstance().getRegionComboBox().getSelectedItem();
         final double[] outsideAirTemperatureRange = Weather.computeOutsideTemperature(today, city);
         final double outsideAirTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideAirTemperatureRange[1], outsideAirTemperatureRange[0], hour * 60);
 
