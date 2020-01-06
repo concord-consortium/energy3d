@@ -3,9 +3,12 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import com.ardor3d.ui.text.BMText;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -27,8 +30,9 @@ import com.ardor3d.scenegraph.shape.Cone;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
+import org.concord.energy3d.util.Util;
 
-public class Tree extends HousePart {
+public class Tree extends HousePart implements Labelable {
 
     public final static Plant[] PLANTS = new Plant[]{
             new Plant("Dogwood", false, 6.0, 8.0, 500), //
@@ -45,6 +49,7 @@ public class Tree extends HousePart {
     private transient Node collisionRoot;
     private transient Mesh crown;
     private transient Cylinder trunk;
+    private transient BMText label;
     private int treeType = 0;
     private boolean showPolygons;
     private static Calendar leaf_shed_northern_hemisphere, leaf_grow_northern_hemisphere;
@@ -126,6 +131,12 @@ public class Tree extends HousePart {
         crown.setUserData(new UserData(this));
         trunk.setUserData(new UserData(this));
 
+        label = new BMText("Label", "# " + id, FontManager.getInstance().getPartNumberFont(), BMText.Align.Center, BMText.Justify.Center);
+        Util.initHousePartLabel(label);
+        label.setFontScale(0.5);
+        label.setVisible(false);
+        root.attachChild(label);
+
         updateTextureAndColor();
 
     }
@@ -191,6 +202,33 @@ public class Tree extends HousePart {
         final double scale = 0.2 / Scene.getInstance().getScale();
         billboard.setScale(scale);
         collisionRoot.setScale(scale);
+        drawFloatingLabel();
+    }
+
+    @Override
+    public void updateLabel() {
+        drawFloatingLabel();
+    }
+
+    private void drawFloatingLabel() {
+        String text = "";
+        if (labelCustom && labelCustomText != null) {
+            text += labelCustomText;
+        }
+        if (labelId) {
+            text += (text.equals("") ? "" : "\n") + "#" + id;
+        }
+        if (!text.equals("")) {
+            label.setText(text);
+            label.setTranslation(getAbsCenter().addLocal(0, 0, treeHeight));
+            label.setVisible(true);
+        } else {
+            label.setVisible(false);
+        }
+    }
+
+    public boolean isLabelVisible() {
+        return label.isVisible();
     }
 
     @Override

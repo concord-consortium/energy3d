@@ -6,6 +6,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ChangePlantCommand;
 import org.concord.energy3d.undo.LockEditPointsCommand;
+import org.concord.energy3d.undo.SetTreeLabelCommand;
 import org.concord.energy3d.util.Util;
 
 import javax.swing.*;
@@ -21,7 +22,24 @@ class PopupMenuForTree extends PopupMenuFactory {
 
         if (popupMenuForTree == null) {
 
+            final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+            final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+            final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
             final JCheckBoxMenuItem miPolygon = new JCheckBoxMenuItem("Show Polygon");
+            final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Disable Edit Point");
+
+             popupMenuForTree = createPopupMenu(true, true, () -> {
+                final HousePart p = SceneManager.getInstance().getSelectedPart();
+                if (p instanceof Tree) {
+                    Tree t = (Tree) p;
+                    Util.selectSilently(miPolygon, t.getShowPolygons());
+                    Util.selectSilently(miLock, t.getLockEdit());
+                    Util.selectSilently(miLabelNone, !t.isLabelVisible());
+                    Util.selectSilently(miLabelCustom, t.getLabelCustom());
+                    Util.selectSilently(miLabelId, t.getLabelId());
+                }
+            });
+
             miPolygon.addItemListener(e -> {
                 final HousePart p = SceneManager.getInstance().getSelectedPart();
                 if (p instanceof Tree) {
@@ -30,7 +48,6 @@ class PopupMenuForTree extends PopupMenuFactory {
                 Scene.getInstance().setEdited(true);
             });
 
-            final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Disable Edit Point");
             miLock.addItemListener(e -> {
                 final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
                 if (selectedPart instanceof Tree) {
@@ -46,14 +63,6 @@ class PopupMenuForTree extends PopupMenuFactory {
                         return null;
                     });
                     Scene.getInstance().setEdited(true);
-                }
-            });
-
-            popupMenuForTree = createPopupMenu(true, true, () -> {
-                final HousePart p = SceneManager.getInstance().getSelectedPart();
-                if (p instanceof Tree) {
-                    Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
-                    Util.selectSilently(miLock, p.getLockEdit());
                 }
             });
 
@@ -95,6 +104,65 @@ class PopupMenuForTree extends PopupMenuFactory {
                 }
 
             });
+
+            final JMenu labelMenu = new JMenu("Label");
+            popupMenuForTree.add(labelMenu);
+
+            miLabelNone.addActionListener(e -> {
+                if (miLabelNone.isSelected()) {
+                    final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                    if (selectedPart instanceof Tree) {
+                        final Tree t = (Tree) selectedPart;
+                        final SetTreeLabelCommand c = new SetTreeLabelCommand(t);
+                        t.clearLabels();
+                        SceneManager.getTaskManager().update(() -> {
+                            t.draw();
+                            SceneManager.getInstance().refresh();
+                            return null;
+                        });
+                        SceneManager.getInstance().getUndoManager().addEdit(c);
+                        Scene.getInstance().setEdited(true);
+                    }
+                }
+            });
+            labelMenu.add(miLabelNone);
+
+            miLabelCustom.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Tree) {
+                    final Tree t = (Tree) selectedPart;
+                    final SetTreeLabelCommand c = new SetTreeLabelCommand(t);
+                    t.setLabelCustom(miLabelCustom.isSelected());
+                    if (t.getLabelCustom()) {
+                        t.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", t.getLabelCustomText()));
+                    }
+                    SceneManager.getTaskManager().update(() -> {
+                        t.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
+                }
+            });
+            labelMenu.add(miLabelCustom);
+
+            miLabelId.addActionListener(e -> {
+                final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+                if (selectedPart instanceof Tree) {
+                    final Tree s = (Tree) selectedPart;
+                    final SetTreeLabelCommand c = new SetTreeLabelCommand(s);
+                    s.setLabelId(miLabelId.isSelected());
+                    SceneManager.getTaskManager().update(() -> {
+                        s.draw();
+                        SceneManager.getInstance().refresh();
+                        return null;
+                    });
+                    SceneManager.getInstance().getUndoManager().addEdit(c);
+                    Scene.getInstance().setEdited(true);
+                }
+            });
+            labelMenu.add(miLabelId);
 
         }
 
