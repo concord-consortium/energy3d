@@ -133,7 +133,7 @@ public class Tree extends HousePart implements Labelable {
 
         label = new BMText("Label", "# " + id, FontManager.getInstance().getPartNumberFont(), BMText.Align.Center, BMText.Justify.Center);
         Util.initHousePartLabel(label);
-        label.setFontScale(0.5);
+        label.setFontScale(0.75);
         label.setVisible(false);
         root.attachChild(label);
 

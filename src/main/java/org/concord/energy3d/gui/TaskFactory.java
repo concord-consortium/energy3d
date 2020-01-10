@@ -4,13 +4,11 @@ import java.awt.EventQueue;
 
 import javax.swing.JOptionPane;
 
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import org.concord.energy3d.geneticalgorithms.applications.SolarPanelArrayOptimizer;
 import org.concord.energy3d.geneticalgorithms.applications.SolarPanelTiltAngleOptimizer;
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.PartGroup;
-import org.concord.energy3d.model.Rack;
-import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.*;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.*;
@@ -376,6 +374,100 @@ public final class TaskFactory {
             }
         } catch (final Exception e) {
             JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + options + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // command example: remove tree #1
+    static void removeTree(final String command) {
+        final String[] t = command.split("\\s+");
+        String label = null;
+        if (t.length >= 3) {
+            label = t[2];
+            Tree tree = null;
+            for (Tree i : Scene.getInstance().getAllTrees()) {
+                if (label.equalsIgnoreCase(i.getLabelCustomText())) {
+                    tree = i;
+                    break;
+                }
+            }
+            if (tree != null) {
+                final Tree finalTree = tree;
+                SceneManager.getTaskManager().update(() -> {
+                    Scene.getInstance().remove(finalTree, true);
+                    Scene.getInstance().redrawAll();
+                    return null;
+                });
+                Scene.getInstance().setEdited(true);
+            }
+        } else {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + command + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // command example: add tree pine 1.25 2.50 #1 locked
+    static void addTree(final String command) {
+        try {
+            final String[] t = command.split("\\s+");
+            String type = null;
+            double x, y;
+            String label = null;
+            boolean locked = false;
+            if (t.length >= 5) {
+                type = t[2];
+                x = Float.parseFloat(t[3]);
+                y = Float.parseFloat(t[4]);
+                if (t.length >= 6) {
+                    label = t[5];
+                    if (t.length >= 7) {
+                        locked = t[6].equals("locked");
+                    }
+                }
+                boolean existing = false;
+                final double scale = Scene.getInstance().getScale();
+                for (Tree i : Scene.getInstance().getAllTrees()) {
+                    final ReadOnlyVector3 v = i.getAbsPoint(0);
+                    double dx = v.getX() * scale - x;
+                    double dy = v.getY() * scale - y;
+                    if (dx * dx + dy * dy < 0.01) {
+                        existing = true;
+                        break;
+                    }
+                }
+                if (!existing) {
+                    Tree tree = new Tree();
+                    if (type.equalsIgnoreCase("dogwood")) {
+                        tree.setPlantType(0);
+                    } else if (type.equalsIgnoreCase("elm")) {
+                        tree.setPlantType(1);
+                    } else if (type.equalsIgnoreCase("maple")) {
+                        tree.setPlantType(2);
+                    } else if (type.equalsIgnoreCase("pine")) {
+                        tree.setPlantType(3);
+                    } else if (type.equalsIgnoreCase("oak")) {
+                        tree.setPlantType(4);
+                    } else if (type.equalsIgnoreCase("linden")) {
+                        tree.setPlantType(5);
+                    } else if (type.equalsIgnoreCase("cottonwood")) {
+                        tree.setPlantType(6);
+                    }
+                    tree.setLocation(new Vector3(x / scale, y / scale, 0));
+                    if (label != null) {
+                        tree.setLabelCustom(true);
+                        tree.setLabelCustomText(label);
+                    }
+                    tree.setLockEdit(locked);
+                    SceneManager.getTaskManager().update(() -> {
+                        Scene.getInstance().add(tree, true);
+                        Scene.getInstance().redrawAll();
+                        return null;
+                    });
+                    Scene.getInstance().setEdited(true);
+                }
+            } else {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + command + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (final Exception e) {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + command + "</i>.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

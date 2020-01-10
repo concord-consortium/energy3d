@@ -389,6 +389,16 @@ class MyEditorPane {
             }
         }
 
+        // add tree commands
+        else if (act.startsWith("add tree")) {
+            TaskFactory.addTree(act);
+        }
+
+        // remove tree commands
+        else if (act.startsWith("remove tree")) {
+            TaskFactory.removeTree(act);
+        }
+
         // heliodon commands
         else if ("Heliodon".equals(act)) {
             MainPanel.getInstance().getHeliodonButton().setSelected(buttonModel.isSelected());
